@@ -1,0 +1,82 @@
+import { log } from './util/log';
+import settings, { Property, props, setIsMain } from './settings';
+import data from './data';
+import { load, unload, postInit } from './loader';
+import tabCompletion from './util/tabcompletion';
+setIsMain();
+
+const VERSION = '0.0.1';
+register('command', ...args => {
+  if (!args) args = ['config'];
+
+  const cmdName = args.shift();
+
+  try {
+    switch (cmdName) {
+      case 'help':
+      case '?':
+        [
+          `&9&l-> ChickTils v${VERSION}`,
+          ' &3/chicktils &7(Alias &f/cts, /csm&7)',
+          ' &3/chicktils help &l-> &bshows this help menu &7(Alias &f/chicktils ?&7)',
+          ' &3/chicktils reload &l-> &breloads modules',
+          ' &3/chicktils unload &l-> &bunloads modules',
+          ' &3/chicktils config view [<page>] &l-> &bopens the settings',
+          ' &3/chicktils config edit <name> [<value>] &l-> &bopens the settings',
+          ' &3/chicktils config search <search term> &l-> &bsearches the settings'
+        ].forEach(v => ChatLib.chat(v));
+        break;
+      case 'config':
+        if (args.length === 0) args = ['view'];
+        if (args[0] === 'view') {
+          if (args.length === 1) args[1] = settings.minPage.toString();
+          // how scuffed do you want it: yes
+          const p = new Property('pageHelper', 0, 0, Property.Type.Integer, 1, { min: settings.minPage, max: settings.maxPage });
+          const page = p.parse(args[1]);
+          p.validate(page);
+          settings.display(page);
+        } else if (args[0] === 'search') {
+          settings.displaySearch(args[1] || '');
+        } else if (args[0] === 'edit') {
+          if (args.length === 1) throw 'missing arguments';
+          settings.update(args[1], args.slice(2).join(' '));
+        } else throw 'unknown argument: ' + args[0];
+        break;
+      case 'reload':
+        unload();
+        load();
+        break;
+      case 'unload':
+        unload();
+        break;
+      default:
+        throw 'Unknown command: ' + cmdName;
+    }
+  } catch (e) {
+    log(e.toString());
+    if (settings.isDev) log(e.stack);
+  }
+}).setTabCompletions(tabCompletion({
+  help: [],
+  '?': [],
+  config: {
+    search: [],
+    view: [],
+    edit: Object.values(props).map(p => [p.name, p.type === Property.Type.Option ? p.opts.options : p.type === Property.Type.Toggle ? ['true', 'false'] : []]).reduce((a, [k, v]) => (a[k] = v, a), {})
+  },
+  reload: []
+})).setName('chicktils').setAliases('csm', 'cts');
+
+if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
+  // log('helper mod not found, please copy it from `/ct files -> modules -> chicktils -> chicktilshelper -> build -> libs` to your mod folder');
+  const src = new (Java.type('java.io.File'))('./config/ChatTriggers/modules/chicktils/chicktilshelper/build/libs/chicktilshelper-1.0.jar').toPath();
+  const dst = Java.type('java.nio.file.Paths').get('./mods/chicktilshelper-1.0.jar');
+  Java.type('java.nio.Files').copy(src, dst, Java.type('java.nio.file.StandardCopyOption').REPLACE_EXISTING);
+  const cr = new (Java.type('net.minecraft.crash.CrashReport'))('ChickTils', new (Java.type('java.lang.Throwable'))('need to load helper mod (it has been copied) :D'));
+  Client.getMinecraft().func_71377_b(cr);
+}
+
+// TODO: check for skyblock
+settings.load();
+load();
+postInit();
