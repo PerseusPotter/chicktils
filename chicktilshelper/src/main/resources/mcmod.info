@@ -1,0 +1,16 @@
+[
+{
+  "modid": "csmhelper",
+  "name": "CSM Helper",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Ch1ck3NeedsRNG"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
