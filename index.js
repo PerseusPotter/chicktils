@@ -3,7 +3,47 @@ import settings, { Property, props, setIsMain } from './settings';
 import data from './data';
 import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
+import * as Updater from './updater';
 setIsMain();
+
+let sev;
+function tryUpdate() {
+  const m = Updater.loadMeta();
+  const v = Updater.getVersion(m);
+  if (v === VERSION) return false;
+  const u = Updater.getAssetURL(m);
+  Updater.downloadUpdate(u);
+  const vv = Updater.getCurrVV();
+  const uvv = Updater.getUpdateVV();
+  sev = vv.findIndex((v, i) => v !== uvv[i]);
+  if (sev < 0) return false; // if i fuck up idk
+  ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
+  ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
+  if (sev === 0) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
+  if (sev === 1) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
+  const ans = new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'));
+  const c = Math.max(0, ChatLib.getChatWidth() - Renderer.getStringWidth(ans.getFormattedText())) / 2 / Renderer.getStringWidth(' ');
+  ans.addTextComponent(0, ' '.repeat(~~c));
+  ans.chat();
+}
+register('command', res => {
+  if (sev === undefined) return;
+  if (res === 'accept') {
+    Updater.applyUpdate();
+    if (sev === 0) crashGame('updating !');
+    if (sev === 1) ChatLib.command('ct reload', true);
+    if (sev === 2) loadMod();
+  } else loadMod();
+}).setName('csmupdate');
+function loadMod() {
+  load();
+  postInit();
+}
+
+function crashGame(txt) {
+  const cr = new (Java.type('net.minecraft.crash.CrashReport'))('ChickTils', new (Java.type('java.lang.Throwable'))(txt));
+  Client.getMinecraft().func_71377_b(cr);
+}
 
 const VERSION = '0.0.1';
 register('command', ...args => {
@@ -18,6 +58,7 @@ register('command', ...args => {
         [
           `&9&l-> ChickTils v${VERSION}`,
           ' &3/chicktils &7(Alias &f/cts, /csm&7)',
+          ' &3/chicktils update &l-> &bchecks for updates',
           ' &3/chicktils help &l-> &bshows this help menu &7(Alias &f/chicktils ?&7)',
           ' &3/chicktils reload &l-> &breloads modules',
           ' &3/chicktils unload &l-> &bunloads modules',
@@ -25,6 +66,9 @@ register('command', ...args => {
           ' &3/chicktils config edit <name> [<value>] &l-> &bopens the settings',
           ' &3/chicktils config search <search term> &l-> &bsearches the settings'
         ].forEach(v => ChatLib.chat(v));
+        break;
+      case 'update':
+        tryUpdate();
         break;
       case 'config':
         if (args.length === 0) args = ['view'];
@@ -72,11 +116,10 @@ if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
   const src = new (Java.type('java.io.File'))('./config/ChatTriggers/modules/chicktils/chicktilshelper/build/libs/chicktilshelper-1.0.jar').toPath();
   const dst = Java.type('java.nio.file.Paths').get('./mods/chicktilshelper-1.0.jar');
   Java.type('java.nio.Files').copy(src, dst, Java.type('java.nio.file.StandardCopyOption').REPLACE_EXISTING);
-  const cr = new (Java.type('net.minecraft.crash.CrashReport'))('ChickTils', new (Java.type('java.lang.Throwable'))('need to load helper mod (it has been copied) :D'));
-  Client.getMinecraft().func_71377_b(cr);
+  crashGame('need to load helper mod (it has been copied for you) :D');
 }
 
 // TODO: check for skyblock
 settings.load();
-load();
-postInit();
+if (settings.autoUpdate && tryUpdate()) { }
+else loadMod();
