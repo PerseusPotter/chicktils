@@ -39,3 +39,9 @@ export function colorForNumber(n, max = 1) {
       n > max * 0.25 ? '§6' :
         '§4');
 }
+
+export function centerMessage(msg) {
+  const c = Math.max(0, ChatLib.getChatWidth() - Renderer.getStringWidth(msg.getFormattedText())) / 2 / Renderer.getStringWidth(' ');
+  msg.addTextComponent(0, ' '.repeat(~~c));
+  return msg;
+}
