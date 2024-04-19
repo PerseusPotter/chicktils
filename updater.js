@@ -1,5 +1,10 @@
+import axios from '../axios/index';
+import Promise from '../promisev2/index';
+
 export function loadMeta() {
-  return JSON.parse(FileLib.getUrlContent('https://api.github.com/repos/perseuspotter/chicktils/releases/latest'));
+  return new Promise((res, rej) => {
+    axios.get('https://api.github.com/repos/perseuspotter/chicktils/releases/latest').then(({ data }) => res(data)).catch(rej);
+  });
 };
 
 export function getVersion(meta) {
@@ -14,9 +19,14 @@ function rel(p) {
   return './config/ChatTriggers/modules/chicktils/' + p;
 }
 export function downloadUpdate(url) {
-  FileLib.write(rel('temp.zip'), FileLib.getUrlContent(url));
-  FileLib.unzip(rel('temp.zip'), rel('temp'));
-  FileLib.delete(rel('temp.zip'));
+  return new Promise((res, rej) => {
+    axios.get(url).then(({ data }) => {
+      FileLib.write(rel('temp.zip'), data);
+      FileLib.unzip(rel('temp.zip'), rel('temp'));
+      FileLib.delete(rel('temp.zip'));
+      res();
+    }).catch(rej);
+  });
 };
 
 export function getCurrVV() {

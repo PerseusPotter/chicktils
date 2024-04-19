@@ -4,27 +4,36 @@ import data from './data';
 import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
+import { centerMessage } from './util/format';
 setIsMain();
+const VERSION = '0.0.1';
 
 let sev;
+// bruh no async rhino = :clown:
 function tryUpdate() {
-  const m = Updater.loadMeta();
-  const v = Updater.getVersion(m);
-  if (v === VERSION) return false;
-  const u = Updater.getAssetURL(m);
-  Updater.downloadUpdate(u);
-  const vv = Updater.getCurrVV();
-  const uvv = Updater.getUpdateVV();
-  sev = vv.findIndex((v, i) => v !== uvv[i]);
-  if (sev < 0) return false; // if i fuck up idk
-  ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
-  ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
-  if (sev === 0) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
-  if (sev === 1) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
-  const ans = new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'));
-  const c = Math.max(0, ChatLib.getChatWidth() - Renderer.getStringWidth(ans.getFormattedText())) / 2 / Renderer.getStringWidth(' ');
-  ans.addTextComponent(0, ' '.repeat(~~c));
-  ans.chat();
+  Updater.loadMeta().then(m => {
+    const v = Updater.getVersion(m);
+    if (v === VERSION) return false;
+    ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
+    ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
+    centerMessage(new Message(new TextComponent('&nClick to Open').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
+    // TODO: [ChickTils] failed to download update: Error: org.mozilla.javascript.WrappedException: Wrapped javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target (/axios/src/request.js#83)
+    return loadMod();
+    const u = Updater.getAssetURL(m);
+    Updater.downloadUpdate(u).then(() => {
+      const vv = Updater.getCurrVV();
+      const uvv = Updater.getUpdateVV();
+      sev = vv.findIndex((v, i) => v !== uvv[i]);
+      if (sev < 0) return false; // if i fuck up idk
+      ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
+      ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
+      if (sev === 0) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
+      if (sev === 1) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
+      const ans = new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'));
+      centerMessage(ans);
+      ans.chat();
+    }).catch(e => settings.isDev ? log('failed to download update:', e) : log('failed to download update'));
+  }).catch(e => settings.isDev ? log('failed to fetch update:', e) : log('failed to fetch update'));
 }
 register('command', res => {
   if (sev === undefined) return;
@@ -45,7 +54,6 @@ function crashGame(txt) {
   Client.getMinecraft().func_71377_b(cr);
 }
 
-const VERSION = '0.0.1';
 register('command', ...args => {
   if (!args) args = ['config'];
 

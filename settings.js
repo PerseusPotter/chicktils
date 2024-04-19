@@ -1,5 +1,6 @@
 // vigilance refused to work
 
+import { centerMessage } from './util/format';
 import { log, logDebug } from './util/log';
 
 // if reloading modules without cache it reloads settings :(
@@ -382,8 +383,7 @@ class Settings {
     props.sort((a, b) => a.sort - b.sort);
     const msgs = props.map(p => p.getMessage(this.module));
     const pageNav = new Message(page === this.minPage ? '   ' : new TextComponent('&a<- ').setClick('run_command', `/${this.module} config view ${page - 1}`), `&fPage &6${page} &fof &6${this.maxPage}`, page === this.maxPage ? '   ' : new TextComponent('&a ->').setClick('run_command', `/${this.module} config view ${page + 1}`));
-    const c = Math.max(0, ChatLib.getChatWidth() - Renderer.getStringWidth(pageNav.getFormattedText())) / 2 / Renderer.getStringWidth(' ');
-    pageNav.addTextComponent(0, ' '.repeat(~~c));
+    centerMessage(pageNav);
     // msgs.unshift(pageNav.clone());
     msgs.unshift(new Message(ChatLib.getCenteredText(`&d&l${this.module} &b&l${this.pageNames[page]} &d&lSettings`)));
     msgs.push(pageNav);
@@ -437,7 +437,7 @@ let sort = 0;
 export const props = {
   // 1
   enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'Toggles mod globally' }),
-  autoUpdate: new Property('AutoUpdate', page, ++sort, Property.Type.Toggle, true, { desc: 'check for updates when loaded' }),
+  autoUpdate: new Property('CheckForUpdates', page, ++sort, Property.Type.Toggle, true, { desc: 'check for updates when loaded' }),
   isDev: new Property('IsDev', page, ++sort, Property.Type.Toggle, false),
 
   // 2

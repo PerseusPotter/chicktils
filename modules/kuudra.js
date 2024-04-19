@@ -272,7 +272,7 @@ const dirOverlayReg = reg('renderOverlay', () => {
   renderArrowTo(settings.kuudraArrowToKuudraColor, kt * Math.PI, 20, Player.getY() > 60 ? 0 : Player.getYaw());
 });
 
-let regInst = regForge()
+let regInst = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn);
 function entitySpawn(evn) {
   if (evn.entity.getClass().getSimpleName() === 'EntityGiantZombie') {
     const e = new Entity(evn.entity);
