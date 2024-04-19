@@ -1,0 +1,12 @@
+{
+  "name": "ChickTils",
+  "creator": "Ch1ck3nNeedsRNG",
+  "description": "mmm",
+  "version": "0.0.1",
+  "entry": "index.js",
+  "requires": [
+    "RenderLib",
+    "PogData",
+    "BeaconBeam"
+  ]
+}
