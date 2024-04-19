@@ -437,7 +437,8 @@ let sort = 0;
 export const props = {
   // 1
   enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'Toggles mod globally' }),
-  isDev: new Property('IsDev', page, 1, Property.Type.Toggle, false),
+  autoUpdate: new Property('AutoUpdate', page, ++sort, Property.Type.Toggle, true, { desc: 'check for updates when loaded' }),
+  isDev: new Property('IsDev', page, ++sort, Property.Type.Toggle, false),
 
   // 2
   enablekuudra: new Property('EnableKuudra', ++page, sort = 0, Property.Type.Toggle, true),

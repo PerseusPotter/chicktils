@@ -1,5 +1,4 @@
 import { registerForge, unregisterForge } from './forge';
-import { log } from './log';
 
 /**
  * @type {typeof register}
@@ -10,7 +9,6 @@ reg = function reg(type, shit) {
   let isReg = false;
   return new Proxy({}, {
     get(t, p, r) {
-      log(type, p, isReg);
       if (p === 'register') {
         if (!isReg) {
           isReg = true;
