@@ -1,44 +1,5 @@
-// downloader from soopy
+import { urlToFile, urlToString } from './util/net';
 const File = Java.type('java.io.File');
-const URL = Java.type('java.net.URL');
-const PrintStream = Java.type('java.io.PrintStream');
-const Byte = Java.type('java.lang.Byte');
-const ByteArrayOutputStream = Java.type('java.io.ByteArrayOutputStream');
-function urlToFile(url, dst, connecttimeout, readtimeout) {
-  const d = new File(dst);
-  d.getParentFile().mkdirs();
-  if (d.exists()) d.delete();
-  const connection = new URL(url).openConnection();
-  Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper').removeCertCheck(connection);
-  connection.setDoOutput(true);
-  connection.setConnectTimeout(connecttimeout);
-  connection.setReadTimeout(readtimeout);
-  const IS = connection.getInputStream();
-  const FilePS = new PrintStream(dst);
-  let buf = new Packages.java.lang.reflect.Array.newInstance(Byte.TYPE, 65536);
-  let len;
-  while ((len = IS.read(buf)) > 0) {
-    FilePS.write(buf, 0, len);
-  }
-  IS.close();
-  FilePS.close();
-}
-function urlToString(url, connecttimeout, readtimeout) {
-  const connection = new URL(url).openConnection();
-  // Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper').removeCertCheck(connection);
-  connection.setDoOutput(true);
-  connection.setConnectTimeout(connecttimeout);
-  connection.setReadTimeout(readtimeout);
-  const IS = connection.getInputStream();
-  const out = new ByteArrayOutputStream();
-  let buf = new Packages.java.lang.reflect.Array.newInstance(Byte.TYPE, 65536);
-  let len;
-  while ((len = IS.read(buf)) > 0) {
-    out.write(buf, 0, len);
-  }
-  IS.close();
-  return out.toString('UTF-8');
-}
 export function loadMeta() {
   return JSON.parse(urlToString('https://api.github.com/repos/perseuspotter/chicktils/releases/latest', 1000, 1000));
 };
