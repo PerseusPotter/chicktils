@@ -9,12 +9,22 @@ function execCmd(cmd) {
   }
 }
 
-const storage = new Array(9).fill(0).map((_, i) => reg('command', execCmd('enderchest ' + (i + 1))).setName('e' + (i + 1), true)).concat(new Array(18).fill(0).map((_, i) => reg('command', execCmd('backpack ' + (i + 1))).setName('b' + (i + 1), true).setAliases('' + (i + 1))));
+const storage = new Array(9).fill(0).map((_, i) =>
+  reg('command', execCmd('enderchest ' + (i + 1))).setName('e' + (i + 1), true).unregister()
+).concat(new Array(18).fill(0).map((_, i) =>
+  reg('command', execCmd('backpack ' + (i + 1))).setName('b' + (i + 1), true).setAliases('' + (i + 1)).unregister()
+));
 const names = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'];
 const kuudraNames = ['NORMAL', 'HOT', 'BURNING', 'FIERY', 'INFERNAL'];
-const dungeon = new Array(7).fill(0).map((_, i) => reg('command', execCmd('joininstance CATACOMBS_FLOOR_' + names[i])).setName('f' + (i + 1), true)).concat(new Array(7).fill(0).map((_, i) => reg('command', execCmd('joininstance MASTER_CATACOMBS_FLOOR_' + names[i])).setName('m' + (i + 1), true)));
-dungeon.unshift(reg('command', execCmd('joininstance CATACOMBS_ENTRANCE')).setName('fe', true));
-const kuudra = new Array(5).fill(0).map((_, i) => reg('command', execCmd('joininstance KUUDRA_' + kuudraNames[i])).setName('k' + (i + 1), true));
+const dungeon = new Array(7).fill(0).map((_, i) =>
+  reg('command', execCmd('joininstance CATACOMBS_FLOOR_' + names[i])).setName('f' + (i + 1), true).unregister()
+).concat(new Array(7).fill(0).map((_, i) =>
+  reg('command', execCmd('joininstance MASTER_CATACOMBS_FLOOR_' + names[i])).setName('m' + (i + 1), true).unregister()
+));
+dungeon.unshift(reg('command', execCmd('joininstance CATACOMBS_ENTRANCE')).setName('fe', true).unregister());
+const kuudra = new Array(5).fill(0).map((_, i) =>
+  reg('command', execCmd('joininstance KUUDRA_' + kuudraNames[i])).setName('k' + (i + 1), true).unregister()
+);
 
 function updater(list) {
   return function(v) {
