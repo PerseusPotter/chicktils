@@ -16,9 +16,6 @@ function tryUpdate(delay = 0) {
     const v = Updater.getVersion(m);
     if (v === VERSION) return -1;
     if (delay > 0) Thread.sleep(delay);
-    ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
-    ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
-    centerMessage(new Message(new TextComponent('&nClick to Open').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
     const u = Updater.getAssetURL(m);
     try {
       Updater.downloadUpdate(u);
