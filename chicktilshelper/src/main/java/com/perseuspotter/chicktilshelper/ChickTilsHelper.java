@@ -3,6 +3,7 @@ package com.perseuspotter.chicktilshelper;
 import java.lang.reflect.Field;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -92,5 +93,16 @@ public class ChickTilsHelper {
       sc.init(null, trustAllCerts, null);
       ((HttpsURLConnection) url).setSSLSocketFactory(sc.getSocketFactory());
     } catch (Exception e) {}
+  }
+
+  // not scuffed tf you mean?
+  public static boolean removeLastElement(Field f, Object o) {
+    try {
+      CopyOnWriteArrayList<?> arr = (CopyOnWriteArrayList<?>) f.get(o);
+      arr.remove(arr.size() - 1);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 }
