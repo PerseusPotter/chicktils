@@ -54,9 +54,11 @@ register('command', res => {
   } else sev = void loadMod();
 }).setName('csmupdate');
 function loadMod() {
+  log('&7Loading ChickTils...');
   load();
   settings.refresh();
   postInit();
+  log('&7ChickTils Loaded!');
 }
 
 function crashGame(txt) {
