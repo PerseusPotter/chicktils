@@ -28,11 +28,12 @@ const cmdReg = reg('command', ...args => {
 }).setTabCompletions(...args => {
   if (!args) return [];
   return fix(args)[args.length];
-}).setName('gfs', true);
+});
 
 export function init() { }
 export function load() {
-  cmdReg.register();
+  // cmdReg.register();
+  cmdReg.setName('gfs', true);
 }
 export function unload() {
   cmdReg.unregister();
