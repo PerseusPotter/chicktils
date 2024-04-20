@@ -25,10 +25,10 @@ export function downloadUpdate(url) {
 };
 
 export function getCurrVV() {
-  return FileLib.read(rel('v.txt')).split(' ');
+  return FileLib.read(rel('v.txt')).split(' ').map(v => +v);
 };
 export function getUpdateVV() {
-  return FileLib.read(rel('temp/v.txt')).split(' ');
+  return FileLib.read(rel('temp/v.txt')).split(' ').map(v => +v);
 };
 
 export function applyUpdate() {
