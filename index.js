@@ -135,7 +135,11 @@ if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
   crashGame('need to load helper mod (it has been copied for you) :D');
 }
 
-// TODO: check for skyblock
-settings.load();
-if (settings.autoUpdate) tryUpdate().then(v => v || loadMod());
-else loadMod();
+const worldLoadOnce = register('worldLoad', () => {
+  // TODO: check for skyblock
+  settings.load();
+  if (settings.autoUpdate) tryUpdate().then(v => v || loadMod());
+  else loadMod();
+
+  worldLoadOnce.unregister();
+});
