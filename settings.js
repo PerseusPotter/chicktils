@@ -559,7 +559,7 @@ export const props = {
   moveLoc16: new Property('MoveCatacombsGUI', page, ++sort, Property.Type.Action),
 
   // 5
-  enableservertracker: new Property('EnableServerTracker', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'tracks servers youve been to' }),
+  enableservertracker: new Property('EnableServerTracker', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'tracks servers youve been to,  also /warp tab complete' }),
   serverTrackerTransferCd: new Property('ServerTrackerTransferCd', page, ++sort, Property.Type.Integer, 3000, { desc: 'delays warps by this long if spammed too quickly', min: 0 }),
   serverTrackerCdMessage: new Property('ServerTrackerCdMessage', page, ++sort, Property.Type.Text, 'waiting for cd (u.U)｡｡｡ zzZ'),
 

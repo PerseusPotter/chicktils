@@ -34,12 +34,12 @@ const loadReg = reg('worldLoad', () => {
       setTimeout(() => ChatLib.command('warp ' + loc), settings.serverTrackerTransferCd - t);
     } else ChatLib.command('warp ' + loc)
     lastLoc = loc;
-  }).setTabCompletions(tabComplete).setName('warp', true).register());
-  regs.push(reg('command', () => ChatLib.command('warp island', true)).setName('is', true).register());
-  regs.push(reg('command', () => ChatLib.command('warp hub', true)).setName('hub', true).register());
-  regs.push(reg('command', () => ChatLib.command('warp forge', true)).setName('warpforge', true).register());
-  regs.push(reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dn', true).register());
-  regs.push(reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dh', true).register());
+  }).setTabCompletions(tabComplete).setName('warp', true));
+  regs.push(reg('command', () => ChatLib.command('warp island', true)).setName('is', true));
+  regs.push(reg('command', () => ChatLib.command('warp hub', true)).setName('hub', true));
+  regs.push(reg('command', () => ChatLib.command('warp forge', true)).setName('warpforge', true));
+  regs.push(reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dn', true));
+  regs.push(reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dh', true));
 });
 
 export function init() { }
