@@ -7,8 +7,6 @@
   "requires": [
     "RenderLib",
     "PogData",
-    "BeaconBeam",
-    "axios",
-    "promisev2"
+    "BeaconBeam"
   ]
 }
