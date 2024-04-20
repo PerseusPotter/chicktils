@@ -5,51 +5,54 @@ import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
 import { centerMessage } from './util/format';
-import Promise from '../promisev2/index';
 setIsMain();
-const VERSION = '0.0.2';
+const VERSION = '0.0.3';
 
 let sev;
 // bruh no async rhino = :clown:
 function tryUpdate() {
-  return new Promise(res => {
-    Updater.loadMeta().then(m => {
-      const v = Updater.getVersion(m);
-      if (v === VERSION) return res(false);
-      ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
-      ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
-      centerMessage(new Message(new TextComponent('&nClick to Open').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
-      // TODO: [ChickTils] failed to download update: Error: org.mozilla.javascript.WrappedException: Wrapped javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target (/axios/src/request.js#83)
-      return res(false);
-      const u = Updater.getAssetURL(m);
-      Updater.downloadUpdate(u).then(() => {
-        const vv = Updater.getCurrVV();
-        const uvv = Updater.getUpdateVV();
-        sev = vv.findIndex((v, i) => v !== uvv[i]);
-        if (sev < 0) return res(false); // if i fuck up idk
-        ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
-        ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
-        if (sev === 0) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
-        if (sev === 1) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
-        const ans = new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'));
-        centerMessage(ans);
-        ans.chat();
-        res(true);
-      }).catch(e => {
-        settings.isDev ? log('failed to download update:', e) : log('failed to download update');
-        centerMessage(new Message(new TextComponent('&nClick to Manually Update').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
-      });
-    }).catch(e => settings.isDev ? log('failed to fetch update:', e) : log('failed to fetch update'));
-  });
+  try {
+    const m = Updater.loadMeta();
+    const v = Updater.getVersion(m);
+    if (v === VERSION) return -1;
+    ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
+    ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
+    centerMessage(new Message(new TextComponent('&nClick to Open').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
+    const u = Updater.getAssetURL(m);
+    try {
+      Updater.downloadUpdate(u);
+    } catch (e) {
+      if (settings.isDev) log('failed to download update:', e, e.stack);
+      else log('failed to download update');
+      centerMessage(new Message(new TextComponent('&nClick to Manually Update').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
+      return 1;
+    }
+    const vv = Updater.getCurrVV();
+    const uvv = Updater.getUpdateVV();
+    sev = vv.findIndex((v, i) => v !== uvv[i]);
+    if (sev < 0) return -1; // if i fuck up idk
+    ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
+    ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
+    if (sev === 0) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
+    if (sev === 1) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
+    const ans = new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'));
+    centerMessage(ans);
+    ans.chat();
+    return 0;
+  } catch (e) {
+    if (settings.isDev) log('failed to fetch update:', e, e.stack);
+    else log('failed to fetch update');
+  }
 }
 register('command', res => {
   if (sev === undefined) return;
   if (res === 'accept') {
     Updater.applyUpdate();
     if (sev === 0) crashGame('updating !');
-    if (sev === 1) ChatLib.command('ct reload', true);
+    if (sev === 1) Java.type('com.chattriggers.ctjs.Reference').reloadCT();
     if (sev === 2) loadMod();
-  } else loadMod();
+    sev = void 0;
+  } else sev = void loadMod();
 }).setName('csmupdate');
 function loadMod() {
   load();
@@ -84,7 +87,9 @@ register('command', ...args => {
         ].forEach(v => ChatLib.chat(v));
         break;
       case 'update':
-        tryUpdate();
+        new Thread(() => {
+          if (tryUpdate() === -1) log('You are up to date!');
+        }).start();
         break;
       case 'config':
         if (args.length === 0) args = ['view'];
@@ -136,10 +141,13 @@ if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
 }
 
 const worldLoadOnce = register('worldLoad', () => {
-  // TODO: check for skyblock
-  settings.load();
-  if (settings.autoUpdate) tryUpdate().then(v => v || loadMod());
-  else loadMod();
+  new Thread(() => {
+    Thread.sleep(5000);
+    // TODO: check for skyblock
+    settings.load();
+    if (settings.autoUpdate && tryUpdate() !== -1) { }
+    else loadMod();
 
-  worldLoadOnce.unregister();
+    worldLoadOnce.unregister();
+  }).start();
 });
