@@ -1,7 +1,7 @@
 // vigilance refused to work
 
 import { centerMessage } from './util/format';
-import { log, logDebug } from './util/log';
+import { log } from './util/log';
 
 // if reloading modules without cache it reloads settings :(
 let isMainSettings = false;
@@ -44,7 +44,7 @@ export class Property {
   }
   set(v) {
     if (this.type === Property.Type.Action) return;
-    if (v === this.value) return;
+    // if (v === this.value) return;
     this.validate(v);
     this.listeners0.forEach(cb => cb.call(this, v, old));
     const old = this.value;
@@ -328,6 +328,9 @@ class Settings {
     this.path = path;
     let p = Object.entries(props).filter(v => v[1] instanceof Property);
     this.propIds = p.map(v => v[0]);
+    /**
+     * @type {Property[]}
+     */
     this.props = p.map(v => {
       this[v[0]] = v[1].valueOf();
       this['_' + v[0]] = v[1];
@@ -339,7 +342,7 @@ class Settings {
     this.maxPage = Math.max.apply(null, this.props.map(v => v.page));
 
     // this.load();
-    Client.scheduleTask(() => this.load(true));
+    Client.scheduleTask(20, () => this.load(true));
   }
 
   load(isAutoLoad = false) {
@@ -372,6 +375,13 @@ class Settings {
           )
       )
     );
+  }
+
+  refresh() {
+    this.props.forEach(p => {
+      p.listeners0.forEach(v => v.call(p, p.value, p.value));
+      p.listeners1.forEach(v => v.call(p, p.value, p.value));
+    });
   }
 
   prevMsgs = [];
@@ -438,7 +448,7 @@ export const props = {
   // 1
   enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'Toggles mod globally' }),
   autoUpdate: new Property('CheckForUpdates', page, ++sort, Property.Type.Toggle, true, { desc: 'check for updates when loaded' }),
-  isDev: new Property('IsDev', page, ++sort, Property.Type.Toggle, false),
+  isDev: new Property('IsDev', page, ++sort, Property.Type.Toggle, false, { desc: 'negatively impacts loading performance and may spam your chat' }),
 
   // 2
   enablekuudra: new Property('EnableKuudra', ++page, sort = 0, Property.Type.Toggle, true),
