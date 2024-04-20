@@ -1,4 +1,5 @@
 import settings from '../settings';
+import { execCmd } from '../util/format';
 import { reg } from '../util/registerer';
 
 function sanitizeName(str) {
@@ -39,6 +40,8 @@ function fix(args) {
   const arr = [['gfs']];
   if (!args || args.length === 0) return arr;
   args = args.map(v => String(v));
+  let amt = settings.betterGFSBlankAmount.toString();
+  if (/^\d+$/.test(args[args.length - 1])) amt = args.pop();
   const possIds = new Set();
   if (args.length === 1) {
     const n = sanitizeId(args[0]);
@@ -70,12 +73,12 @@ function fix(args) {
       break;
     }
   }
-  arr.push([settings.betterGFSBlankAmount.toString()]);
+  arr.push([amt]);
   return arr;
 }
 
 const cmdReg = reg('command', ...args => {
-  ChatLib.command(fix(args).map(v => v[0]).join(' '));
+  execCmd(fix(args).map(v => v[0]).join(' '));
 }).setTabCompletions(args => fix(args)[args.length] || []);
 
 export function init() { }

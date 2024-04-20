@@ -1,29 +1,25 @@
 import settings from '../settings';
-import { log } from '../util/log';
+import { execCmd } from '../util/format';
 import { reg } from '../util/registerer';
 
-function execCmd(cmd) {
-  return function() {
-    log('&2Executing command: &7/' + cmd);
-    ChatLib.command(cmd);
-  }
-}
-
+// rhino :clown:
+// java.lang.IllegalStateException at org.mozilla.javascript.ScriptRuntime.getTopCallScope(ScriptRuntime.java:3926)
+// execCmd.bind(null, ...)
 const storage = new Array(9).fill(0).map((_, i) =>
-  reg('command', execCmd('enderchest ' + (i + 1))).setName('e' + (i + 1), true).unregister()
+  reg('command', execCmd.bind({}, 'enderchest ' + (i + 1))).setName('e' + (i + 1), true).unregister()
 ).concat(new Array(18).fill(0).map((_, i) =>
-  reg('command', execCmd('backpack ' + (i + 1))).setName('b' + (i + 1), true).setAliases('' + (i + 1)).unregister()
+  reg('command', execCmd.bind({}, 'backpack ' + (i + 1))).setName('b' + (i + 1), true).setAliases('' + (i + 1)).unregister()
 ));
 const names = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN'];
 const kuudraNames = ['NORMAL', 'HOT', 'BURNING', 'FIERY', 'INFERNAL'];
 const dungeon = new Array(7).fill(0).map((_, i) =>
-  reg('command', execCmd('joininstance CATACOMBS_FLOOR_' + names[i])).setName('f' + (i + 1), true).unregister()
+  reg('command', execCmd.bind({}, 'joininstance CATACOMBS_FLOOR_' + names[i])).setName('f' + (i + 1), true).unregister()
 ).concat(new Array(7).fill(0).map((_, i) =>
-  reg('command', execCmd('joininstance MASTER_CATACOMBS_FLOOR_' + names[i])).setName('m' + (i + 1), true).unregister()
+  reg('command', execCmd.bind({}, 'joininstance MASTER_CATACOMBS_FLOOR_' + names[i])).setName('m' + (i + 1), true).unregister()
 ));
-dungeon.unshift(reg('command', execCmd('joininstance CATACOMBS_ENTRANCE')).setName('fe', true).unregister());
+dungeon.unshift(reg('command', execCmd.bind({}, 'joininstance CATACOMBS_ENTRANCE')).setName('fe', true).unregister());
 const kuudra = new Array(5).fill(0).map((_, i) =>
-  reg('command', execCmd('joininstance KUUDRA_' + kuudraNames[i])).setName('k' + (i + 1), true).unregister()
+  reg('command', execCmd.bind({}, 'joininstance KUUDRA_' + kuudraNames[i])).setName('k' + (i + 1), true).unregister()
 );
 
 function updater(list) {
