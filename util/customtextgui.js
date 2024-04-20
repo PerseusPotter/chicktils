@@ -89,6 +89,10 @@ editGui.registerScrolled((x, y, d) => {
  *  clearLines(): CustomTextGui;
  * }} CustomTextGui
  */
+// const DisplayHandler = Java.type('com.chattriggers.ctjs.minecraft.objects.display.DisplayHandler');
+const displaysF = DisplayHandler.class.getDeclaredField('displays');
+const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
+displaysF.setAccessible(true);
 /**
  * @param {() => import('../data').TextLocation} getLoc
  * @param {() => string[]} getEditText
@@ -100,9 +104,9 @@ export default function createTextGui(getLoc, getEditText, str = '') {
    * @type {CustomTextGui}
    */
   const obj = new EventEmitter();
-  // would be more efficient to remove from DisplayHandler.displays but i dont want to deal with reflection so
   obj.display = new Display();
-  obj.display.hide();
+  const isRemoved = helper ? helper.removeLastElement(displaysF, DisplayHandler) : false;
+  obj.display.setShouldRender(isRemoved);
   obj.getLoc = getLoc;
   obj.isEdit = false;
   obj.getEditText = getEditText;
@@ -144,9 +148,9 @@ export default function createTextGui(getLoc, getEditText, str = '') {
     if (this.isEdit) return;
     updateLocCache();
     // wouldn't have to do this if DisplayHandler checks if should render and Display.render() always renders but here we are
-    this.display.setShouldRender(true);
+    if (!isRemoved) this.display.setShouldRender(true);
     this.display.render();
-    this.display.setShouldRender(false);
+    if (!isRemoved) this.display.setShouldRender(false);
   };
   let cstr = 'googoogAA gaa';
   let cll = 0;
