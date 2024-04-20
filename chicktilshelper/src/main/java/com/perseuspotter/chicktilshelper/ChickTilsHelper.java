@@ -57,6 +57,8 @@ public class ChickTilsHelper {
       }
 
       gui.refreshChat();
-    } catch (IllegalAccessException e) {} catch (NoSuchFieldException e) {}
+    } catch (IllegalAccessException e) {} catch (
+      NoSuchFieldException e
+    ) {} catch (NullPointerException e) {}
   }
 }

@@ -29,7 +29,7 @@ export function load() {
   list.forEach(v => settings['enable' + v] && loadModule(v));
 }
 export function loadModule(name) {
-  const m = RequireNoCache(name);
+  const m = modules.has(name) ? modules.get(name) : RequireNoCache(name);
   if (!modules.has(name)) m.init();
   modules.set(name, m);
   m.load();
