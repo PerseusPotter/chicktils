@@ -9,11 +9,12 @@ setIsMain();
 const VERSION = '0.0.6';
 
 let sev;
-function tryUpdate() {
+function tryUpdate(delay = 0) {
   try {
     const m = Updater.loadMeta();
     const v = Updater.getVersion(m);
     if (v === VERSION) return -1;
+    if (delay > 0) Thread.sleep(delay);
     ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
     ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
     centerMessage(new Message(new TextComponent('&nClick to Open').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
@@ -143,10 +144,9 @@ if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
 
 const worldLoadOnce = register('worldLoad', () => {
   new Thread(() => {
-    Thread.sleep(5000);
     // TODO: check for skyblock
     settings.load();
-    if (settings.autoUpdate && tryUpdate() !== -1) { }
+    if (settings.autoUpdate && tryUpdate(1000) !== -1) { }
     else loadMod();
 
     worldLoadOnce.unregister();
