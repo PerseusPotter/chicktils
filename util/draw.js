@@ -164,9 +164,10 @@ export function drawFilledBox(x, y, z, w, h, red, green, blue, alpha, phase) {
  * @param {number} g
  * @param {number} b
  * @param {boolean?} phase
+ * @param {boolean?} isCentered
  * @returns
  */
-export function renderWaypoints(waypoints, r, g, b, phase = true) {
+export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = true) {
   if (waypoints.length === 0) return;
   let x = 0;
   let y = 0;
@@ -176,11 +177,11 @@ export function renderWaypoints(waypoints, r, g, b, phase = true) {
   let distance = 0;
 
   waypoints.forEach((waypoint) => {
-    x = waypoint.x;
-    y = waypoint.y;
-    z = waypoint.z;
     w = waypoint.w || 1;
     h = waypoint.h || 1;
+    x = waypoint.x + (isCentered ? 0 : w / 2);
+    y = waypoint.y;
+    z = waypoint.z + (isCentered ? 0 : w / 2);
 
     distance = (Player.getX() - x) ** 2 + (Player.getY() - y) ** 2 + (Player.getZ() - z) ** 2;
 
