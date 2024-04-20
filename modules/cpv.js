@@ -6,8 +6,8 @@ import { log } from '../util/log';
 const userUUIDC = new Map();
 const NotEnoughUpdates = Java.type('io.github.moulberry.notenoughupdates.NotEnoughUpdates');
 function cpv(user) {
-  if (!user) user = Player.getName();
   if (!NotEnoughUpdates) return log('you need neu silly');
+  if (!user) user = Player.getName();
   user = user.toLowerCase();
   new Thread(() => {
     try {
