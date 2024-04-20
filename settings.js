@@ -613,7 +613,7 @@ export const props = {
   excavatorSolverDustTooltip: new Property('ExcavatorSolverDustTooltip', page, ++sort, Property.Type.Option, 'Custom', { options: ['Default', 'Hide', 'Custom'] }),
   excavatorSolverAutoClose: new Property('ExcavatorSolverAutoClose', page, ++sort, Property.Type.Toggle, false),
 
-  enablebettergfs: new Property('EnableBetterGFS', page, ++sort, Property.Type.Toggle, false, { desc: 'does not work yet' }),
+  enablebettergfs: new Property('EnableBetterGFS', page, ++sort, Property.Type.Toggle, false, { desc: 'autocomplete for gfs' }),
   betterGFSBlankAmount: new Property('BetterGFSUnspecifiedAmount', page, ++sort, Property.Type.Integer, 1, { min: 1, max: 2240 }),
   betterGFSIDPref: new Property('BetterGFSIdPreference', page, ++sort, Property.Type.Option, 'Dynamic', { options: ['Dynamic', 'ID', 'Name'] }),
 
