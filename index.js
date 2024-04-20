@@ -1,11 +1,12 @@
 import { log } from './util/log';
-import settings, { Property, props, setIsMain } from './settings';
-import data from './data';
+import settings, { Property, props, setIsMain as setIsMainS } from './settings';
+import { setIsMain as setIsMainD } from './data';
 import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
 import { centerMessage } from './util/format';
-setIsMain();
+setIsMainS();
+setIsMainD();
 const VERSION = '0.0.6';
 
 let sev;
