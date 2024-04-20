@@ -1,4 +1,5 @@
 import settings from './settings';
+import { log } from './util/log';
 
 const JSLoader = Java.type('com.chattriggers.ctjs.engine.langs.js.JSLoader');
 const UrlModuleSourceProvider = Java.type('org.mozilla.javascript.commonjs.module.provider.UrlModuleSourceProvider');
@@ -29,11 +30,13 @@ export function load() {
   list.forEach(v => settings['enable' + v] && loadModule(v));
 }
 export function loadModule(name) {
-  const m = modules.has(name) ? modules.get(name) : RequireNoCache(name);
-  if (!modules.has(name)) m.init();
-  modules.set(name, m);
-  m.load();
-  return m;
+  if (modules.has(name)) modules.get(name).load();
+  else {
+    const m = RequireNoCache(name);
+    modules.set(name, m);
+    m.init();
+    m.load();
+  }
 }
 export function unloadModule(name) {
   if (!modules.has(name)) return;
