@@ -28,7 +28,7 @@ function tryUpdate() {
     }
     const vv = Updater.getCurrVV();
     const uvv = Updater.getUpdateVV();
-    sev = vv.findIndex((v, i) => v !== uvv[i]);
+    sev = vv.findIndex((v, i) => v < uvv[i]);
     if (sev < 0) return -1; // if i fuck up idk
     ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
     ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
