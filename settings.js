@@ -3,7 +3,7 @@
 import { centerMessage } from './util/format';
 import { log } from './util/log';
 
-// if reloading modules without cache it reloads settings :(
+// if reloading modules without cache it resets settings :(
 let isMainSettings = false;
 export function setIsMain() {
   isMainSettings = true;
