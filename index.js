@@ -7,7 +7,7 @@ import * as Updater from './updater';
 import { centerMessage } from './util/format';
 import Promise from '../promisev2/index';
 setIsMain();
-const VERSION = '0.0.1';
+const VERSION = '0.0.2';
 
 let sev;
 // bruh no async rhino = :clown:
