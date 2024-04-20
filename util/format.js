@@ -1,3 +1,5 @@
+import { log } from './log';
+
 /**
  * @param {number} t
  * @returns {string}
@@ -44,4 +46,9 @@ export function centerMessage(msg) {
   const c = Math.max(0, ChatLib.getChatWidth() - Renderer.getStringWidth(msg.getFormattedText())) / 2 / Renderer.getStringWidth(' ');
   msg.addTextComponent(0, ' '.repeat(~~c));
   return msg;
+}
+
+export function execCmd(cmd) {
+  log('&2Executing command: &7/' + cmd);
+  ChatLib.command(cmd);
 }
