@@ -6,7 +6,7 @@ import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
 import { centerMessage } from './util/format';
 setIsMain();
-const VERSION = '0.0.5';
+const VERSION = '0.0.6';
 
 let sev;
 function tryUpdate() {
