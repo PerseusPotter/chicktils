@@ -35,7 +35,7 @@ const renderReg = reg('renderWorld', () => {
   const g = ((c >> 16) & 0xFF) / 256;
   const b = ((c >> 8) & 0xFF) / 256;
   // const a = ((c >> 0) & 0xFF) / 256;
-  renderWaypoints(chests, r, g, b, settings.powderBoxEsp);
+  renderWaypoints(chests, r, g, b, settings.powderBoxEsp, false);
 });
 
 export function init() { }

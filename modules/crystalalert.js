@@ -22,7 +22,7 @@ const renderReg = reg('renderWorld', () => {
   const g = ((c >> 16) & 0xFF) / 256;
   const b = ((c >> 8) & 0xFF) / 256;
   // const a = ((c >> 24) & 0xFF) / 256;
-  renderWaypoints(crystals, r, g, b, settings.crystalBoxEsp);
+  renderWaypoints(crystals, r, g, b, settings.crystalBoxEsp, false);
 });
 function reset() {
   crystals = [];
