@@ -1,5 +1,11 @@
 import PogObject from '../PogData';
 
+// if reloading modules without cache it resets data :(
+let isMainData = false;
+export function setIsMain() {
+  isMainData = true;
+};
+
 /**
  * @typedef {{ x: number, y: number, s: number }} Location
  */
@@ -22,6 +28,6 @@ const data = new PogObject('chicktils', {
   dungeonMapLoc: { x: 50, y: 50, s: 1 }
 }, 'data.json');
 
-register('gameUnload', () => data.save());
+register('gameUnload', () => isMainData && data.save());
 
 export default data;

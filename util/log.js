@@ -19,8 +19,8 @@ function format(obj, depth = 3) {
       if (obj === null) return 'null';
       if (obj instanceof Date) return obj.toISOString();
       if (obj instanceof Error) return obj.toString();
-      if (obj instanceof Set) return format(Array.from(obj.keys()), depth);
-      if (obj instanceof Map) return format(Array.from(obj.entries()).reduce((a, [k, v]) => (a[k] = v, a), {}), depth);
+      if (obj instanceof Set) return 'Set' + format(Array.from(obj.keys()), depth);
+      if (obj instanceof Map) return 'Map' + format(Array.from(obj.entries()).reduce((a, [k, v]) => (a[k] = v, a), {}), depth);
       if (Array.isArray(obj)) {
         if (depth === 0) return `Array(${obj.length})`;
         return `[${obj.map(v => format(v, depth - 1)).join(', ')}]`;
