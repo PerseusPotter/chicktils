@@ -55,7 +55,6 @@ register('command', res => {
 }).setName('csmupdate');
 function loadMod() {
   load();
-  return;
   settings.refresh();
   postInit();
 }
