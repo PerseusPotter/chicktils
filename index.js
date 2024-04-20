@@ -32,8 +32,8 @@ function tryUpdate() {
     if (sev < 0) return -1; // if i fuck up idk
     ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
     ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
-    if (sev === 0) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
-    if (sev === 1) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
+    if (sev === 0 || (sev === 1 && !settings.isDev)) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
+    if (sev === 1 && settings.isDev) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
     const ans = new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'));
     centerMessage(ans);
     ans.chat();
@@ -49,7 +49,7 @@ register('command', res => {
     Updater.applyUpdate();
     if (sev === 0) crashGame('updating !');
     if (sev === 1) Java.type('com.chattriggers.ctjs.Reference').reloadCT();
-    if (sev === 2) loadMod();
+    if (sev === 2) settings.isDev ? ChatLib.command('chicktils reload', true) : Java.type('com.chattriggers.ctjs.Reference').reloadCT();
     sev = void 0;
   } else sev = void loadMod();
 }).setName('csmupdate');
