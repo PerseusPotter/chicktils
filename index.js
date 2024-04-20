@@ -6,10 +6,9 @@ import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
 import { centerMessage } from './util/format';
 setIsMain();
-const VERSION = '0.0.3';
+const VERSION = '0.0.4';
 
 let sev;
-// bruh no async rhino = :clown:
 function tryUpdate() {
   try {
     const m = Updater.loadMeta();
@@ -56,6 +55,7 @@ register('command', res => {
 }).setName('csmupdate');
 function loadMod() {
   load();
+  return;
   settings.refresh();
   postInit();
 }
