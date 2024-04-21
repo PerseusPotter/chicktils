@@ -142,6 +142,7 @@ if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
 
 const worldLoadOnce = register('worldLoad', () => {
   new Thread(() => {
+    Thread.sleep(1000);
     // TODO: check for skyblock
     settings.load();
     if (settings.autoUpdate && tryUpdate(1000) !== -1) { }
