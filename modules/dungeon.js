@@ -5,6 +5,7 @@ import createGui from '../util/customgui';
 import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox } from '../util/draw';
 import createAlert from '../util/alert';
 import { reg, regForge } from '../util/registerer';
+import { execCmd } from '../util/format';
 
 let entSpawnReg = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn);
 function reset() {
@@ -16,6 +17,9 @@ function reset() {
   stepVarReg.unregister();
   particleReg.unregister();
   entSpawnReg.unregister();
+  puzzleFailReg.unregister();
+  quizFailReg.unregister();
+  architectUseReg.unregister();
 
   dungeon.removeListener('bloodOpen', onBloodOpen);
   dungeon.removeListener('bossEnter', onBossEnter);
@@ -47,6 +51,9 @@ function start() {
   stepVarReg.register();
   particleReg.register();
   entSpawnReg.register();
+  puzzleFailReg.register();
+  quizFailReg.register();
+  architectUseReg.register();
 
   dungeon.on('bloodOpen', onBloodOpen);
   dungeon.on('bossEnter', onBossEnter);
@@ -88,6 +95,7 @@ const orbIds = [
 ];
 let powerupCand = [];
 const hiddenPowerups = new Map();
+const shitterAlert = createAlert('Shitter', 10);
 function getBucketId(ent) {
   return (ent.field_70165_t >> bucketSize) * bucketKey + (ent.field_70161_v >> bucketSize);
 }
@@ -315,6 +323,17 @@ const stepVarReg = reg('step', () => {
     return true;
   });
 });
+
+function onPuzzleFail(name) {
+  let i = name.indexOf(' ');
+  if (i < 0) i = name.length;
+  if (name.slice(1, i) !== Player.getName()) return;
+  execCmd('gfs ARCHITECT_FIRST_DRAFT 1');
+  shitterAlert.show();
+}
+const puzzleFailReg = register('chat', onPuzzleFail).setCriteria('&r&c&lPUZZLE FAIL! &r&${name} ${*}');
+const quizFailReg = register('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the Omniscient&r&f: &r&${name} &r&cchose the wrong answer! I shall never forget this moment of misrememberance.&r');
+const architectUseReg = register('chat', () => shitterAlert.hide()).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}');
 
 // const renderReg = reg('renderWorld', partial => {
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
