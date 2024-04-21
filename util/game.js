@@ -9,7 +9,7 @@ export const dungeon = new EventEmitter();
 const dungeonReg = {
   dungeonJoin: reg('chat', () => dungeon.emit('dungeonJoin')).setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}'),
   dungeonStart: reg('chat', () => dungeon.emit('dungeonStart')).setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r'),
-  bloodOpen: reg('chat', () => dungeon.emit('bloodOpen')).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r'),
+  bloodOpen: reg('chat', () => dungeon.emit('bloodOpen')).setChatCriteria('&r&c[BOSS] The Watcher&r&f: Things feel a little more roomy now, eh?&r'),
   bloodEnd: reg('chat', () => dungeon.emit('bloodEnd')).setCriteria('&r&c[BOSS] The Watcher&r&f: That will be enough for now.&r'),
   bossEnter: reg('chat', (name, msg) => {
     switch (name) {
