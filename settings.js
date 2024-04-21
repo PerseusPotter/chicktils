@@ -305,12 +305,12 @@ export class Property {
   getMessage(module, name = this.name) {
     const desc = this.desc ? new TextComponent(`&f${name}`).setHover('show_text', this.desc) : `&f${name}`;
     if (this.type === Property.Type.Action) return new Message(
-      new TextComponent('&7[&eRUN&7]&r ').setClick('suggest_command', `/${module} config edit ${name}`),
+      new TextComponent('&7[&eRUN&7]&r ').setClick('suggest_command', `/${module} config edit ${this.name}`),
       desc,
     );
     return new Message(
-      new TextComponent('&7[&4RESET&7]&r').setClick('suggest_command', `/${module} config edit ${name}`),
-      new TextComponent('&7[&aEDIT&7]&r ').setClick('suggest_command', `/${module} config edit ${name} ${this.toString()}`),
+      new TextComponent('&7[&4RESET&7]&r').setClick('suggest_command', `/${module} config edit ${this.name}`),
+      new TextComponent('&7[&aEDIT&7]&r ').setClick('suggest_command', `/${module} config edit ${this.name} ${this.toString()}`),
       desc,
       `&7: &6${this.toString()}`
     );
