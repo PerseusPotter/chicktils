@@ -28,7 +28,10 @@ function tryUpdate(delay = 0) {
     const vv = Updater.getCurrVV();
     const uvv = Updater.getUpdateVV();
     sev = vv.findIndex((v, i) => v < uvv[i]);
-    if (sev < 0) return -1; // if i fuck up idk
+    if (sev < 0) { // if i fuck up idk
+      Updater.deleteDownload();
+      return -1;
+    }
     ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
     ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
     if (sev === 0 || (sev === 1 && !settings.isDev)) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
@@ -36,21 +39,34 @@ function tryUpdate(delay = 0) {
     const ans = new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'));
     centerMessage(ans);
     ans.chat();
+    setTimeout(() => {
+      ChatLib.command('csmupdate deny', true);
+      silentUpdate = true;
+    }, 10_000);
     return 0;
   } catch (e) {
     if (settings.isDev) log('failed to fetch update:', e, e.stack);
     else log('failed to fetch update');
   }
 }
+let silentUpdate = false;
 register('command', res => {
-  if (sev === undefined) return;
+  if (sev === undefined) {
+    if (!silentUpdate) log('there is not an update pending');
+    silentUpdate = false;
+    return;
+  }
   if (res === 'accept') {
     Updater.applyUpdate();
     if (sev === 0) crashGame('updating !');
     if (sev === 1) Java.type('com.chattriggers.ctjs.Reference').reloadCT();
     if (sev === 2) settings.isDev ? ChatLib.command('chicktils reload', true) : Java.type('com.chattriggers.ctjs.Reference').reloadCT();
     sev = void 0;
-  } else sev = void loadMod();
+  } else {
+    sev = void 0;
+    Updater.deleteDownload();
+    loadMod();
+  }
 }).setName('csmupdate');
 function loadMod() {
   log('&7Loading ChickTils...');
