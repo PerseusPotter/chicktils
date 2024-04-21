@@ -20,6 +20,19 @@ const createAlert = (function() {
       if (this._timeout !== undefined) this._timeout = void (_clearTimeout(this._timeout));
     }
   };
+  /**
+   * @param {string?} txt
+   * @param {number?} scale
+   * @param {boolean?} sound
+   * @returns {{
+   *  _display: Display;
+   *  sound: boolean;
+   *  text: string;
+   *  _timeout: number?;
+   *  show: (time?: number) => void;
+   *  hide: () => void;
+   * }}
+   */
   return function(txt = 'alert', scale = 5, sound = true) {
     let obj = Object.create(proto);
     obj._display = new Display();
