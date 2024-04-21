@@ -69,7 +69,7 @@ const updateReg = reg('step', () => {
   const lines = TabList.getNames();
   // locs[16] === 'Catacombs'
   const startI = (currLoc === 16 ? lines.findIndex(v => v.startsWith('§r§e§lSkills:')) : lines.indexOf('§r§e§lStats:§r'));
-  if (startI < 0) return ['&cUnable to find stats'];
+  if (startI < 0) return display.setLine('&cUnable to find stats');
   let endI = lines.findIndex((v, i) => i > startI && (v === '§r' || !v.startsWith('§r ')));
   if (endI < 0) endI = lines.length;
 
