@@ -38,7 +38,8 @@ export function applyUpdate() {
   // oldMods.forEach(v => v.deleteOnExit()); // doesn't on crash
   const newModName = newMod.getName().slice(0, 'chicktilshelper-1.0'.length) + Date.now() + '.jar';
   newMod.renameTo(new File(modFolder, newModName));
-  new (Java.type('java.lang.ProcessBuilder'))(getJavaPath(), '-cp', `"${new File(modFolder, newModName).getPath()}"`, 'com.perseuspotter.chicktilshelper.ChickTilsUpdateHelper', ...oldMods.map(v => `"${v.getPath()}"`)).start();
+  // fuck constring
+  new (Java.type('java.lang.ProcessBuilder'))(getJavaPath().toString(), '-cp', `"${new File(modFolder, newModName).getPath()}"`.toString(), 'com.perseuspotter.chicktilshelper.ChickTilsUpdateHelper', ...oldMods.map(v => `"${v.getPath()}"`.toString())).start();
   rimraf(rel('temp/chicktilshelper'));
   copy(new File(rel('temp')), new File(rel('')));
   deleteDownload();
