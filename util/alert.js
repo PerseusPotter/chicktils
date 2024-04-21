@@ -1,4 +1,22 @@
 import { _setTimeout, _clearTimeout } from './timers';
+import createTextGui from './customtextgui';
+import { reg } from './registerer';
+
+/**
+ * @typedef {{
+   *  _display: import('./customtextgui').CustomTextGui;
+*  sound: boolean;
+*  text: string;
+*  _timeout: number?;
+*  show: (time?: number) => void;
+*  hide: () => void;
+* }} Alert
+ */
+/**
+ * @type {Alert[]}
+ */
+const activeAlerts = [];
+const renderReg = reg('renderOverlay', () => activeAlerts.forEach(v => v._display.render()));
 
 const createAlert = (function() {
   const alertSound = new Sound({ source: 'orb.ogg', priority: true, attenuation: 0, pitch: 0.5, volume: 1 });
@@ -7,8 +25,8 @@ const createAlert = (function() {
     _timeout: undefined,
     _display: undefined,
     show(time) {
-      this._display.setRenderLoc(Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2 - 30);
-      this._display.show();
+      activeAlerts.push(this);
+      renderReg.register();
       if (time) {
         if (this._timeout !== undefined) _clearTimeout(this._timeout);
         this._timeout = _setTimeout(() => this.hide(), time, this);
@@ -16,7 +34,9 @@ const createAlert = (function() {
       if (this.sound) alertSound.play();
     },
     hide() {
-      this._display.hide();
+      const i = activeAlerts.indexOf(this);
+      if (i >= 0) activeAlerts.splice(i, 1);
+      if (activeAlerts.length === 0) renderReg.unregister();
       if (this._timeout !== undefined) this._timeout = void (_clearTimeout(this._timeout));
     }
   };
@@ -24,30 +44,23 @@ const createAlert = (function() {
    * @param {string?} txt
    * @param {number?} scale
    * @param {boolean?} sound
-   * @returns {{
-   *  _display: Display;
-   *  sound: boolean;
-   *  text: string;
-   *  _timeout: number?;
-   *  show: (time?: number) => void;
-   *  hide: () => void;
-   * }}
+   * @returns {Alert}
    */
   return function(txt = 'alert', scale = 5, sound = true) {
+    /**
+     * @type {Alert}
+     */
     let obj = Object.create(proto);
-    obj._display = new Display();
-    obj._display.setAlign('CENTER');
-    obj._display.setTextColor(Renderer.RED);
-    obj._display.addLine(new DisplayLine(txt).setScale(scale));
-    obj._display.setRenderLoc(Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2 - 30);
-    obj._display.hide();
+    obj._display = createTextGui(() => ({ a: 4, s: scale, x: Renderer.screen.getWidth() / 2, y: Renderer.screen.getHeight() / 2 - 30 }));
+    obj._display.display.setTextColor(Renderer.RED);
+    obj._display.setLine(txt);
     obj.sound = sound;
     Object.defineProperty(obj, 'text', {
       get() {
-        return obj._display.getLine(0).getText();
+        return obj._display.display.getLine(0).getText();
       },
       set(v) {
-        obj._display.getLine(0).setText(v).setScale(scale);
+        obj._display.setLine(v);
       }
     });
     return obj;
