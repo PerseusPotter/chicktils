@@ -32,11 +32,31 @@ export function getUpdateVV() {
 };
 
 export function applyUpdate() {
+  const modFolder = new File(rel('chicktilshelper/build/libs'));
+  const newMod = new File(rel('temp/chicktilshelper/build/libs')).listFiles()[0];
+  const oldMods = modFolder.listFiles();
+  // oldMods.forEach(v => v.deleteOnExit()); // doesn't on crash
+  const newModName = newMod.getName().slice(0, 'chicktilshelper-1.0'.length) + Date.now() + '.jar';
+  newMod.renameTo(new File(modFolder, newModName));
+  new (Java.type('java.lang.ProcessBuilder'))(getJavaPath(), '-cp', `"${new File(modFolder, newModName).getPath()}"`, 'com.perseuspotter.chicktilshelper.ChickTilsUpdateHelper', ...oldMods.map(v => `"${v.getPath()}"`)).start();
+  rimraf(rel('temp/chicktilshelper'));
   copy(new File(rel('temp')), new File(rel('')));
-  FileLib.deleteDirectory(rel('temp'));
+  deleteDownload();
 };
 
+export function deleteDownload() {
+  rimraf(rel('temp'));
+}
+
+const System = Java.type('java.lang.System');
+function getJavaPath() {
+  // https://stackoverflow.com/a/24295025
+  if (System.getProperty('os.name').startsWith('Win')) return System.getProperties().getProperty('java.home') + File.separator + 'bin' + File.separator + 'javaw.exe';
+  return System.getProperties().getProperty('java.home') + File.separator + 'bin' + File.separator + 'javaw';
+}
 function rimraf(src) {
+  if (!(src instanceof File)) src = new File(src);
+  if (!src.exists()) return;
   src.listFiles()?.forEach(f => {
     if (f.isDirectory()) rimraf(f);
     else f.delete();
