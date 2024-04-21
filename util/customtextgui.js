@@ -141,6 +141,7 @@ export default function createTextGui(getLoc, getEditText, str = '') {
       ca = a;
       obj.display.setAlign((a & 1) === 0 ? 'LEFT' : 'RIGHT');
       obj.display.setOrder((a & 2) === 0 ? 'DOWN' : 'UP');
+      if (a === 4) obj.display.setAlign('CENTER');
     }
   };
   Client.scheduleTask(() => updateLocCache());
