@@ -99,7 +99,9 @@ const updateReg = reg('step', () => {
   const inv = Player.getInventory();
   if (!inv) return;
   const item = inv.getStackInSlot(8);
-  if (!item || item.getRegistryName() !== 'minecraft:feather') return;
+  if (!item) return;
+  const n = item.getRegistryName();
+  if (n !== 'minecraft:feather' || n !== 'minecraft:arrow') return;
 
   const lore = item.getLore()[5];
   if (!lore) return;
