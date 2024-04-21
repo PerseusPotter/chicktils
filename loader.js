@@ -1,5 +1,4 @@
 import settings from './settings';
-import { log } from './util/log';
 
 const JSLoader = Java.type('com.chattriggers.ctjs.engine.langs.js.JSLoader');
 const UrlModuleSourceProvider = Java.type('org.mozilla.javascript.commonjs.module.provider.UrlModuleSourceProvider');
