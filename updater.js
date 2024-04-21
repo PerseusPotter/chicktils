@@ -69,6 +69,10 @@ function copy(src, dst) {
   src.listFiles().forEach(f => {
     const d = new File(dst, f.getName());
     if (f.isDirectory()) copy(f, d);
-    else FileLib.write(d.getPath(), FileLib.read(f.getPath()));
+    else {
+      if (d.exists()) d.delete();
+      f.renameTo(d);
+      // FileLib.write(d.getPath(), FileLib.read(f.getPath()));
+    }
   });
 }
