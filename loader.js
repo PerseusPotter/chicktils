@@ -15,8 +15,8 @@ function RequireNoCache(name) {
     return require('./modules/' + name);
   }
 
-  StrongCachingModuleScriptProvider = new StrongCachingModuleScriptProviderClass(UrlModuleSourceProviderInstance);
-  CTRequire = new JSLoader.CTRequire(StrongCachingModuleScriptProvider);
+  // StrongCachingModuleScriptProvider = new StrongCachingModuleScriptProviderClass(UrlModuleSourceProviderInstance);
+  // CTRequire = new JSLoader.CTRequire(StrongCachingModuleScriptProvider);
   return CTRequire('./modules/' + name);
 }
 
