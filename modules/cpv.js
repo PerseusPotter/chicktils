@@ -13,7 +13,7 @@ function cpv(user) {
     try {
       const uuid = userUUIDC.has(user) ? userUUIDC.get(user) : urlToString('https://api.ashcon.app/mojang/v2/uuid/' + user);
       if (!uuid || uuid.length !== 36) {
-        userUUIDC.set(user, '');
+        // userUUIDC.set(user, '');
         log('Player not found.');
         return;
       }
