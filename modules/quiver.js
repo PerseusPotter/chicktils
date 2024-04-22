@@ -101,7 +101,7 @@ const updateReg = reg('step', () => {
   const item = inv.getStackInSlot(8);
   if (!item) return;
   const n = item.getRegistryName();
-  if (n !== 'minecraft:feather' || n !== 'minecraft:arrow') return;
+  if (n !== 'minecraft:feather' && n !== 'minecraft:arrow') return;
 
   const lore = item.getLore()[5];
   if (!lore) return;
