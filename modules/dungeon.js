@@ -328,7 +328,8 @@ function onPuzzleFail(name) {
   let i = name.indexOf(' ');
   if (i < 0) i = name.length;
   if (name.slice(1, i) !== Player.getName()) return;
-  execCmd('gfs ARCHITECT_FIRST_DRAFT 1');
+  // You can't use this command while in combat! (blaze)
+  Client.scheduleTask(20, execCmd('gfs ARCHITECT_FIRST_DRAFT 1'));
   shitterAlert.show();
 }
 const puzzleFailReg = register('chat', onPuzzleFail).setCriteria('&r&c&lPUZZLE FAIL! &r&${name} ${*}');
