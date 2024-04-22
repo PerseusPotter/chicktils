@@ -149,11 +149,7 @@ register('command', ...args => {
 })).setName('chicktils').setAliases('csm', 'cts');
 
 if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
-  // log('helper mod not found, please copy it from `/ct files -> modules -> chicktils -> chicktilshelper -> build -> libs` to your mod folder');
-  const src = new (Java.type('java.io.File'))('./config/ChatTriggers/modules/chicktils/chicktilshelper/build/libs/chicktilshelper-1.0.jar').toPath();
-  const dst = Java.type('java.nio.file.Paths').get('./mods/chicktilshelper-1.0.jar');
-  Java.type('java.nio.Files').copy(src, dst, Java.type('java.nio.file.StandardCopyOption').REPLACE_EXISTING);
-  crashGame('need to load helper mod (it has been copied for you) :D');
+  log('helper mod not found, some features may not work');
 }
 
 const worldLoadOnce = register('worldLoad', () => {
