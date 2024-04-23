@@ -5,12 +5,12 @@ import { log } from '../util/log';
 
 const userUUIDC = new Map();
 function _getUUID(user) {
-  let uuid = urlToString('https://api.ashcon.app/mojang/v2/uuid/' + user);
+  let uuid = urlToString('https://api.mojang.com/users/profiles/minecraft/' + user);
+  if (uuid) uuid = JSON.parse(uuid).id;
+  if (uuid) return uuid;
+  uuid = urlToString('https://api.ashcon.app/mojang/v2/uuid/' + user);
   if (uuid && uuid.length === 36) return uuid;
-  uuid = urlToString('https://api.mojang.com/users/profiles/minecraft/' + user);
-  if (!uuid) return '';
-  uuid = JSON.parse(uuid).id;
-  return uuid || '';
+  return '';
 }
 function getUUID(user) {
   if (userUUIDC.has(user)) return userUUIDC.get(user);
