@@ -34,7 +34,7 @@ const createAlert = (function() {
       if (this.sound) alertSound.play();
     },
     hide() {
-      const i = activeAlerts.indexOf(this);
+      const i = activeAlerts.findIndex(v => v === this);
       if (i >= 0) activeAlerts.splice(i, 1);
       if (activeAlerts.length === 0) renderReg.unregister();
       if (this._timeout !== undefined) this._timeout = void (_clearTimeout(this._timeout));
