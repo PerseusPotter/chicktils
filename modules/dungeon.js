@@ -25,6 +25,8 @@ function reset() {
   bossEnterReg.unregister();
   bossEndReg.unregister();
   dungeonLeaveReg.unregister();
+
+  shitterAlert.hide();
 }
 function start() {
   isInBoss = false;
