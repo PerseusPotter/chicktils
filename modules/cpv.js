@@ -4,6 +4,20 @@ import settings from '../settings';
 import { log } from '../util/log';
 
 const userUUIDC = new Map();
+function _getUUID(user) {
+  let uuid = urlToString('https://api.ashcon.app/mojang/v2/uuid/' + user);
+  if (uuid && uuid.length === 36) return uuid;
+  uuid = urlToString('https://api.mojang.com/users/profiles/minecraft/' + user);
+  if (!uuid) return '';
+  uuid = JSON.parse(uuid).id;
+  return uuid || '';
+}
+function getUUID(user) {
+  if (userUUIDC.has(user)) return userUUIDC.get(user);
+  const uuid = _getUUID(user);
+  if (uuid) userUUIDC.set(user, uuid);
+  return uuid;
+}
 const NotEnoughUpdates = Java.type('io.github.moulberry.notenoughupdates.NotEnoughUpdates');
 function cpv(user) {
   if (!NotEnoughUpdates) return log('you need neu silly');
@@ -11,13 +25,8 @@ function cpv(user) {
   user = user.toLowerCase();
   new Thread(() => {
     try {
-      const uuid = userUUIDC.has(user) ? userUUIDC.get(user) : urlToString('https://api.ashcon.app/mojang/v2/uuid/' + user);
-      if (!uuid || uuid.length !== 36) {
-        // userUUIDC.set(user, '');
-        log('Player not found.');
-        return;
-      }
-      userUUIDC.set(user, uuid);
+      const uuid = getUUID(user);
+      if (!uuid) return log('Player not found.');
 
       const uuidNoDash = uuid.replace(/-/g, '');
       if (!NotEnoughUpdates.profileViewer.getUuidToHypixelProfile().containsKey(uuidNoDash)) {
