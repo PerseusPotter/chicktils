@@ -313,14 +313,6 @@ function onBuildStart() {
   supplyPickReg.unregister();
   cannonReg.register();
 }
-function onBuildEnd() {
-  hpOverlayReg.register();
-  hasBuildEnded = true;
-}
-function onDpsStart() {
-  hideTitleReg.register();
-  dirOverlayReg.register();
-}
 
 function reset() {
   regInst.unregister();
@@ -364,10 +356,16 @@ function start() {
 // const kuudraJoinReg = reg('chat', () => kuudra.emit('kuudraJoin')).setChatCriteria('&e[NPC] &cElle&f: &rTalk with me to begin!&r');
 const kuudraStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &cElle&f: &rOkay adventurers, I will go and fish up Kuudra!&r');
 // const supplyStartReg = reg('chat', () => kuudra.emit('supplyStart')).setChatCriteria('&e[NPC] &cElle&f: &rNot again!&r');
-const buildStartReg = reg('chat', () => kuudra.emit('buildStart')).setCriteria('&e[NPC] &cElle&f: &rOMG! Great work collecting my supplies!&r');
-const buildEndReg = reg('chat', () => kuudra.emit('buildEnd')).setCriteria('&e[NPC] &cElle&f: &rPhew! The Ballista is finally ready! It should be strong enough to tank Kuudra\'s blows now!&r');
+const buildStartReg = reg('chat', () => onBuildStart()).setCriteria('&e[NPC] &cElle&f: &rOMG! Great work collecting my supplies!&r');
+const buildEndReg = reg('chat', () => {
+  hpOverlayReg.register();
+  hasBuildEnded = true;
+}).setCriteria('&e[NPC] &cElle&f: &rPhew! The Ballista is finally ready! It should be strong enough to tank Kuudra\'s blows now!&r');
 // const stunReg = reg('chat', () => kuudra.emit('stun')).setChatCriteria('&e[NPC] &cElle&f: &rThat looks like it hurt! Quickly, while &cKuudra is distracted, shoot him with the Ballista&f!&r');
-const dpsStartReg = reg('chat', () => kuudra.emit('dpsStart')).setChatCriteria('&e[NPC] &cElle&f: &rPOW! SURELY THAT\'S IT! I don\'t think he has any more in him!&r');
+const dpsStartReg = reg('chat', () => {
+  hideTitleReg.register();
+  dirOverlayReg.register();
+}).setChatCriteria('&e[NPC] &cElle&f: &rPOW! SURELY THAT\'S IT! I don\'t think he has any more in him!&r');
 // const kuudraEndReg = reg('chat', () => kuudra.emit('kuudraEnd')).setChatCriteria('&r&f                               &r&6&lKUUDRA DOWN!&r');
 const kuudraLeaveReg = reg('worldUnload', () => kuudra.emit('kuudraLeave'));
 
