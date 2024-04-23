@@ -1,4 +1,3 @@
-import { dungeon } from '../util/game';
 import settings from '../settings';
 import data from '../data';
 import createGui from '../util/customgui';
@@ -21,10 +20,11 @@ function reset() {
   quizFailReg.unregister();
   architectUseReg.unregister();
 
-  dungeon.removeListener('bloodOpen', onBloodOpen);
-  dungeon.removeListener('bossEnter', onBossEnter);
-  dungeon.removeListener('bossEnd', onBossEnd);
-  dungeon.removeListener('dungeonLeave', reset);
+  bloodOpenReg.unregister();
+  bloodEndReg.unregister();
+  bossEnterReg.unregister();
+  bossEndReg.unregister();
+  dungeonLeaveReg.unregister();
 }
 function start() {
   isInBoss = false;
@@ -41,6 +41,7 @@ function start() {
   lastRoom = '';
   motionData.clear();
   bloodOpenTime = 0;
+  bloodClosed = false;
   powerupCand = [];
   hiddenPowerups.clear();
   renderEntReg.register();
@@ -55,10 +56,11 @@ function start() {
   quizFailReg.register();
   architectUseReg.register();
 
-  dungeon.on('bloodOpen', onBloodOpen);
-  dungeon.on('bossEnter', onBossEnter);
-  dungeon.on('bossEnd', onBossEnd);
-  dungeon.on('dungeonLeave', reset);
+  bloodOpenReg.register();
+  bloodEndReg.register();
+  bossEnterReg.register();
+  bossEndReg.register();
+  dungeonLeaveReg.register();
 }
 
 const dist = (n1, n2) => n1 < n2 ? n2 - n1 : n1 - n2;
@@ -79,6 +81,7 @@ let bloodX = -1;
 let bloodZ = -1;
 const motionData = new Map();
 let bloodOpenTime = 0;
+let bloodClosed = false;
 let map;
 const mapDisplay = createGui(() => data.dungeonMapLoc, renderMap, renderMapEdit);
 let lastRoom = '';
@@ -133,7 +136,7 @@ function entitySpawn(evn) {
   if (c === 'EntityArmorStand') {
     if (settings.dungeonHideHealerPowerups) powerupCand.unshift([Date.now(), e]);
     if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) nameCand.push(e);
-    if (settings.dungeonCamp) possibleSkulls.push(e);
+    if (settings.dungeonCamp && !bloodClosed) possibleSkulls.push(e);
   } else if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss) && isDungeonMob(c)) mobCand.push(e);
 }
 function toJavaCol(c) {
@@ -329,7 +332,7 @@ function onPuzzleFail(name) {
   if (i < 0) i = name.length;
   if (name.slice(1, i) !== Player.getName()) return;
   // You can't use this command while in combat! (blaze)
-  Client.scheduleTask(20, execCmd('gfs ARCHITECT_FIRST_DRAFT 1'));
+  Client.scheduleTask(20, () => execCmd('gfs ARCHITECT_FIRST_DRAFT 1'));
   shitterAlert.show();
 }
 const puzzleFailReg = register('chat', onPuzzleFail).setCriteria('&r&c&lPUZZLE FAIL! &r&${name} ${*}');
@@ -442,12 +445,6 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
   } catch (e) { }
 });
 
-function onBloodOpen() {
-  if (!bloodOpenTime) bloodOpenTime = Date.now();
-}
-function onBossEnter() {
-  isInBoss = true;
-}
 function onBossEnd() {
   if (settings.dungeonHecatombAlert) {
     /**
@@ -464,6 +461,52 @@ function onBossEnd() {
   }
 }
 
+// const dungeonJoinReq = reg('chat', () => dungeon.emit('dungeonJoin')).setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}');
+const dungeonStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
+const dungeonLeaveReg = reg('worldUnload', () => reset());
+const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = Date.now())).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r');
+const bloodEndReg = reg('chat', () => bloodClosed = true).setCriteria('&r&c[BOSS] The Watcher&r&f: That will be enough for now.&r');
+const bossEnterReg = reg('chat', (name, msg) => {
+  switch (name) {
+    case 'The Watcher':
+      if (!bloodOpenTime) bloodOpenTime = Date.now();
+      break;
+    case 'Scarf':
+      if (msg === `How can you move forward when you keep regretting the past?`) break;
+      if (msg === `If you win, you live. If you lose, you die. If you don't fight, you can't win.`) break;
+      if (msg === `If I had spent more time studying and less time watching anime, maybe mother would be here with me!`) break;
+    default:
+      isInBoss = true;
+  }
+}).setChatCriteria('&r&c[BOSS] ${name}&r&f: ${msg}&r');
+const bossEndReg = reg('chat', (name, msg) => {
+  if (name.endsWith('Livid') && msg === `Impossible! How did you figure out which one I was?!`) onBossEnd();
+  switch (name) {
+    case 'Bonzo':
+      if (msg === `Alright, maybe I'm just weak after all..`) onBossEnd();
+      break;
+    case 'Scarf':
+      if (msg === `Whatever...`) onBossEnd();
+      break;
+    case 'The Professor':
+      if (msg === `What?! My Guardian power is unbeatable!`) onBossEnd();
+      break;
+    case 'Thorn':
+      // if (msg === `This is it... where shall I go now?`) onBossEnd();
+      break;
+    case 'Sadan':
+      if (msg === `Maybe in another life. Until then, meet my ultimate corpse.`) onBossEnd();
+      break;
+    case 'Necron':
+      if (msg === `All this, for nothing...`) onBossEnd();
+      break;
+    case 'Wither King':
+      // if (msg === `Incredible. You did what I couldn't do myself.`) onBossEnd();
+      break;
+  }
+}).setChatCriteria('&r&c[BOSS] ${name}&r&f: ${msg}&r');
+// const dungeonEndReg = reg('chat', () => dungeon.emit('dungeonEnd')).setChatCriteria('&r&f                            &r&fTeam Score:').setParameter('START');
+
 export function init() {
   settings._dungeonCampSmoothTime.onAfterChange(v => {
     if (v <= 1000) stepVarReg.setFps(1000 / v);
@@ -472,9 +515,9 @@ export function init() {
   settings._moveDungeonMap.onAction(() => mapDisplay.edit());
 }
 export function load() {
-  dungeon.on('dungeonStart', start);
+  dungeonStartReg.register();
 }
 export function unload() {
-  dungeon.removeListener('dungeonStart', start);
+  dungeonStartReg.unregister();
   reset();
 }

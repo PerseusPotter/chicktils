@@ -1,4 +1,3 @@
-import { kuudra } from '../util/game';
 import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, renderArrowTo, renderWaypoints } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
@@ -330,10 +329,12 @@ function reset() {
   tickReg.unregister();
   updateReg1.unregister();
   bossBarReg.unregister();
-  kuudra.removeListener('buildStart', onBuildStart);
-  kuudra.removeListener('buildEnd', onBuildEnd);
-  kuudra.removeListener('dpsStart', onDpsStart);
-  kuudra.removeListener('kuudraLeave', reset);
+
+  buildStartReg.unregister();
+  buildEndReg.unregister();
+  dpsStartReg.unregister();
+  kuudraLeaveReg.unregister();
+
   cannonReg.unregister();
   hideTitleReg.unregister();
   hpOverlayReg.unregister();
@@ -350,21 +351,33 @@ function start() {
   updateReg1.register();
   bossBarReg.register();
   supplyPickReg.register();
-  kuudra.on('buildStart', onBuildStart);
-  kuudra.on('buildEnd', onBuildEnd);
-  kuudra.on('dpsStart', onDpsStart);
-  kuudra.on('kuudraLeave', reset);
+
+  buildStartReg.register();
+  buildEndReg.register();
+  dpsStartReg.register();
+  kuudraLeaveReg.register();
+
   hpOverlayReg.register();
   addPearls();
 }
+
+// const kuudraJoinReg = reg('chat', () => kuudra.emit('kuudraJoin')).setChatCriteria('&e[NPC] &cElle&f: &rTalk with me to begin!&r');
+const kuudraStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &cElle&f: &rOkay adventurers, I will go and fish up Kuudra!&r');
+// const supplyStartReg = reg('chat', () => kuudra.emit('supplyStart')).setChatCriteria('&e[NPC] &cElle&f: &rNot again!&r');
+const buildStartReg = reg('chat', () => kuudra.emit('buildStart')).setCriteria('&e[NPC] &cElle&f: &rOMG! Great work collecting my supplies!&r');
+const buildEndReg = reg('chat', () => kuudra.emit('buildEnd')).setCriteria('&e[NPC] &cElle&f: &rPhew! The Ballista is finally ready! It should be strong enough to tank Kuudra\'s blows now!&r');
+// const stunReg = reg('chat', () => kuudra.emit('stun')).setChatCriteria('&e[NPC] &cElle&f: &rThat looks like it hurt! Quickly, while &cKuudra is distracted, shoot him with the Ballista&f!&r');
+const dpsStartReg = reg('chat', () => kuudra.emit('dpsStart')).setChatCriteria('&e[NPC] &cElle&f: &rPOW! SURELY THAT\'S IT! I don\'t think he has any more in him!&r');
+// const kuudraEndReg = reg('chat', () => kuudra.emit('kuudraEnd')).setChatCriteria('&r&f                               &r&6&lKUUDRA DOWN!&r');
+const kuudraLeaveReg = reg('worldUnload', () => kuudra.emit('kuudraLeave'));
 
 export function init() {
   settings._moveKuudraHp.onAction(() => hpDisplay.edit());
 }
 export function load() {
-  kuudra.on('kuudraStart', start);
+  kuudraStartReg.register();
 }
 export function unload() {
-  kuudra.removeListener('kuudraStart', start);
+  kuudraStartReg.unregister();
   reset();
 }
