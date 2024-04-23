@@ -7,7 +7,7 @@ import * as Updater from './updater';
 import { centerMessage } from './util/format';
 setIsMainS();
 setIsMainD();
-const VERSION = '0.1.1';
+const VERSION = '0.1.2';
 
 let sev;
 function tryUpdate(delay = 0) {
