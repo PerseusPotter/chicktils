@@ -601,6 +601,12 @@ export const props = {
   quiverShowRefillThresh: new Property('QuiverRefillCostDisplayThreshold', page, ++sort, Property.Type.Percent, 25, { desc: 'only show refill cost when below this amount full', min: 0, max: 100 }),
 
   // 11
+  enablerabbit: new Property('EnableRabbitTils', ++page, sort = 0, Property.Type.Toggle, false),
+  rabbitBoxColor: new Property('RabbitTilsBoxColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
+  rabbitBoxEsp: new Property('RabbitTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
+  rabbitAlertTime: new Property('RabbitTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { min: 0 }),
+
+  // 12
   enableabsorption: new Property('EnableCustomAbsorption', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'custom absorption renderer to more accurately portray total hp' }),
   absorptionMaxHearts: new Property('AbsorptionMaxHearts', page, ++sort, Property.Type.Integer, 40, { desc: 'caps hearts for things like mastiff', min: 0 }),
 
@@ -634,6 +640,7 @@ const pageNames = [
   'Crystal Alert',
   'Command Aliases',
   'Quiver Display',
+  'Rabbit',
   'Misc.'
 ];
 /**
