@@ -5,6 +5,7 @@ import { log } from '../util/log';
 
 const userUUIDC = new Map();
 function _getUUID(user) {
+  if (!user) return Player.getUUID();
   let uuid;
   try {
     uuid = urlToString('https://api.mojang.com/users/profiles/minecraft/' + user);
@@ -24,8 +25,8 @@ function getUUID(user) {
 const NotEnoughUpdates = Java.type('io.github.moulberry.notenoughupdates.NotEnoughUpdates');
 function cpv(user) {
   if (!NotEnoughUpdates) return log('you need neu silly');
-  if (!user) user = Player.getName();
-  user = user.toLowerCase();
+  // if (!user) user = Player.getName();
+  user = user?.toLowerCase();
   new Thread(() => {
     try {
       const uuid = getUUID(user);
