@@ -196,8 +196,9 @@ const step10Reg = reg('step', () => {
 
         const id = getBucketId(e);
         if (!bucket.has(id)) return true;
-        const ent = bucket.get(id).find(v => equalish(v.field_70165_t, x) && equalish(v.field_70161_v, z) && v.field_70163_u < y && y - v.field_70163_u < 5);
-        if (!ent) return true;
+        const ents = bucket.get(id).filter(v => equalish(v.field_70165_t, x) && equalish(v.field_70161_v, z) && v.field_70163_u < y && y - v.field_70163_u < 5);
+        if (ents.length === 0) return true;
+        const ent = ents.reduce((a, v) => dist(a.field_70165_t, x) + dist(a.field_70161_v, z) > dist(v.field_70165_t, x) - dist(v.field_70161_v, z) ? v : a, ents[0]);
 
         let h = 2;
         let c = settings.dungeonBoxMobColor;
