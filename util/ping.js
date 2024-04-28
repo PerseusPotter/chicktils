@@ -7,8 +7,8 @@ export default function getPing() {
   if (!Ping) return 0;
   const t = Date.now();
   if (t - lastPing > settings.pingRefreshDelay) {
-    Ping.sendPing();
+    Ping.INSTANCE.sendPing();
     lastPing = t;
   }
-  return Ping.pingCache;
+  return Ping.INSTANCE.getPingCache();
 }
