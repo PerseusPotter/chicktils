@@ -140,9 +140,9 @@ const promoteReg = reg('chat', (name, lvl, status, evn) => {
   if (!helper) return;
   cancel(evn);
   helper.deleteMessages([prevMessages[name]]);
-  const msg = `${name}&7 -> Lvl &b${lvl} ${status}`;
-  ChatLib.chat(msg);
-  prevMessages[name] = msg.toString(); // fuck rhino https://github.com/mozilla/rhino/issues/247
+  const msg = new Message(`${name}&7 -> Lvl &b${lvl} ${status}`);
+  msg.chat();
+  prevMessages[name] = msg.getFormattedText();
 }).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r');
 
 export function init() {
