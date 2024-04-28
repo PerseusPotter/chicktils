@@ -40,8 +40,8 @@ function tryUpdate(delay = 0) {
     centerMessage(ans);
     ans.chat();
     setTimeout(() => {
-      ChatLib.command('csmupdate deny', true);
       silentUpdate = true;
+      ChatLib.command('csmupdate deny', true);
     }, 10_000);
     return 0;
   } catch (e) {
