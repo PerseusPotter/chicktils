@@ -5,6 +5,7 @@ import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
 import { centerMessage } from './util/format';
+import getPing from './util/ping';
 setIsMainS();
 setIsMainD();
 const VERSION = '0.1.8';
@@ -93,8 +94,9 @@ register('command', ...args => {
         [
           `&9&l-> ChickTils v${VERSION}`,
           ' &3/chicktils &7(Alias &f/cts, /csm&7)',
-          ' &3/chicktils update &l-> &bchecks for updates',
           ' &3/chicktils help &l-> &bshows this help menu &7(Alias &f/chicktils ?&7)',
+          ' &3/chicktils update &l-> &bchecks for updates',
+          ' &3/chicktils ping &l-> &bcurrent ping (not refreshed maybe)',
           ' &3/chicktils reload &l-> &breloads modules',
           ' &3/chicktils unload &l-> &bunloads modules',
           ' &3/chicktils config view [<page>] &l-> &bopens the settings',
@@ -106,6 +108,9 @@ register('command', ...args => {
         new Thread(() => {
           if (tryUpdate() === -1) log('You are up to date!');
         }).start();
+        break;
+      case 'ping':
+        log(getPing());
         break;
       case 'config':
         if (args.length === 0) args = ['view'];
