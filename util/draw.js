@@ -1,5 +1,5 @@
 import RenderLib from '../../RenderLib/index';
-import { log, logDebug } from './log';
+import { log } from './log';
 if (!GlStateManager) {
   var GL11 = Java.type("org.lwjgl.opengl.GL11");
   var GlStateManager = Java.type("net.minecraft.client.renderer.GlStateManager");
@@ -308,4 +308,24 @@ export function drawBoxPos(x, y, z, w, h, c, f, esp = false, center = true, lw =
   }
   const bb = new AABB(x, y, z, x + w, y + h, z + w);
   drawBoxBB(bb, c, f, esp, lw);
+}
+
+/**
+ * https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/utils/RenderUtils.java#L47
+ * @param {number} size `InventoryBasic::func_70302_i_();`
+ * @param {number} xSlotPos `Slot::field_75223_e;`
+ * @param {number} ySlotPos `Slot::field_75221_f;`
+ * @param {number} color argb
+ */
+export function highlightSlot(size, xSlotPos, ySlotPos, color) {
+  const guiLeft = (Renderer.screen.getWidth() - 176) / 2;
+  const guiTop = (Renderer.screen.getHeight() - 222) / 2;
+  const x = guiLeft + xSlotPos;
+  let y = guiTop + ySlotPos;
+  // Move down when chest isn't 6 rows
+  if (size !== 90) y += (6 - (size - 36) / 9) * 9;
+
+  GL11.glTranslated(0, 0, 1);
+  Gui.func_73734_a(x, y, x + 16, y + 16, color | 0); // integer, e.g. 4278255360 (0xFF00FF00) -> -16711936
+  GL11.glTranslated(0, 0, -1);
 }
