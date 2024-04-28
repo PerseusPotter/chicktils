@@ -130,8 +130,10 @@ function roundRoomCoords(c) {
   return ((c + 9) & 0b11111111111111111111111111100000) - 9;
 }
 function addToBucket(id, v) {
-  if (!bucket.has(id)) bucket.set(id, []);
-  bucket.get(id).push(v);
+  if (!Array.isArray(bucket.get(id))) bucket.set(id, []);
+  // the fuck is rhino doing
+  // if (!bucket.has(id)) bucket.set(id, []);
+  bucket.get(id).push(v); // org.mozilla.javascript.EcmaError: TypeError: Cannot call method "push" of undefined
 }
 function entitySpawn(evn) {
   const e = evn.entity;
