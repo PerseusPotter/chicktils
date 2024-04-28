@@ -13,10 +13,10 @@ import { reg } from './registerer';
 * }} Alert
  */
 /**
- * @type {Alert[]}
+ * @type {Alert}
  */
-const activeAlerts = [];
-const renderReg = reg('renderOverlay', () => activeAlerts.forEach(v => v._display.render()));
+let activeAlert;
+const renderReg = reg('renderOverlay', () => activeAlert._display.render());
 
 const createAlert = (function() {
   const alertSound = new Sound({ source: 'orb.ogg', priority: true, attenuation: 0, pitch: 0.5, volume: 1 });
@@ -26,7 +26,7 @@ const createAlert = (function() {
     _display: undefined,
     show(time) {
       this.hide();
-      activeAlerts.push(this);
+      activeAlert = this;
       renderReg.register();
       if (time) {
         if (this._timeout !== undefined) _clearTimeout(this._timeout);
@@ -35,9 +35,10 @@ const createAlert = (function() {
       if (this.sound) alertSound.play();
     },
     hide() {
-      const i = activeAlerts.indexOf(this);
-      if (i >= 0) activeAlerts.splice(i, 1);
-      if (activeAlerts.length === 0) renderReg.unregister();
+      if (activeAlert === this) {
+        renderReg.unregister();
+        activeAlert = null;
+      }
       if (this._timeout !== undefined) this._timeout = void (_clearTimeout(this._timeout));
     }
   };
