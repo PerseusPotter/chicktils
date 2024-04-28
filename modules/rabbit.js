@@ -7,8 +7,10 @@ import { reg } from '../util/registerer';
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');
 let eggs = [];
+let activeEggs = [];
 function reset() {
   eggs = [];
+  activeEggs = [];
   eggCollectReg.unregister();
   eggStepReg.unregister();
   eggRenderReg.unregister();
@@ -23,25 +25,33 @@ function scanEgg() {
     const nbt = v.entity.func_71124_b(4)?.func_77978_p();
     if (!nbt) return false;
     const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
-    return ['55ae5624-c86b-359f-be54-e0ec7c175403', '015adc61-0aba-3d4d-b3d1-ca47a68a154b', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].includes(id);
+    return ['015adc61-0aba-3d4d-b3d1-ca47a68a154b', '55ae5624-c86b-359f-be54-e0ec7c175403', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].find((v, i) => activeEggs[i] && v === id);
   });
   if (eggs.length > l) {
     eggSpawnAlert.hide();
     eggFoundAlert.show(settings.rabbitAlertTime);
   }
 }
-const eggSpawnReg = reg('chat', () => {
+const types = {
+  Breakfast: 0,
+  Lunch: 1,
+  Dinner: 2
+};
+const eggSpawnReg = reg('chat', type => {
+  if (type === 'Breakfast') eggs = activeEggs = [];
   unloadReg.register();
   eggStepReg.register();
   eggCollectReg.register();
   eggRenderReg.register();
+  activeEggs[types[type]] = true;
   scanEgg();
   eggSpawnAlert.show(settings.rabbitAlertTime);
-}).setCriteria('&r&d&lHOPPITY\'S HUNT ${*} &r&dhas appeared!&r');
+}).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dA &r&${*}Chocolate ${type} Egg &r&dhas appeared!&r');
 const eggStepReg = reg('step', () => scanEgg()).setFps(5);
-const eggCollectReg = reg('chat', () => {
+const eggCollectReg = reg('chat', type => {
+  activeEggs[types[type]] = false;
   Client.scheduleTask(() => scanEgg());
-}).setCriteria('§r§d§lHOPPITY\'S HUNT §r§dYou found a ${*} §r§dwithin the §r${*}§r§d!§r').unregister();
+}).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').unregister();
 const eggRenderReg = reg('renderWorld', () => {
   const c = settings.rabbitBoxColor;
   const r = ((c >> 24) & 0xFF) / 256;
