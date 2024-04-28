@@ -358,10 +358,10 @@ class Settings {
         log(e);
       }
     });
+    if (isMainSettings) register('gameUnload', () => this.save());
   }
 
   save() {
-    if (!isMainSettings) return;
     FileLib.write(this.module, this.path,
       JSON.stringify(
         this.props
@@ -648,4 +648,3 @@ const pageNames = [
 const inst = new Settings('ChickTils', 'settings.json', props, pageNames);
 
 export default inst;
-register('gameUnload', () => inst.save());
