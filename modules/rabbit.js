@@ -134,7 +134,23 @@ const guiReg = reg('guiOpened', evn => {
   });
 });
 
-export function init() { }
+const prevMessages = {};
+const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
+const promoteReg = reg('chat', (name, lvl, status, evn) => {
+  if (!helper) return;
+  cancel(evn);
+  helper.deleteMessages([prevMessages[name]]);
+  const msg = `${name}&7 -> Lvl &b${lvl} ${status}`;
+  ChatLib.chat(msg);
+  prevMessages[name] = msg;
+}).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r');
+
+export function init() {
+  settings._rabbitCondenseChat.onAfterChange(v => {
+    if (v) promoteReg.register();
+    else promoteReg.unregister();
+  })
+}
 export function load() {
   eggSpawnReg.register();
   guiReg.register();
