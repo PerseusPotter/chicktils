@@ -5,6 +5,7 @@ import drawBeaconBeam from '../../BeaconBeam/index';
 import createTextGui from '../util/customtextgui';
 import { colorForNumber } from '../util/format';
 import { reg, regForge } from '../util/registerer';
+import getPing from '../util/ping';
 const { gsl_sf_lambert_W0: W, intersectPL } = require('../util/math');
 
 /**
@@ -97,8 +98,8 @@ const renderReg = reg('renderWorld', () => {
     const b = ((c >> 8) & 0xFF) / 256;
     // const a = ((c >> 0) & 0xFF) / 256;
 
-    const ticksLeft = ticksUntilPickup - (Date.now() - pickupStart);
-    pearlLocs.forEach(v => v.text = Math.max(0, (ticksLeft - v.ticks * 50) / 1000).toFixed(2) + 's');
+    const timeLeft = ticksUntilPickup - (Date.now() - pickupStart) - getPing();
+    pearlLocs.forEach(v => v.text = Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's');
     renderWaypoints(pearlLocs, r, g, b);
   }
   if (settings.kuudraRenderEmptySupplySpot && dropLocs.length > 0) {

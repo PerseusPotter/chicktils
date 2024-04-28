@@ -449,6 +449,7 @@ export const props = {
   enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'Toggles mod globally' }),
   autoUpdate: new Property('CheckForUpdates', page, ++sort, Property.Type.Toggle, true, { desc: 'check for updates when loaded' }),
   isDev: new Property('IsDev', page, ++sort, Property.Type.Toggle, false, { desc: 'negatively impacts loading performance and may spam your chat' }),
+  pingRefreshDelay: new Property('PingRefreshDelay', page, ++sort, Property.Type.Number, 10, { desc: 'how often (in seconds) to refresh ping. set to 0 to disable ping. requires skytils' }),
 
   // 2
   enablekuudra: new Property('EnableKuudra', ++page, sort = 0, Property.Type.Toggle, true),
