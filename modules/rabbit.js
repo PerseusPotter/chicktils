@@ -28,10 +28,7 @@ function scanEgg() {
     const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
     return ['015adc61-0aba-3d4d-b3d1-ca47a68a154b', '55ae5624-c86b-359f-be54-e0ec7c175403', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].find((v, i) => activeEggs[i] === 2 && v === id);
   });
-  if (eggs.length > l) {
-    eggSpawnAlert.hide();
-    eggFoundAlert.show(settings.rabbitAlertTime);
-  }
+  if (eggs.length > l) Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertTime));
 }
 const types = {
   Breakfast: 0,
