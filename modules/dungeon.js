@@ -393,8 +393,8 @@ const renderWorldReg = reg('renderWorld', () => {
       const wb = ((settings.dungeonCampWireColor >> 8) & 0xFF) / 256;
       const wa = ((settings.dungeonCampWireColor >> 0) & 0xFF) / 256;
       drawFilledBox(x, y + 2.5 - m, z, m, 2 * m, br, bg, bb, ba, settings.dungeonCampBoxEsp);
-      if (settings.dungeonCampBoxEsp) drawBoxAtBlock(x - 0.5, y + 1.5, z - 0.5, wr, wg, wb, 1, 2, wa);
-      else drawBoxAtBlockNotVisThruWalls(x - 0.5, y + 1.5, z - 0.5, wr, wg, wb, 1, 2, wa);
+      if (settings.dungeonCampBoxEsp) drawBoxAtBlock(x - 0.5, y + 1.5, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
+      else drawBoxAtBlockNotVisThruWalls(x - 0.5, y + 1.5, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
     });
   }
   if (settings.dungeonMap) {

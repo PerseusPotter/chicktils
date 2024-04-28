@@ -6,10 +6,10 @@ if (!GlStateManager) {
 }
 
 // soopy !
-export function drawBoxAtBlockNotVisThruWalls(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1) {
+export function drawBoxAtBlockNotVisThruWalls(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1, lw = 5) {
   GL11.glBlendFunc(770, 771);
   GL11.glEnable(GL11.GL_BLEND);
-  GL11.glLineWidth(5);
+  GL11.glLineWidth(lw);
   GL11.glDisable(GL11.GL_TEXTURE_2D);
   GlStateManager.func_179094_E();
 
@@ -47,10 +47,10 @@ export function drawBoxAtBlockNotVisThruWalls(x, y, z, colorR, colorG, colorB, w
   GL11.glEnable(GL11.GL_TEXTURE_2D);
   GL11.glDisable(GL11.GL_BLEND);
 };
-export function drawBoxAtBlock(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1) {
+export function drawBoxAtBlock(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1, lw = 5) {
   GL11.glBlendFunc(770, 771);
   GL11.glEnable(GL11.GL_BLEND);
-  GL11.glLineWidth(5);
+  GL11.glLineWidth(lw);
   GL11.glDisable(GL11.GL_TEXTURE_2D);
   GL11.glDisable(GL11.GL_DEPTH_TEST);
   GL11.glDepthMask(false);
