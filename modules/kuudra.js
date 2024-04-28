@@ -122,7 +122,7 @@ const renderReg = reg('renderWorld', () => {
       const z = v.getRenderZ();
       if (settings.kuudraBoxSuppliesEsp) drawBoxAtBlock(x - 3.25, y + 8, z + 2, r, g, b, 2.5, 2.5, a);
       else drawBoxAtBlockNotVisThruWalls(x - 3.25, y + 8, z + 2, r, g, b, 2.5, 2.5, a);
-      drawBeaconBeam(x - 2.5, y + 11, z + 2.75, r, g, b, a, false);
+      drawBeaconBeam(x - 2.5, y + 11, z + 2.75, r, g, b, a, !settings.kuudraBoxSuppliesEsp);
     });
   }
   if (settings.kuudraBoxChunks && chunks.length > 0) {
