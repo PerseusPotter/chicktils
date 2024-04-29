@@ -387,7 +387,7 @@ const renderWorldReg = reg('renderWorld', () => {
         y = lastEstY + (estY - lastEstY) * smoothFactor;
         z = lastEstZ + (estZ - lastEstZ) * smoothFactor;
       }
-      const m = (maxTtl - ttl + getPing() / 20) / maxTtl;
+      const m = (maxTtl - ttl + getPing() / 50) / maxTtl;
       const br = ((settings.dungeonCampBoxColor >> 24) & 0xFF) / 256;
       const bg = ((settings.dungeonCampBoxColor >> 16) & 0xFF) / 256;
       const bb = ((settings.dungeonCampBoxColor >> 8) & 0xFF) / 256;
