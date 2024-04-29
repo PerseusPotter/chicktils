@@ -1,5 +1,5 @@
 import RenderLib from '../../RenderLib/index';
-import { log } from './log';
+import { compareFloat, getAngle, rescale, rotate, toArray } from './math';
 if (!GlStateManager) {
   var GL11 = Java.type("org.lwjgl.opengl.GL11");
   var GlStateManager = Java.type("net.minecraft.client.renderer.GlStateManager");
@@ -219,6 +219,137 @@ export function renderArrowTo(color, theta, length = 20, yaw) {
   Renderer.drawLine(c, x2, y2, x2 + Math.cos(dt - Math.PI * 7 / 8) * length / 3, y2 + Math.sin(dt - Math.PI * 7 / 8) * length / 3, 1);
 }
 
+/**
+ * in radians
+ * @param {number} color rgba
+ * @param {number} theta radians
+ * @param {number} phi radians
+ * @param {number?} scale
+ * @param {number?} yaw degrees
+ * @param {number?} pitch degrees
+ */
+export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
+  if (yaw === undefined) yaw = Player.getYaw();
+  if (pitch === undefined) pitch = Player.getPitch();
+  const dt = theta - yaw / 180 * Math.PI - Math.PI / 2;
+  const dp = Math.PI - (phi - pitch / 180 * Math.PI);
+  let points = [
+    [+1, 0, +1],
+    [-1, 0, +1],
+    [+1, 0, -1],
+    [-1, 0, -1],
+
+    [+1, 4, +1],
+    [-1, 4, +1],
+    [+1, 4, -1],
+    [-1, 4, -1],
+
+    [+2, 4, +1],
+    [-2, 4, +1],
+    [+2, 4, -1],
+    [-2, 4, -1],
+
+    [+0, 6, +1],
+    [+0, 6, -1]
+  ].map(([x, y, z]) => toArray(rotate(x, y, z, dt, dp, 0)));
+  /*
+  const edges = [
+    [0, 1],
+    [0, 2],
+    [1, 3],
+    [2, 3],
+
+    [0, 4],
+    [1, 5],
+    [2, 6],
+    [3, 7],
+
+    [4, 6],
+    [5, 7],
+
+    [4, 8],
+    [5, 9],
+    [6, 10],
+    [7, 11],
+
+    [8, 10],
+    [9, 11],
+
+    [8, 12],
+    [9, 12],
+    [10, 13],
+    [11, 13],
+    [12, 13]
+  ].map(([p1, p2]) => [Math.max(points[p1][0], points[p2][0]), p1, p2]).sort((a, b) => compareFloat(b[0], a[0]));
+  */
+  points = points.map(([x, y, z]) => [z * scale + Renderer.screen.getWidth() / 2, y * scale + Renderer.screen.getHeight() / 2 + scale + 10, x]);
+  const polys = [
+    [0, 1, 2, 3],
+
+    [0, 2, 4, 6],
+    [1, 3, 5, 7],
+    [0, 1, 4, 5],
+    [2, 3, 6, 7],
+
+    [8, 9, 12],
+    [10, 11, 13],
+
+    [4, 6, 8, 10],
+    [5, 7, 9, 11],
+
+    [8, 10, 12, 13],
+    [9, 11, 12, 13]
+  ].map(v => v.map(v => points[v]));
+  polys.forEach((v, i) => {
+    v.w = Math.max.apply(null, v.map(v => v[2]));
+    v.o = i;
+  });
+  polys.sort((a, b) => compareFloat(b.w, a.w));
+  const norms = [
+    [0, -1, 0],
+
+    [1, 0, 0],
+    [-1, 0, 0],
+    [0, 0, 1],
+    [0, 0, -1],
+
+    [0, 0, 1],
+    [0, 0, -1],
+
+    [1, 0, 0],
+    [-1, 0, 0],
+
+    [1, 1, 0],
+    [-1, 1, 0]
+  ].map(([x, y, z]) => toArray(rotate(x, y, z, dt, dp, 0)));
+  // polys.forEach(v => v.forEach(v => v[2] = 0));
+  // const c2 = (color >> 8) | ((color & 0xFF) << 24);
+  // points.forEach(([x, y]) => Renderer.drawCircle(c2, x, y, 2, 10));
+  // points.forEach(([x, y], i) => Renderer.drawString(i.toString(), x, y));
+  // edges.forEach(([w, i, j]) => Renderer.drawLine(c2, points[i][0], points[i][1], points[j][0], points[j][1], 1));
+  polys.forEach(v => {
+    const n = norms[v.o];
+    const a = 1 - getAngle(
+      ...n,
+      -1, 0, 0,
+      false
+    ) / Math.PI;
+    drawPolygon(applyTint(color, rescale(a * a * a, 0, 1, 0.4, 1)), v);
+  });
+}
+/**
+ * @param {number} color rgba
+ * @param {number} dx
+ * @param {number} dy
+ * @param {number} dz
+ * @param {boolean?} rel
+ * @param {number?} scale
+ */
+export function drawArrow3DPos(color, dx, dy, dz, rel = true, scale) {
+  if (rel) return drawArrow3D(color, Math.atan2(dz, dx), Math.acos(dy / Math.hypot(dx, dy, dz)), scale);
+  return drawArrow3DPos(color, dx - getRenderX(), dy - getRenderY(), dz - getRenderZ(), scale);
+}
+
 const RenderUtil = Java.type('gg.skytils.skytilsmod.utils.RenderUtil');
 let interpolate;
 let getRenderX;
@@ -328,4 +459,51 @@ export function highlightSlot(size, xSlotPos, ySlotPos, color) {
   GL11.glTranslated(0, 0, 1);
   Gui.func_73734_a(x, y, x + 16, y + 16, color | 0); // integer, e.g. 4278255360 (0xFF00FF00) -> -16711936
   GL11.glTranslated(0, 0, -1);
+}
+
+const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
+const worldRen = tess.func_178180_c();
+/**
+ * @param {number} color rgba
+ * @param {number[][]} vertexes [x, y] or [x, y, depth]
+ * @link https://github.com/ChatTriggers/ChatTriggers/blob/3aac68d7aa6c3276ae79000306895130c291d85b/src/main/kotlin/com/chattriggers/ctjs/minecraft/libs/renderer/Renderer.kt#L225
+ */
+export function drawPolygon(color, vertexes) {
+  GlStateManager.func_179147_l();
+  GlStateManager.func_179090_x();
+  GlStateManager.func_179120_a(770, 771, 1, 0);
+  GlStateManager.func_179097_i();
+  GlStateManager.func_179129_p();
+
+  GlStateManager.func_179094_E();
+
+  const r = ((color >> 24) & 0xFF) / 256;
+  const g = ((color >> 16) & 0xFF) / 256;
+  const b = ((color >> 8) & 0xFF) / 256;
+  const a = ((color >> 0) & 0xFF) / 256;
+  GlStateManager.func_179131_c(r, g, b, a);
+  worldRen.func_181668_a(5, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+
+  vertexes.forEach(v => worldRen.func_181662_b(v[0], v[1], v[2] || 0).func_181675_d());
+  tess.func_78381_a();
+  GlStateManager.func_179121_F();
+
+  GlStateManager.func_179084_k();
+  GlStateManager.func_179098_w();
+  GlStateManager.func_179126_j();
+  GlStateManager.func_179089_o();
+}
+
+/**
+ * @param {number} c rgba
+ * @param {number} a [0, 1]
+ * @returns {number} rgba
+ */
+function applyTint(c, a) {
+  // (((( moment, i have 0 trust in bitwise associativity
+  return 0 |
+    ((((c >> 24) & 0xFF) * a) << 24) |
+    ((((c >> 16) & 0xFF) * a) << 16) |
+    ((((c >> 8) & 0xFF) * a) << 8) |
+    (c & 0xFF);
 }
