@@ -294,11 +294,6 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
     [8, 10, 12, 13],
     [9, 11, 12, 13]
   ].map(v => v.map(v => points[v]));
-  polys.forEach((v, i) => {
-    v.w = Math.max.apply(null, v.map(v => v[2]));
-    v.o = i;
-  });
-  polys.sort((a, b) => compareFloat(b.w, a.w));
   const norms = [
     [0, -1, 0],
 
@@ -310,26 +305,29 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
     [0, 0, 1],
     [0, 0, -1],
 
-    [1, 0, 0],
-    [-1, 0, 0],
+    [0, -1, 0],
+    [0, -1, 0],
 
     [1, 1, 0],
     [-1, 1, 0]
   ].map(([x, y, z]) => toArray(rotate(x, y, z, dt, dp, 0)));
-  // polys.forEach(v => v.forEach(v => v[2] = 0));
+  polys.forEach((v, i) => {
+    // rhino :clown:
+    // java.lang.ClassCastException
+    // ...norms[i]
+    const n = norms[i];
+    const a = getAngle(...n, -1, 0, 0, false) / Math.PI
+    v.a = 1 - a;
+    v.w = Math.min.apply(null, v.map(v => v[2]));
+  });
+  polys.sort((a, b) => compareFloat(b.w, a.w) || compareFloat(a.a, b.a));
+  polys.forEach(v => {
+    drawPolygon(applyTint(color, rescale(v.a * v.a * v.a, 0, 1, 0.3, 1)), v);
+  });
   // const c2 = (color >> 8) | ((color & 0xFF) << 24);
+  // edges.forEach(([w, i, j]) => Renderer.drawLine(c2, points[i][0], points[i][1], points[j][0], points[j][1], 1));
   // points.forEach(([x, y]) => Renderer.drawCircle(c2, x, y, 2, 10));
   // points.forEach(([x, y], i) => Renderer.drawString(i.toString(), x, y));
-  // edges.forEach(([w, i, j]) => Renderer.drawLine(c2, points[i][0], points[i][1], points[j][0], points[j][1], 1));
-  polys.forEach(v => {
-    const n = norms[v.o];
-    const a = 1 - getAngle(
-      ...n,
-      -1, 0, 0,
-      false
-    ) / Math.PI;
-    drawPolygon(applyTint(color, rescale(a * a * a, 0, 1, 0.4, 1)), v);
-  });
 }
 /**
  * @param {number} color rgba
@@ -341,7 +339,7 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
  */
 export function drawArrow3DPos(color, dx, dy, dz, rel = true, scale) {
   if (rel) return drawArrow3D(color, Math.atan2(dz, dx), Math.acos(dy / Math.hypot(dx, dy, dz)), scale);
-  return drawArrow3DPos(color, dx - getRenderX(), dy - getRenderY(), dz - getRenderZ(), scale);
+  return drawArrow3DPos(color, dx - getRenderX(), dy - getRenderY(), dz - getRenderZ(), true, scale);
 }
 
 const RenderUtil = Java.type('gg.skytils.skytilsmod.utils.RenderUtil');
