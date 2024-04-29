@@ -94,7 +94,7 @@ const guiReg = reg('guiOpened', evn => {
         .map(({ a, v }) => {
           const tag = v.func_77978_p().func_74775_l('display');
           const lore = tag.func_150295_c('Lore', 8);
-          let cost;
+          let cost = Number.POSITIVE_INFINITY;
           for (let i = 0; i < lore.func_74745_c(); i++) {
             let m = lore.func_150307_f(i).match(/^§6([\d,]+) Chocolate$/);
             if (m) {
@@ -106,6 +106,7 @@ const guiReg = reg('guiOpened', evn => {
         });
       if (rabbits.length > 0) {
         const bestRabbit = rabbits.reduce((a, v) => a.u < v.u ? v : a, rabbits[0]);
+        if (bestRabbit.u === 0) return;
         for (let i = 29; i <= 33; i++) {
           inv.func_70301_a(i - 9).func_77964_b(15);
         }

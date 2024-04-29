@@ -45,6 +45,24 @@ public class ChickTilsHelper {
     return false;
   }
 
+  public static String trimReset(String str) {
+    int l = -2;
+    while (l + 2 < str.length()) {
+      if (
+        (str.charAt(l + 2) == '§' || str.charAt(l + 2) == '&') &&
+        str.charAt(l + 3) == 'r'
+      ) l += 2; else break;
+    }
+    int r = str.length();
+    while (r - 2 >= 0) {
+      if (
+        (str.charAt(r - 2) == '§' || str.charAt(r - 2) == '&') &&
+        str.charAt(r - 1) == 'r'
+      ) r -= 2; else break;
+    }
+    return str.substring(l + 2, r);
+  }
+
   public static void deleteMessages(List<String> str) {
     try {
       GuiNewChat gui = Minecraft.getMinecraft().ingameGUI.getChatGUI();
@@ -56,7 +74,7 @@ public class ChickTilsHelper {
         ChatLine c = lines.get(i);
         try {
           if (
-            contains(str, c.getChatComponent().getFormattedText())
+            contains(str, trimReset(c.getChatComponent().getFormattedText()))
             // str.contains(c.getChatComponent().getFormattedText().substring(4))
           ) lines.remove(i);
         } catch (StringIndexOutOfBoundsException e) {}
