@@ -200,12 +200,12 @@ export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = t
 
 /**
  * in radians
- * @param {number} color
- * @param {number} theta
+ * @param {number} color rgba
+ * @param {number} theta radians
  * @param {number?} length
- * @param {number?} yaw
+ * @param {number?} yaw degrees
  */
-export function renderArrowTo(color, theta, length = 20, yaw) {
+export function drawArrow2D(color, theta, length = 20, yaw) {
   if (yaw === undefined) yaw = Player.getYaw();
   const dt = theta - yaw / 180 * Math.PI - Math.PI;
   const x1 = Renderer.screen.getWidth() / 2;
@@ -442,11 +442,11 @@ export function drawBoxPos(x, y, z, w, h, c, f, esp = false, center = true, lw =
 }
 
 /**
- * https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/utils/RenderUtils.java#L47
  * @param {number} size `InventoryBasic::func_70302_i_();`
  * @param {number} xSlotPos `Slot::field_75223_e;`
  * @param {number} ySlotPos `Slot::field_75221_f;`
  * @param {number} color argb
+ * @link https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/utils/RenderUtils.java#L47
  */
 export function highlightSlot(size, xSlotPos, ySlotPos, color) {
   const guiLeft = (Renderer.screen.getWidth() - 176) / 2;
