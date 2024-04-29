@@ -169,27 +169,21 @@ export function drawFilledBox(x, y, z, w, h, red, green, blue, alpha, phase) {
  */
 export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = true) {
   if (waypoints.length === 0) return;
-  let x = 0;
-  let y = 0;
-  let z = 0;
-  let w = 0;
-  let h = 0;
-  let distance = 0;
 
   waypoints.forEach((waypoint) => {
-    w = waypoint.w || 1;
-    h = waypoint.h || 1;
-    x = waypoint.x + (isCentered ? 0 : w / 2);
-    y = waypoint.y;
-    z = waypoint.z + (isCentered ? 0 : w / 2);
+    const w = waypoint.w || 1;
+    const h = waypoint.h || 1;
+    let x = waypoint.x + (isCentered ? 0 : w / 2);
+    let y = waypoint.y;
+    let z = waypoint.z + (isCentered ? 0 : w / 2);
 
-    distance = (Player.getX() - x) ** 2 + (Player.getY() - y) ** 2 + (Player.getZ() - z) ** 2;
+    let d = (getRenderX() - x) ** 2 + (getRenderY() - y) ** 2 + (getRenderZ() - z) ** 2;
 
-    if (distance >= 40000) {
-      distance = 200 / Math.sqrt(distance);
-      x = Player.getX() + (x - Player.getX()) * distance;
-      y = Player.getY() + (y - Player.getY()) * distance;
-      z = Player.getZ() + (z - Player.getZ()) * distance;
+    if (d >= 40000) {
+      d = 200 / Math.sqrt(d);
+      x = getRenderX() + (x - getRenderX()) * d;
+      y = getRenderY() + (y - getRenderY()) * d;
+      z = getRenderZ() + (z - getRenderZ()) * d;
     }
 
     RenderLib.drawEspBox(x, y, z, w, h, r, g, b, 1, phase)
@@ -352,9 +346,18 @@ export function drawArrow3DPos(color, dx, dy, dz, rel = true, scale) {
 
 const RenderUtil = Java.type('gg.skytils.skytilsmod.utils.RenderUtil');
 let interpolate;
-let getRenderX;
-let getRenderY;
-let getRenderZ;
+/**
+ * @type {() => number}
+ */
+export let getRenderX;
+/**
+ * @type {() => number}
+ */
+export let getRenderY;
+/**
+ * @type {() => number}
+ */
+export let getRenderZ;
 if (RenderUtil) {
   interpolate = RenderUtil.INSTANCE.interpolate.bind(RenderUtil.INSTANCE);
   getRenderX = RenderUtil.INSTANCE.getRenderX.bind(RenderUtil.INSTANCE);
@@ -364,19 +367,16 @@ if (RenderUtil) {
   interpolate = function(currentValue, lastValue, multiplier) {
     return lastValue + (currentValue - lastValue) * multiplier;
   };
-  if (!Client.getMinecraft()) log('fuck');
-  else {
-    const rm = Client.getMinecraft().func_175598_ae();
-    const xa = rm.class.getDeclaredField('field_78725_b');
-    xa.setAccessible(true);
-    const ya = rm.class.getDeclaredField('field_78726_c');
-    ya.setAccessible(true);
-    const za = rm.class.getDeclaredField('field_78723_d');
-    za.setAccessible(true);
-    getRenderX = function() { return xa.get(rm); };
-    getRenderY = function() { return ya.get(rm); };
-    getRenderZ = function() { return za.get(rm); };
-  }
+  const rm = Renderer.getRenderManager();
+  const xa = rm.class.getDeclaredField('field_78725_b');
+  xa.setAccessible(true);
+  const ya = rm.class.getDeclaredField('field_78726_c');
+  ya.setAccessible(true);
+  const za = rm.class.getDeclaredField('field_78723_d');
+  za.setAccessible(true);
+  getRenderX = function() { return xa.get(rm); };
+  getRenderY = function() { return ya.get(rm); };
+  getRenderZ = function() { return za.get(rm); };
 }
 const AABB = Java.type('net.minecraft.util.AxisAlignedBB');
 /**

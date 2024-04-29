@@ -1,4 +1,4 @@
-import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, renderArrowTo, renderWaypoints } from '../util/draw';
+import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawArrow2D, renderWaypoints, getRenderX, getRenderY, getRenderZ } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
 import drawBeaconBeam from '../../BeaconBeam/index';
@@ -154,7 +154,7 @@ const renderReg = reg('renderWorld', () => {
         Math.sin(phi) * Math.cos(theta),
         Math.cos(phi),
         Math.sin(phi) * Math.sin(theta),
-        Player.getX(), Player.getY(), Player.getZ(),
+        getRenderX(), getRenderY(), getRenderZ(),
         0, 0, 1,
         0, 0, -80
       ),
@@ -187,9 +187,9 @@ const tickReg = reg('tick', () => {
           Math.sin(phi) * Math.cos(theta),
           Math.cos(phi),
           Math.sin(phi) * Math.sin(theta),
-          Player.getX(),
-          Player.getY() + 1.5,
-          Player.getZ(),
+          getRenderX(),
+          getRenderY(),
+          getRenderZ(),
           0, 1, 0,
           0, 140, 0
         ),
@@ -269,7 +269,7 @@ const dirOverlayReg = reg('renderOverlay', () => {
       kuuder.getZ() > -85 ? 0.5 :
         kuuder.getX() < -120 ? 1 :
           1.5;
-  renderArrowTo(settings.kuudraArrowToKuudraColor, kt * Math.PI, 20, Player.getY() > 60 ? 0 : Player.getYaw());
+  drawArrow2D(settings.kuudraArrowToKuudraColor, kt * Math.PI, 20, Player.getY() > 60 ? 0 : Player.getYaw());
 });
 
 let regInst = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn);
