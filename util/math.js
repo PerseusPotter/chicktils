@@ -163,3 +163,108 @@ export function intersectPL(dx, dy, dz, x, y, z, nx, ny, nz, px, py, pz) {
   const d = b / a;
   return { x: x + dx * d, y: y + dy * d, z: z + dz * d };
 }
+
+/**
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} z1
+ * @param {number} x2
+ * @param {number} y2
+ * @param {number} z2
+ * @param {number} x3
+ * @param {number} y3
+ * @param {number} z3
+ * @returns {{ x: number, y: number, z: number }}
+ */
+export function getNormal(x1, y1, z1, x2, y2, z2, x3, y3, z3) {
+  const x4 = x1 - x2;
+  const y4 = y1 - y2;
+  const z4 = z1 - z2;
+  const x5 = x1 - x3;
+  const y5 = y1 - y3;
+  const z5 = z1 - z3;
+  return { x: y4 * z5 - z4 * y5, y: z4 * x5 - x4 * z5, z: x4 * y5 - y4 * x5 };
+}
+
+/**
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} z1
+ * @param {number} x2
+ * @param {number} y2
+ * @param {number} z2
+ * @param {boolean?} smallest
+ * @returns {number} radians
+ */
+export function getAngle(x1, y1, z1, x2, y2, z2, smallest = true) {
+  const dp = x1 * x2 + y1 * y2 + z1 * z2;
+  const a = Math.acos(dp / (Math.hypot(x1, y1, z1) * Math.hypot(x2, y2, z2)));
+  if (!smallest) return a;
+  if (dp >= 0) return a;
+  return Math.PI - a;
+}
+
+/**
+ * @param {number} f1
+ * @param {number} f2
+ * @param {number?} e
+ * @returns {number}
+ */
+export function compareFloat(f1, f2, e = 1e-6) {
+  const d = f1 - f2;
+  if (Math.abs(d) < e) return 0;
+  return Math.sign(d);
+}
+
+/**
+ *
+ * @param {number} n
+ * @param {number} oldMin
+ * @param {number} oldMax
+ * @param {number} newMin
+ * @param {number} newMax
+ * @returns {number}
+ */
+export function rescale(n, oldMin, oldMax, newMin, newMax) {
+  return (n - oldMin) / (oldMax - oldMin) * (newMax - newMin) + newMin;
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {number} t
+ * @param {number} p
+ * @param {number} r
+ * @returns {{ x: number, y: number, z: number }}
+ */
+export function rotate(x, y, z, t, p, r) {
+  const ct = Math.cos(t);
+  const st = Math.sin(t);
+  const cp = Math.cos(p);
+  const sp = Math.sin(p);
+  const cr = Math.cos(r);
+  const sr = Math.sin(r);
+  return {
+    x:
+      x * ct * cp +
+      z * (ct * sp * sr - st * cr) +
+      y * (ct * sp * cr + st * sr),
+    z:
+      x * st * cp +
+      z * (st * sp * sr + ct * cr) +
+      y * (st * sp * cr - ct * sr),
+    y:
+      x * -sp +
+      z * cp * sr +
+      y * cp * cr
+  };
+}
+
+/**
+ * @param {{ x: number, y: number, z: number }} pos
+ * @returns {[number, number, number]}
+ */
+export function toArray(pos) {
+  return [pos.x, pos.y, pos.z];
+}
