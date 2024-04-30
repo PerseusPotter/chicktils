@@ -1,4 +1,5 @@
 import { urlToFile, urlToString } from './util/net';
+import runHelper from './util/runner';
 const File = Java.type('java.io.File');
 export function loadMeta() {
   return JSON.parse(urlToString('https://api.github.com/repos/perseuspotter/chicktils/releases/latest', 1000, 1000));
@@ -38,8 +39,7 @@ export function applyUpdate() {
   // oldMods.forEach(v => v.deleteOnExit()); // doesn't on crash
   const newModName = newMod.getName().slice(0, 'chicktilshelper-1.0'.length) + Date.now() + '.jar';
   newMod.renameTo(new File(modFolder, newModName));
-  // fuck constring
-  new (Java.type('java.lang.ProcessBuilder'))(getJavaPath().toString(), '-cp', `"${new File(modFolder, newModName).getPath()}"`.toString(), 'com.perseuspotter.chicktilshelper.ChickTilsUpdateHelper', ...oldMods.map(v => `"${v.getPath()}"`.toString())).start();
+  runHelper('ChickTilsUpdateHelper', oldMods.map(v => `"${v.getPath()}"`.toString()));
   rimraf(rel('temp/chicktilshelper'));
   copy(new File(rel('temp')), new File(rel('')));
   deleteDownload();
@@ -49,12 +49,6 @@ export function deleteDownload() {
   rimraf(rel('temp'));
 }
 
-const System = Java.type('java.lang.System');
-function getJavaPath() {
-  // https://stackoverflow.com/a/24295025
-  if (System.getProperty('os.name').startsWith('Win')) return System.getProperties().getProperty('java.home') + File.separator + 'bin' + File.separator + 'javaw.exe';
-  return System.getProperties().getProperty('java.home') + File.separator + 'bin' + File.separator + 'javaw';
-}
 function rimraf(src) {
   if (!(src instanceof File)) src = new File(src);
   if (!src.exists()) return;
