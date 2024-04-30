@@ -524,6 +524,8 @@ export const props = {
 
   dungeonAutoArchitect: new Property('DungeonAutoGFSArchitect', page, ++sort, Property.Type.Toggle, true, { desc: 'auto gfs on puzzle fail' }),
 
+  dungeonInstaMidTimer: new Property('DungeonInstaMidTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'timer when instamidding' }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
