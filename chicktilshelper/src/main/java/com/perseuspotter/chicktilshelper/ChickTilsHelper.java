@@ -38,9 +38,9 @@ public class ChickTilsHelper {
     ((List<String>) (evn.toolTip)).add(str);
   }
 
-  public static boolean contains(List<String> strs, String str) {
-    for (int i = 0; i < strs.size(); i++) {
-      if (strs.get(i).equals(str)) return true;
+  public static boolean contains(String[] strs, String str) {
+    for (int i = 0; i < strs.length; i++) {
+      if (strs[i].equals(str)) return true;
     }
     return false;
   }
@@ -70,11 +70,13 @@ public class ChickTilsHelper {
       prop.setAccessible(true);
       List<ChatLine> lines = (List<ChatLine>) prop.get(gui);
 
+      String[] strs = new String[str.size()];
+      for (int i = 0; i < str.size(); i++) strs[i] = trimReset(str.get(i));
       for (int i = lines.size() - 1; i >= 0; i--) {
         ChatLine c = lines.get(i);
         try {
           if (
-            contains(str, trimReset(c.getChatComponent().getFormattedText()))
+            contains(strs, trimReset(c.getChatComponent().getFormattedText()))
             // str.contains(c.getChatComponent().getFormattedText().substring(4))
           ) lines.remove(i);
         } catch (StringIndexOutOfBoundsException e) {}
