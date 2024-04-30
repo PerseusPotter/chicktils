@@ -6,6 +6,7 @@ import createAlert from '../util/alert';
 import { reg, regForge } from '../util/registerer';
 import { execCmd } from '../util/format';
 import getPing from '../util/ping';
+import runHelper from '../util/runner';
 
 let entSpawnReg = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn);
 function reset() {
@@ -20,6 +21,7 @@ function reset() {
   puzzleFailReg.unregister();
   quizFailReg.unregister();
   architectUseReg.unregister();
+  necronStartReg.unregister();
 
   bloodOpenReg.unregister();
   bloodEndReg.unregister();
@@ -28,6 +30,10 @@ function reset() {
   dungeonLeaveReg.unregister();
 
   shitterAlert.hide();
+  if (instaMidProc && instaMidProc.isAlive()) {
+    instaMidProc.destroyForcibly();
+    instaMidProc = void 0;
+  }
 }
 function start() {
   isInBoss = false;
@@ -47,6 +53,7 @@ function start() {
   bloodClosed = false;
   powerupCand = [];
   hiddenPowerups.clear();
+
   renderEntReg.register();
   renderWorldReg.register();
   renderOvlyReg.register();
@@ -58,6 +65,7 @@ function start() {
   puzzleFailReg.register();
   quizFailReg.register();
   architectUseReg.register();
+  necronStartReg.register();
 
   bloodOpenReg.register();
   bloodEndReg.register();
@@ -102,6 +110,7 @@ const orbIds = [
 let powerupCand = [];
 const hiddenPowerups = new Map();
 const shitterAlert = createAlert('Shitter', 10);
+let instaMidProc;
 function getBucketId(ent) {
   return (ent.field_70165_t >> bucketSize) * bucketKey + (ent.field_70161_v >> bucketSize);
 }
@@ -130,10 +139,11 @@ function roundRoomCoords(c) {
   return ((c + 9) & 0b11111111111111111111111111100000) - 9;
 }
 function addToBucket(id, v) {
-  if (!Array.isArray(bucket.get(id))) bucket.set(id, []);
+  if (!bucket.has(id)) bucket.set(id, []);
   // the fuck is rhino doing
-  // if (!bucket.has(id)) bucket.set(id, []);
-  bucket.get(id).push(v); // org.mozilla.javascript.EcmaError: TypeError: Cannot call method "push" of undefined
+  try {
+    bucket.get(id).push(v); // org.mozilla.javascript.EcmaError: TypeError: Cannot call method "push" of undefined
+  } catch (e) { }
 }
 function entitySpawn(evn) {
   const e = evn.entity;
@@ -287,6 +297,12 @@ const tickReg = reg('tick', () => {
     }
     powerupCand = powerupCand.slice(0, f);
   }
+  if (instaMidProc) {
+    if (instaMidProc.isAlive()) {
+      instaMidProc.getOutputStream().write(10);
+      instaMidProc.getOutputStream().flush();
+    } else instaMidProc = void 0;
+  }
 });
 
 const stepVarReg = reg('step', () => {
@@ -341,9 +357,14 @@ function onPuzzleFail(name) {
   Client.scheduleTask(20, () => execCmd('gfs ARCHITECT_FIRST_DRAFT 1'));
   shitterAlert.show();
 }
-const puzzleFailReg = register('chat', onPuzzleFail).setCriteria('&r&c&lPUZZLE FAIL! &r&${name} ${*}');
-const quizFailReg = register('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the Omniscient&r&f: &r&${name} &r&cchose the wrong answer! I shall never forget this moment of misrememberance.&r');
-const architectUseReg = register('chat', () => shitterAlert.hide()).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}');
+const puzzleFailReg = reg('chat', onPuzzleFail).setCriteria('&r&c&lPUZZLE FAIL! &r&${name} ${*}');
+const quizFailReg = reg('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the Omniscient&r&f: &r&${name} &r&cchose the wrong answer! I shall never forget this moment of misrememberance.&r');
+const architectUseReg = reg('chat', () => shitterAlert.hide()).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}');
+
+const necronStartReg = reg('chat', () => {
+  if (!settings.dungeonInstaMidTimer) return;
+  instaMidProc = runHelper('InstaMidHelper');
+}).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r');
 
 // const renderReg = reg('renderWorld', partial => {
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
