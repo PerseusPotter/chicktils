@@ -68,6 +68,7 @@ public class ChickTilsHelper {
       GuiNewChat gui = Minecraft.getMinecraft().ingameGUI.getChatGUI();
       Field prop = GuiNewChat.class.getDeclaredField("field_146252_h");
       prop.setAccessible(true);
+      @SuppressWarnings("unchecked")
       List<ChatLine> lines = (List<ChatLine>) prop.get(gui);
 
       String[] strs = new String[str.size()];
