@@ -316,7 +316,7 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
     // java.lang.ClassCastException
     // ...norms[i]
     const n = norms[i];
-    const a = getAngle(...n, -1, 0, 0, false) / Math.PI
+    const a = getAngle(...n, -1, 0, 0, false) / Math.PI;
     v.a = 1 - a;
     v.w = Math.min.apply(null, v.map(v => v[2]));
   });

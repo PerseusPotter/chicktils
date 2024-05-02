@@ -138,7 +138,6 @@ export function gsl_sf_lambert_W0(x) {
 }
 
 /**
- *
  * @param {number} dx
  * @param {number} dy
  * @param {number} dz
@@ -217,7 +216,6 @@ export function compareFloat(f1, f2, e = 1e-6) {
 }
 
 /**
- *
  * @param {number} n
  * @param {number} oldMin
  * @param {number} oldMax

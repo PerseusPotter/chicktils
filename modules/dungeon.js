@@ -323,29 +323,27 @@ const stepVarReg = reg('step', () => {
   }
 
   const t = Date.now();
-  bloodMobs = bloodMobs.filter(e => {
+  bloodMobs.forEach(e => {
     const uuid = e.getUUID().toString();
-    if (motionData.has(uuid)) {
-      const x = e.getX();
-      const y = e.getY();
-      const z = e.getZ();
-      const data = motionData.get(uuid);
-      const dt = (t - data.startT) / 50;
-      const dx = x - data.startX;
-      const dy = y - data.startY;
-      const dz = z - data.startZ;
-      const estX = x + dx / dt * data.ttl;
-      const estY = y + dy / dt * data.ttl;
-      const estZ = z + dz / dt * data.ttl;
-      data.lastEstX = data.estX;
-      data.lastEstY = data.estY;
-      data.lastEstZ = data.estZ;
-      data.estX = estX;
-      data.estY = estY;
-      data.estZ = estZ;
-      data.lastUpdate = t;
-    }
-    return true;
+    if (!motionData.has(uuid)) return;
+    const x = e.getX();
+    const y = e.getY();
+    const z = e.getZ();
+    const data = motionData.get(uuid);
+    const dt = (t - data.startT) / 50;
+    const dx = x - data.startX;
+    const dy = y - data.startY;
+    const dz = z - data.startZ;
+    const estX = x + dx / dt * data.ttl;
+    const estY = y + dy / dt * data.ttl;
+    const estZ = z + dz / dt * data.ttl;
+    data.lastEstX = data.estX;
+    data.lastEstY = data.estY;
+    data.lastEstZ = data.estZ;
+    data.estX = estX;
+    data.estY = estY;
+    data.estZ = estZ;
+    data.lastUpdate = t;
   });
 });
 

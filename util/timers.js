@@ -24,11 +24,15 @@ export class FrameTimer {
     const t = Date.now();
     while (this.fps.length > 0 && this.fps[0] < t - 1000) this.fps.shift();
     this.fps.push(t);
-    if (this.fps.length === 1) return Boolean(this.lastRender = t);
-    const dt = t - this.fps[this.fps.length - 2];
+    if (this.fps.length === 1) {
+      this.lastRender = t;
+      return true;
+    }
+    // const dt = t - this.fps[this.fps.length - 2];
+    const dt = 1000 / this.fps.length;
     const dr = t - this.lastRender;
-    const r = (dt + dr) > this.target;
-    this.lastRender = r ? t : this.lastRender;
-    return r;
+    if (dt + dr < this.target) return false;
+    this.lastRender = t;
+    return true;
   }
 }
