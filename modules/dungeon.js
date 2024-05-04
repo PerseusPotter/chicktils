@@ -270,32 +270,30 @@ const tickReg = reg('tick', () => {
     lastRoom = k;
   }
   if (settings.dungeonHideHealerPowerups) {
-    let f = 0;
     const t = Date.now();
-    for (let j = 0; j < powerupCand.length; j++) {
-      if (t - powerupCand[j][0] < 500) f++;
-      let e = powerupCand[j][1];
+    powerupCand = powerupCand.filter(v => {
+      const e = v[1];
       const n = e.func_70005_c_();
-      if (orbNames.some(v => n.startsWith(v))) {
-        hiddenPowerups.set(e.func_110124_au().toString(), e);
-        continue;
-      }
-      let i = e.func_71124_b(4);
-      let b = i && i.func_77978_p();
-      if (b) {
-        const d = b.func_74775_l('ExtraAttributes').func_74779_i('id');
-        if (orbIds.some(v => d === v)) {
-          hiddenPowerups.set(e.func_110124_au().toString(), e);
-          continue;
+      if (n === 'Armor Stand') {
+        let i = e.func_71124_b(4);
+        let b = i && i.func_77978_p();
+        if (b) {
+          const d = b.func_74775_l('ExtraAttributes').func_74779_i('id');
+          if (orbIds.some(v => d === v)) {
+            hiddenPowerups.set(e.func_110124_au().toString(), e);
+            return false;
+          }
         }
+        i = e.func_71124_b(0);
+        b = i && i.func_77978_p();
+        if (b && b.func_74775_l('SkullOwner').func_74775_l('Properties').func_150295_c('textures', 10).func_150305_b(0).func_74775_l('Value').func_74775_l('textures').func_74775_l('SKIN').func_74779_i('url') === 'http://textures.minecraft.net/texture/96c3e31cfc66733275c42fcfb5d9a44342d643b55cd14c9c77d273a2352') {
+          hiddenPowerups.set(e.func_110124_au().toString(), e);
+        }
+        return t - v[0] < 500;
       }
-      i = e.func_71124_b(0);
-      b = i && i.func_77978_p();
-      if (b && b.func_74775_l('SkullOwner').func_74775_l('Properties').func_150295_c('textures', 10).func_150305_b(0).func_74775_l('Value').func_74775_l('textures').func_74775_l('SKIN').func_74779_i('url') === 'http://textures.minecraft.net/texture/96c3e31cfc66733275c42fcfb5d9a44342d643b55cd14c9c77d273a2352') {
-        hiddenPowerups.set(e.func_110124_au().toString(), e);
-      }
-    }
-    powerupCand = powerupCand.slice(0, f);
+      if (orbNames.some(v => n.startsWith(v))) hiddenPowerups.set(e.func_110124_au().toString(), e);
+      return false;
+    });
   }
   if (instaMidProc) {
     if (instaMidProc.isAlive()) {
