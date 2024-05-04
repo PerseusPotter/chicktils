@@ -1,5 +1,6 @@
 import RenderLib from '../../RenderLib/index';
 import { compareFloat, getAngle, rescale, rotate, toArray } from './math';
+import settings from '../settings';
 if (!GlStateManager) {
   var GL11 = Java.type("org.lwjgl.opengl.GL11");
   var GlStateManager = Java.type("net.minecraft.client.renderer.GlStateManager");
@@ -192,6 +193,10 @@ export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = t
   });
 }
 
+function getXMult() {
+  return Client.settings.getSettings().field_74320_O === 2 ? -1 : 1;
+}
+
 /**
  * in radians
  * @param {number} color rgba
@@ -201,7 +206,7 @@ export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = t
  */
 export function drawArrow2D(color, theta, length = 20, yaw) {
   if (yaw === undefined) yaw = Player.getYaw();
-  const dt = theta - yaw / 180 * Math.PI - Math.PI;
+  const dt = theta - yaw / 180 * Math.PI/* + (getXMult() === 1 ? -Math.PI : 0)*/;
   const x1 = Renderer.screen.getWidth() / 2;
   const y1 = Renderer.screen.getHeight() / 2 + length + 10;
 
@@ -225,7 +230,7 @@ export function drawArrow2D(color, theta, length = 20, yaw) {
 export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
   if (yaw === undefined) yaw = Player.getYaw();
   if (pitch === undefined) pitch = Player.getPitch();
-  const dt = theta - yaw / 180 * Math.PI - Math.PI / 2;
+  const dt = theta - yaw / 180 * Math.PI - Math.PI / 2 + (getXMult() === 1 ? 0 : Math.PI);
   const dp = Math.PI - (phi - pitch / 180 * Math.PI);
   let points = [
     [+1, 0, +1],
