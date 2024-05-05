@@ -5,6 +5,8 @@ if (!GlStateManager) {
   var GL11 = Java.type("org.lwjgl.opengl.GL11");
   var GlStateManager = Java.type("net.minecraft.client.renderer.GlStateManager");
 }
+const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
+const worldRen = tess.func_178180_c();
 
 // soopy !
 export function drawBoxAtBlockNotVisThruWalls(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1, lw = 5) {
@@ -196,6 +198,16 @@ export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = t
 function getXMult() {
   return Client.settings.getSettings().field_74320_O === 2 ? -1 : 1;
 }
+function getYaw() {
+  const p = Player.getPlayer();
+  if (!p) return 0;
+  return p.field_70126_B + (p.field_70177_z - p.field_70126_B) * Tessellator.partialTicks;
+}
+function getPitch() {
+  const p = Player.getPlayer();
+  if (!p) return 0;
+  return p.field_70127_C + (p.field_70125_A - p.field_70127_C) * Tessellator.partialTicks;
+}
 
 /**
  * in radians
@@ -205,7 +217,7 @@ function getXMult() {
  * @param {number?} yaw degrees
  */
 export function drawArrow2D(color, theta, length = 20, yaw) {
-  if (yaw === undefined) yaw = Player.getYaw();
+  if (yaw === undefined) yaw = getYaw();
   const dt = theta - yaw / 180 * Math.PI/* + (getXMult() === 1 ? -Math.PI : 0)*/;
   const x1 = Renderer.screen.getWidth() / 2;
   const y1 = Renderer.screen.getHeight() / 2 + length + 10;
@@ -228,8 +240,8 @@ export function drawArrow2D(color, theta, length = 20, yaw) {
  * @param {number?} pitch degrees
  */
 export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
-  if (yaw === undefined) yaw = Player.getYaw();
-  if (pitch === undefined) pitch = Player.getPitch();
+  if (yaw === undefined) yaw = getYaw();
+  if (pitch === undefined) pitch = getPitch();
   const dt = theta - yaw / 180 * Math.PI - Math.PI / 2 + (getXMult() === 1 ? 0 : Math.PI);
   const dp = Math.PI - (phi - pitch / 180 * Math.PI);
   let points = [
@@ -464,8 +476,6 @@ export function highlightSlot(size, xSlotPos, ySlotPos, color) {
   GL11.glTranslated(0, 0, -1);
 }
 
-const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
-const worldRen = tess.func_178180_c();
 /**
  * @param {number} color rgba
  * @param {number[][]} vertexes [x, y] or [x, y, depth]
