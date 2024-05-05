@@ -117,7 +117,7 @@ const updateReg = reg('step', () => {
     const missing = maxSize - c;
     const data = arrowTypes[a];
     if (!data) return;
-    const stacks = Math.ceil(missing / (64 * (data.stackSize || 1)));
+    const stacks = Math.floor(missing / (64 * (data.stackSize || 1)));
     if (stacks <= 0) return;
     const cost = (function() {
       switch (settings.quiverRefillCost) {
