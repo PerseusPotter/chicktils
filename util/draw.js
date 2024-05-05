@@ -340,7 +340,7 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
   });
   polys.sort((a, b) => compareFloat(b.w, a.w) || compareFloat(a.a, b.a));
   polys.forEach(v => {
-    drawPolygon(applyTint(color, rescale(v.a * v.a * v.a, 0, 1, 0.3, 1)), v);
+    drawPolygon(applyTint(color, rescale(v.a * v.a * v.a, 0, 1, 0.2, 1)), v);
   });
   // const c2 = (color >> 8) | ((color & 0xFF) << 24);
   // edges.forEach(([w, i, j]) => Renderer.drawLine(c2, points[i][0], points[i][1], points[j][0], points[j][1], 1));
