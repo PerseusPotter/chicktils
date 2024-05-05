@@ -1,24 +1,33 @@
 import createAlert from '../util/alert';
-import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, highlightSlot } from '../util/draw';
+import { pointTo3D, drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls } from '../util/draw';
 import drawBeaconBeam from '../../BeaconBeam/index';
 import settings from '../settings';
 import { reg } from '../util/registerer';
-import { log } from '../util/log';
 
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');
 let eggs = [];
-let activeEggs = [];
+let activeEggs = [2, 2, 2];
 function reset() {
   eggs = [];
-  activeEggs = [];
+  // activeEggs = [2, 2, 2];
   eggCollectReg.unregister();
-  eggStepReg.unregister();
-  eggRenderReg.unregister();
+  eggAlrCollectReg.unregister();
+  // eggStepReg.unregister();
+  eggRenWrldReg.unregister();
+  eggRendOvReg.unregister();
   unloadReg.unregister();
+  eggStepReg.setDelay(2);
 }
-// const unloadReg = reg('worldUnload', () => reset());
-const unloadReg = reg('worldUnload', () => eggs = []);
+function start() {
+  unloadReg.register();
+  eggCollectReg.register();
+  eggAlrCollectReg.register();
+  eggRenWrldReg.register();
+  eggRendOvReg.register();
+  eggStepReg.setFps(5);
+}
+const unloadReg = reg('worldUnload', () => reset());
 function scanEgg() {
   const l = eggs.length;
   eggs = World.getAllEntities().filter(v => {
@@ -28,7 +37,10 @@ function scanEgg() {
     const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
     return ['015adc61-0aba-3d4d-b3d1-ca47a68a154b', '55ae5624-c86b-359f-be54-e0ec7c175403', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].find((v, i) => activeEggs[i] === 2 && v === id);
   });
-  if (eggs.length > l) Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertTime));
+  if (eggs.length > l) {
+    start();
+    Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertTime));
+  }
 }
 const types = {
   Breakfast: 0,
@@ -36,23 +48,23 @@ const types = {
   Dinner: 2
 };
 const eggSpawnReg = reg('chat', type => {
-  if (type === 'Breakfast') eggs = activeEggs = [];
-  unloadReg.register();
-  eggStepReg.register();
-  eggCollectReg.register();
-  eggRenderReg.register();
+  // if (type === 'Breakfast') eggs = activeEggs = [];
+  start();
   for (let i = 0; i <= types[type]; i++) {
     if (activeEggs[i] !== 1) activeEggs[i] = 2;
   }
+  activeEggs[types[type]] = 2;
   scanEgg();
-  eggSpawnAlert.show(settings.rabbitAlertTime);
+  if (!settings.rabbitAlertOnlyDinner || type === 'Dinner') eggSpawnAlert.show(settings.rabbitAlertTime);
 }).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dA &r&${*}Chocolate ${type} Egg &r&dhas appeared!&r');
-const eggStepReg = reg('step', () => scanEgg()).setFps(5);
-const eggCollectReg = reg('chat', type => {
+const eggStepReg = reg('step', () => scanEgg()).setDelay(2);
+function onCollect(type) {
   activeEggs[types[type]] = 1;
   Client.scheduleTask(() => scanEgg());
-}).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').unregister();
-const eggRenderReg = reg('renderWorld', () => {
+}
+const eggCollectReg = reg('chat', onCollect).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').unregister();
+const eggAlrCollectReg = reg('chat', onCollect).setCriteria('&r&cYou have already collected this Chocolate ${type} Egg&r&c! Try again when it respawns!&r').unregister();
+const eggRenWrldReg = reg('renderWorld', () => {
   const c = settings.rabbitBoxColor;
   const r = ((c >> 24) & 0xFF) / 256;
   const g = ((c >> 16) & 0xFF) / 256;
@@ -66,6 +78,11 @@ const eggRenderReg = reg('renderWorld', () => {
     else drawBoxAtBlockNotVisThruWalls(x - 0.25, y + 1.5, z - 0.25, r, g, b, 0.5, 0.5, a);
     drawBeaconBeam(x - 0.5, y + 2.5, z - 0.5, r, g, b, a, !settings.rabbitBoxEsp);
   });
+});
+const eggRendOvReg = reg('renderOverlay', () => {
+  if (eggs.length === 0) return;
+  eggs.sort((a, b) => Player.asPlayerMP().distanceTo(a) - Player.asPlayerMP().distanceTo(b));
+  pointTo3D(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
 });
 
 const lowerInvF = Java.type('net.minecraft.client.gui.inventory.GuiChest').class.getDeclaredField('field_147015_w');
@@ -136,11 +153,12 @@ const prevMessages = {};
 const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 const promoteReg = reg('chat', (name, lvl, status, evn) => {
   if (!helper) return;
+  const n = name.removeFormatting();
   cancel(evn);
-  helper.deleteMessages([prevMessages[name]]);
+  helper.deleteMessages([prevMessages[n]]);
   const msg = new Message(`${name}&7 -> Lvl &b${lvl} ${status}`);
   msg.chat();
-  prevMessages[name] = msg.getFormattedText();
+  prevMessages[n] = msg.getFormattedText();
 }).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r');
 
 export function init() {
@@ -151,10 +169,12 @@ export function init() {
 }
 export function load() {
   eggSpawnReg.register();
+  eggStepReg.register();
   guiReg.register();
 }
 export function unload() {
   eggSpawnReg.unregister();
+  eggStepReg.unregister();
   guiReg.unregister();
   reset();
 }
