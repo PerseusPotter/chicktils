@@ -34,12 +34,12 @@ function tryUpdate(delay = 0) {
       return -1;
     }
     ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
+    centerMessage(new Message(new TextComponent('&3&nClick To View').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
     ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
+    ChatLib.chat('')
     if (sev === 0 || (sev === 1 && !settings.isDev)) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
     if (sev === 1 && settings.isDev) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
-    const ans = new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'));
-    centerMessage(ans);
-    ans.chat();
+    centerMessage(new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'))).chat();
     setTimeout(() => {
       silentUpdate = true;
       ChatLib.command('csmupdate deny', true);
