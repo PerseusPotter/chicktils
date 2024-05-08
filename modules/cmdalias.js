@@ -34,12 +34,12 @@ export function init() {
   settings._cmdAliasKuudra.onAfterChange(updater(kuudra));
 }
 export function load() {
-  if (settings.cmdAliasStorage) updater(storage, true);
-  if (settings.cmdAliasDungeon) updater(dungeon, true);
-  if (settings.cmdAliasKuudra) updater(kuudra, true);
+  if (settings.cmdAliasStorage) updater(storage)(true);
+  if (settings.cmdAliasDungeon) updater(dungeon)(true);
+  if (settings.cmdAliasKuudra) updater(kuudra)(true);
 }
 export function unload() {
-  updater(storage, false);
-  updater(dungeon, false);
-  updater(kuudra, false);
+  updater(storage)(false);
+  updater(dungeon)(false);
+  updater(kuudra)(false);
 }
