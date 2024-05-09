@@ -37,8 +37,6 @@ function reset() {
 }
 function start() {
   isInBoss = false;
-  // boxMobs = [];
-  // shouldOcclude.clear();
   boxMobs.clear();
   mobCand = [];
   nameCand = [];
@@ -78,9 +76,6 @@ const dist = (n1, n2) => n1 < n2 ? n2 - n1 : n1 - n2;
 const equalish = (n1, n2) => dist(n1, n2) < 0.25;
 
 let isInBoss = false;
-// let boxMobs = [];
-// let shouldOcclude = new Map();
-// const boxMobs = new Map();
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
 let mobCand = [];
 let nameCand = [];
@@ -159,17 +154,6 @@ function toJavaCol(c) {
   return new (Java.type('java.awt.Color'))(((c & 0xFF) << 24) | c >> 8, true);
 }
 
-/*
-org.mozilla.javascript.WrappedException: Wrapped java.lang.RuntimeException: No OpenGL context found in the current thread.
-Caused by: java.lang.RuntimeException: No OpenGL context found in the current thread.
-  at org.lwjgl.opengl.GLContext.getCapabilities(GLContext.java:124)
-  at org.lwjgl.opengl.GL15.glBeginQuery(GL15.java:405)
-  at club.sk1er.patcher.util.world.render.culling.EntityCulling.checkEntity(EntityCulling.java:181)
-*/
-// const EntityCulling = Java.type('club.sk1er.patcher.util.world.render.culling.EntityCulling');
-// const checkEntity = EntityCulling.class.getDeclaredMethod('checkEntity', [Java.type('net.minecraft.entity.Entity').class]);
-// checkEntity.setAccessible(true);
-// Java.type('org.lwjgl.opengl.GL').createCapabilities(false);
 const step10Reg = reg('step', () => {
   if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
     new Thread(() => {
@@ -178,30 +162,17 @@ const step10Reg = reg('step', () => {
         if (e.field_70128_L) return false;
         const n = e.func_70005_c_();
         if (n === 'Shadow Assassin') {
-          // boxMobs.push({ yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor), e });
-          // boxMobs.set(e.func_110124_au().toString(), { yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor) });
           boxMobs.put(e, { yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor) });
           return false;
         }
         const id = getBucketId(e);
-        // addToBucket(id - bucketKey - 1, e);
-        // addToBucket(id - bucketKey + 0, e);
-        // addToBucket(id - bucketKey + 1, e);
-        // addToBucket(id - 1, e);
         addToBucket(id + 0, e);
-        // addToBucket(id + 1, e);
-        // addToBucket(id + bucketKey - 1, e);
-        // addToBucket(id + bucketKey + 0, e);
-        // addToBucket(id + bucketKey + 1, e);
         return true;
       });
-      // boxMobs = boxMobs.filter(v => !v.e.field_70128_L);
       nameCand = nameCand.filter(e => {
         if (e.field_70128_L) return false;
         const n = e.func_70005_c_();
         if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
-          // boxMobs.push({ yO: -1, h: 1, c: toJavaCol(settings.dungeonBoxKeyColor), e });
-          // boxMobs.set(e.func_110124_au().toString(), { yO: -1, h: 1, c: toJavaCol(settings.dungeonBoxKeyColor) });
           boxMobs.put(e, { yO: -1, h: 1, c: toJavaCol(settings.dungeonBoxKeyColor) });
           return false;
         }
@@ -225,15 +196,10 @@ const step10Reg = reg('step', () => {
           h = 3;
           c = settings.dungeonBoxMancerColor;
         }
-        // boxMobs.push({ yO: 0, h, c: toJavaCol(c), e: ent });
-        // boxMobs.set(ent.func_110124_au().toString(), { yO: 0, h, c: toJavaCol(c) });
         boxMobs.put(ent, { yO: 0, h, c: toJavaCol(c) });
 
         return false;
       });
-
-      // shouldOcclude.clear();
-      // boxMobs.forEach(({ e }) => shouldOcclude.set(e.func_110124_au().toString(), checkEntity.invoke(EntityCulling, e)));
     }).start();
   }
 }).setFps(10);
@@ -366,26 +332,12 @@ const necronStartReg = reg('chat', () => {
   instaMidProc = runHelper('InstaMidHelper');
 }).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r');
 
-// const renderReg = reg('renderWorld', partial => {
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (settings.dungeonHideHealerPowerups && hiddenPowerups.has(e.getUUID().toString())) return void cancel(evn);
   if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
-    // const uuid = e.getUUID().toString();
-    // if (!boxMobs.has(uuid)) return;
-    // const { yO, h, c } = boxMobs.get(uuid);
     if (!boxMobs.containsKey(e.entity)) return;
     const { yO, h, c } = boxMobs.get(e.entity);
-    // boxMobs.forEach(({ yO, h, c, e }) => {
-    // if (e.field_70128_L) return;
-
-    // const uuid = e.func_110124_au().toString();
-    // if (shouldOcclude.get(uuid)) return;
-    // drawBoxBB(e.func_174813_aQ(), c, partial);
-    // drawBoxPos(e.field_70165_t, e.field_70163_u - yO, e.field_70161_v, 1, h, c, partial, true, false);
     drawBoxPos(pos.getX(), pos.getY() - yO, pos.getZ(), 1, h, c, partial, settings.dungeonBoxMobEsp, false);
-    // drawBoxAtBlock(px - 0.5, py - yO, pz - 0.5, r, g, b, 1, h, a);
-    // drawBoxAtBlockNotVisThruWalls(px - 0.5, py - yO, pz - 0.5, r, g, b, 1, h, a);
-    // });
   }
 });
 
