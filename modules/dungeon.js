@@ -80,7 +80,8 @@ const equalish = (n1, n2) => dist(n1, n2) < 0.25;
 let isInBoss = false;
 // let boxMobs = [];
 // let shouldOcclude = new Map();
-const boxMobs = new Map();
+// const boxMobs = new Map();
+const boxMobs = new (Java.type('java.util.WeakHashMap'))();
 let mobCand = [];
 let nameCand = [];
 const bucketSize = 1;
@@ -178,7 +179,8 @@ const step10Reg = reg('step', () => {
         const n = e.func_70005_c_();
         if (n === 'Shadow Assassin') {
           // boxMobs.push({ yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor), e });
-          boxMobs.set(e.func_110124_au().toString(), { yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor) });
+          // boxMobs.set(e.func_110124_au().toString(), { yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor) });
+          boxMobs.put(e, { yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor) });
           return false;
         }
         const id = getBucketId(e);
@@ -199,7 +201,8 @@ const step10Reg = reg('step', () => {
         const n = e.func_70005_c_();
         if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
           // boxMobs.push({ yO: -1, h: 1, c: toJavaCol(settings.dungeonBoxKeyColor), e });
-          boxMobs.set(e.func_110124_au().toString(), { yO: -1, h: 1, c: toJavaCol(settings.dungeonBoxKeyColor) });
+          // boxMobs.set(e.func_110124_au().toString(), { yO: -1, h: 1, c: toJavaCol(settings.dungeonBoxKeyColor) });
+          boxMobs.put(e, { yO: -1, h: 1, c: toJavaCol(settings.dungeonBoxKeyColor) });
           return false;
         }
         if (!n.startsWith('§6✯ ')) return false;
@@ -223,7 +226,8 @@ const step10Reg = reg('step', () => {
           c = settings.dungeonBoxMancerColor;
         }
         // boxMobs.push({ yO: 0, h, c: toJavaCol(c), e: ent });
-        boxMobs.set(ent.func_110124_au().toString(), { yO: 0, h, c: toJavaCol(c) });
+        // boxMobs.set(ent.func_110124_au().toString(), { yO: 0, h, c: toJavaCol(c) });
+        boxMobs.put(ent, { yO: 0, h, c: toJavaCol(c) });
 
         return false;
       });
@@ -366,9 +370,11 @@ const necronStartReg = reg('chat', () => {
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (settings.dungeonHideHealerPowerups && hiddenPowerups.has(e.getUUID().toString())) return void cancel(evn);
   if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
-    const uuid = e.getUUID().toString();
-    if (!boxMobs.has(uuid)) return;
-    const { yO, h, c } = boxMobs.get(uuid);
+    // const uuid = e.getUUID().toString();
+    // if (!boxMobs.has(uuid)) return;
+    // const { yO, h, c } = boxMobs.get(uuid);
+    if (!boxMobs.containsKey(e.entity)) return;
+    const { yO, h, c } = boxMobs.get(e.entity);
     // boxMobs.forEach(({ yO, h, c, e }) => {
     // if (e.field_70128_L) return;
 
