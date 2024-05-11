@@ -181,13 +181,13 @@ export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = t
     let y = waypoint.y;
     let z = waypoint.z + (isCentered ? 0 : w / 2);
 
-    let d = (getRenderX() - x) ** 2 + (getRenderY() - y) ** 2 + (getRenderZ() - z) ** 2;
+    let d = (_getRenderX() - x) ** 2 + (_getRenderY() - y) ** 2 + (_getRenderZ() - z) ** 2;
 
     if (d >= 40000) {
       d = 200 / Math.sqrt(d);
-      x = getRenderX() + (x - getRenderX()) * d;
-      y = getRenderY() + (y - getRenderY()) * d;
-      z = getRenderZ() + (z - getRenderZ()) * d;
+      x = _getRenderX() + (x - _getRenderX()) * d;
+      y = _getRenderY() + (y - _getRenderY()) * d;
+      z = _getRenderZ() + (z - _getRenderZ()) * d;
     }
 
     RenderLib.drawEspBox(x, y, z, w, h, r, g, b, 1, phase)
@@ -219,7 +219,7 @@ function getPitch() {
  */
 export function drawArrow2D(color, theta, length = 20, yaw) {
   if (yaw === undefined) yaw = getYaw();
-  const dt = theta - yaw / 180 * Math.PI/* + (getXMult() === 1 ? -Math.PI : 0)*/;
+  const dt = theta - yaw / 180 * Math.PI - Math.PI/* + (getXMult() === 1 ? -Math.PI : 0)*/;
   const x1 = Renderer.screen.getWidth() / 2;
   const y1 = Renderer.screen.getHeight() / 2 + length + 10;
 
@@ -357,11 +357,11 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
  */
 export function pointTo3D(color, dx, dy, dz, rel = true, scale) {
   if (rel) {
-    if (settings.preferUseTracer) return renderTracer(color, dx + getRenderX(), dy + getRenderY(), dz + getRenderZ());
+    if (settings.preferUseTracer) return renderTracer(color, dx + _getRenderX(), dy + _getRenderY(), dz + _getRenderZ());
     return drawArrow3D(color, Math.atan2(dz, dx), Math.acos(dy / Math.hypot(dx, dy, dz)), scale);
   }
   if (settings.preferUseTracer) return renderTracer(color, dx, dy, dz);
-  return pointTo3D(color, dx - getRenderX(), dy - getRenderY(), dz - getRenderZ(), true, scale);
+  return pointTo3D(color, dx - _getRenderX(), dy - _getRenderY(), dz - _getRenderZ(), true, scale);
 }
 
 export function renderTracer(color, x, y, z) {
@@ -410,23 +410,35 @@ export function renderTracer(color, x, y, z) {
 
 const RenderUtil = Java.type('gg.skytils.skytilsmod.utils.RenderUtil');
 let interpolate;
+let _getRenderX;
+let _getRenderY;
+let _getRenderZ;
 /**
  * @type {() => number}
  */
-export let getRenderX;
+export function getRenderX() {
+  if (_getRenderX) return _getRenderX();
+  return 0;
+}
 /**
  * @type {() => number}
  */
-export let getRenderY;
+export function getRenderY() {
+  if (_getRenderY) return _getRenderY();
+  return 0;
+}
 /**
  * @type {() => number}
  */
-export let getRenderZ;
+export function getRenderZ() {
+  if (_getRenderZ) return _getRenderZ();
+  return 0;
+}
 if (RenderUtil) {
   interpolate = RenderUtil.INSTANCE.interpolate.bind(RenderUtil.INSTANCE);
-  getRenderX = RenderUtil.INSTANCE.getRenderX.bind(RenderUtil.INSTANCE);
-  getRenderY = RenderUtil.INSTANCE.getRenderY.bind(RenderUtil.INSTANCE);
-  getRenderZ = RenderUtil.INSTANCE.getRenderZ.bind(RenderUtil.INSTANCE);
+  _getRenderX = RenderUtil.INSTANCE.getRenderX.bind(RenderUtil.INSTANCE);
+  _getRenderY = RenderUtil.INSTANCE.getRenderY.bind(RenderUtil.INSTANCE);
+  _getRenderZ = RenderUtil.INSTANCE.getRenderZ.bind(RenderUtil.INSTANCE);
 } else {
   interpolate = function(currentValue, lastValue, multiplier) {
     return lastValue + (currentValue - lastValue) * multiplier;
@@ -438,9 +450,9 @@ if (RenderUtil) {
   ya.setAccessible(true);
   const za = rm.class.getDeclaredField('field_78723_d');
   za.setAccessible(true);
-  getRenderX = function() { return xa.get(rm); };
-  getRenderY = function() { return ya.get(rm); };
-  getRenderZ = function() { return za.get(rm); };
+  _getRenderX = function() { return xa.get(rm); };
+  _getRenderY = function() { return ya.get(rm); };
+  _getRenderZ = function() { return za.get(rm); };
 }
 const AABB = Java.type('net.minecraft.util.AxisAlignedBB');
 /**
@@ -494,9 +506,9 @@ export function drawBoxBB(bb, c, f, esp = false, lw = 5) {
  * @param {number?} lw line width (5)
  */
 export function drawBoxPos(x, y, z, w, h, c, f, esp = false, center = true, lw = 5) {
-  x += getRenderX();
-  y += getRenderY();
-  z += getRenderZ();
+  x += _getRenderX();
+  y += _getRenderY();
+  z += _getRenderZ();
   if (!center) {
     x -= w / 2;
     z -= w / 2;
