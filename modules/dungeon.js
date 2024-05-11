@@ -392,7 +392,7 @@ const renderOvlyReg = reg('renderOverlay', () => {
   if (necronDragStart > 0 && (settings.dungeonNecronDragTimer === 'OnScreen' || settings.dungeonNecronDragTimer === 'Both')) {
     const d = 6000 - Date.now() + necronDragStart;
     if (d >= 0) {
-      necronDragTimer.setLine(`§l${colorForNumber(d, 6000)}${d.toFixed(2)}s`.toString());
+      necronDragTimer.setLine(`§l${colorForNumber(d, 6000)}${(d / 1000).toFixed(2)}s`.toString());
       necronDragTimer.render();
     }
   }
