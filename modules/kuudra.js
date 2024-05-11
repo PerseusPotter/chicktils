@@ -269,7 +269,7 @@ const dirOverlayReg = reg('renderOverlay', () => {
       kuuder.getZ() > -85 ? 0.5 :
         kuuder.getX() < -120 ? 1 :
           1.5;
-  drawArrow2D(settings.kuudraArrowToKuudraColor, kt * Math.PI, 20, Player.getY() > 60 ? 0 : Player.getYaw());
+  drawArrow2D(settings.kuudraArrowToKuudraColor, kt * Math.PI, 20, Player.getY() > 60 ? 0 : undefined);
 });
 
 let regInst = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn);
@@ -367,8 +367,8 @@ const dpsStartReg = reg('chat', () => {
   hideTitleReg.register();
   dirOverlayReg.register();
 }).setChatCriteria('&e[NPC] &cElle&f: &rPOW! SURELY THAT\'S IT! I don\'t think he has any more in him!&r');
-// const kuudraEndReg = reg('chat', () => kuudra.emit('kuudraEnd')).setChatCriteria('&r&f                               &r&6&lKUUDRA DOWN!&r');
-const kuudraLeaveReg = reg('worldUnload', () => kuudra.emit('kuudraLeave'));
+const kuudraEndReg = reg('chat', () => reset()).setChatCriteria('&r&f                               &r&6&lKUUDRA DOWN!&r');
+const kuudraLeaveReg = reg('worldUnload', () => reset());
 
 export function init() {
   settings._moveKuudraHp.onAction(() => hpDisplay.edit());
