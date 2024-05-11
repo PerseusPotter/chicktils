@@ -525,7 +525,8 @@ export const props = {
 
   dungeonAutoArchitect: new Property('DungeonAutoGFSArchitect', page, ++sort, Property.Type.Toggle, true, { desc: 'auto gfs on puzzle fail' }),
 
-  dungeonInstaMidTimer: new Property('DungeonInstaMidTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'timer when instamidding' }),
+  dungeonNecronDragTimer: new Property('DungeonNecronDragTimer', page, ++sort, Property.Type.Option, 'None', { desc: 'timer when necron does some dragging', options: ['OnScreen', 'InstaMid', 'Both', 'None'] }),
+  moveNecronDragTimer: new Property('MoveNecronDragTimer', page, ++sort, Property.Type.Action),
 
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),

@@ -17,7 +17,8 @@ export function setIsMain() {
  *  statLocs: TextLocation[],
  *  quiverLoc: TextLocation,
  *  kuudraHpLoc: TextLocation,
- *  dungeonMapLoc: Location
+ *  dungeonMapLoc: Location,
+ *  dungeonNecronDragTimerLoc: TextLocation
  * }}
  */
 const data = new PogObject('chicktils', {
@@ -25,7 +26,8 @@ const data = new PogObject('chicktils', {
   statLocs: new Array(17).fill(0).map(() => ({ x: 50, y: 50, s: 1, a: 0 })),
   quiverLoc: { x: 50, y: 50, s: 1, a: 0 },
   kuudraHpLoc: { x: 50, y: 50, s: 1, a: 0 },
-  dungeonMapLoc: { x: 50, y: 50, s: 1 }
+  dungeonMapLoc: { x: 50, y: 50, s: 1 },
+  dungeonNecronDragTimerLoc: { x: 50, y: 50, s: 1, a: 0 }
 }, 'data.json');
 
 register('gameUnload', () => isMainData && data.save());
