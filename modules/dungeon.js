@@ -4,9 +4,10 @@ import createGui from '../util/customgui';
 import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox } from '../util/draw';
 import createAlert from '../util/alert';
 import { reg, regForge } from '../util/registerer';
-import { execCmd } from '../util/format';
+import { colorForNumber, execCmd } from '../util/format';
 import getPing from '../util/ping';
 import runHelper from '../util/runner';
+import createTextGui from '../util/customtextgui';
 
 let entSpawnReg = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn);
 function reset() {
@@ -51,6 +52,7 @@ function start() {
   bloodClosed = false;
   powerupCand = [];
   hiddenPowerups.clear();
+  necronDragStart = 0;
 
   renderEntReg.register();
   renderWorldReg.register();
@@ -107,6 +109,8 @@ let powerupCand = [];
 const hiddenPowerups = new Map();
 const shitterAlert = createAlert('Shitter', 10);
 let instaMidProc;
+const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () => ['§l§26.42s']);
+let necronDragStart = 0;
 function getBucketId(ent) {
   return (ent.field_70165_t >> bucketSize) * bucketKey + (ent.field_70161_v >> bucketSize);
 }
@@ -328,8 +332,8 @@ const quizFailReg = reg('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the
 const architectUseReg = reg('chat', () => shitterAlert.hide()).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}');
 
 const necronStartReg = reg('chat', () => {
-  if (!settings.dungeonInstaMidTimer) return;
-  instaMidProc = runHelper('InstaMidHelper');
+  necronDragStart = Date.now();
+  if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc = runHelper('InstaMidHelper');
 }).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r');
 
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
@@ -384,6 +388,13 @@ const renderWorldReg = reg('renderWorld', () => {
 const renderOvlyReg = reg('renderOverlay', () => {
   if (settings.dungeonMap) {
     mapDisplay.render();
+  }
+  if (necronDragStart > 0 && (settings.dungeonNecronDragTimer === 'OnScreen' || settings.dungeonNecronDragTimer === 'Both')) {
+    const d = 6000 - Date.now() + necronDragStart;
+    if (d >= 0) {
+      necronDragTimer.setLine(`§l${colorForNumber(d, 6000)}${d.toFixed(2)}s`.toString());
+      necronDragTimer.render();
+    }
   }
 });
 
@@ -494,6 +505,7 @@ export function init() {
     else stepVarReg.setDelay(v / 1000);
   });
   settings._moveDungeonMap.onAction(() => mapDisplay.edit());
+  settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());
 }
 export function load() {
   dungeonStartReg.register();
