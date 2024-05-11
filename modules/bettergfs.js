@@ -39,9 +39,10 @@ let dumbBullshit;
 let dumbBullshitTime = 0;
 /**
  * @param {string[]} args
+ * @param {boolean} multiple
  * @returns {string[][]}
  */
-function fix(args) {
+function fix(args, multiple = true) {
   const t = Date.now();
   if (t - dumbBullshitTime < 1000) return dumbBullshit;
   const arr = [['gfs']];
@@ -64,15 +65,17 @@ function fix(args) {
   function addNames() {
     if (args.length === 1) possNames.forEach(v => arr[1].push(names[v].join(' ')));
     else {
-      const n = [];
-      possNames.forEach(v => names[v].forEach((v, i) => {
-        if (i === n.length) n.push(new Set());
-        n[i].add(v);
-      }));
-      n.forEach((v, i) => {
-        if (i + 1 === arr.length) arr.push([]);
-        Array.prototype.push.apply(arr[i + 1], Array.from(v));
-      });
+      if (multiple) {
+        const n = [];
+        possNames.forEach(v => names[v].forEach((v, i) => {
+          if (i === n.length) n.push(new Set());
+          n[i].add(v);
+        }));
+        n.forEach((v, i) => {
+          if (i + 1 === arr.length) arr.push([]);
+          Array.prototype.push.apply(arr[i + 1], Array.from(v));
+        });
+      } else if (possNames.length > 0) names[possNames[0]].forEach((v, i) => arr[i + 1].push(v));
     }
   }
   switch (settings.betterGFSIDPref) {
@@ -103,7 +106,7 @@ function fix(args) {
 
 const cmdReg = reg('command', ...args => {
   if (!args) args = [];
-  const cmd = fix(args);
+  const cmd = fix(args, false);
   if (cmd[0].length !== 1) execCmd(['gfs', ...args].join(' '));
   else execCmd(cmd.map(v => v[0]).join(' '));
 }).setTabCompletions(args => fix(args)[args.length] || []);
