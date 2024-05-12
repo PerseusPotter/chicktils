@@ -118,8 +118,35 @@ function isDungeonMob(name) {
   return name === 'EntityZombie' ||
     name === 'EntitySkeleton' ||
     name === 'EntityOtherPlayerMP' ||
-    name === 'EntityEnderman' ||
-    name === 'EntityWitherSkeleton';
+    name === 'EntityEnderman';
+}
+function getBoxMobType(n) {
+  if (n.includes('Fels', 6)) return 1;
+
+  if (n.includes('Withermancer', 6)) return 2;
+  // if (n.includes('Zombie Lord', 6)) return 2;
+  // if (n.includes('Skeleton Lord', 6)) return 2;
+  if (n.includes('Lord', 6)) return 2;
+  if (n.includes('Zombie Commander', 6)) return 2;
+
+  // if (n.includes('Lost Adventurer', 6)) return 3;
+  // if (n.includes('Frozen Adventurer', 6)) return 3;
+  if (n.includes('Adventurer', 6)) return 3;
+  if (n.includes('Angry Archaeologist', 6)) return 3;
+
+  return 4;
+}
+function matchesMobType(n, e) {
+  const c = e.getClass().getSimpleName();
+  if (n.includes('Zombie Commander', 6)) return c === 'EntityOtherPlayerMP';
+  if (n.includes('Zombie', 6)) return c === 'EntityZombie';
+  if (n.includes('Skele', 6)) return c === 'EntitySkeleton';
+  if (n.includes('Fels', 6)) return c === 'EntityEnderman';
+  if (n.includes('Withermancer', 6)) return c === 'EntitySkeleton' && e.func_82202_m() === 1;
+  if (n.includes('Crypt Lurker', 6)) return c === 'EntityZombie';
+  if (n.includes('Super Archer', 6)) return c === 'EntitySkeleton';
+  if (n.includes('Sniper', 6)) return c === 'EntitySkeleton';
+  return c === 'EntityOtherPlayerMP';
 }
 function isSkull(e) {
   const i = e.func_71124_b(4);
@@ -187,18 +214,21 @@ const step10Reg = reg('step', () => {
 
         const id = getBucketId(e);
         if (!bucket.has(id)) return true;
-        const ents = bucket.get(id).filter(v => equalish(v.field_70165_t, x) && equalish(v.field_70161_v, z) && v.field_70163_u < y && y - v.field_70163_u < 5);
+        const ents = bucket.get(id).filter(v => equalish(v.field_70165_t, x) && equalish(v.field_70161_v, z) && v.field_70163_u < y && y - v.field_70163_u < 5).filter(v => matchesMobType(n, v));
         if (ents.length === 0) return true;
         const ent = ents.reduce((a, v) => dist(a.field_70165_t, x) + dist(a.field_70161_v, z) > dist(v.field_70165_t, x) - dist(v.field_70161_v, z) ? v : a, ents[0]);
 
         let h = 2;
+        const t = getBoxMobType(n);
         let c = settings.dungeonBoxMobColor;
-        if (n.includes('Fels', 6)) {
+        if (t === 1) {
           h = 3;
           c = settings.dungeonBoxFelColor;
-        } else if (n.includes('Withermancer', 6)) {
-          h = 3;
-          c = settings.dungeonBoxMancerColor;
+        } else if (t === 2) {
+          c = settings.dungeonBoxChonkColor;
+          if (n.includes('Withermancer', 6)) h = 3;
+        } else if (t === 3) {
+          c = settings.dungeonBoxMiniColor;
         }
         boxMobs.put(ent, { yO: 0, h, c: toJavaCol(c) });
 
