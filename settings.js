@@ -529,6 +529,8 @@ export const props = {
   dungeonNecronDragTimer: new Property('DungeonNecronDragTimer', page, ++sort, Property.Type.Option, 'None', { desc: 'timer when necron does some dragging', options: ['OnScreen', 'InstaMid', 'Both', 'None'] }),
   moveNecronDragTimer: new Property('MoveNecronDragTimer', page, ++sort, Property.Type.Action),
 
+  dungeonDev4Helper: new Property('DungeonClearViewDev4', page, ++sort, Property.Type.Option, 'Both', { options: ['None', 'Titles', 'Particles', 'Both'] }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),

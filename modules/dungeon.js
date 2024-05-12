@@ -18,6 +18,7 @@ function reset() {
   tickReg.unregister();
   stepVarReg.unregister();
   particleReg.unregister();
+  titleReg.unregister();
   entSpawnReg.unregister();
   puzzleFailReg.unregister();
   quizFailReg.unregister();
@@ -53,6 +54,7 @@ function start() {
   powerupCand = [];
   hiddenPowerups.clear();
   necronDragStart = 0;
+  isAtDev4 = false;
 
   renderEntReg.register();
   renderWorldReg.register();
@@ -61,6 +63,7 @@ function start() {
   tickReg.register();
   stepVarReg.register();
   particleReg.register();
+  titleReg.register();
   entSpawnReg.register();
   puzzleFailReg.register();
   quizFailReg.register();
@@ -111,6 +114,7 @@ const shitterAlert = createAlert('Shitter', 10);
 let instaMidProc;
 const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () => ['§l§26.42s']);
 let necronDragStart = 0;
+let isAtDev4 = false;
 function getBucketId(ent) {
   return (ent.field_70165_t >> bucketSize) * bucketKey + (ent.field_70161_v >> bucketSize);
 }
@@ -305,6 +309,7 @@ const tickReg = reg('tick', () => {
       instaMidProc.getOutputStream().flush();
     } else instaMidProc = void 0;
   }
+  isAtDev4 = dist(Player.getX(), 63) + dist(Player.getY(), 127) + dist(Player.getZ(), 35) < 3;
 });
 
 const stepVarReg = reg('step', () => {
@@ -455,6 +460,7 @@ function renderDoor() {
 }
 
 const particleReg = reg('spawnParticle', (part, id, evn) => {
+  if (isAtDev4 && (settings.dungeonDev4Helper === 'Particles' || settings.dungeonDev4Helper === 'Both')) return cancel(evn);
   if (!settings.dungeonHideHealerPowerups) return;
   if (id.toString() !== 'REDSTONE') return;
   try {
@@ -465,6 +471,10 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
     // something something bucket ¯\_(ツ)_/¯
     if (Array.from(hiddenPowerups.values()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
   } catch (e) { }
+});
+
+const titleReg = reg('renderTitle', (t, s, evn) => {
+  if (isAtDev4 && (settings.dungeonDev4Helper === 'Titles' || settings.dungeonDev4Helper === 'Both') && (s === '§aThe gate has been destroyed!§r' || s.includes('activated a'))) return cancel(evn);
 });
 
 function onBossEnd() {
