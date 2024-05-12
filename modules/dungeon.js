@@ -8,6 +8,7 @@ import { colorForNumber, execCmd } from '../util/format';
 import getPing from '../util/ping';
 import runHelper from '../util/runner';
 import createTextGui from '../util/customtextgui';
+import { compareFloat } from '../util/math';
 
 let entSpawnReg = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn);
 function reset() {
@@ -78,7 +79,6 @@ function start() {
 }
 
 const dist = (n1, n2) => n1 < n2 ? n2 - n1 : n1 - n2;
-const equalish = (n1, n2) => dist(n1, n2) < 0.25;
 
 let isInBoss = false;
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
@@ -204,22 +204,22 @@ const step10Reg = reg('step', () => {
         addToBucket(id + 0, e);
         return true;
       });
-      nameCand = nameCand.filter(e => {
-        if (e.field_70128_L) return false;
+      nameCand.forEach(e => {
+        if (e.field_70128_L) return;
         const n = e.func_70005_c_();
         if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
           boxMobs.put(e, { yO: -1, h: 1, c: toJavaCol(settings.dungeonBoxKeyColor) });
-          return false;
+          return;
         }
-        if (!n.startsWith('§6✯ ')) return false;
+        if (!n.startsWith('§6✯ ')) return;
         const x = e.field_70165_t;
         const y = e.field_70163_u;
         const z = e.field_70161_v;
 
         const id = getBucketId(e);
-        if (!bucket.has(id)) return true;
-        const ents = bucket.get(id).filter(v => equalish(v.field_70165_t, x) && equalish(v.field_70161_v, z) && v.field_70163_u < y && y - v.field_70163_u < 5).filter(v => matchesMobType(n, v));
-        if (ents.length === 0) return true;
+        if (!bucket.has(id)) return;
+        const ents = bucket.get(id).filter(v => compareFloat(v.field_70165_t, x, 1) === 0 && compareFloat(v.field_70161_v, z, 1) === 0 && v.field_70163_u < y && y - v.field_70163_u < 5).filter(v => matchesMobType(n, v));
+        if (ents.length === 0) return;
         const ent = ents.reduce((a, v) => dist(a.field_70165_t, x) + dist(a.field_70161_v, z) > dist(v.field_70165_t, x) - dist(v.field_70161_v, z) ? v : a, ents[0]);
 
         let h = 2;
@@ -235,9 +235,8 @@ const step10Reg = reg('step', () => {
           c = settings.dungeonBoxMiniColor;
         }
         boxMobs.put(ent, { yO: 0, h, c: toJavaCol(c) });
-
-        return false;
       });
+      nameCand = [];
     }).start();
   }
 }).setFps(10);
