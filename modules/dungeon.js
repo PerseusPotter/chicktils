@@ -132,6 +132,7 @@ function getBoxMobType(n) {
   // if (n.includes('Skeleton Lord', 6)) return 2;
   if (n.includes('Lord', 6)) return 2;
   if (n.includes('Zombie Commander', 6)) return 2;
+  if (n.includes('Super Archer')) return 2;
 
   // if (n.includes('Lost Adventurer', 6)) return 3;
   // if (n.includes('Frozen Adventurer', 6)) return 3;
