@@ -1,7 +1,9 @@
 import { registerForge, unregisterForge } from './forge';
 
 /**
- * @type {{ isRegistered: () => boolean } & typeof register}
+ * isRegistered: () => boolean;
+ * forceTrigger(...args: any[]) => any;
+ * @type {typeof register}
  */
 let reg;
 reg = function reg(type, shit) {
@@ -23,6 +25,8 @@ reg = function reg(type, shit) {
         return Function.prototype;
       } else if (p === 'isRegistered') {
         return () => isReg;
+      } else if (p === 'forceTrigger') {
+        return shit;
       } else if (rr[p] instanceof Function) return rr[p].bind(rr);
       else return rr[p];
     }
