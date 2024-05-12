@@ -497,7 +497,7 @@ export const props = {
   dungeonBoxKeyColor: new Property('DungeonBoxKeyColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
   dungeonBoxSAColor: new Property('DungeonBoxSAColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   dungeonBoxFelColor: new Property('DungeonBoxFelColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
-  dungeonBoxChonkColor: new Property('DungeonBoxChonkersColor', page, ++sort, Property.Type.Color, 0xFF0080FF, { desc: 'withermancers, commanders, and lords' }),
+  dungeonBoxChonkColor: new Property('DungeonBoxChonkersColor', page, ++sort, Property.Type.Color, 0xFF0080FF, { desc: 'withermancers, commanders, lords, and super archers' }),
   dungeonBoxMiniColor: new Property('DungeonBoxMiniColor', page, ++sort, Property.Type.Color, 0xB400B4FF),
   dungeonBoxMobDisableInBoss: new Property('DungeonBoxMobDisableInBoss', page, ++sort, Property.Type.Toggle, false),
 
