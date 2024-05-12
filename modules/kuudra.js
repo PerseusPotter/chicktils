@@ -285,7 +285,7 @@ function entitySpawn(evn) {
 
 const cannonReg = reg('chat', () => {
   isOnCannon = true;
-  Client.scheduleTask(() => isOnCannon = false, 200);
+  Client.scheduleTask(200, () => isOnCannon = false);
 }).setChatCriteria('&r&aYou purchased Human Cannonball!&r');
 
 function addPearls() {
@@ -311,6 +311,7 @@ function onBuildStart() {
   ticksUntilPickup = 0;
   pickupStart = 0;
   lastPickUpdate = 0;
+  isOnCannon = false;
   supplyPickReg.unregister();
   cannonReg.register();
 }
@@ -327,6 +328,7 @@ function reset() {
   buildEndReg.unregister();
   dpsStartReg.unregister();
   kuudraLeaveReg.unregister();
+  kuudraEndReg.unregister();
 
   cannonReg.unregister();
   hideTitleReg.unregister();
@@ -349,6 +351,7 @@ function start() {
   buildEndReg.register();
   dpsStartReg.register();
   kuudraLeaveReg.register();
+  kuudraEndReg.register();
 
   hpOverlayReg.register();
   addPearls();
