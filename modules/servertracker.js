@@ -41,9 +41,14 @@ const loadReg = reg('worldLoad', () => {
   regs.push(reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dn', true));
   regs.push(reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dh', true));
 });
-loadReg.forceTrigger();
 
-export function init() { }
+export function init() {
+  let first = true;
+  settings._enableservertracker.onAfterChange(v => {
+    if (v && first) loadReg.forceTrigger();
+    first = false;
+  });
+}
 export function load() {
   warpReg.register();
   unloadReg.register();
