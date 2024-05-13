@@ -292,12 +292,21 @@ export class Property {
     }
   }
 
+  /**
+   * @param {(this: Property, newValue: string | number | boolean, oldValue: string | number | boolean) => void} cb
+   */
   onBeforeChange(cb) {
     this.listeners0.push(cb);
   }
+  /**
+   * @param {(this: Property, newValue: string | number | boolean, oldValue: string | number | boolean) => void} cb
+   */
   onAfterChange(cb) {
     this.listeners1.push(cb);
   }
+  /**
+   * @param {(this: Property) => void} cb
+   */
   onAction(cb) {
     this.actionListeners.push(cb);
   }
