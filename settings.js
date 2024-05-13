@@ -305,7 +305,7 @@ export class Property {
   getMessage(module, name = this.name) {
     const desc = this.desc ? new TextComponent(`&f${name}`).setHover('show_text', this.desc) : `&f${name}`;
     if (this.type === Property.Type.Action) return new Message(
-      new TextComponent('&7[&eRUN&7]&r ').setClick('suggest_command', `/${module} config edit ${this.name}`),
+      new TextComponent('&7[&eRUN&7]&r ').setClick('run_command', `/${module} config edit ${this.name}`),
       desc,
     );
     return new Message(
