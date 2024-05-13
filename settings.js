@@ -522,6 +522,8 @@ export const props = {
   dungeonMapBoxLockedDoorOutlineColor: new Property('DungeonMapBoxLockedDoorOutlineColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   dungeonMapBoxLockedDoorFillColor: new Property('DungeonMapBoxLockedDoorFillColor', page, ++sort, Property.Type.Color, 0xFF000050),
 
+  dungeonShowSecrets: new Property('DungeonShowSecrets', page, ++sort, Property.Type.Option, 'None', { options: ['None', 'Wire', 'Waypoint'] }),
+
   dungeonHideHealerPowerups: new Property('DungeonHideHealerPowerups', page, ++sort, Property.Type.Toggle, true),
 
   dungeonAutoArchitect: new Property('DungeonAutoGFSArchitect', page, ++sort, Property.Type.Toggle, true, { desc: 'auto gfs on puzzle fail' }),

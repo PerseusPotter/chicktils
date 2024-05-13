@@ -9,13 +9,16 @@ import getPing from '../util/ping';
 import runHelper from '../util/runner';
 import createTextGui from '../util/customtextgui';
 import { compareFloat } from '../util/math';
+import Grid from '../util/grid';
+import { logDebug } from '../util/log';
 
 let entSpawnReg = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn);
 function reset() {
   renderEntReg.unregister();
+  renderEntPostReg.unregister();
   renderWorldReg.unregister();
   renderOvlyReg.unregister();
-  step10Reg.unregister();
+  step2Reg.unregister();
   tickReg.unregister();
   stepVarReg.unregister();
   particleReg.unregister();
@@ -48,19 +51,22 @@ function start() {
   bloodX = -1;
   bloodZ = -1;
   map = null;
+  mapId = null;
   lastRoom = '';
   motionData.clear();
   bloodOpenTime = 0;
   bloodClosed = false;
   powerupCand = [];
   hiddenPowerups.clear();
+  hiddenPowerupsBucket.clear();
   necronDragStart = 0;
   isAtDev4 = false;
 
   renderEntReg.register();
+  renderEntPostReg.register();
   renderWorldReg.register();
   renderOvlyReg.register();
-  step10Reg.register();
+  step2Reg.register();
   tickReg.register();
   stepVarReg.register();
   particleReg.register();
@@ -84,9 +90,7 @@ let isInBoss = false;
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
 let mobCand = [];
 let nameCand = [];
-const bucketSize = 1;
-const bucket = new Map();
-const bucketKey = 631;
+const mobCandBucket = new Grid();
 let bloodMobs = [];
 let possibleSkulls = [];
 let bloodX = -1;
@@ -95,6 +99,7 @@ const motionData = new Map();
 let bloodOpenTime = 0;
 let bloodClosed = false;
 let map;
+let mapId;
 const mapDisplay = createGui(() => data.dungeonMapLoc, renderMap, renderMapEdit);
 let lastRoom = '';
 const hecAlert = createAlert('Hecatomb');
@@ -109,15 +114,13 @@ const orbIds = [
   'DUNGEON_GREEN_SUPPORT_ORB'
 ];
 let powerupCand = [];
-const hiddenPowerups = new Map();
+const hiddenPowerups = new (Java.type('java.util.HashSet'))();
+const hiddenPowerupsBucket = new Grid({ addNeighbors: true });
 const shitterAlert = createAlert('Shitter', 10);
 let instaMidProc;
 const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () => ['§l§26.42s']);
 let necronDragStart = 0;
 let isAtDev4 = false;
-function getBucketId(ent) {
-  return (ent.field_70165_t >> bucketSize) * bucketKey + (ent.field_70161_v >> bucketSize);
-}
 function isDungeonMob(name) {
   return name === 'EntityZombie' ||
     name === 'EntitySkeleton' ||
@@ -170,18 +173,11 @@ function addSkull(skull) {
 function roundRoomCoords(c) {
   return ((c + 9) & 0b11111111111111111111111111100000) - 9;
 }
-function addToBucket(id, v) {
-  if (!bucket.has(id)) bucket.set(id, []);
-  // the fuck is rhino doing
-  try {
-    bucket.get(id).push(v); // org.mozilla.javascript.EcmaError: TypeError: Cannot call method "push" of undefined
-  } catch (e) { }
-}
 function entitySpawn(evn) {
   const e = evn.entity;
   const c = e.getClass().getSimpleName();
   if (c === 'EntityArmorStand') {
-    if (settings.dungeonHideHealerPowerups) powerupCand.unshift([Date.now(), e]);
+    if (settings.dungeonHideHealerPowerups) powerupCand.push([Date.now(), e]);
     if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) nameCand.push(e);
     if (settings.dungeonCamp && !bloodClosed) possibleSkulls.push(e);
   } else if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss) && isDungeonMob(c)) mobCand.push(e);
@@ -190,21 +186,45 @@ function toJavaCol(c) {
   return new (Java.type('java.awt.Color'))(((c & 0xFF) << 24) | c >> 8, true);
 }
 
-const step10Reg = reg('step', () => {
+const step2Reg = reg('step', () => {
   if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
-    new Thread(() => {
-      bucket.clear();
-      mobCand = mobCand.filter(e => {
-        if (e.field_70128_L) return false;
-        const n = e.func_70005_c_();
-        if (n === 'Shadow Assassin') {
-          boxMobs.put(e, { yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor) });
-          return false;
+    mobCandBucket.clear();
+    mobCand = mobCand.filter(e => {
+      if (e.field_70128_L) return false;
+      const n = e.func_70005_c_();
+      if (n === 'Shadow Assassin') {
+        boxMobs.put(e, { yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor) });
+        return false;
+      }
+      mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
+      return true;
+    });
+  }
+}).setFps(2);
+
+const tickReg = reg('tick', () => {
+  new Thread(() => {
+    if (settings.dungeonCamp) {
+      const t = Date.now();
+      bloodMobs = bloodMobs.filter(e => {
+        const uuid = e.getUUID().toString();
+        const x = e.getX();
+        const y = e.getY();
+        const z = e.getZ();
+        const dx = Math.abs(x - e.getLastX());
+        const dz = Math.abs(z - e.getLastZ());
+        if (motionData.has(uuid)) {
+          const data = motionData.get(uuid);
+          data.ttl--;
+          if (data.ttl <= 0) return void motionData.delete(uuid);
+        } else if (bloodOpenTime > 0 && (dx !== 0 || dz !== 0)) {
+          const ttl = (t - bloodOpenTime > 26000) ? 40 : 80;
+          motionData.set(uuid, { startX: x, startY: y, startZ: z, startT: t, estX: x, estY: y, estZ: z, lastEstX: x, lastEstY: y, lastEstZ: z, ttl, maxTtl: ttl, lastUpdate: t });
         }
-        const id = getBucketId(e);
-        addToBucket(id + 0, e);
         return true;
       });
+    }
+    if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
       nameCand.forEach(e => {
         if (e.field_70128_L) return;
         const n = e.func_70005_c_();
@@ -217,9 +237,9 @@ const step10Reg = reg('step', () => {
         const y = e.field_70163_u;
         const z = e.field_70161_v;
 
-        const id = getBucketId(e);
-        if (!bucket.has(id)) return;
-        const ents = bucket.get(id).filter(v => compareFloat(v.field_70165_t, x, 1) === 0 && compareFloat(v.field_70161_v, z, 1) === 0 && v.field_70163_u < y && y - v.field_70163_u < 5).filter(v => matchesMobType(n, v));
+        let ents = mobCandBucket.get(e.field_70165_t, e.field_70161_v);
+        if (!ents) return;
+        ents = ents.filter(v => compareFloat(v.field_70165_t, x, 1) === 0 && compareFloat(v.field_70161_v, z, 1) === 0 && v.field_70163_u < y && y - v.field_70163_u < 5).filter(v => matchesMobType(n, v));
         if (ents.length === 0) return;
         const ent = ents.reduce((a, v) => dist(a.field_70165_t, x) + dist(a.field_70161_v, z) > dist(v.field_70165_t, x) - dist(v.field_70161_v, z) ? v : a, ents[0]);
 
@@ -238,79 +258,72 @@ const step10Reg = reg('step', () => {
         boxMobs.put(ent, { yO: 0, h, c: toJavaCol(c) });
       });
       nameCand = [];
-    }).start();
-  }
-}).setFps(10);
+    }
+    if (settings.dungeonMap) {
+      map = null;
+      const mapI = Player.getInventory()?.getStackInSlot(8);
+      if (mapI && mapI.getRegistryName() === 'minecraft:filled_map') {
+        map = mapI.item.func_77873_a(mapI.itemStack, World.getWorld());
+        if (map && !mapId) mapId = mapI.getMetadata();
+      } else if (mapId) map = World.getWorld().func_72943_a(Java.type('net.minecraft.world.storage.MapData').class, 'map_' + mapId);
 
-const tickReg = reg('tick', () => {
-  if (settings.dungeonCamp) {
-    const t = Date.now();
-    bloodMobs = bloodMobs.filter(e => {
-      const uuid = e.getUUID().toString();
-      const x = e.getX();
-      const y = e.getY();
-      const z = e.getZ();
-      const dx = Math.abs(x - e.getLastX());
-      const dz = Math.abs(z - e.getLastZ());
-      if (motionData.has(uuid)) {
-        const data = motionData.get(uuid);
-        data.ttl--;
-        if (data.ttl <= 0) return void motionData.delete(uuid);
-      } else if (bloodOpenTime > 0 && (dx !== 0 || dz !== 0)) {
-        const ttl = (t - bloodOpenTime > 26000) ? 40 : 80;
-        motionData.set(uuid, { startX: x, startY: y, startZ: z, startT: t, estX: x, estY: y, estZ: z, lastEstX: x, lastEstY: y, lastEstZ: z, ttl, maxTtl: ttl, lastUpdate: t });
-      }
-      return true;
-    });
-  }
-  if (settings.dungeonMap) {
-    map = null;
-    const mapI = Player.getInventory()?.getStackInSlot(8);
-    if (!mapI || mapI.getRegistryName() !== 'minecraft:filled_map') return;
-    map = mapI.item.func_77873_a(mapI.itemStack, World.getWorld());
-
-    const x = roundRoomCoords(Player.getX());
-    const z = roundRoomCoords(Player.getZ());
-    const k = x + ',' + z;
-    if (k === lastRoom) return;
-    // TODO: update doors
-    // TODO: check if room coords are in same room based on map doors
-    lastRoom = k;
-  }
-  if (settings.dungeonHideHealerPowerups) {
-    const t = Date.now();
-    powerupCand = powerupCand.filter(v => {
-      const e = v[1];
-      const n = e.func_70005_c_();
-      if (n === 'Armor Stand') {
-        let i = e.func_71124_b(4);
-        let b = i && i.func_77978_p();
-        if (b) {
-          const d = b.func_74775_l('ExtraAttributes').func_74779_i('id');
-          if (orbIds.some(v => d === v)) {
-            hiddenPowerups.set(e.func_110124_au().toString(), e);
-            return false;
+      const x = roundRoomCoords(Player.getX());
+      const z = roundRoomCoords(Player.getZ());
+      const k = x + ',' + z;
+      if (k === lastRoom) return;
+      // TODO: update doors
+      // TODO: check if room coords are in same room based on map doors
+      lastRoom = k;
+    }
+    if (settings.dungeonHideHealerPowerups) {
+      const t = Date.now();
+      powerupCand = powerupCand.filter(v => {
+        const e = v[1];
+        const n = e.func_70005_c_();
+        if (n === 'Armor Stand') {
+          let i = e.func_71124_b(4);
+          let b = i && i.func_77978_p();
+          if (b) {
+            const d = b.func_74775_l('ExtraAttributes').func_74779_i('id');
+            if (orbIds.some(v => d === v)) {
+              hiddenPowerups.add(e);
+              hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
+              return false;
+            }
           }
+          i = e.func_71124_b(0);
+          b = i && i.func_77978_p();
+          if (b && b.func_74775_l('SkullOwner').func_74775_l('Properties').func_150295_c('textures', 10).func_150305_b(0).func_74775_l('Value').func_74775_l('textures').func_74775_l('SKIN').func_74779_i('url') === 'http://textures.minecraft.net/texture/96c3e31cfc66733275c42fcfb5d9a44342d643b55cd14c9c77d273a2352') {
+            hiddenPowerups.add(e);
+            hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
+          }
+          return t - v[0] < 500;
+        } else if (orbNames.some(v => n.startsWith(v))) {
+          hiddenPowerups.add(e);
+          hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
         }
-        i = e.func_71124_b(0);
-        b = i && i.func_77978_p();
-        if (b && b.func_74775_l('SkullOwner').func_74775_l('Properties').func_150295_c('textures', 10).func_150305_b(0).func_74775_l('Value').func_74775_l('textures').func_74775_l('SKIN').func_74779_i('url') === 'http://textures.minecraft.net/texture/96c3e31cfc66733275c42fcfb5d9a44342d643b55cd14c9c77d273a2352') {
-          hiddenPowerups.set(e.func_110124_au().toString(), e);
-        }
-        return t - v[0] < 500;
-      }
-      if (orbNames.some(v => n.startsWith(v))) hiddenPowerups.set(e.func_110124_au().toString(), e);
-      return false;
-    });
-  }
-  if (instaMidProc) {
-    if (instaMidProc.isAlive()) {
-      instaMidProc.getOutputStream().write(10);
-      instaMidProc.getOutputStream().flush();
-    } else instaMidProc = void 0;
-  }
-  isAtDev4 = dist(Player.getX(), 63) + dist(Player.getY(), 127) + dist(Player.getZ(), 35) < 3;
+        return false;
+      });
+    }
+    if (instaMidProc) {
+      if (instaMidProc.isAlive()) {
+        instaMidProc.getOutputStream().write(10);
+        instaMidProc.getOutputStream().flush();
+      } else instaMidProc = void 0;
+    }
+    isAtDev4 = dist(Player.getX(), 63) + dist(Player.getY(), 127) + dist(Player.getZ(), 35) < 3;
+  }).start();
 });
+
+register('command', () => {
+  const obj = {};
+  if (map) map.field_76203_h.forEach((k, v) => obj[k] = `${v.func_176110_a()}, ${v.func_176112_b()}, ${v.func_176113_c()}, ${v.func_176111_d()}`);
+  logDebug({
+    id: mapId,
+    data: Array.from(map?.field_76198_e),
+    dec: obj
+  });
+}).setName('csmdump');
 
 const stepVarReg = reg('step', () => {
   if (!settings.dungeonCamp) return;
@@ -372,11 +385,12 @@ const necronStartReg = reg('chat', () => {
 }).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r');
 
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
-  if (settings.dungeonHideHealerPowerups && hiddenPowerups.has(e.getUUID().toString())) return void cancel(evn);
+  if (settings.dungeonHideHealerPowerups && hiddenPowerups.contains(e.entity)) cancel(evn);
+});
+const renderEntPostReg = reg('postRenderEntity', (e, pos, partial) => {
   if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
-    if (!boxMobs.containsKey(e.entity)) return;
-    const { yO, h, c } = boxMobs.get(e.entity);
-    drawBoxPos(pos.getX(), pos.getY() - yO, pos.getZ(), 1, h, c, partial, settings.dungeonBoxMobEsp, false);
+    const data = boxMobs.get(e.entity);
+    if (data) drawBoxPos(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, partial, settings.dungeonBoxMobEsp, false);
   }
 });
 
@@ -433,6 +447,9 @@ const renderOvlyReg = reg('renderOverlay', () => {
   }
 });
 
+/**
+ * @this typeof mapDisplay
+ */
 function renderMap() {
   if (!map) return;
   // copy map to screen
@@ -443,12 +460,21 @@ function renderMap() {
   if (settings.dungeonMapRenderName === 'Always' || (settings.dungeonMapRenderName === 'Holding Leap' && isHoldingLeap)) renderPlayerText.call(this, 'name');
   else if (settings.dungeonMapRenderClass === 'Always' || (settings.dungeonMapRenderClass === 'Holding Leap' && isHoldingLeap)) renderPlayerText.call(this, 'class');
 }
+/**
+ * @this typeof mapDisplay
+ */
 function renderHeads() {
 
 }
-function renderPlayerText() {
+/**
+ * @this typeof mapDisplay
+ */
+function renderPlayerText(type) {
   // draw text with shadow
 }
+/**
+ * @this typeof mapDisplay
+ */
 function renderMapEdit() {
 
 }
@@ -468,14 +494,17 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
     // org.mozilla.javascript.WrappedException: Wrapped java.lang.IllegalArgumentException: Color parameter outside of expected range: Green Blue
     const b = part.getColor().getBlue();
     if (b === 0 || b > 10) return;
-    // something something bucket ¯\_(ツ)_/¯
-    if (Array.from(hiddenPowerups.values()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
+    if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
   } catch (e) { }
 });
 
 const titleReg = reg('renderTitle', (t, s, evn) => {
   if (isAtDev4 && (settings.dungeonDev4Helper === 'Titles' || settings.dungeonDev4Helper === 'Both') && (s === '§aThe gate has been destroyed!§r' || s.includes('activated a'))) return cancel(evn);
 });
+
+const mapPacketReg = reg('packetReceived', p => {
+  if (map && !mapId) mapId = p.func_149188_c();
+}).setFilteredClass(Java.type('net.minecraft.network.play.server.S34PacketMaps'));
 
 function onBossEnd() {
   if (settings.dungeonHecatombAlert) {
@@ -546,6 +575,10 @@ export function init() {
   });
   settings._moveDungeonMap.onAction(() => mapDisplay.edit());
   settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());
+  settings._dungeonMap.onAfterChange(v => {
+    if (v) mapPacketReg.register();
+    else mapPacketReg.unregister();
+  });
 }
 export function load() {
   dungeonStartReg.register();
