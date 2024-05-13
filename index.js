@@ -37,8 +37,12 @@ function tryUpdate(delay = 0) {
     centerMessage(new Message(new TextComponent('&3&nClick To View').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
     ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
     ChatLib.chat('')
-    if (sev === 0 || (sev === 1 && !settings.isDev)) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
-    if (sev === 1 && settings.isDev) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
+    if (sev === 0) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
+    else if (sev === 1 || (sev === 2 && !settings.isDev)) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
+    else {
+      ChatLib.chat(ChatLib.getCenteredText('&l&cNote: ChickTils will be reloaded.'));
+      ChatLib.chat(ChatLib.getCenteredText('&l&c(but you already knew that)'));
+    }
     centerMessage(new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'))).chat();
     setTimeout(() => {
       silentUpdate = true;
@@ -54,10 +58,7 @@ let silentUpdate = false;
 register('command', res => {
   if (sev === undefined) {
     if (!silentUpdate) log('there is not an update pending');
-    silentUpdate = false;
-    return;
-  }
-  if (res === 'accept') {
+  } else if (res === 'accept') {
     Updater.applyUpdate();
     if (sev === 0) crashGame('updating !');
     if (sev === 1) Java.type('com.chattriggers.ctjs.Reference').reloadCT();
@@ -68,6 +69,7 @@ register('command', res => {
     Updater.deleteDownload();
     loadMod();
   }
+  silentUpdate = false;
 }).setName('csmupdate');
 function loadMod() {
   log('&7Loading ChickTils...');
