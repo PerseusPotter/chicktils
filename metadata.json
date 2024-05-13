@@ -1,7 +1,7 @@
 {
   "name": "ChickTils",
   "creator": "Ch1ck3nNeedsRNG",
-  "description": "mmm",
+  "description": "/chicktils, (/cts or /csm)",
   "version": "0.0.1",
   "entry": "index.js",
   "requires": [
