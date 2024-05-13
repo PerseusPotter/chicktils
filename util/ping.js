@@ -7,7 +7,7 @@ export default function getPing() {
   if (!Ping || settings.pingRefreshDelay === 0) return 0;
   const t = Date.now();
   if (t - lastPing > settings.pingRefreshDelay * 1000) {
-    new Thread(() => Ping.INSTANCE.sendPing()).start();
+    Ping.INSTANCE.sendPing();
     lastPing = t;
   }
   return Ping.INSTANCE.getPingCache();
