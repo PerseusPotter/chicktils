@@ -203,27 +203,64 @@ const step2Reg = reg('step', () => {
 }).setFps(2);
 
 const tickReg = reg('tick', () => {
-  new Thread(() => {
-    if (settings.dungeonCamp) {
-      const t = Date.now();
-      bloodMobs = bloodMobs.filter(e => {
-        const uuid = e.getUUID().toString();
-        const x = e.getX();
-        const y = e.getY();
-        const z = e.getZ();
-        const dx = Math.abs(x - e.getLastX());
-        const dz = Math.abs(z - e.getLastZ());
-        if (motionData.has(uuid)) {
-          const data = motionData.get(uuid);
-          data.ttl--;
-          if (data.ttl <= 0) return void motionData.delete(uuid);
-        } else if (bloodOpenTime > 0 && (dx !== 0 || dz !== 0)) {
-          const ttl = (t - bloodOpenTime > 26000) ? 40 : 80;
-          motionData.set(uuid, { startX: x, startY: y, startZ: z, startT: t, estX: x, estY: y, estZ: z, lastEstX: x, lastEstY: y, lastEstZ: z, ttl, maxTtl: ttl, lastUpdate: t });
+  if (settings.dungeonCamp) {
+    const t = Date.now();
+    bloodMobs = bloodMobs.filter(e => {
+      const uuid = e.getUUID().toString();
+      const x = e.getX();
+      const y = e.getY();
+      const z = e.getZ();
+      const dx = Math.abs(x - e.getLastX());
+      const dz = Math.abs(z - e.getLastZ());
+      if (motionData.has(uuid)) {
+        const data = motionData.get(uuid);
+        data.ttl--;
+        if (data.ttl <= 0) return void motionData.delete(uuid);
+      } else if (bloodOpenTime > 0 && (dx !== 0 || dz !== 0)) {
+        const ttl = (t - bloodOpenTime > 26000) ? 40 : 80;
+        motionData.set(uuid, { startX: x, startY: y, startZ: z, startT: t, estX: x, estY: y, estZ: z, lastEstX: x, lastEstY: y, lastEstZ: z, ttl, maxTtl: ttl, lastUpdate: t });
+      }
+      return true;
+    });
+  }
+  if (settings.dungeonHideHealerPowerups) {
+    const t = Date.now();
+    powerupCand = powerupCand.filter(v => {
+      const e = v[1];
+      const n = e.func_70005_c_();
+      if (n === 'Armor Stand') {
+        let i = e.func_71124_b(4);
+        let b = i && i.func_77978_p();
+        if (b) {
+          const d = b.func_74775_l('ExtraAttributes').func_74779_i('id');
+          if (orbIds.some(v => d === v)) {
+            hiddenPowerups.add(e);
+            hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
+            return false;
+          }
         }
-        return true;
-      });
-    }
+        i = e.func_71124_b(0);
+        b = i && i.func_77978_p();
+        if (b && b.func_74775_l('SkullOwner').func_74775_l('Properties').func_150295_c('textures', 10).func_150305_b(0).func_74775_l('Value').func_74775_l('textures').func_74775_l('SKIN').func_74779_i('url') === 'http://textures.minecraft.net/texture/96c3e31cfc66733275c42fcfb5d9a44342d643b55cd14c9c77d273a2352') {
+          hiddenPowerups.add(e);
+          hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
+        }
+        return t - v[0] < 500;
+      } else if (orbNames.some(v => n.startsWith(v))) {
+        hiddenPowerups.add(e);
+        hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
+      }
+      return false;
+    });
+  }
+  if (instaMidProc) {
+    if (instaMidProc.isAlive()) {
+      instaMidProc.getOutputStream().write(10);
+      instaMidProc.getOutputStream().flush();
+    } else instaMidProc = void 0;
+  }
+  isAtDev4 = dist(Player.getX(), 63) + dist(Player.getY(), 127) + dist(Player.getZ(), 35) < 3;
+  new Thread(() => {
     if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
       nameCand.forEach(e => {
         if (e.field_70128_L) return;
@@ -275,43 +312,6 @@ const tickReg = reg('tick', () => {
       // TODO: check if room coords are in same room based on map doors
       lastRoom = k;
     }
-    if (settings.dungeonHideHealerPowerups) {
-      const t = Date.now();
-      powerupCand = powerupCand.filter(v => {
-        const e = v[1];
-        const n = e.func_70005_c_();
-        if (n === 'Armor Stand') {
-          let i = e.func_71124_b(4);
-          let b = i && i.func_77978_p();
-          if (b) {
-            const d = b.func_74775_l('ExtraAttributes').func_74779_i('id');
-            if (orbIds.some(v => d === v)) {
-              hiddenPowerups.add(e);
-              hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
-              return false;
-            }
-          }
-          i = e.func_71124_b(0);
-          b = i && i.func_77978_p();
-          if (b && b.func_74775_l('SkullOwner').func_74775_l('Properties').func_150295_c('textures', 10).func_150305_b(0).func_74775_l('Value').func_74775_l('textures').func_74775_l('SKIN').func_74779_i('url') === 'http://textures.minecraft.net/texture/96c3e31cfc66733275c42fcfb5d9a44342d643b55cd14c9c77d273a2352') {
-            hiddenPowerups.add(e);
-            hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
-          }
-          return t - v[0] < 500;
-        } else if (orbNames.some(v => n.startsWith(v))) {
-          hiddenPowerups.add(e);
-          hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
-        }
-        return false;
-      });
-    }
-    if (instaMidProc) {
-      if (instaMidProc.isAlive()) {
-        instaMidProc.getOutputStream().write(10);
-        instaMidProc.getOutputStream().flush();
-      } else instaMidProc = void 0;
-    }
-    isAtDev4 = dist(Player.getX(), 63) + dist(Player.getY(), 127) + dist(Player.getZ(), 35) < 3;
   }).start();
 });
 
