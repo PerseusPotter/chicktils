@@ -25,7 +25,7 @@ export default class Grid {
   }
   _getById(id) {
     const i = this.hm.get(id);
-    if (i === null) return null;
+    if (i === null) return [];
     return this.arrs[i];
   }
 
