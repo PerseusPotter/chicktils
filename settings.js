@@ -256,6 +256,7 @@ export class Property {
     };
     switch (this.type) {
       case Property.Type.Toggle:
+        if (str === 'TOGGLE') return !this.value;
         if (truthy.includes(str)) return true;
         if (falsy.includes(str)) return false;
         throw 'Invalid Boolean: ' + str;
@@ -312,17 +313,17 @@ export class Property {
   }
 
   getMessage(module, name = this.name) {
-    const desc = this.desc ? new TextComponent(`&f${name}`).setHover('show_text', this.desc) : `&f${name}`;
-    if (this.type === Property.Type.Action) return new Message(
-      new TextComponent('&7[&eRUN&7]&r ').setClick('run_command', `/${module} config edit ${this.name}`),
-      desc,
-    );
-    return new Message(
-      new TextComponent('&7[&4RESET&7]&r').setClick('run_command', `/${module} config edit ${this.name}`),
-      new TextComponent('&7[&aEDIT&7]&r ').setClick('suggest_command', `/${module} config edit ${this.name} ${this.toString()}`),
-      desc,
-      `&7: &6${this.toString()}`
-    );
+    const comps = [this.desc ? new TextComponent(`&f${name}`).setHover('show_text', this.desc) : `&f${name}`];
+    if (this.type === Property.Type.Toggle) comps.unshift(new TextComponent('&7[&bTOGGLE&7]&r ').setClick('run_command', `/${module} config edit ${this.name} TOGGLE`));
+    if (this.type === Property.Type.Action) comps.unshift(new TextComponent('&7[&eRUN&7]&r ').setClick('run_command', `/${module} config edit ${this.name}`));
+    else {
+      comps.unshift(
+        new TextComponent('&7[&4RESET&7]&r').setClick('run_command', `/${module} config edit ${this.name}`),
+        new TextComponent('&7[&aEDIT&7]&r ').setClick('suggest_command', `/${module} config edit ${this.name} ${this.toString()}`)
+      );
+      comps.push(`&7:&6 ${this.toString()}`);
+    }
+    return new Message(...comps);
   }
 }
 
