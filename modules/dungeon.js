@@ -115,7 +115,7 @@ const orbIds = [
 ];
 let powerupCand = [];
 const hiddenPowerups = new (Java.type('java.util.HashSet'))();
-const hiddenPowerupsBucket = new Grid({ addNeighbors: true });
+const hiddenPowerupsBucket = new Grid({ addNeighbors: 1 });
 const shitterAlert = createAlert('Shitter', 10);
 let instaMidProc;
 const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () => ['§l§26.42s']);
