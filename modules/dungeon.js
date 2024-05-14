@@ -1,7 +1,7 @@
 import settings from '../settings';
 import data from '../data';
 import createGui from '../util/customgui';
-import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox } from '../util/draw';
+import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D } from '../util/draw';
 import createAlert from '../util/alert';
 import { reg, regForge } from '../util/registerer';
 import { colorForNumber, execCmd } from '../util/format';
@@ -28,6 +28,7 @@ function reset() {
   quizFailReg.unregister();
   architectUseReg.unregister();
   necronStartReg.unregister();
+  stairBreakReg.unregister();
 
   bloodOpenReg.unregister();
   bloodEndReg.unregister();
@@ -61,6 +62,7 @@ function start() {
   hiddenPowerupsBucket.clear();
   necronDragStart = 0;
   isAtDev4 = false;
+  brokenStairBucket.clear();
 
   renderEntReg.register();
   renderEntPostReg.register();
@@ -76,6 +78,7 @@ function start() {
   quizFailReg.register();
   architectUseReg.register();
   necronStartReg.register();
+  stairBreakReg.register();
 
   bloodOpenReg.register();
   bloodEndReg.register();
@@ -121,6 +124,7 @@ let instaMidProc;
 const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () => ['§l§26.42s']);
 let necronDragStart = 0;
 let isAtDev4 = false;
+const brokenStairBucket = new Grid({ size: 2, addNeighbors: 2 });
 function isDungeonMob(name) {
   return name === 'EntityZombie' ||
     name === 'EntitySkeleton' ||
@@ -384,6 +388,31 @@ const necronStartReg = reg('chat', () => {
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc = runHelper('InstaMidHelper');
 }).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r');
 
+const BlockStairs = Java.type('net.minecraft.block.BlockStairs');
+const stairBreakReg = reg('blockBreak', b => {
+  if (!settings.dungeonStairStonkHelper) return;
+  if (!(b.type.mcBlock instanceof BlockStairs)) return;
+  const x = b.getX();
+  const y = b.getY();
+  const z = b.getZ();
+  const n = x * 631 * 631 + y * 631 + z;
+  if (brokenStairBucket.get(x, z).some(v => v[0] === n)) return;
+  switch (b.getMetadata()) {
+    case 0:
+      brokenStairBucket.add(x, z, [n, [x + 0.24, y + 1.1, z], [x + 0.24, y + 1.1, z + 1]]);
+      break;
+    case 1:
+      brokenStairBucket.add(x, z, [n, [x + 0.76, y + 1.1, z], [x + 0.76, y + 1.1, z + 1]]);
+      break;
+    case 2:
+      brokenStairBucket.add(x, z, [n, [x, y + 1.1, z + 0.24], [x + 1, y + 1.1, z + 0.24]]);
+      break;
+    case 3:
+      brokenStairBucket.add(x, z, [n, [x, y + 1.1, z + 0.76], [x + 1, y + 1.1, z + 0.76]]);
+      break;
+  }
+});
+
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (settings.dungeonHideHealerPowerups && hiddenPowerups.contains(e.entity)) cancel(evn);
 });
@@ -431,6 +460,19 @@ const renderWorldReg = reg('renderWorld', () => {
   }
   if (settings.dungeonMap) {
     if (settings.dungeonMapBoxDoors) renderDoor();
+  }
+  if (settings.dungeonStairStonkHelper) {
+    brokenStairBucket.get(Player.getX(), Player.getZ()).forEach(v => {
+      // average rhino L
+      // java.lang.ClassCastException: java.lang.Boolean cannot be cast to [Ljava.lang.Object;
+      // drawLine(settings.dungeonStairStonkHelperColor, ...v[1], ...v[2], 2);
+      drawLine3D(
+        settings.dungeonStairStonkHelperColor,
+        v[1][0], v[1][1], v[1][2],
+        v[2][0], v[2][1], v[2][2],
+        2
+      );
+    });
   }
 });
 
