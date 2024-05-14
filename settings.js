@@ -42,9 +42,9 @@ export class Property {
     this.listeners1 = [];
     this.actionListeners = [];
   }
-  set(v) {
+  set(v, force) {
     if (this.type === Property.Type.Action) return;
-    // if (v === this.value) return;
+    if (!force && v === this.value) return;
     this.validate(v);
     this.listeners0.forEach(cb => cb.call(this, v, old));
     const old = this.value;
