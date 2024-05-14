@@ -592,7 +592,7 @@ function applyTint(c, a) {
  * @param {number} z2
  * @param {number} lw
  */
-export function drawLine(color, x1, y1, z1, x2, y2, z2, lw = 2) {
+export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   const render = Client.getMinecraft().func_175606_aa();
   const realX = interpolate(render.field_70165_t, render.field_70142_S, Tessellator.partialTicks);
   const realY = interpolate(render.field_70163_u, render.field_70137_T, Tessellator.partialTicks);
