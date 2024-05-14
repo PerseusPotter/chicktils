@@ -361,7 +361,7 @@ class Settings {
       k = '_' + k;
       if (!this[k] || !(this[k] instanceof Property)) return;
       try {
-        this[k].set(this[k].parse(v));
+        this[k].set(this[k].parse(v), true);
       } catch (e) {
         log(`error parsing value for setting ${this[k].name}, reverting to default`);
         log(e);
