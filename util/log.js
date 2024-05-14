@@ -1,5 +1,14 @@
+const prefix = '&7[&2ChickTils&7]&f ';
+
 export function log(...args) {
-  ChatLib.chat('&7[&2ChickTils&7] &f' + args.join(' '));
+  ChatLib.chat(prefix + args.join(' '));
+}
+/**
+ * @param {Message} msg
+ */
+export function logMessage(msg) {
+  msg.addTextComponent(0, prefix);
+  msg.chat();
 }
 
 function format(obj, depth = 3) {
