@@ -651,8 +651,10 @@ export const props = {
   betterGFSBlankAmount: new Property('BetterGFSUnspecifiedAmount', page, ++sort, Property.Type.Integer, 1, { min: 1, max: 2240 }),
   betterGFSIDPref: new Property('BetterGFSIdPreference', page, ++sort, Property.Type.Option, 'Dynamic', { options: ['Dynamic', 'ID', 'Name'] }),
 
-  enablecpv: new Property('EnableChicktilsPV', page, ++sort, Property.Type.Toggle, true, { desc: '/cpv, neu /pv wrapper but with different api' }),
-  cpvReplaceNeu: new Property('ChicktilsPVReplaceNEU', page, ++sort, Property.Type.Toggle, false)
+  enablecpv: new Property('EnableChickTilsPV', page, ++sort, Property.Type.Toggle, true, { desc: '/cpv, neu /pv wrapper but with different api' }),
+  cpvReplaceNeu: new Property('ChickTilsPVReplaceNEU', page, ++sort, Property.Type.Toggle, false),
+  cpvAutoCompleteTabList: new Property('ChickTilsAutoCompleteTabList', page, ++sort, Property.Type.Toggle, true),
+  cpvAutoCompleteParty: new Property('ChickTilsAutoCompleteParty', page, ++sort, Property.Type.Toggle, true)
 };
 const pageNames = [
   '',

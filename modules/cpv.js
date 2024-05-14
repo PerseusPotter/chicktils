@@ -2,6 +2,8 @@ import { urlToString } from '../util/net';
 import { reg } from '../util/registerer';
 import settings from '../settings';
 import { log } from '../util/log';
+import * as Party from '../util/party';
+import { getPlayerName } from '../util/format';
 
 const userUUIDC = new Map();
 function _getUUID(user) {
@@ -58,13 +60,41 @@ function cpv(user) {
   }).start();
 }
 
-const cmdReg = reg('command', cpv);
-const neuOverride = reg('command', cpv);
+const autocomplete = function() {
+  const list = [];
+  if (settings.cpvAutoCompleteParty) Party.getMembers().forEach(v => list.push(v));
+  if (settings.cpvAutoCompleteTabList) {
+    const tab = TabList.getNames();
+    let expectEmpty = false;
+    for (let i = 1; i < tab.length; i++) {
+      let s = tab[i];
+      if (expectEmpty) {
+        if (s !== '§r') break;
+        expectEmpty = false;
+        continue;
+      }
+      if (s === '§r' || /^§r§7and \d+ other players\.\.\.§r$/.test(s)) break;
+      if (s.startsWith('§r Revive Stones:')) {
+        expectEmpty = true;
+        continue;
+      }
+      if (s.startsWith('§r Ultimate:') || s.startsWith('§r         §r§a§lPlayers')) continue;
+      list.push(getPlayerName(s));
+    }
+  }
+  return list;
+};
+const cmdReg = reg('command', cpv).setTabCompletions(autocomplete);
+const neuOverride = reg('command', cpv).setTabCompletions(autocomplete);
 
 export function init() {
   settings._cpvReplaceNeu.onAfterChange(v => {
     if (v) neuOverride.setName('pv', true);
     else neuOverride.unregister();
+  });
+  settings._cpvAutoCompleteParty.onAfterChange(v => {
+    if (v) Party.listen();
+    else Party.unlisten();
   });
 }
 export function load() {
