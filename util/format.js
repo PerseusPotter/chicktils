@@ -42,13 +42,28 @@ export function colorForNumber(n, max = 1) {
         '§4');
 }
 
+/**
+ * @param {Message} msg
+ */
 export function centerMessage(msg) {
   const c = Math.max(0, ChatLib.getChatWidth() - Renderer.getStringWidth(msg.getFormattedText())) / 2 / Renderer.getStringWidth(' ');
   msg.addTextComponent(0, ' '.repeat(~~c));
   return msg;
 }
 
+/**
+ * @param {string} cmd
+ */
 export function execCmd(cmd) {
   log('&2Executing command: &7/' + cmd);
   ChatLib.command(cmd);
+}
+
+/**
+ * @param {string} name
+ */
+export function stripRank(name) {
+  const match = name.match(/(?<=\s|^)(?:§.){0,}([A-Za-z0-9_]+?)$/);
+  if (!match) return '';
+  return match[1];
 }
