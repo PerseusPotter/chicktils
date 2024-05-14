@@ -581,3 +581,46 @@ function applyTint(c, a) {
     ((((c >> 8) & 0xFF) * a) << 8) |
     (c & 0xFF);
 }
+
+/**
+ * @param {number} color rgba
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} z1
+ * @param {number} x2
+ * @param {number} y2
+ * @param {number} z2
+ * @param {number} lw
+ */
+export function drawLine(color, x1, y1, z1, x2, y2, z2, lw = 2) {
+  const render = Client.getMinecraft().func_175606_aa();
+  const realX = interpolate(render.field_70165_t, render.field_70142_S, Tessellator.partialTicks);
+  const realY = interpolate(render.field_70163_u, render.field_70137_T, Tessellator.partialTicks);
+  const realZ = interpolate(render.field_70161_v, render.field_70136_U, Tessellator.partialTicks);
+  GlStateManager.func_179094_E();
+  GlStateManager.func_179137_b(-realX, -realY, -realZ);
+  GlStateManager.func_179090_x();
+  GlStateManager.func_179147_l();
+  GlStateManager.func_179140_f();
+  GlStateManager.func_179118_c();
+  GlStateManager.func_179120_a(770, 771, 1, 0);
+  GL11.glLineWidth(lw);
+
+  const r = ((color >> 24) & 0xFF) / 256;
+  const g = ((color >> 16) & 0xFF) / 256;
+  const b = ((color >> 8) & 0xFF) / 256;
+  const a = ((color >> 0) & 0xFF) / 256;
+  GlStateManager.func_179131_c(r, g, b, a);
+  worldRen.func_181668_a(3, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+
+  worldRen.func_181662_b(x1, y1, z1).func_181675_d();
+  worldRen.func_181662_b(x2, y2, z2).func_181675_d();
+  tess.func_78381_a();
+
+  GlStateManager.func_179137_b(realX, realY, realZ);
+  GlStateManager.func_179084_k();
+  GlStateManager.func_179141_d();
+  GlStateManager.func_179098_w();
+  GlStateManager.func_179131_c(1, 1, 1, 1);
+  GlStateManager.func_179121_F();
+}
