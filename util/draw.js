@@ -225,7 +225,7 @@ export function drawArrow2D(color, theta, length = 20, yaw) {
 
   const x2 = x1 + Math.cos(dt) * length;
   const y2 = y1 + Math.sin(dt) * length;
-  const c = (color >> 8) | ((color & 0xFF) << 24);
+  const c = rgbaToARGB(c);
   Renderer.drawLine(c, x1, y1, x2, y2, 1);
   Renderer.drawLine(c, x2, y2, x2 + Math.cos(dt + Math.PI * 7 / 8) * length / 3, y2 + Math.sin(dt + Math.PI * 7 / 8) * length / 3, 1);
   Renderer.drawLine(c, x2, y2, x2 + Math.cos(dt - Math.PI * 7 / 8) * length / 3, y2 + Math.sin(dt - Math.PI * 7 / 8) * length / 3, 1);
@@ -623,4 +623,12 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   GlStateManager.func_179098_w();
   GlStateManager.func_179131_c(1, 1, 1, 1);
   GlStateManager.func_179121_F();
+}
+
+export function rgbaToARGB(c) {
+  return ((c & 0xFF) << 24) | c >> 8;
+}
+
+export function rgbToJavaColor(c) {
+  return new (Java.type('java.awt.Color'))(rgbaToARGB(c), true);
 }
