@@ -1,10 +1,10 @@
 import settings from '../settings';
-import { drawBoxPos } from '../util/draw';
+import { drawBoxPos, rgbToJavaColor } from '../util/draw';
 import { reg } from '../util/registerer';
 
 let c;
 function updateColor() {
-  c = new (Java.type('java.awt.Color'))(((settings.boxAllEntitiesColor & 0xFF) << 24) | settings.boxAllEntitiesColor >> 8, true);
+  c = rgbToJavaColor(settings.boxAllEntitiesColor);
 };
 updateColor();
 const renderReg = reg('renderEntity', (ent, pos, part) => {
@@ -12,7 +12,6 @@ const renderReg = reg('renderEntity', (ent, pos, part) => {
 });
 
 export function init() {
-  updateColor();
   settings._boxAllEntitiesColor.onAfterChange(() => updateColor());
 }
 export function load() {

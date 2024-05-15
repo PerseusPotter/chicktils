@@ -1,7 +1,7 @@
 import settings from '../settings';
 import data from '../data';
 import createGui from '../util/customgui';
-import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D } from '../util/draw';
+import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbToJavaColor } from '../util/draw';
 import createAlert from '../util/alert';
 import { reg, regForge } from '../util/registerer';
 import { colorForNumber, execCmd } from '../util/format';
@@ -186,9 +186,6 @@ function entitySpawn(evn) {
     if (settings.dungeonCamp && !bloodClosed) possibleSkulls.push(e);
   } else if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss) && isDungeonMob(c)) mobCand.push(e);
 }
-function toJavaCol(c) {
-  return new (Java.type('java.awt.Color'))(((c & 0xFF) << 24) | c >> 8, true);
-}
 
 const step2Reg = reg('step', () => {
   if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
@@ -197,7 +194,7 @@ const step2Reg = reg('step', () => {
       if (e.field_70128_L) return false;
       const n = e.func_70005_c_();
       if (n === 'Shadow Assassin') {
-        boxMobs.put(e, { yO: 0, h: 2, c: toJavaCol(settings.dungeonBoxSAColor) });
+        boxMobs.put(e, { yO: 0, h: 2, c: rgbToJavaColor(settings.dungeonBoxSAColor) });
         return false;
       }
       mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
@@ -270,7 +267,7 @@ const tickReg = reg('tick', () => {
         if (e.field_70128_L) return;
         const n = e.func_70005_c_();
         if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
-          boxMobs.put(e, { yO: -1, h: 1, c: toJavaCol(settings.dungeonBoxKeyColor) });
+          boxMobs.put(e, { yO: -1, h: 1, c: rgbToJavaColor(settings.dungeonBoxKeyColor) });
           return;
         }
         if (!n.startsWith('§6✯ ')) return;
@@ -296,7 +293,7 @@ const tickReg = reg('tick', () => {
         } else if (t === 3) {
           c = settings.dungeonBoxMiniColor;
         }
-        boxMobs.put(ent, { yO: 0, h, c: toJavaCol(c) });
+        boxMobs.put(ent, { yO: 0, h, c: rgbToJavaColor(c) });
       });
       nameCand = [];
     }
