@@ -52,7 +52,7 @@ function processMessageWaypoint(ign, msg) {
   if (pos.length !== 3) return;
 
   coords.push({ x: pos[0], y: pos[1], z: pos[2], n: oIgn, z: waypointReloadNum });
-  Client.scheduleTask(settings.chatTilsWaypointDuration * 20, () => {
+  if (settings.chatTilsWaypointDuration) Client.scheduleTask(settings.chatTilsWaypointDuration * 20, () => {
     if (coords.length === 0) return;
     if (coords[0].z !== waypointReloadNum) return;
     coords.shift();
