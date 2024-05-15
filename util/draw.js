@@ -163,7 +163,7 @@ export function drawFilledBox(x, y, z, w, h, red, green, blue, alpha, phase) {
 };
 
 /**
- * @param {{x: number, y: number, z: number, w: number, h: number}[]} waypoints
+ * @param {{x: number, y: number, z: number, w?: number, h?: number, text?: string}[]} waypoints
  * @param {number} r
  * @param {number} g
  * @param {number} b
