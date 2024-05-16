@@ -1,6 +1,5 @@
 import settings from '../settings';
-import { drawBoxAtBlock, renderWaypoints } from '../util/draw';
-import drawBeaconBeam from '../../BeaconBeam/index';
+import { drawBeaconBeam, drawBoxAtBlock, drawString, renderWaypoints } from '../util/draw';
 import { getPlayerName } from '../util/format';
 import { log, logMessage } from '../util/log';
 import { reg } from '../util/registerer';
@@ -21,7 +20,7 @@ const worldRenderReg = reg('renderWorld', partial => {
   if (settings.chatTilsWaypointType === 'Box') renderWaypoints(coords, r, g, b, true, false);
   if (settings.chatTilsWaypointType === 'Wireframe') coords.forEach(v => drawBoxAtBlock(v.x, v.y, v.z, r, g, b, 1, 1, a));
   if (settings.chatTilsWaypointBeacon) coords.forEach(v => drawBeaconBeam(v.x, v.y + 1, v.z, r, g, b, a, false));
-  if (settings.chatTilsWaypointName) coords.forEach(v => Tessellator.drawString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(c)*/));
+  if (settings.chatTilsWaypointName) coords.forEach(v => drawString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(c)*/));
 });
 let waypointReloadNum = 0;
 const worldUnloadReg = reg('worldUnload', () => {

@@ -1,7 +1,6 @@
-import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawArrow2D, renderWaypoints, getRenderX, getRenderY, getRenderZ } from '../util/draw';
+import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawArrow2D, renderWaypoints, getRenderX, getRenderY, getRenderZ, drawBeaconBeam } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
-import drawBeaconBeam from '../../BeaconBeam/index';
 import createTextGui from '../util/customtextgui';
 import { colorForNumber } from '../util/format';
 import { reg, regForge } from '../util/registerer';
