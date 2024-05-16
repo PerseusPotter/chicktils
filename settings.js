@@ -655,6 +655,7 @@ export const props = {
   dianaArrowToBurrowColor: new Property('DianaArrowToBurrowColor', page, ++sort, Property.Type.Color, 0x9FE2BF),
   dianaPreferFinish: new Property('DianaPreferFinishCurrentChain', page, ++sort, Property.Type.Toggle, true),
   dianaAlertFoundBurrow: new Property('DianaAlertFoundBurrow', page, ++sort, Property.Type.Toggle, true),
+  dianaAlertFoundBurrowNoStart: new Property('DianaAlertFoundBurrowNoStart', page, ++sort, Property.Type.Toggle, false, { desc: 'do not alert when found burrow is a start burrow' }),
   dianaAlertFoundBurrowTime: new Property('DianaAlertFoundBurrowTime', page, ++sort, Property.Type.Integer, 500),
   dianaAlertFoundBurrowSound: new Property('DianaAlertFoundBurrowSound', page, ++sort, Property.Type.Toggle, true),
   dianaFixSkytils: new Property('DianaFixSkytils', page, ++sort, Property.Type.Toggle, false),

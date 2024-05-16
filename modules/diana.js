@@ -65,7 +65,7 @@ let numNotStartBurrows = 0;
 let numStartBurrows = 0;
 let targetLoc = null;
 const renderOvReg = reg('renderOverlay', () => {
-  if (targetLoc) pointTo3D(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1], targetLoc[2], false);
+  if (targetLoc) pointTo3D(settings.dianaArrowToBurrowColor, targetLoc[0] + 0.5, targetLoc[1] + 1, targetLoc[2] + 0.5, false);
 });
 const GriffinBurrows = Java.type('gg.skytils.skytilsmod.features.impl.events.GriffinBurrows');
 // 0 repetition, clean code
@@ -102,7 +102,7 @@ const tickReg = reg('tick', () => {
     }
   });
   if (burrowCount > numNotStartBurrows) burrowFoundAlert.show(settings.dianaAlertFoundBurrowTime);
-  else if (burrowCount === 0 && burrowSCount > numStartBurrows && GriffinBurrows.BurrowEstimation.INSTANCE.getGuesses().size() === 0) burrowFoundAlert.show(settings.dianaAlertFoundBurrowTime);
+  else if (!settings.dianaAlertFoundBurrowNoStart && burrowCount === 0 && burrowSCount > numStartBurrows && GriffinBurrows.BurrowEstimation.INSTANCE.getGuesses().size() === 0) burrowFoundAlert.show(settings.dianaAlertFoundBurrowTime);
   numNotStartBurrows = burrowCount;
   numStartBurrows = burrowSCount;
   if (closest) return targetLoc = [closest.getX(), closest.getY(), closest.getZ()];
@@ -155,7 +155,7 @@ warpKey.registerKeyRelease(() => {
   if (lineRectColl(Player.getX(), Player.getZ(), targetLoc[0], targetLoc[2], -60, 0, 90, 70)) bestD += 50;
   warps.forEach((v, i) => {
     if (!data.unlockedHubWarps[i]) return;
-    const d = Math.hypot(targetLoc[0] - v.loc[0], targetLoc[1] - v.loc[1], targetLoc[2] - v.loc[2]) + v.cost;
+    const d = Math.hypot(targetLoc[0] - v.loc[0], targetLoc[1] - v.loc[1], targetLoc[2] - v.loc[2]) + v.cost + 50;
     if (d < bestD) {
       bestD = d;
       best = v.name;
