@@ -1,6 +1,5 @@
 import createAlert from '../util/alert';
-import { pointTo3D, drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls } from '../util/draw';
-import drawBeaconBeam from '../../BeaconBeam/index';
+import { pointTo3D, drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawBeaconBeam } from '../util/draw';
 import settings from '../settings';
 import { reg } from '../util/registerer';
 

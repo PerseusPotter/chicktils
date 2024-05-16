@@ -1,6 +1,7 @@
 import RenderLib from '../../RenderLib/index';
 import { compareFloat, getAngle, rescale, rotate, toArray } from './math';
 import RenderLib2D from '../../RenderLib2D/index';
+import _drawBeaconBeam from '../../BeaconBeam/index';
 import settings from '../settings';
 if (!GlStateManager) {
   var GL11 = Java.type("org.lwjgl.opengl.GL11");
@@ -11,6 +12,7 @@ const worldRen = tess.func_178180_c();
 
 // soopy !
 export function drawBoxAtBlockNotVisThruWalls(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1, lw = 5) {
+  ({ x, y, z } = rescaleRender(x, y, z));
   GL11.glBlendFunc(770, 771);
   GL11.glEnable(GL11.GL_BLEND);
   GL11.glLineWidth(lw);
@@ -52,6 +54,7 @@ export function drawBoxAtBlockNotVisThruWalls(x, y, z, colorR, colorG, colorB, w
   GL11.glDisable(GL11.GL_BLEND);
 };
 export function drawBoxAtBlock(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1, lw = 5) {
+  ({ x, y, z } = rescaleRender(x, y, z));
   GL11.glBlendFunc(770, 771);
   GL11.glEnable(GL11.GL_BLEND);
   GL11.glLineWidth(lw);
@@ -92,6 +95,7 @@ export function drawBoxAtBlock(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a 
 };
 // soopy, the most consistent coder. wtf is he on
 export function drawFilledBox(x, y, z, w, h, red, green, blue, alpha, phase) {
+  ({ x, y, z } = rescaleRender(x, y, z));
   GL11.glDisable(GL11.GL_CULL_FACE);
   if (phase) {
     GL11.glBlendFunc(770, 771);
@@ -180,15 +184,7 @@ export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = t
     let x = waypoint.x + (isCentered ? 0 : w / 2);
     let y = waypoint.y;
     let z = waypoint.z + (isCentered ? 0 : w / 2);
-
-    let d = (_getRenderX() - x) ** 2 + (_getRenderY() - y) ** 2 + (_getRenderZ() - z) ** 2;
-
-    if (d >= 40000) {
-      d = 200 / Math.sqrt(d);
-      x = _getRenderX() + (x - _getRenderX()) * d;
-      y = _getRenderY() + (y - _getRenderY()) * d;
-      z = _getRenderZ() + (z - _getRenderZ()) * d;
-    }
+    ({ x, y, z } = rescaleRender(x, y, z));
 
     RenderLib.drawEspBox(x, y, z, w, h, r, g, b, 1, phase)
     RenderLib.drawInnerEspBox(x, y, z, w, h, r, g, b, 0.25, phase);
@@ -365,6 +361,7 @@ export function pointTo3D(color, dx, dy, dz, rel = true, scale) {
 }
 
 export function renderTracer(color, x, y, z) {
+  ({ x, y, z } = rescaleRender(x, y, z));
   // renderWorld
   // const p = Player.getPlayer();
   // if (!p) return;
@@ -513,6 +510,7 @@ export function drawBoxPos(x, y, z, w, h, c, f, esp = false, center = true, lw =
     x -= w / 2;
     z -= w / 2;
   }
+  ({ x, y, z } = rescaleRender(x, y, z));
   const bb = new AABB(x, y, z, x + w, y + h, z + w);
   drawBoxBB(bb, c, f, esp, lw);
 }
@@ -593,6 +591,8 @@ function applyTint(c, a) {
  * @param {number} lw
  */
 export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
+  ({ x1, y1, z1 } = rescaleRender(x1, y1, z1));
+  ({ x2, y2, z2 } = rescaleRender(x2, y2, z2));
   const render = Client.getMinecraft().func_175606_aa();
   const realX = interpolate(render.field_70165_t, render.field_70142_S, Tessellator.partialTicks);
   const realY = interpolate(render.field_70163_u, render.field_70137_T, Tessellator.partialTicks);
@@ -625,10 +625,62 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   GlStateManager.func_179121_F();
 }
 
+/**
+ * @param {string} text
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {number?} color msb ARGB lsb (0xFFFFFFFF)
+ * @param {boolean?} renderBlackBox (true)
+ * @param {number?} scale (1)
+ * @param {boolean?} increase (true)
+ */
+export function drawString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = true, scale = 1, increase = true) {
+  ({ x, y, z } = rescaleRender(x, y, z));
+  Tessellator.drawString(text, x, y, z, color | 0, renderBlackBox, scale, increase);
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {number} r
+ * @param {number} g
+ * @param {number} b
+ * @param {number} alpha
+ * @param {boolean} depthCheck
+ * @param {number?} height (300)
+ */
+export function drawBeaconBeam(x, y, z, r, g, b, alpha, depthCheck, height = 300) {
+  ({ x, y, z } = rescaleRender(x, y, z));
+  _drawBeaconBeam(x, y, z, r, g, b, alpha, depthCheck, height);
+}
+
 export function rgbaToARGB(c) {
   return ((c & 0xFF) << 24) | c >> 8;
 }
 
 export function rgbToJavaColor(c) {
   return new (Java.type('java.awt.Color'))(rgbaToARGB(c), true);
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @returns {{x: number, y: number, z: number}}
+ */
+function rescaleRender(x, y, z) {
+  let d = (_getRenderX() - x) ** 2 + (_getRenderY() - y) ** 2 + (_getRenderZ() - z) ** 2;
+
+  const rd = Client.settings.video.getRenderDistance() << 4;
+  if (d >= rd * rd) {
+    d = rd / Math.sqrt(d);
+    return {
+      x: _getRenderX() + (x - _getRenderX()) * d,
+      y: _getRenderY() + (y - _getRenderY()) * d,
+      z: _getRenderZ() + (z - _getRenderZ()) * d
+    };
+  }
+  return { x, y, z };
 }
