@@ -130,7 +130,7 @@ dist
 .pnp.*
 
 
-\!*
+#\!*
 chicktils.zip
 package-lock.json
 package.json
