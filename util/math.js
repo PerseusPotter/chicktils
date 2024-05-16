@@ -266,3 +266,38 @@ export function rotate(x, y, z, t, p, r) {
 export function toArray(pos) {
   return [pos.x, pos.y, pos.z];
 }
+
+/**
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @param {number} rx
+ * @param {number} ry
+ * @param {number} rw
+ * @param {number} rh
+ * @returns {boolean}
+ */
+export function lineRectColl(x1, y1, x2, y2, rx, ry, rw, rh) {
+  return lineLineColl(x1, y1, x2, y2, rx, ry, rx, ry + rh) ||
+    lineLineColl(x1, y1, x2, y2, rx + rw, ry, rx + rw, ry + rh) ||
+    lineLineColl(x1, y1, x2, y2, rx, ry, rx + rw, ry) ||
+    lineLineColl(x1, y1, x2, y2, rx, ry + rh, rx + rw, ry + rh);
+}
+
+/**
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @param {number} x3
+ * @param {number} y3
+ * @param {number} x4
+ * @param {number} y4
+ * @returns {boolean}
+ */
+export function lineLineColl(x1, y1, x2, y2, x3, y3, x4, y4) {
+  const uA = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+  const uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+  return uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1;
+}
