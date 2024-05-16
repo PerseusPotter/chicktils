@@ -68,11 +68,49 @@ function processMessageWaypoint(ign, msg) {
   ));
 }
 
+const melodyMessages = new Map();
+function hideMessage(option, evn) {
+  if (option === 'False') return;
+  cancelNextPing = true;
+  if (option === 'Both') cancel(evn);
+}
+function tryMelody(msg, evn, mel) {
+  if (mel === msg) hideMessage(settings.chatTilsHideMelody, evn);
+  else if (msg.startsWith(mel) && msg.endsWith('/4')) {
+    hideMessage(settings.chatTilsHideMelody, evn);
+    if (settings.chatTilsCompactMelody && helper) {
+      const prog = +msg.slice(-3, -2);
+      const prev = prog === 1 ? mel : `${mel} ${prog - 1}/4`;
+      helper.deleteMessages([`&r&9Party &8> ${ign}&f: &r${prev}&r`.toString()]);
+    }
+  } else return false;
+  return true;
+}
+const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
+
 const allChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
 }).setCriteria('&r${ign}&f: ${msg}&r');
-const partyChatReg = reg('chat', (ign, msg) => {
+const partyChatReg = reg('chat', (ign, msg, evn) => {
   processMessageWaypoint(ign, msg);
+  if (settings.chatTilsHideBonzo !== 'False' && msg === 'Bonzo Procced (3s)') return hideMessage(settings.chatTilsHideBonzo, evn);
+  if (settings.chatTilsHidePhoenix !== 'False' && msg === 'Phoenix Procced (3s)') return hideMessage(settings.chatTilsHidePhoenix, evn);
+  if (settings.chatTilsHideLeap !== 'False' && msg.startsWith('Leaped to ')) return hideMessage(settings.chatTilsHideLeap, evn);
+  if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
+    const lIgn = ign.toLowerCase();
+    let mel = melodyMessages.get(lIgn);
+    if (mel) return tryMelody(msg, evn, mel);
+    if (msg === 'melody') {
+      melodyMessages.set(lIgn, msg);
+      hideMessage(settings.chatTilsHideMelody, evn);
+      return;
+    } else if (msg.endsWith(' 1/4')) {
+      mel = msg.slice(0, -4);
+      melodyMessages.set(lIgn, mel);
+      tryMelody(msg, evn, mel);
+      return;
+    }
+  }
 }).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r');
 const coopChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
@@ -96,6 +134,10 @@ export function init() {
     else worldUnloadReg.register();
   });
   settings._chatTilsWaypointDuration.onBeforeChange(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
+  settings._chatTilsHideMelody.onAfterChange(v => {
+    if (v !== 'None') chatPingReg.register();
+    else chatPingReg.unregister();
+  });
 }
 export function load() {
   regs.forEach(v => v.register());
@@ -105,3 +147,10 @@ export function unload() {
   worldRenderReg.unregister();
   worldUnloadReg.unregister();
 }
+
+let cancelNextPing = false;
+const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
+  if (!cancelNextPing || name !== 'random.orb' || vol !== 1 || pitch !== 1) return;
+  cancel(evn);
+  cancelNextPing = false;
+});

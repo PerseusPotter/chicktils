@@ -634,6 +634,7 @@ export const props = {
 
   // 12
   enablechattils: new Property('EnableChatTils', ++page, sort = 0, Property.Type.Toggle, false),
+
   chatTilsWaypoint: new Property('ChatTilsFindWaypoints', page, ++sort, Property.Type.Toggle, true),
   chatTilsWaypointColor: new Property('ChatTilsWaypointColor', page, ++sort, Property.Type.Color, 0xC80000FF),
   chatTilsWaypointType: new Property('ChatTilsWaypointType', page, ++sort, Property.Type.Option, 'Box', { options: ['Box', 'Wireframe', 'None'] }),
@@ -642,6 +643,12 @@ export const props = {
   chatTilsWaypointDuration: new Property('ChatTilsWaypointDuration', page, ++sort, Property.Type.Integer, 60, { desc: 'time in seconds, 0 = forever', min: 0 }),
   chatTilsWaypointShowOwn: new Property('ChatTilsWaypointShowOwn', page, ++sort, Property.Type.Toggle, true, { desc: 'show your own waypoints' }),
   chatTilsWaypointPersist: new Property('ChatTilsWaypointPersist', page, ++sort, Property.Type.Toggle, false, { desc: 'whether to persist on swapping servers' }),
+
+  chatTilsHideBonzo: new Property('ChatTilsHideAzureBonzo', page, ++sort, Property.Type.Option, 'False', { options: ['False', 'Sound', 'Both'] }),
+  chatTilsHidePhoenix: new Property('ChatTilsHideAzurePhoenix', page, ++sort, Property.Type.Option, 'False', { options: ['False', 'Sound', 'Both'] }),
+  chatTilsHideLeap: new Property('ChatTilsHideAzureLeap', page, ++sort, Property.Type.Option, 'False', { options: ['False', 'Sound', 'Both'] }),
+  chatTilsHideMelody: new Property('ChatTilsHideAzureMelody', page, ++sort, Property.Type.Option, 'False', { options: ['False', 'Sound', 'Both'] }),
+  chatTilsCompactMelody: new Property('ChatTilsCompactAzureMelody', page, ++sort, Property.Type.Toggle, true),
 
   // 13
   enableabsorption: new Property('EnableCustomAbsorption', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'custom absorption renderer to more accurately portray total hp' }),
