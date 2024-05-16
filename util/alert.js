@@ -32,7 +32,9 @@ const createAlert = (function() {
         if (this._timeout !== undefined) _clearTimeout(this._timeout);
         this._timeout = _setTimeout(() => this.hide(), time, this);
       }
-      if (this.sound) alertSound.play();
+      try {
+        if (this.sound) alertSound.play();
+      } catch (e) { }
     },
     hide() {
       if (activeAlert === this) {
