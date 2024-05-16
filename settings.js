@@ -652,7 +652,6 @@ export const props = {
 
   // 13
   enablediana: new Property('EnableDiana', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'requires skytils to work' }),
-  dianaArrowToBurrow: new Property('DianaArrowToBurrow', page, ++sort, Property.Type.Option, 'Smart', { options: ['None', 'Estimation', 'Smart'] }),
   dianaArrowToBurrowColor: new Property('DianaArrowToBurrowColor', page, ++sort, Property.Type.Color, 0x9FE2BF),
   dianaPreferFinish: new Property('DianaPreferFinishCurrentChain', page, ++sort, Property.Type.Toggle, true),
   dianaAlertFoundBurrow: new Property('DianaAlertFoundBurrow', page, ++sort, Property.Type.Toggle, true),
