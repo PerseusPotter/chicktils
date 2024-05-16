@@ -71,6 +71,7 @@ const regs = [
     createParty();
     _isLeader = false;
   }).setCriteria('&cYou are not this party\'s leader!&r'),
+  reg('chat', () => createParty()).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r'),
 
   reg('chat', (p1, p2) => {
     createParty();
