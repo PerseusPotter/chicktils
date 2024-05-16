@@ -657,6 +657,8 @@ export const props = {
   dianaPreferFinish: new Property('DianaPreferFinishCurrentChain', page, ++sort, Property.Type.Toggle, true),
   dianaAlertFoundBurrow: new Property('DianaAlertFoundBurrow', page, ++sort, Property.Type.Toggle, true),
   dianaAlertFoundBurrowTime: new Property('DianaAlertFoundBurrowTime', page, ++sort, Property.Type.Integer, 500),
+  dianaAlertFoundBurrowSound: new Property('DianaAlertFoundBurrowSound', page, ++sort, Property.Type.Toggle, true),
+  dianaFixSkytils: new Property('DianaFixSkytils', page, ++sort, Property.Type.Toggle, false),
 
   // 14
   enableabsorption: new Property('EnableCustomAbsorption', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'custom absorption renderer to more accurately portray total hp' }),
