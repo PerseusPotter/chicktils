@@ -45,16 +45,19 @@ function processMessageWaypoint(ign, msg) {
   const pos = [];
   const re = /(?:\b|(?=-))(-?\d+)\b/g;
   let match;
+  let lastPos = 0;
   while (match = re.exec(msg)) {
+    if (match.index - lastPos > 5) return;
     pos.push(+match[1]);
+    lastPos = match.index + match[0].length;
     if (pos.length > 3) return;
   }
   if (pos.length !== 3) return;
 
-  coords.push({ x: pos[0], y: pos[1], z: pos[2], n: oIgn, z: waypointReloadNum });
+  coords.push({ x: pos[0], y: pos[1], z: pos[2], n: oIgn, c: waypointReloadNum });
   if (settings.chatTilsWaypointDuration) Client.scheduleTask(settings.chatTilsWaypointDuration * 20, () => {
     if (coords.length === 0) return;
-    if (coords[0].z !== waypointReloadNum) return;
+    if (coords[0].c !== waypointReloadNum) return;
     coords.shift();
     if (coords.length === 0) worldRenderReg.unregister();
   });
@@ -62,9 +65,9 @@ function processMessageWaypoint(ign, msg) {
 
   if (isOwn) log('&7Loaded waypoint from chat.');
   else logMessage(new Message(
-    '&7Loaded waypoint from chat. Click ',
-    new TextComponent('&6HERE').setClick('run_command', 'ctschatwaypointblock ' + ign),
-    ' &7to block waypoints from them (until game restart)'
+    '&7Loaded waypoint from &3${ign}&7. ',
+    new TextComponent('&6CLICK HERE').setClick('run_command', 'ctschatwaypointblock ' + ign),
+    ' &7to ignore waypoints from them. (until game restart)'
   ));
 }
 
@@ -74,32 +77,32 @@ function hideMessage(option, evn) {
   cancelNextPing = true;
   if (option === 'Both') cancel(evn);
 }
-function tryMelody(msg, evn, mel) {
+function tryMelody(ign, msg, evn, mel) {
   if (mel === msg) hideMessage(settings.chatTilsHideMelody, evn);
   else if (msg.startsWith(mel) && msg.endsWith('/4')) {
     hideMessage(settings.chatTilsHideMelody, evn);
     if (settings.chatTilsCompactMelody && helper) {
       const prog = +msg.slice(-3, -2);
       const prev = prog === 1 ? mel : `${mel} ${prog - 1}/4`;
-      helper.deleteMessages([`&r&9Party &8> ${ign}&f: &r${prev}&r`.toString()]);
+      helper.deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
     }
-  } else return false;
-  return true;
+  }
 }
 const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 
 const allChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}).setCriteria('&r${ign}&f: ${msg}&r');
+}).setCriteria(/^§r([^>]+?)§(?:7|f): (.+?)§r$/);
 const partyChatReg = reg('chat', (ign, msg, evn) => {
   processMessageWaypoint(ign, msg);
+
   if (settings.chatTilsHideBonzo !== 'False' && msg === 'Bonzo Procced (3s)') return hideMessage(settings.chatTilsHideBonzo, evn);
   if (settings.chatTilsHidePhoenix !== 'False' && msg === 'Phoenix Procced (3s)') return hideMessage(settings.chatTilsHidePhoenix, evn);
   if (settings.chatTilsHideLeap !== 'False' && msg.startsWith('Leaped to ')) return hideMessage(settings.chatTilsHideLeap, evn);
   if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
     const lIgn = ign.toLowerCase();
     let mel = melodyMessages.get(lIgn);
-    if (mel) return tryMelody(msg, evn, mel);
+    if (mel) return tryMelody(ign, msg, evn, mel);
     if (msg === 'melody') {
       melodyMessages.set(lIgn, msg);
       hideMessage(settings.chatTilsHideMelody, evn);
@@ -107,7 +110,7 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
     } else if (msg.endsWith(' 1/4')) {
       mel = msg.slice(0, -4);
       melodyMessages.set(lIgn, mel);
-      tryMelody(msg, evn, mel);
+      tryMelody(ign, msg, evn, mel);
       return;
     }
   }
