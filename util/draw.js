@@ -225,7 +225,7 @@ export function drawArrow2D(color, theta, length = 20, yaw) {
 
   const x2 = x1 + Math.cos(dt) * length;
   const y2 = y1 + Math.sin(dt) * length;
-  const c = rgbaToARGB(c);
+  const c = rgbaToARGB(color);
   Renderer.drawLine(c, x1, y1, x2, y2, 1);
   Renderer.drawLine(c, x2, y2, x2 + Math.cos(dt + Math.PI * 7 / 8) * length / 3, y2 + Math.sin(dt + Math.PI * 7 / 8) * length / 3, 1);
   Renderer.drawLine(c, x2, y2, x2 + Math.cos(dt - Math.PI * 7 / 8) * length / 3, y2 + Math.sin(dt - Math.PI * 7 / 8) * length / 3, 1);
