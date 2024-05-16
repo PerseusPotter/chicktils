@@ -60,7 +60,7 @@ function cpv(user) {
   }).start();
 }
 
-const autocomplete = function() {
+const autocomplete = function(args) {
   const list = [];
   if (settings.cpvAutoCompleteParty) Party.getMembers().forEach(v => list.push(v));
   if (settings.cpvAutoCompleteTabList) {
@@ -82,6 +82,8 @@ const autocomplete = function() {
       list.push(getPlayerName(s));
     }
   }
+  const a = args[0].toLowerCase();
+  if (a) return list.filter(v => v.toLowerCase().startsWith(a));
   return list;
 };
 const cmdReg = reg('command', cpv).setTabCompletions(autocomplete);
