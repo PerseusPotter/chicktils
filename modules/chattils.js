@@ -137,18 +137,16 @@ export function init() {
     else worldUnloadReg.register();
   });
   settings._chatTilsWaypointDuration.onBeforeChange(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
-  settings._chatTilsHideMelody.onAfterChange(v => {
-    if (v !== 'None') chatPingReg.register();
-    else chatPingReg.unregister();
-  });
 }
 export function load() {
   regs.forEach(v => v.register());
+  chatPingReg.register();
 }
 export function unload() {
   regs.forEach(v => v.unregister());
   worldRenderReg.unregister();
   worldUnloadReg.unregister();
+  chatPingReg.unregister();
 }
 
 let cancelNextPing = false;
