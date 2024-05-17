@@ -66,7 +66,8 @@ export function getPlayerName(name) {
   // rhino :trash:
   // org.mozilla.javascript.EcmaError: SyntaxError: Invalid quantifier ?
   // /(?<=\s|^)(?:(?:§|&).){0,}([A-Za-z0-9_]+?)(?:(?:§|&).){0,}\b/
-  const match = name.match(/(?:\s|^)(?:(?:§|&).){0,}([A-Za-z0-9_]+?)(?:(?:§|&).){0,}\b(?!.+?])/);
+  // more rhino bullshit?
+  const match = name.toString().match(/(?:\s|^)(?:(?:§|&).){0,}([A-Za-z0-9_]+?)(?:(?:§|&).){0,}\b(?!.+?])/);
   if (!match) return '';
   return match[1];
 }
