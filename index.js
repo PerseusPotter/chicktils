@@ -8,7 +8,7 @@ import { centerMessage } from './util/format';
 import getPing from './util/ping';
 setIsMainS();
 setIsMainD();
-const VERSION = '0.2.7';
+const VERSION = '0.2.8';
 
 let sev;
 function tryUpdate(delay = 0) {
