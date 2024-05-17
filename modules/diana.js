@@ -149,7 +149,7 @@ const warpKey = new KeyBind('Diana Warp', data.dianaWarpKey, 'ChickTils');
 warpKey.registerKeyRelease(() => {
   data.dianaWarpKey = warpKey.getKeyCode();
   if (!targetLoc) return;
-  if (data.unlockedHubWarps.filter(Boolean).length === 0) return log('open warps menu pweese');
+  if (data.unlockedHubWarps.filter(Boolean).length === 0) return log('open warps menu pweese (turn on paper icons, will look for heads later thx)');
   let best = null;
   let bestD = Math.hypot(Player.getX() - targetLoc[0], Player.getY() - targetLoc[1], Player.getZ() - targetLoc[2]);
   if (lineRectColl(Player.getX(), Player.getZ(), targetLoc[0], targetLoc[2], -60, 0, 90, 70)) bestD += 50;
