@@ -42,7 +42,7 @@ function processMessageWaypoint(ign, msg) {
   if (isOwn && !settings.chatTilsWaypointShowOwn) return;
 
   const pos = [];
-  const re = /(?:\b|(?=-))(-?\d+)\b/g;
+  const re = /(?:\b|(?=-))(-?\d+(?:\.?\d+)?)\b/g;
   let match;
   let lastPos = 0;
   while (match = re.exec(msg)) {
