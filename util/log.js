@@ -42,5 +42,5 @@ function format(obj, depth = 3) {
 
 }
 export function logDebug(obj) {
-  Object.entries(obj).forEach(([k, v]) => log(k + ':', format(v)));
+  log(Object.entries(obj).map(([k, v]) => k + ': ' + format(v)).join('\n'));
 }
