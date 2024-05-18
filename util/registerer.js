@@ -47,7 +47,7 @@ reg = function reg(type, shit) {
   });
   const re = wrap(rr, prox, rr.register);
   const un = wrap(rr, prox, rr.unregister);
-  const isR = wrap(rr, prox, () => isReg);
+  const isR = () => isReg;
   const noop = wrap(rr, prox, Function.prototype);
   return prox;
 }
@@ -77,7 +77,7 @@ export function regForge(e, prio, nshit) {
   });
   const re = wrap({}, prox, () => reg = registerForge(e, prio, nshit));
   const un = wrap({}, prox, () => reg = void unregisterForge(reg));
-  const isR = wrap({}, prox, () => Boolean(reg));
+  const isR = () => Boolean(reg);
   const noop = wrap({}, prox, Function.prototype);
   return prox;
 }
