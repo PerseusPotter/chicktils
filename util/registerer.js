@@ -75,9 +75,9 @@ export function regForge(e, prio, nshit) {
       // else return reg[p];
     }
   });
-  const re = wrap(rr, prox, () => reg = registerForge(e, prio, nshit));
-  const un = wrap(rr, prox, () => reg = void unregisterForge(reg));
-  const isR = wrap(rr, prox, () => Boolean(reg));
-  const noop = wrap(rr, prox, Function.prototype);
+  const re = wrap({}, prox, () => reg = registerForge(e, prio, nshit));
+  const un = wrap({}, prox, () => reg = void unregisterForge(reg));
+  const isR = wrap({}, prox, () => Boolean(reg));
+  const noop = wrap({}, prox, Function.prototype);
   return prox;
 }
