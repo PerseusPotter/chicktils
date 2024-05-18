@@ -5,10 +5,13 @@ import { reg } from './registerer';
 let _hasLoaded = false;
 let _inParty = false;
 let _members = new Set();
-let _isLeader = false;
+let _leader = '';
 
+export function getLeader() {
+  return _leader;
+}
 export function isLeader() {
-  return _isLeader;
+  return _leader == Player.getName();
 }
 export function isInParty() {
   return _inParty;
@@ -28,7 +31,7 @@ function testLoad() {
 function createParty() {
   testLoad();
   if (!_inParty) {
-    if (_hasLoaded) _isLeader = true;
+    if (_hasLoaded) _leader = Player.getName();;
     _members.add(Player.getName());
   }
   _inParty = true;
@@ -37,7 +40,7 @@ function clearParty() {
   _hasLoaded = true;
   _inParty = false;
   _members.clear();
-  _isLeader = false;
+  _leader = '';
 }
 function addMember(name) {
   createParty();
@@ -49,7 +52,7 @@ function removeMember(name) {
 }
 function setLead(name) {
   createParty();
-  _isLeader = getPlayerName(name) === Player.getName();
+  _leader = getPlayerName(name);
 }
 
 const regs = [
@@ -65,11 +68,11 @@ const regs = [
 
   reg('chat', () => {
     createParty();
-    _isLeader = true;
+    _leader = Player.getName();
   }).setCriteria('&r&eQueueing your party...&r'),
   reg('chat', () => {
     createParty();
-    _isLeader = false;
+    _leader = '';
   }).setCriteria('&cYou are not this party\'s leader!&r'),
   reg('chat', () => createParty()).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r'),
 
@@ -108,7 +111,7 @@ const regs = [
     _hasLoaded = true;
     createParty();
     addMember(p);
-    _isLeader = false;
+    setLead(p);
   }).setCriteria('&eYou have joined ${p}\'s &r&eparty!&r'),
   reg('chat', names => names.split(', ').forEach(p => addMember(p))).setCriteria('&eYou\'ll be partying with: ${names}&r'),
   reg('chat', p => {
