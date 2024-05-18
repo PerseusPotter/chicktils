@@ -650,6 +650,9 @@ export const props = {
   chatTilsHideMelody: new Property('ChatTilsHideAzureMelody', page, ++sort, Property.Type.Option, 'False', { options: ['False', 'Sound', 'Both'] }),
   chatTilsCompactMelody: new Property('ChatTilsCompactAzureMelody', page, ++sort, Property.Type.Toggle, true),
 
+  chatTilsClickAnywhereFollow: new Property('ChatTilsClickAnywhereFollow', page, ++sort, Property.Type.Toggle, false),
+  chatTilsClickAnywhereFollowOnlyLead: new Property('ChatTilsClickAnywhereFollowOnlyLead', page, ++sort, Property.Type.Toggle, true),
+
   // 13
   enablediana: new Property('EnableDiana', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'requires skytils to work (not the meow solver)' }),
   dianaArrowToBurrowColor: new Property('DianaArrowToBurrowColor', page, ++sort, Property.Type.Color, 0x9FE2BF),
