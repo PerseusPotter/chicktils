@@ -91,7 +91,7 @@ const tickReg = reg('tick', () => {
   let closest;
   let closestD;
   GriffinBurrows.INSTANCE.getParticleBurrows().forEach((k, v) => {
-    const t = v.getType().get();
+    const t = v.getType();
     if (t === 0) return burrowSCount++;
     burrowCount++;
     if (!settings.dianaPreferFinish) return;
@@ -177,4 +177,5 @@ export function unload() {
   warpOpenReg.unregister();
   startBurrowReg.unregister();
   unloadReg.unregister();
+  unloadReg.forceTrigger();
 }
