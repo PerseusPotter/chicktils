@@ -33,15 +33,15 @@ function tryUpdate(delay = 0) {
       Updater.deleteDownload();
       return -1;
     }
-    ChatLib.chat(ChatLib.getCenteredText('&9&lChickTils &r&5Update Found!'));
+    ChatLib.chat(centerMessage('&9&lChickTils &r&5Update Found!'));
     centerMessage(new Message(new TextComponent('&3&nClick To View').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
-    ChatLib.chat(ChatLib.getCenteredText(`&4v${VERSION} &r-> &2v${v}`));
+    ChatLib.chat(centerMessage(`&4v${VERSION} &r-> &2v${v}`));
     ChatLib.chat('')
-    if (sev === 0) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your game will be restarted.'));
-    else if (sev === 1 || (sev === 2 && !settings.isDev)) ChatLib.chat(ChatLib.getCenteredText('&l&cNote: Your CT Modules will be reloaded.'));
+    if (sev === 0) ChatLib.chat(centerMessage('&l&cNote: Your game will be restarted.'));
+    else if (sev === 1 || (sev === 2 && !settings.isDev)) ChatLib.chat(centerMessage('&l&cNote: Your CT Modules will be reloaded.'));
     else {
-      ChatLib.chat(ChatLib.getCenteredText('&l&cNote: ChickTils will be reloaded.'));
-      ChatLib.chat(ChatLib.getCenteredText('&l&c(but you already knew that)'));
+      ChatLib.chat(centerMessage('&l&cNote: ChickTils will be reloaded.'));
+      ChatLib.chat(centerMessage('&l&c(but you already knew that)'));
     }
     centerMessage(new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'))).chat();
     setTimeout(() => {
