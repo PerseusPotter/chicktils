@@ -658,7 +658,7 @@ export const props = {
   dianaAlertFoundBurrowNoStart: new Property('DianaAlertFoundBurrowNoStart', page, ++sort, Property.Type.Toggle, false, { desc: 'do not alert when found burrow is a start burrow' }),
   dianaAlertFoundBurrowTime: new Property('DianaAlertFoundBurrowTime', page, ++sort, Property.Type.Integer, 500),
   dianaAlertFoundBurrowSound: new Property('DianaAlertFoundBurrowSound', page, ++sort, Property.Type.Toggle, true),
-  dianaFixSkytils: new Property('DianaFixSkytils', page, ++sort, Property.Type.Toggle, false),
+  dianaFixSkytils: new Property('DianaFixSkytils', page, ++sort, Property.Type.Toggle, false, { desc: 'only keep 1 guess waypoint at a time\nalternatively use /ctsmanualfixstdiana to remove oldest guess' }),
 
   // 14
   enableabsorption: new Property('EnableCustomAbsorption', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'custom absorption renderer to more accurately portray total hp' }),
