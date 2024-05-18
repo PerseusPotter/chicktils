@@ -309,3 +309,17 @@ export function lineLineColl(x1, y1, x2, y2, x3, y3, x4, y4) {
   const uB = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
   return uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1;
 }
+
+/**
+ * @param {number[][]} arr
+ * @returns {{ r: number, b: number }}
+ */
+export function linReg(arr) {
+  const xMean = arr.reduce((a, v) => a + v[0], 0) / arr.length;
+  const yMean = arr.reduce((a, v) => a + v[1], 0) / arr.length;
+  const xStd = Math.sqrt(arr.reduce((a, v) => a + (v[0] - xMean) ** 2, 0)); // should be / (n - 1)
+  const yStd = Math.sqrt(arr.reduce((a, v) => a + (v[1] - yMean) ** 2, 0)); // should be / (n - 1)
+  const r = arr.reduce((a, v) => a + (v[0] - xMean) * (v[1] - yMean), 0) / (xStd * yStd);
+  const b = r * yStd / xStd;
+  return { r, b };
+}
