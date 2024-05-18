@@ -204,6 +204,14 @@ export function getAngle(x1, y1, z1, x2, y2, z2, smallest = true) {
 }
 
 /**
+ * @param {number} n1
+ * @param {number} n2
+ */
+export function dist(n1, n2) {
+  return n1 < n2 ? n2 - n1 : n1 - n2;
+}
+
+/**
  * @param {number} f1
  * @param {number} f2
  * @param {number?} e
