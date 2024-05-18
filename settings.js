@@ -662,6 +662,8 @@ export const props = {
   dianaAlertFoundBurrowTime: new Property('DianaAlertFoundBurrowTime', page, ++sort, Property.Type.Integer, 500),
   dianaAlertFoundBurrowSound: new Property('DianaAlertFoundBurrowSound', page, ++sort, Property.Type.Toggle, true),
   dianaFixSkytils: new Property('DianaFixSkytils', page, ++sort, Property.Type.Toggle, false, { desc: 'only keep 1 guess waypoint at a time\nalternatively use /ctsmanualfixstdiana to remove oldest guess' }),
+  dianaGuessFromParticles: new Property('DianaGuessFromParticles', page, ++sort, Property.Type.Toggle, false, { desc: '/togglesound must be on, from soopy (but not fps tax)\ndoes not require skytils but a lot more accurate and consistent with it' }),
+  dianaGuessFromParticlesColor: new Property('DianaGuessFromParticlesColor', page, ++sort, Property.Type.Color, 0x00FFFFFF),
 
   // 14
   enableabsorption: new Property('EnableCustomAbsorption', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'custom absorption renderer to more accurately portray total hp' }),

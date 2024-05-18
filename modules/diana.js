@@ -3,8 +3,8 @@ import data from '../data';
 import { reg } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { pointTo3D } from '../util/draw';
-import { lineRectColl } from '../util/math';
+import { drawBeaconBeam, drawString, pointTo3D, renderWaypoints } from '../util/draw';
+import { dist, linReg, lineRectColl } from '../util/math';
 import { execCmd } from '../util/format';
 
 const warps = [
@@ -64,8 +64,22 @@ const burrowFoundAlert = createAlert('Burrow Found');
 let numNotStartBurrows = 0;
 let numStartBurrows = 0;
 let targetLoc = null;
+let guessLoc = null;
 const renderOvReg = reg('renderOverlay', () => {
-  if (targetLoc) pointTo3D(settings.dianaArrowToBurrowColor, targetLoc[0] + 0.5, targetLoc[1] + 1, targetLoc[2] + 0.5, false);
+  const l = targetLoc || guessLoc;
+  if (l) pointTo3D(settings.dianaArrowToBurrowColor, l[0], l[1] + 1, l[2], false);
+});
+const renderWrldReg = reg('renderWorld', () => {
+  if (guessLoc) {
+    const c = settings.dianaGuessFromParticlesColor;
+    const r = ((c >> 24) & 0xFF) / 256;
+    const g = ((c >> 16) & 0xFF) / 256;
+    const b = ((c >> 8) & 0xFF) / 256;
+    const a = ((c >> 0) & 0xFF) / 256;
+    renderWaypoints([{ x: guessLoc[0], y: guessLoc[1], z: guessLoc[2] }], r, g, b, true, true);
+    drawBeaconBeam(guessLoc[0] - 0.5, guessLoc[1] + 1, guessLoc[2] - 0.5, r, g, b, a, false);
+    // drawString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
+  }
 });
 const GriffinBurrows = Java.type('gg.skytils.skytilsmod.features.impl.events.GriffinBurrows');
 // 0 repetition, clean code
@@ -105,7 +119,7 @@ const tickReg = reg('tick', () => {
   else if (!settings.dianaAlertFoundBurrowNoStart && burrowSCount > numStartBurrows) burrowFoundAlert.show(settings.dianaAlertFoundBurrowTime);
   numNotStartBurrows = burrowCount;
   numStartBurrows = burrowSCount;
-  if (closest) return targetLoc = [closest.getX(), closest.getY(), closest.getZ()];
+  if (closest) return targetLoc = [closest.getX() + 0.5, closest.getY(), closest.getZ() + 0.5];
 
   if (!settings.dianaPreferFinish) GriffinBurrows.INSTANCE.getParticleBurrows().forEach((k, v) => {
     const d = Math.hypot(Player.getX() - v.getX(), Player.getY() - v.getY(), Player.getZ() - v.getZ());
@@ -121,7 +135,7 @@ const tickReg = reg('tick', () => {
       closestD = d;
     }
   });
-  if (closest) return targetLoc = [closest.getX(), closest.getY(), closest.getZ()];
+  if (closest) return targetLoc = [closest.getX() + 0.5, closest.getY(), closest.getZ() + 0.5];
   if (!settings.dianaPreferFinish) return targetLoc = null;
   GriffinBurrows.INSTANCE.getParticleBurrows().forEach((k, v) => {
     const d = Math.hypot(Player.getX() - v.getX(), Player.getY() - v.getY(), Player.getZ() - v.getZ());
@@ -130,36 +144,136 @@ const tickReg = reg('tick', () => {
       closestD = d;
     }
   });
-  if (closest) targetLoc = [closest.getX(), closest.getY(), closest.getZ()];
+  if (closest) targetLoc = [closest.getX() + 0.5, closest.getY(), closest.getZ() + 0.5];
   else targetLoc = null;
 });
+
+let prevSounds = [];
+let prevParticles = [];
+const guessDir = [];
+let lastGuessTime = 0;
+let guessD = 0;
+function updateGuess() {
+  if (prevParticles.length === 0) return;
+  let gx = prevParticles[prevParticles.length - 1].getX() + guessDir[0] * guessD;
+  let gz = prevParticles[prevParticles.length - 1].getZ() + guessDir[1] * guessD;
+  let gy = 100;
+  let topBlock;
+  while (gy >= 60) {
+    let i = World.getBlockAt(~~gx, gy, ~~gz).type.getID();
+    if (!topBlock && i !== 0) topBlock = gy;
+    if (i === 2) break;
+    gy--;
+  }
+  guessLoc = [gx, gy < 60 ? (topBlock || 70) : gy, gz];
+}
+const soundPlayReg = reg('soundPlay', (pos, name, vol, pit, cat, evn) => {
+  if (vol !== 1 || name !== 'note.harp') return;
+  const t = Date.now();
+  if (t - lastGuessTime > 3_000) {
+    prevSounds = [];
+    prevParticles = [];
+  }
+
+  let pX;
+  let pY;
+  let pZ;
+  if (prevSounds.length === 0) {
+    try {
+      if (GriffinBurrows && GriffinBurrows.INSTANCE.getLastDugParticleBurrow()) {
+        pX = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().getX();
+        pY = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().getY();
+        pZ = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().getZ();
+      }
+    } catch (e) {
+      // MutableBlockPos because why the fuck not
+      pX = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().func_177958_n();
+      pY = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().func_177956_o();
+      pZ = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().func_177952_p();
+    }
+    if (pX === undefined || ((Player.getX() - pX) ** 2 + (Player.getY() - pY) ** 2 + (Player.getZ() - pZ) ** 2) > 25) {
+      pX = Player.getX();
+      pY = Player.getY();
+      pZ = Player.getZ();
+    }
+  } else {
+    pX = prevSounds[prevSounds.length - 1][0][0];
+    pY = prevSounds[prevSounds.length - 1][0][1];
+    pZ = prevSounds[prevSounds.length - 1][0][2];
+  }
+  if (dist(pX, pos.getX()) > (prevSounds.length ? 1 : 5) || dist(pY, pos.getY()) > (prevSounds.length ? 1.5 : 5) || dist(pZ, pos.getZ()) > (prevSounds.length ? 1 : 5)) return;
+
+  if (prevParticles.length === 0) lastGuessTime = t;
+  prevSounds.push([[pos.getX(), pos.getY(), pos.getZ()], pit]);
+  if (prevSounds.length < 2) return;
+
+  // https://github.com/Skytils/SkytilsMod/blob/d4c47a33db18187fd94cf7ecd297606500d4145e/src/main/kotlin/gg/skytils/skytilsmod/features/impl/events/GriffinBurrows.kt#L105
+  const { r, b } = linReg(prevSounds.map((v, i) => [i, v[1]]));
+  guessD = Math.E / b;
+  updateGuess();
+});
+const spawnPartReg = reg('spawnParticle', (part, id, evn) => {
+  if (id.toString() !== 'DRIP_LAVA') return;
+  const t = Date.now();
+  if (t - lastGuessTime > 3_000) {
+    prevSounds = [];
+    prevParticles = [];
+    lastGuessTime = t;
+  }
+  const prev = prevParticles[prevParticles.length - 1] || Player;
+  if (dist(part.getX(), prev.getX()) > 2 || dist(part.getY(), prev.getY()) > 2 || dist(part.getZ(), prev.getZ()) > 2) return;
+
+  if (prevParticles.length && prevParticles[prevParticles.length - 1].getX() - part.getX() === 0) return;
+  prevParticles.push(part);
+  if (prevParticles.length < 2) return;
+
+  const { r, b } = linReg(prevParticles.slice(-5).map(v => [v.getX(), v.getZ()]));
+  const m = Math.sign((prevParticles[prevParticles.length - 1].getX() - prevParticles[0].getX())) / Math.sqrt(1 + b * b);
+  guessDir[0] = m;
+  guessDir[1] = b * m;
+  updateGuess();
+});
+
 const startBurrowReg = reg('chat', () => {
   numNotStartBurrows = 0;
   numStartBurrows = 0;
   targetLoc = null;
+  guessLoc = null;
+  prevSounds = [];
+  prevParticles = [];
   renderOvReg.register();
-  tickReg.register();
-  fixStReg.register();
+  renderWrldReg.register();
+  if (GriffinBurrows) {
+    tickReg.register();
+    fixStReg.register();
+  }
+  if (settings.dianaGuessFromParticles) {
+    soundPlayReg.register();
+    spawnPartReg.register();
+  }
 }).setCriteria('&r&eYou dug out a Griffin Burrow! &r&7(1/4)&r');
 const unloadReg = reg('worldUnload', () => {
   renderOvReg.unregister();
+  renderWrldReg.unregister();
   tickReg.unregister();
   fixStReg.unregister();
   targetLoc = null;
+  guessLoc = null;
 });
 
 const warpKey = new KeyBind('Diana Warp', data.dianaWarpKey, 'ChickTils');
 warpKey.registerKeyRelease(() => {
   data.dianaWarpKey = warpKey.getKeyCode();
-  if (!targetLoc) return;
+  const l = targetLoc || guessLoc;
+  if (!l) return;
   if (data.unlockedHubWarps.filter(Boolean).length === 0) return log('open warps menu pweese (turn on paper icons, will look for heads later thx)');
   let best = null;
-  let bestD = Math.hypot(Player.getX() - targetLoc[0], Player.getY() - targetLoc[1], Player.getZ() - targetLoc[2]);
-  if (lineRectColl(Player.getX(), Player.getZ(), targetLoc[0], targetLoc[2], -60, 0, 90, 70)) bestD += 50;
+  let bestD = Math.hypot(Player.getX() - l[0], Player.getY() - l[1], Player.getZ() - l[2]);
+  if (lineRectColl(Player.getX(), Player.getZ(), l[0], l[2], -60, 0, 90, 70)) bestD += 50;
   warps.forEach((v, i) => {
     if (!data.unlockedHubWarps[i]) return;
-    let d = Math.hypot(targetLoc[0] - v.loc[0], targetLoc[1] - v.loc[1], targetLoc[2] - v.loc[2]) + v.cost;
-    if (lineRectColl(v.loc[0], v.loc[1], targetLoc[0], targetLoc[2], -60, 0, 90, 70)) d += 50;
+    let d = Math.hypot(l[0] - v.loc[0], l[1] - v.loc[1], l[2] - v.loc[2]) + v.cost;
+    if (lineRectColl(v.loc[0], v.loc[1], l[0], l[2], -60, 0, 90, 70)) d += 50;
     if (d < bestD) {
       bestD = d;
       best = v.name;
@@ -185,9 +299,19 @@ const fixStReg = reg('command', () => {
 
 export function init() {
   settings._dianaAlertFoundBurrowSound.onAfterChange(v => burrowFoundAlert.sound = v);
+  settings._dianaGuessFromParticles.onAfterChange(v => {
+    if (renderOvReg.isRegistered()) {
+      if (v) {
+        soundPlayReg.register();
+        spawnPartReg.register();
+      } else {
+        soundPlayReg.unregister();
+        spawnPartReg.unregister();
+      }
+    }
+  });
 }
 export function load() {
-  if (!GriffinBurrows) return log('requires skytils');
   warpOpenReg.register();
   startBurrowReg.register();
   unloadReg.register();
