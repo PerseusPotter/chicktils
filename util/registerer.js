@@ -1,5 +1,12 @@
 import { registerForge, unregisterForge } from './forge';
 
+function wrap(orig, wrap, prop) {
+  return function(...args) {
+    prop.apply(orig, args[0] === undefined ? args.slice(1) : args);
+    return wrap;
+  }
+}
+
 /**
  * isRegistered: () => boolean;
  * forceTrigger(...args: any[]) => any;
@@ -9,30 +16,40 @@ let reg;
 reg = function reg(type, shit) {
   const rr = register(type, shit).unregister();
   let isReg = false;
-  const re = rr.register.bind(rr);
-  const un = rr.unregister.bind(rr);
-  return new Proxy({}, {
+  const props = new Map();
+  const prox = new Proxy({}, {
     get(t, p, r) {
       if (p === 'register') {
         if (!isReg) {
           isReg = true;
           return re;
         }
-        return Function.prototype;
+        return noop;
       } else if (p === 'unregister') {
         if (isReg) {
           isReg = false;
           return un;
         }
-        return Function.prototype;
+        return noop
       } else if (p === 'isRegistered') {
-        return () => isReg;
+        return isR;
       } else if (p === 'forceTrigger') {
         return shit;
-      } else if (rr[p] instanceof Function) return rr[p].bind(rr);
-      else return rr[p];
+      } else if (rr[p] instanceof Function) {
+        let w;
+        return props.get(p) || (
+          (w = wrap(rr, prox, rr[p])),
+          props.set(p, w),
+          w
+        );
+      }
     }
   });
+  const re = wrap(rr, prox, rr.register);
+  const un = wrap(rr, prox, rr.unregister);
+  const isR = wrap(rr, prox, () => isReg);
+  const noop = wrap(rr, prox, Function.prototype);
+  return prox;
 }
 export { reg };
 
@@ -45,19 +62,22 @@ export { reg };
  */
 export function regForge(e, prio, nshit) {
   let reg;
-  return new Proxy({}, {
+  const prox = new Proxy({}, {
     get(t, p, r) {
       if (p === 'register') {
-        if (reg) return Function.prototype;
-        return () => ((reg = registerForge(e, prio, nshit)), r);
+        return reg ? noop : re;
       } else if (p === 'unregister') {
-        if (!reg) return Function.prototype;
-        return () => ((reg = void unregisterForge(reg)), r);
+        return reg ? un : noop;
       } else if (p === 'isRegistered') {
-        return () => Boolean(reg);
+        return isR;
       } else return void 0;
       // else if (reg[p] instanceof Function) return reg[p].bind(reg);
       // else return reg[p];
     }
   });
+  const re = wrap(rr, prox, () => reg = registerForge(e, prio, nshit));
+  const un = wrap(rr, prox, () => reg = void unregisterForge(reg));
+  const isR = wrap(rr, prox, () => Boolean(reg));
+  const noop = wrap(rr, prox, Function.prototype);
+  return prox;
 }
