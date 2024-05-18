@@ -9,18 +9,20 @@ let reg;
 reg = function reg(type, shit) {
   const rr = register(type, shit).unregister();
   let isReg = false;
+  const re = rr.register.bind(rr);
+  const un = rr.unregister.bind(rr);
   return new Proxy({}, {
     get(t, p, r) {
       if (p === 'register') {
         if (!isReg) {
           isReg = true;
-          return rr.register.bind(rr);
+          return re;
         }
         return Function.prototype;
       } else if (p === 'unregister') {
         if (isReg) {
           isReg = false;
-          return rr.unregister.bind(rr);
+          return un;
         }
         return Function.prototype;
       } else if (p === 'isRegistered') {
