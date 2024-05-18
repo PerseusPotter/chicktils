@@ -65,6 +65,7 @@ public class ChickTilsHelper {
 
   public static void deleteMessages(List<String> str) {
     try {
+      long start = System.currentTimeMillis();
       GuiNewChat gui = Minecraft.getMinecraft().ingameGUI.getChatGUI();
       Field prop = GuiNewChat.class.getDeclaredField("field_146252_h");
       prop.setAccessible(true);
@@ -73,13 +74,14 @@ public class ChickTilsHelper {
 
       String[] strs = new String[str.size()];
       for (int i = 0; i < str.size(); i++) strs[i] = trimReset(str.get(i));
-      for (int i = lines.size() - 1; i >= 0; i--) {
+      for (int i = 0; i < strs.length; i++) {
+        if (System.currentTimeMillis() - start > 50) break;
         ChatLine c = lines.get(i);
         try {
           if (
             contains(strs, trimReset(c.getChatComponent().getFormattedText()))
             // str.contains(c.getChatComponent().getFormattedText().substring(4))
-          ) lines.remove(i);
+          ) lines.remove(i--);
         } catch (StringIndexOutOfBoundsException e) {}
       }
 
