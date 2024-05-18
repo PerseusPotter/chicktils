@@ -139,10 +139,13 @@ const startBurrowReg = reg('chat', () => {
   targetLoc = null;
   renderOvReg.register();
   tickReg.register();
+  fixStReg.register();
 }).setCriteria('&r&eYou dug out a Griffin Burrow! &r&7(1/4)&r');
 const unloadReg = reg('worldUnload', () => {
   renderOvReg.unregister();
   tickReg.unregister();
+  fixStReg.unregister();
+  targetLoc = null;
 });
 
 const warpKey = new KeyBind('Diana Warp', data.dianaWarpKey, 'ChickTils');
@@ -164,6 +167,21 @@ warpKey.registerKeyRelease(() => {
   });
   if (best) execCmd('warp ' + best);
 });
+
+const fixStReg = reg('command', () => {
+  const guess = GriffinBurrows.BurrowEstimation.INSTANCE.getGuesses();
+  if (guess.size() > 0) {
+    let oldest;
+    let oldestK;
+    guess.forEach((k, v) => {
+      if (!oldest || v.compareTo(oldest) < 0) {
+        oldest = v;
+        oldestK = k;
+      }
+    });
+    guess.remove(oldestK);
+  }
+}).setName('ctsmanualfixstdiana').unregister();
 
 export function init() {
   settings._dianaAlertFoundBurrowSound.onAfterChange(v => burrowFoundAlert.sound = v);
