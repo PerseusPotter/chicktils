@@ -43,13 +43,25 @@ export function colorForNumber(n, max = 1) {
 }
 
 /**
- * @param {Message} msg
+ * @param {string} msg
+ */
+function getCenteredTextLen(msg) {
+  const msgWidth = Renderer.getStringWidth(msg) * Client.settings.chat.getScale();
+  const margins = ChatLib.getChatWidth() - msgWidth;
+  return (margins / Renderer.getStringWidth(' ') / Client.settings.chat.getScale()) >> 1;
+}
+
+/**
+ * @template {any} T
+ * @param {T} msg
+ * @returns {T}
  */
 export function centerMessage(msg) {
-  const c = Math.max(0, ChatLib.getChatWidth() - Renderer.getStringWidth(msg.getFormattedText())) / 2 / Renderer.getStringWidth(' ');
-  msg.addTextComponent(0, ' '.repeat(~~c));
-  return msg;
+  if (msg instanceof Message) return msg.addTextComponent(0, ' '.repeat(getCenteredTextLen(msg.getFormattedText())));
+  if (typeof msg !== 'string') msg = msg.toString();
+  return ' '.repeat(getCenteredTextLen(msg)) + msg;
 }
+
 
 /**
  * @param {string} cmd

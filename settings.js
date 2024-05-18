@@ -405,7 +405,7 @@ class Settings {
     const pageNav = new Message(page === this.minPage ? '   ' : new TextComponent('&a<- ').setClick('run_command', `/${this.module} config view ${page - 1}`), `&fPage &6${page} &fof &6${this.maxPage}`, page === this.maxPage ? '   ' : new TextComponent('&a ->').setClick('run_command', `/${this.module} config view ${page + 1}`));
     centerMessage(pageNav);
     // msgs.unshift(pageNav.clone());
-    msgs.unshift(new Message(ChatLib.getCenteredText(`&d&l${this.module} &b&l${this.pageNames[page]} &d&lSettings`)));
+    msgs.unshift(new Message(centerMessage(`&d&l${this.module} &b&l${this.pageNames[page]} &d&lSettings`)));
     msgs.push(pageNav);
     // this.prevMsgs.forEach(v => ChatLib.deleteChat(v));
     deleteMessages(this.prevMsgs);
@@ -428,7 +428,7 @@ class Settings {
         return a.p.name.toLowerCase().localeCompare(b.p.name.toLowerCase(), ['en-US']);
       });
     const msgs = props.map(({ s, p }) => p.getMessage(this.module, s));
-    msgs.unshift(new Message(ChatLib.getCenteredText(`&d&l${this.module} &b&l"${str}" &d&lSettings`)));
+    msgs.unshift(new Message(centerMessage(`&d&l${this.module} &b&l"${str}" &d&lSettings`)));
     // this.prevMsgs.forEach(v => ChatLib.deleteChat(v));
     deleteMessages(this.prevMsgs);
     msgs.forEach(v => v.chat());
