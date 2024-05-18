@@ -1,4 +1,5 @@
 import settings from '../settings';
+import { dist } from '../util/math';
 import { reg } from '../util/registerer';
 
 let hpUpdateC = 0;
@@ -42,7 +43,7 @@ const renderHeartReg = reg('renderHealth', evn => {
   }
 
   currHp = hp;
-  let hpDiff = doHighlight ? Math.abs(prevHp - hp) : 0;
+  let hpDiff = doHighlight ? dist(prevHp, hp) : 0;
   hp = doHighlight ? Math.min(prevHp, hp) : hp;
   const maxHp = Math.ceil(playerE.func_110138_aP());
   let aa = Math.ceil(playerE.func_110139_bj());

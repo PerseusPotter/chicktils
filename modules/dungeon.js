@@ -8,7 +8,7 @@ import { colorForNumber, execCmd } from '../util/format';
 import getPing from '../util/ping';
 import runHelper from '../util/runner';
 import createTextGui from '../util/customtextgui';
-import { compareFloat } from '../util/math';
+import { compareFloat, dist } from '../util/math';
 import Grid from '../util/grid';
 import { logDebug } from '../util/log';
 
@@ -86,8 +86,6 @@ function start() {
   bossEndReg.register();
   dungeonLeaveReg.register();
 }
-
-const dist = (n1, n2) => n1 < n2 ? n2 - n1 : n1 - n2;
 
 let isInBoss = false;
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
@@ -211,8 +209,8 @@ const tickReg = reg('tick', () => {
       const x = e.getX();
       const y = e.getY();
       const z = e.getZ();
-      const dx = Math.abs(x - e.getLastX());
-      const dz = Math.abs(z - e.getLastZ());
+      const dx = dist(x, e.getLastX());
+      const dz = dist(z, e.getLastZ());
       if (motionData.has(uuid)) {
         const data = motionData.get(uuid);
         data.ttl--;
