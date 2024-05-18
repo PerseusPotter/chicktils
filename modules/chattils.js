@@ -1,8 +1,9 @@
 import settings from '../settings';
 import { drawBeaconBeam, drawBoxAtBlock, drawString, renderWaypoints } from '../util/draw';
-import { getPlayerName } from '../util/format';
+import { execCmd, getPlayerName } from '../util/format';
+import { getLeader } from '../util/party';
 import { log, logMessage } from '../util/log';
-import { reg } from '../util/registerer';
+import { reg, regForge } from '../util/registerer';
 
 const blockedNames = new Set();
 reg('command', ign => {
@@ -130,22 +131,58 @@ const guildChatReg = reg('chat', (ign, msg) => {
 }).setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r');
 const regs = [allChatReg, partyChatReg, coopChatReg, wisperToReg, wisperFromReg, guildChatReg];
 
+// https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/features/FasterMaddoxCalling.java#L24
+let lastFollowTime = 0;
+let lastFollowToken = '';
+const followReg = regForge(net.minecraftforge.client.event.ClientChatReceivedEvent, undefined, evn => {
+  const msg = evn.message.func_150254_d().match(/§9§l» (.+?) §eis traveling to (.+?) §e§lFOLLOW§r/);
+  if (!msg) return;
+  const ign = getPlayerName(msg[1]);
+  if (ign === Player.getName()) return;
+  if (settings.chatTilsClickAnywhereFollowOnlyLead && ign !== getLeader()) return;
+  lastFollowTime = Date.now();
+  lastFollowToken = evn.message.func_150256_b().func_150235_h()?.func_150668_b();
+  log(`Open chat then click anywhere on-screen to follow &b${ign}`);
+});
+const clickChatReg = regForge(net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post, undefined, evn => {
+  if (Java.type('org.lwjgl.input.Mouse').getEventButtonState() || Java.type('org.lwjgl.input.Mouse').getEventButton() != 0 || !(evn.gui instanceof Java.type('net.minecraft.client.gui.GuiChat'))) return;
+  if (!lastFollowToken || Date.now() - lastFollowTime > 10_000) return;
+  execCmd(lastFollowToken.slice(1));
+});
+
 export function init() {
   settings._chatTilsWaypointPersist.onAfterChange(v => {
     if (v) worldUnloadReg.unregister();
     else worldUnloadReg.register();
   });
   settings._chatTilsWaypointDuration.onBeforeChange(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
+  settings._chatTilsClickAnywhereFollow.onAfterChange(v => {
+    if (settings.enablechattils) {
+      if (v) {
+        followReg.register();
+        clickChatReg.register();
+      } else {
+        followReg.unregister();
+        clickChatReg.unregister();
+      }
+    }
+  });
 }
 export function load() {
   regs.forEach(v => v.register());
   chatPingReg.register();
+  if (settings.chatTilsClickAnywhereFollow) {
+    followReg.register();
+    clickChatReg.register();
+  }
 }
 export function unload() {
   regs.forEach(v => v.unregister());
-  worldRenderReg.unregister();
+  worldUnloadReg.forceTrigger();
   worldUnloadReg.unregister();
   chatPingReg.unregister();
+  followReg.unregister();
+  clickChatReg.unregister();
 }
 
 let cancelNextPing = false;
