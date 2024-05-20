@@ -456,7 +456,7 @@ let page = 0;
 let sort = 0;
 export const props = {
   // 1
-  enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'Toggles mod globally' }),
+  enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'toggles mod globally' }),
   autoUpdate: new Property('CheckForUpdates', page, ++sort, Property.Type.Toggle, true, { desc: 'check for updates when loaded' }),
   isDev: new Property('IsDev', page, ++sort, Property.Type.Toggle, false, { desc: 'negatively impacts loading performance and may spam your chat' }),
   pingRefreshDelay: new Property('PingRefreshDelay', page, ++sort, Property.Type.Number, 10, { desc: 'how often (in seconds) to refresh ping. set to 0 to disable ping. requires skytils' }),
@@ -465,7 +465,7 @@ export const props = {
   // 2
   enablekuudra: new Property('EnableKuudra', ++page, sort = 0, Property.Type.Toggle, true),
 
-  kuudraRenderPearlTarget: new Property('KuudraRenderPearlTarget', page, ++sort, Property.Type.Toggle, true, { desc: 'render location to aim at for sky pearls' }),
+  kuudraRenderPearlTarget: new Property('KuudraRenderPearlTarget', page, ++sort, Property.Type.Toggle, true, { desc: 'render location to aim at for sky pearls\n(but not hardcoded + actually accurate + with timer)' }),
   kuudraPearlTargetColor: new Property('KuudraPearlTargetColor', page, ++sort, Property.Type.Color, 0xFFFF00FF),
 
   kuudraRenderEmptySupplySpot: new Property('KuudraRenderEmptySupplySpot', page, ++sort, Property.Type.Toggle, true, { desc: 'render available supply dropoff location' }),
@@ -484,16 +484,16 @@ export const props = {
 
   kuudraCustomBossBar: new Property('KuudraCustomBossBar', page, ++sort, Property.Type.Toggle, true, { desc: 'rescale kuudra health bar in t5 to go 100% -> 0% twice' }),
 
-  kuudraBoxKuudra: new Property('KuudraBoxKuudra', page, ++sort, Property.Type.Toggle, true),
+  kuudraBoxKuudra: new Property('KuudraBoxKuudra', page, ++sort, Property.Type.Toggle, true, { desc: 'draws box around kuudra' }),
   kuudraBoxKuudraColor: new Property('KuudraBoxKuudraColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   kuudraBoxKuudraEsp: new Property('KuudraBoxKuudraEsp', page, ++sort, Property.Type.Toggle, true),
 
   kuudraDrawArrowToKuudra: new Property('KuudraDrawArrowToKuudra', page, ++sort, Property.Type.Toggle, true, { desc: 'draw arrow pointing to kuudra in p5' }),
   kuudraArrowToKuudraColor: new Property('KuudraArrowToKuudraColor', page, ++sort, Property.Type.Color, 0x00FFFFFF),
 
-  kuudraDrawHpGui: new Property('KuudraDrawHpOnScreen', page, ++sort, Property.Type.Toggle, true),
+  kuudraDrawHpGui: new Property('KuudraDrawHpOnScreen', page, ++sort, Property.Type.Toggle, true, { desc: 'draw hp of kuudra onto hud' }),
   moveKuudraHp: new Property('MoveKuudraHp', page, ++sort, Property.Type.Action),
-  kuudraDrawHpDec: new Property('KuudraDrawHpDecimals', page, ++sort, Property.Type.Integer, 3, { min: 0, max: 3 }),
+  kuudraDrawHpDec: new Property('KuudraDrawHpDecimals', page, ++sort, Property.Type.Integer, 3, { desc: 'number of decimals/sigfigs in the hp', min: 0, max: 3 }),
 
   kuudraAutoRefillPearls: new Property('KuudraAutoRefillPearls', page, ++sort, Property.Type.Toggle, true, { desc: 'automatically run /gfs at start of each run to replenish used pearls' }),
   kuudraAutoRefillPearlsAmount: new Property('KuudraAutoRefillPearlsAmount', page, ++sort, Property.Type.Integer, 16, { desc: 'amount of pearls you want to start run with', min: 0, max: 560 }),
@@ -501,47 +501,47 @@ export const props = {
   // 3
   enabledungeon: new Property('EnableDungeon', ++page, sort = 0, Property.Type.Toggle, true),
 
-  dungeonBoxMobs: new Property('DungeonBoxMobs', page, ++sort, Property.Type.Toggle, true),
-  dungeonBoxMobColor: new Property('DungeonBoxMobColor', page, ++sort, Property.Type.Color, 0x00FFFFFF),
+  dungeonBoxMobs: new Property('DungeonBoxMobs', page, ++sort, Property.Type.Toggle, true, { desc: 'draws boxes around starred mobs\nonly mobs with both nametag and corresponding entity (no ghost nametags!)' }),
+  dungeonBoxMobColor: new Property('DungeonBoxMobColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color for basic mobs' }),
   dungeonBoxMobEsp: new Property('DungeonBoxMobEsp', page, ++sort, Property.Type.Toggle, false),
-  dungeonBoxKeyColor: new Property('DungeonBoxKeyColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
-  dungeonBoxSAColor: new Property('DungeonBoxSAColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
-  dungeonBoxFelColor: new Property('DungeonBoxFelColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
-  dungeonBoxChonkColor: new Property('DungeonBoxChonkersColor', page, ++sort, Property.Type.Color, 0xFF0080FF, { desc: 'withermancers, commanders, lords, and super archers' }),
-  dungeonBoxMiniColor: new Property('DungeonBoxMiniColor', page, ++sort, Property.Type.Color, 0xB400B4FF),
+  dungeonBoxKeyColor: new Property('DungeonBoxKeyColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color for wither/blood keys' }),
+  dungeonBoxSAColor: new Property('DungeonBoxSAColor', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: 'color for SAs' }),
+  dungeonBoxFelColor: new Property('DungeonBoxFelColor', page, ++sort, Property.Type.Color, 0x00FF80FF, { desc: 'color for fels' }),
+  dungeonBoxChonkColor: new Property('DungeonBoxChonkersColor', page, ++sort, Property.Type.Color, 0xFF0080FF, { desc: 'color for withermancers, commanders, lords, and super archers' }),
+  dungeonBoxMiniColor: new Property('DungeonBoxMiniColor', page, ++sort, Property.Type.Color, 0xB400B4FF, { desc: 'color for LAs,  FAs, and AAs' }),
   dungeonBoxMobDisableInBoss: new Property('DungeonBoxMobDisableInBoss', page, ++sort, Property.Type.Toggle, false),
 
-  dungeonCamp: new Property('DungeonEnableCamp', page, ++sort, Property.Type.Toggle, true),
-  dungeonCampWireColor: new Property('DungeonCampWireColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
-  dungeonCampBoxColor: new Property('DungeonCampBoxColor', page, ++sort, Property.Type.Color, 0x00FFFFFF),
+  dungeonCamp: new Property('DungeonEnableCamp', page, ++sort, Property.Type.Toggle, true, { desc: 'blood camp helper' }),
+  dungeonCampWireColor: new Property('DungeonCampWireColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color of wireframe' }),
+  dungeonCampBoxColor: new Property('DungeonCampBoxColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color of shaded box' }),
   dungeonCampBoxEsp: new Property('DungeonCampBoxEsp', page, ++sort, Property.Type.Toggle, false),
-  dungeonCampSmoothTime: new Property('DungeonCampSmoothTime', page, ++sort, Property.Type.Integer, 500, { min: 1 }),
+  dungeonCampSmoothTime: new Property('DungeonCampSmoothTime', page, ++sort, Property.Type.Integer, 500, { desc: 'amount of time in ms spent lerping between different guesses\n(and how often to make guesses)', min: 1 }),
 
   dungeonHecatombAlert: new Property('DungeonHecatombAlert', page, ++sort, Property.Type.Toggle, false, { desc: 'alert before end of run to swap to hecatomb (does not work for f4/m4/m7)' }),
-  hecatombAlertTime: new Property('HecatombAlertTime', page, ++sort, Property.Type.Integer, 5000, { min: 0 }),
+  hecatombAlertTime: new Property('HecatombAlertTime', page, ++sort, Property.Type.Integer, 5000, { desc: 'in ms', min: 0 }),
 
   dungeonMap: new Property('DungeonMap', page, ++sort, Property.Type.Toggle, false, { desc: 'does not work yet' }),
   moveDungeonMap: new Property('MoveDungeonMap', page, ++sort, Property.Type.Action),
   dungeonMapHideBoss: new Property('DungeonMapHideInBoss', page, ++sort, Property.Type.Toggle, false),
-  dungeonMapRenderHead: new Property('DungeonMapRenderPlayerHeads', page, ++sort, Property.Type.Toggle, false),
-  dungeonMapRenderName: new Property('DungeonMapRenderPlayerNames', page, ++sort, Property.Type.Option, 'Holding Leap', { options: ['Always', 'Never', 'Holding Leap'] }),
-  dungeonMapRenderClass: new Property('DungeonMapRenderPlayerClass', page, ++sort, Property.Type.Option, 'Always', { options: ['Always', 'Never', 'Holding Leap'] }),
-  dungeonMapBoxDoors: new Property('DungeonMapBoxDoors', page, ++sort, Property.Type.Option, 'Blood Doors', { options: ['Always', 'Never', 'Blood Doors'] }),
+  dungeonMapRenderHead: new Property('DungeonMapRenderPlayerHeads', page, ++sort, Property.Type.Toggle, false, { desc: 'render heads instead of arrows on map' }),
+  dungeonMapRenderName: new Property('DungeonMapRenderPlayerNames', page, ++sort, Property.Type.Option, 'Holding Leap', { desc: 'render names of players above their marker', options: ['Always', 'Never', 'Holding Leap'] }),
+  dungeonMapRenderClass: new Property('DungeonMapRenderPlayerClass', page, ++sort, Property.Type.Option, 'Always', { desc: 'render class of players above their marker', options: ['Always', 'Never', 'Holding Leap'] }),
+  dungeonMapBoxDoors: new Property('DungeonMapBoxDoors', page, ++sort, Property.Type.Option, 'Blood Doors', { desc: 'boxes wither/blood doors', options: ['Always', 'Never', 'Blood Doors'] }),
   dungeonMapBoxDoorOutlineColor: new Property('DungeonMapBoxDoorOutlineColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
   dungeonMapBoxDoorFillColor: new Property('DungeonMapBoxDoorFillColor', page, ++sort, Property.Type.Color, 0x00FF0050),
   dungeonMapBoxLockedDoorOutlineColor: new Property('DungeonMapBoxLockedDoorOutlineColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   dungeonMapBoxLockedDoorFillColor: new Property('DungeonMapBoxLockedDoorFillColor', page, ++sort, Property.Type.Color, 0xFF000050),
 
-  dungeonShowSecrets: new Property('DungeonShowSecrets', page, ++sort, Property.Type.Option, 'None', { options: ['None', 'Wire', 'Waypoint'] }),
+  dungeonShowSecrets: new Property('DungeonShowSecrets', page, ++sort, Property.Type.Option, 'None', { desc: 'does not work yet', options: ['None', 'Wire', 'Waypoint'] }),
 
-  dungeonHideHealerPowerups: new Property('DungeonHideHealerPowerups', page, ++sort, Property.Type.Toggle, true),
+  dungeonHideHealerPowerups: new Property('DungeonHideHealerPowerups', page, ++sort, Property.Type.Toggle, true, { desc: 'hide healer power orbs (and particles!)' }),
 
-  dungeonAutoArchitect: new Property('DungeonAutoGFSArchitect', page, ++sort, Property.Type.Toggle, true, { desc: 'auto gfs on puzzle fail' }),
+  dungeonAutoArchitect: new Property('DungeonAutoGFSArchitect', page, ++sort, Property.Type.Toggle, true, { desc: 'auto gfs on puzzle fail, and a friendly reminder' }),
 
-  dungeonNecronDragTimer: new Property('DungeonNecronDragTimer', page, ++sort, Property.Type.Option, 'None', { desc: 'timer when necron does some dragging', options: ['OnScreen', 'InstaMid', 'Both', 'None'] }),
+  dungeonNecronDragTimer: new Property('DungeonNecronDragTimer', page, ++sort, Property.Type.Option, 'None', { desc: 'timer when necron does some dragging\n(timer will automatically pop up when instamidding!)', options: ['OnScreen', 'InstaMid', 'Both', 'None'] }),
   moveNecronDragTimer: new Property('MoveNecronDragTimer', page, ++sort, Property.Type.Action),
 
-  dungeonDev4Helper: new Property('DungeonClearViewDev4', page, ++sort, Property.Type.Option, 'Both', { options: ['None', 'Titles', 'Particles', 'Both'] }),
+  dungeonDev4Helper: new Property('DungeonClearViewDev4', page, ++sort, Property.Type.Option, 'Both', { desc: 'clearer vision while doing 4th dev', options: ['None', 'Titles', 'Particles', 'Both'] }),
 
   dungeonStairStonkHelper: new Property('DungeonStairStonkHelper', page, ++sort, Property.Type.Toggle, false, { desc: 'same as soopy but does not cut fps in half' }),
   dungeonStairStonkHelperColor: new Property('DungeonStairStonkHelperColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
@@ -584,7 +584,7 @@ export const props = {
   moveLoc16: new Property('MoveCatacombsGUI', page, ++sort, Property.Type.Action),
 
   // 5
-  enableservertracker: new Property('EnableServerTracker', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'tracks servers youve been to,  also /warp tab complete' }),
+  enableservertracker: new Property('EnableServerTracker', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'tracks servers you\'ve been to, also /warp tab complete' }),
   serverTrackerTransferCd: new Property('ServerTrackerTransferCd', page, ++sort, Property.Type.Integer, 3000, { desc: 'delays warps by this long if spammed too quickly', min: 0 }),
   serverTrackerCdMessage: new Property('ServerTrackerCdMessage', page, ++sort, Property.Type.Text, 'waiting for cd (u.U)｡｡｡ zzZ'),
 
@@ -592,22 +592,22 @@ export const props = {
   enablerattils: new Property('EnableRatTils', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'boxes cheese and other stuff' }),
   ratTilsBoxColor: new Property('RatTilsBoxColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
   ratTilsBoxEsp: new Property('RatTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
-  ratTilsAlertTime: new Property('RatTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { min: 0 }),
+  ratTilsAlertTime: new Property('RatTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
   ratTilsMessage: new Property('RatTilsMessage', page, ++sort, Property.Type.Text, 'i.imgur.com/8da4IiM.png', { desc: 'empty to disable' }),
-  ratTilsMuteSound: new Property('RatTilsMuteSound', page, ++sort, Property.Type.Toggle, true),
+  ratTilsMuteSound: new Property('RatTilsMuteSound', page, ++sort, Property.Type.Toggle, true, { desc: 'mute rat squeaking sounds' }),
 
   // 7
   enablepowderalert: new Property('EnablePowderAlert', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'alerts when powder chest spawns' }),
   powderBoxColor: new Property('PowderBoxColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
   powderBoxEsp: new Property('PowderBoxEsp', page, ++sort, Property.Type.Toggle, true),
-  powderAlertTime: new Property('PowderAlertTime', page, ++sort, Property.Type.Integer, 1000, { min: 0 }),
+  powderAlertTime: new Property('PowderAlertTime', page, ++sort, Property.Type.Integer, 1000, { desc: 'in ms', min: 0 }),
   powderScanRange: new Property('PowderScanRange', page, ++sort, Property.Type.Integer, 10, { min: 0 }),
 
   // 8
   enablecrystalalert: new Property('EnableCrystalAlert', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'alerts when end crystals spawn' }),
   crystalBoxColor: new Property('CrystalBoxColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
   crystalBoxEsp: new Property('CrystalBoxEsp', page, ++sort, Property.Type.Toggle, true),
-  crystalAlertTime: new Property('CrystalAlertTime', page, ++sort, Property.Type.Integer, 1000, { min: 0 }),
+  crystalAlertTime: new Property('CrystalAlertTime', page, ++sort, Property.Type.Integer, 1000, { desc: 'in ms', min: 0 }),
 
   // 9
   enablecmdalias: new Property('EnableCommandAliases', ++page, sort = 0, Property.Type.Toggle, true),
@@ -616,18 +616,18 @@ export const props = {
   cmdAliasKuudra: new Property('EnableKuudraShortcut', page, ++sort, Property.Type.Toggle, true, { desc: 'e.g. /k1' }),
 
   // 10
-  enablequiver: new Property('EnableQuiverDisplay', ++page, sort = 0, Property.Type.Toggle, false),
+  enablequiver: new Property('EnableQuiverDisplay', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'arrow display on hud, only works when holding bow' }),
   moveQuiver: new Property('MoveQuiverDisplay', page, ++sort, Property.Type.Action),
-  quiverSize: new Property('QuiverMaxSize', page, ++sort, Property.Type.Option, 'Giant', { options: ['Medium', 'Large', 'Giant'] }),
-  quiverShowRefill: new Property('QuiverShowRefillCost', page, ++sort, Property.Type.Toggle, false),
-  quiverRefillCost: new Property('QuiverRefillCostType', page, ++sort, Property.Type.Option, 'Instant', { options: ['Instant', 'Individual', 'Jax', 'Ophelia'] }),
+  quiverSize: new Property('QuiverMaxSize', page, ++sort, Property.Type.Option, 'Giant', { desc: 'size of quiver (based on feather collection)', options: ['Medium', 'Large', 'Giant'] }),
+  quiverShowRefill: new Property('QuiverShowRefillCost', page, ++sort, Property.Type.Toggle, false, { desc: 'show refill cost' }),
+  quiverRefillCost: new Property('QuiverRefillCostType', page, ++sort, Property.Type.Option, 'Instant', { desc: 'method of refilling\nInstant: whatever is fastest\nIndividual: spam left click at jax (cheaper, also ur a loser)\nJax: same as instant but jax flint arrows expensiver\nOphelia: same as instant', options: ['Instant', 'Individual', 'Jax', 'Ophelia'] }),
   quiverShowRefillThresh: new Property('QuiverRefillCostDisplayThreshold', page, ++sort, Property.Type.Percent, 25, { desc: 'only show refill cost when below this amount full', min: 0, max: 100 }),
 
   // 11
   enablerabbit: new Property('EnableRabbitTils', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'notifies when egg spawns and when egg is found' }),
   rabbitBoxColor: new Property('RabbitTilsBoxColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
   rabbitBoxEsp: new Property('RabbitTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
-  rabbitAlertTime: new Property('RabbitTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { min: 0 }),
+  rabbitAlertTime: new Property('RabbitTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
   rabbitShowBestUpgrade: new Property('RabbitTilsShowBestUpgrade', page, ++sort, Property.Type.Toggle, true, { desc: 'highlight most cost effective rabbit upgrade' }),
   rabbitCondenseChat: new Property('RabbitTilsCondenseChat', page, ++sort, Property.Type.Toggle, true, { desc: 'has been promoted lookin mf' }),
   rabbitAlertOnlyDinner: new Property('RabbitTilsOnlyAlertDinner', page, ++sort, Property.Type.Toggle, false, { desc: 'only ping on dinner eggs for peak afk' }),
@@ -635,59 +635,59 @@ export const props = {
   // 12
   enablechattils: new Property('EnableChatTils', ++page, sort = 0, Property.Type.Toggle, false),
 
-  chatTilsWaypoint: new Property('ChatTilsFindWaypoints', page, ++sort, Property.Type.Toggle, true),
+  chatTilsWaypoint: new Property('ChatTilsFindWaypoints', page, ++sort, Property.Type.Toggle, true, { desc: 'look for waypoints in all the chats' }),
   chatTilsWaypointColor: new Property('ChatTilsWaypointColor', page, ++sort, Property.Type.Color, 0xC80000FF),
-  chatTilsWaypointType: new Property('ChatTilsWaypointType', page, ++sort, Property.Type.Option, 'Box', { options: ['Box', 'Wireframe', 'None'] }),
-  chatTilsWaypointBeacon: new Property('ChatTilsWaypointShowBeacon', page, ++sort, Property.Type.Toggle, true),
-  chatTilsWaypointName: new Property('ChatTilsWaypointShowName', page, ++sort, Property.Type.Toggle, false),
+  chatTilsWaypointType: new Property('ChatTilsWaypointType', page, ++sort, Property.Type.Option, 'Box', { desc: 'type of waypoint', options: ['Box', 'Wireframe', 'None'] }),
+  chatTilsWaypointBeacon: new Property('ChatTilsWaypointShowBeacon', page, ++sort, Property.Type.Toggle, true, { desc: 'render beacon to waypoint' }),
+  chatTilsWaypointName: new Property('ChatTilsWaypointShowName', page, ++sort, Property.Type.Toggle, false, { desc: 'show name of player who sent waypoint' }),
   chatTilsWaypointDuration: new Property('ChatTilsWaypointDuration', page, ++sort, Property.Type.Integer, 60, { desc: 'time in seconds, 0 = forever', min: 0 }),
   chatTilsWaypointShowOwn: new Property('ChatTilsWaypointShowOwn', page, ++sort, Property.Type.Toggle, true, { desc: 'show your own waypoints' }),
   chatTilsWaypointPersist: new Property('ChatTilsWaypointPersist', page, ++sort, Property.Type.Toggle, false, { desc: 'whether to persist on swapping servers' }),
 
-  chatTilsHideBonzo: new Property('ChatTilsHideAzureBonzo', page, ++sort, Property.Type.Option, 'False', { options: ['False', 'Sound', 'Both'] }),
-  chatTilsHidePhoenix: new Property('ChatTilsHideAzurePhoenix', page, ++sort, Property.Type.Option, 'False', { options: ['False', 'Sound', 'Both'] }),
-  chatTilsHideLeap: new Property('ChatTilsHideAzureLeap', page, ++sort, Property.Type.Option, 'False', { options: ['False', 'Sound', 'Both'] }),
-  chatTilsHideMelody: new Property('ChatTilsHideAzureMelody', page, ++sort, Property.Type.Option, 'False', { options: ['False', 'Sound', 'Both'] }),
-  chatTilsCompactMelody: new Property('ChatTilsCompactAzureMelody', page, ++sort, Property.Type.Toggle, true),
+  chatTilsHideBonzo: new Property('ChatTilsHideAzureBonzo', page, ++sort, Property.Type.Option, 'False', { desc: '"Bonzo Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
+  chatTilsHidePhoenix: new Property('ChatTilsHideAzurePhoenix', page, ++sort, Property.Type.Option, 'False', { desc: '"Phoenix Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
+  chatTilsHideLeap: new Property('ChatTilsHideAzureLeap', page, ++sort, Property.Type.Option, 'False', { desc: '"Leaped to plinkingndriving" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
+  chatTilsHideMelody: new Property('ChatTilsHideAzureMelody', page, ++sort, Property.Type.Option, 'False', { desc: '"melody (1/4)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
+  chatTilsCompactMelody: new Property('ChatTilsCompactAzureMelody', page, ++sort, Property.Type.Toggle, true, { desc: 'only keep most recent melody message from a player' }),
 
-  chatTilsClickAnywhereFollow: new Property('ChatTilsClickAnywhereFollow', page, ++sort, Property.Type.Toggle, false),
-  chatTilsClickAnywhereFollowOnlyLead: new Property('ChatTilsClickAnywhereFollowOnlyLead', page, ++sort, Property.Type.Toggle, true),
+  chatTilsClickAnywhereFollow: new Property('ChatTilsClickAnywhereFollow', page, ++sort, Property.Type.Toggle, false, { desc: 'click anywhere after opening chat to follow party member\n(mostly for diana/assfang/jumpy dt cube)' }),
+  chatTilsClickAnywhereFollowOnlyLead: new Property('ChatTilsClickAnywhereFollowOnlyLead', page, ++sort, Property.Type.Toggle, true, { desc: 'only follow leader' }),
 
   // 13
   enablediana: new Property('EnableDiana', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'requires skytils to work (not the meow solver)' }),
   dianaArrowToBurrowColor: new Property('DianaArrowToBurrowColor', page, ++sort, Property.Type.Color, 0x9FE2BF),
-  dianaPreferFinish: new Property('DianaPreferFinishCurrentChain', page, ++sort, Property.Type.Toggle, true),
-  dianaAlertFoundBurrow: new Property('DianaAlertFoundBurrow', page, ++sort, Property.Type.Toggle, true),
+  dianaPreferFinish: new Property('DianaPreferFinishCurrentChain', page, ++sort, Property.Type.Toggle, true, { desc: 'whether you prefer to do one chain at a time\nor do 5-6 at a time' }),
+  dianaAlertFoundBurrow: new Property('DianaAlertFoundBurrow', page, ++sort, Property.Type.Toggle, true, { desc: 'alert when burrow is found' }),
   dianaAlertFoundBurrowNoStart: new Property('DianaAlertFoundBurrowNoStart', page, ++sort, Property.Type.Toggle, false, { desc: 'do not alert when found burrow is a start burrow' }),
-  dianaAlertFoundBurrowTime: new Property('DianaAlertFoundBurrowTime', page, ++sort, Property.Type.Integer, 500),
-  dianaAlertFoundBurrowSound: new Property('DianaAlertFoundBurrowSound', page, ++sort, Property.Type.Toggle, true),
+  dianaAlertFoundBurrowTime: new Property('DianaAlertFoundBurrowTime', page, ++sort, Property.Type.Integer, 500, { desc: 'in ms' }),
+  dianaAlertFoundBurrowSound: new Property('DianaAlertFoundBurrowSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   dianaFixSkytils: new Property('DianaFixSkytils', page, ++sort, Property.Type.Toggle, false, { desc: 'only keep 1 guess waypoint at a time\nalternatively use /ctsmanualfixstdiana to remove oldest guess' }),
-  dianaGuessFromParticles: new Property('DianaGuessFromParticles', page, ++sort, Property.Type.Toggle, false, { desc: '/togglesound must be on, from soopy (but not fps tax)\ndoes not require skytils but a lot more accurate and consistent with it' }),
+  dianaGuessFromParticles: new Property('DianaGuessFromParticles', page, ++sort, Property.Type.Toggle, false, { desc: '/togglesound must be on, from soopy (but not fps tax)\ndoes not require skytils but a lot more consistent with it' }),
   dianaGuessFromParticlesColor: new Property('DianaGuessFromParticlesColor', page, ++sort, Property.Type.Color, 0x00FFFFFF),
 
   // 14
   enableabsorption: new Property('EnableCustomAbsorption', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'custom absorption renderer to more accurately portray total hp' }),
   absorptionMaxHearts: new Property('AbsorptionMaxHearts', page, ++sort, Property.Type.Integer, 40, { desc: 'caps hearts for things like mastiff', min: 0 }),
 
-  enableboxallentities: new Property('EnableBoxAllEntities', page, ++sort, Property.Type.Toggle, false),
+  enableboxallentities: new Property('EnableBoxAllEntities', page, ++sort, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
   boxAllEntitiesColor: new Property('BoxAllEntitiesColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   boxAllEntitiesEsp: new Property('BoxAllEntitiesEsp', page, ++sort, Property.Type.Toggle, true),
 
-  enableexcavatorsolver: new Property('EnableExcavatorSolver', page, ++sort, Property.Type.Toggle, false),
+  enableexcavatorsolver: new Property('EnableExcavatorSolver', page, ++sort, Property.Type.Toggle, false, { desc: 'find fossils' }),
   excavatorSolverOnlyShowBest: new Property('ExcavatorSolverOnlyHighlightBest', page, ++sort, Property.Type.Toggle, true, { desc: 'only highlight the best move' }),
   excavatorSolverShowRoute: new Property('ExcavatorSolverHighlightStartPath', page, ++sort, Property.Type.Toggle, false, { desc: 'highlight best starting path (turn off if citrine gemstones)' }),
   excavatorSolverDirtTooltip: new Property('ExcavatorSolverDirtTooltip', page, ++sort, Property.Type.Option, 'Custom', { options: ['Default', 'Hide', 'Custom'] }),
   excavatorSolverDustTooltip: new Property('ExcavatorSolverDustTooltip', page, ++sort, Property.Type.Option, 'Custom', { options: ['Default', 'Hide', 'Custom'] }),
-  excavatorSolverAutoClose: new Property('ExcavatorSolverAutoClose', page, ++sort, Property.Type.Toggle, false),
+  excavatorSolverAutoClose: new Property('ExcavatorSolverAutoClose', page, ++sort, Property.Type.Toggle, false, { desc: 'automatically close excavator when all clicks used' }),
 
-  enablebettergfs: new Property('EnableBetterGFS', page, ++sort, Property.Type.Toggle, false, { desc: 'autocomplete for gfs' }),
-  betterGFSBlankAmount: new Property('BetterGFSUnspecifiedAmount', page, ++sort, Property.Type.Integer, 1, { min: 1, max: 2240 }),
-  betterGFSIDPref: new Property('BetterGFSIdPreference', page, ++sort, Property.Type.Option, 'Dynamic', { options: ['Dynamic', 'ID', 'Name'] }),
+  enablebettergfs: new Property('EnableBetterGFS', page, ++sort, Property.Type.Toggle, false, { desc: 'autocomplete for gfs, and shorthand\ne.g. /gfs w c 1 -> /gfs WITHER_CATALYST 1' }),
+  betterGFSBlankAmount: new Property('BetterGFSUnspecifiedAmount', page, ++sort, Property.Type.Integer, 1, { desc: 'amount to default to when not provided\ne.g. /gfs w c -> /gfs WITHER_CATALYST <insert amount>', min: 1, max: 2240 }),
+  betterGFSIDPref: new Property('BetterGFSIdPreference', page, ++sort, Property.Type.Option, 'Dynamic', { desc: 'which format to prefer (name vs id)\nName: replace with qualified name, ID: coerce to ID\nDynamic: use whatever format was given (in theory)', options: ['Dynamic', 'ID', 'Name'] }),
 
-  enablecpv: new Property('EnableChickTilsPV', page, ++sort, Property.Type.Toggle, true, { desc: '/cpv, neu /pv wrapper but with different api' }),
-  cpvReplaceNeu: new Property('ChickTilsPVReplaceNEU', page, ++sort, Property.Type.Toggle, false),
-  cpvAutoCompleteTabList: new Property('ChickTilsAutoCompleteTabList', page, ++sort, Property.Type.Toggle, true),
-  cpvAutoCompleteParty: new Property('ChickTilsAutoCompleteParty', page, ++sort, Property.Type.Toggle, true)
+  enablecpv: new Property('EnableChickTilsPV', page, ++sort, Property.Type.Toggle, true, { desc: '/cpv, neu /pv wrapper but with different api\n(almost 100% success rate!)' }),
+  cpvReplaceNeu: new Property('ChickTilsPVReplaceNEU', page, ++sort, Property.Type.Toggle, false, { desc: 'replace /pv command (may require restart when disabling)' }),
+  cpvAutoCompleteTabList: new Property('ChickTilsAutoCompleteTabList', page, ++sort, Property.Type.Toggle, true, { desc: 'autocomplete /pv with names from tab list' }),
+  cpvAutoCompleteParty: new Property('ChickTilsAutoCompleteParty', page, ++sort, Property.Type.Toggle, true, { desc: 'autcomplete /pv with party members' })
 };
 const pageNames = [
   '',
