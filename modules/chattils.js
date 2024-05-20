@@ -92,7 +92,7 @@ const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 
 const allChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}).setCriteria(/^§r([^>]+?)§(?:7|f): (.+?)§r$/);
+}).setCriteria(/^&r([^>]+?)&(?:7|f): (.+?)&r$/);
 const partyChatReg = reg('chat', (ign, msg, evn) => {
   processMessageWaypoint(ign, msg);
 
