@@ -38,7 +38,9 @@ const renderReg = reg('renderWorld', () => {
   renderWaypoints(chests, r, g, b, settings.powderBoxEsp, false);
 });
 
-export function init() { }
+export function init() {
+  settings._powderAlertSound.onAfterChange(v => chestAlert.sound = v);
+}
 export function load() {
   startReg.register();
 }

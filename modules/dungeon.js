@@ -555,7 +555,7 @@ function onBossEnd() {
     if (!score) return;
     score = +(score[1]);
     if (score < 270) return;
-    hecAlert.show(settings.dungeonHecatombAlert);
+    hecAlert.show(settings.dungeonHecatombAlertTime);
   }
 }
 
@@ -611,6 +611,7 @@ export function init() {
     else stepVarReg.setDelay(v / 1000);
   });
   settings._moveDungeonMap.onAction(() => mapDisplay.edit());
+  settings._dungeonHecatombAlertSound.onAfterChange(v => hecAlert.sound = v);
   settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());
   settings._dungeonMap.onAfterChange(v => {
     if (v) mapPacketReg.register();

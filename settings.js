@@ -518,7 +518,8 @@ export const props = {
   dungeonCampSmoothTime: new Property('DungeonCampSmoothTime', page, ++sort, Property.Type.Integer, 500, { desc: 'amount of time in ms spent lerping between different guesses\n(and how often to make guesses)', min: 1 }),
 
   dungeonHecatombAlert: new Property('DungeonHecatombAlert', page, ++sort, Property.Type.Toggle, false, { desc: 'alert before end of run to swap to hecatomb (does not work for f4/m4/m7)' }),
-  hecatombAlertTime: new Property('HecatombAlertTime', page, ++sort, Property.Type.Integer, 5000, { desc: 'in ms', min: 0 }),
+  dungeonHecatombAlertTime: new Property('DungeonHecatombAlertTime', page, ++sort, Property.Type.Integer, 5000, { desc: 'in ms', min: 0 }),
+  dungeonHecatombAlertSound: new Property('DungeonHecatombAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
 
   dungeonMap: new Property('DungeonMap', page, ++sort, Property.Type.Toggle, false, { desc: 'does not work yet' }),
   moveDungeonMap: new Property('MoveDungeonMap', page, ++sort, Property.Type.Action),
@@ -593,6 +594,7 @@ export const props = {
   ratTilsBoxColor: new Property('RatTilsBoxColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
   ratTilsBoxEsp: new Property('RatTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
   ratTilsAlertTime: new Property('RatTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
+  ratTilsAlertSound: new Property('RatTilsAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   ratTilsMessage: new Property('RatTilsMessage', page, ++sort, Property.Type.Text, 'i.imgur.com/8da4IiM.png', { desc: 'empty to disable' }),
   ratTilsMuteSound: new Property('RatTilsMuteSound', page, ++sort, Property.Type.Toggle, true, { desc: 'mute rat squeaking sounds' }),
 
@@ -601,6 +603,7 @@ export const props = {
   powderBoxColor: new Property('PowderBoxColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
   powderBoxEsp: new Property('PowderBoxEsp', page, ++sort, Property.Type.Toggle, true),
   powderAlertTime: new Property('PowderAlertTime', page, ++sort, Property.Type.Integer, 1000, { desc: 'in ms', min: 0 }),
+  powderAlertSound: new Property('PowderAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   powderScanRange: new Property('PowderScanRange', page, ++sort, Property.Type.Integer, 10, { min: 0 }),
 
   // 8
@@ -608,6 +611,7 @@ export const props = {
   crystalBoxColor: new Property('CrystalBoxColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
   crystalBoxEsp: new Property('CrystalBoxEsp', page, ++sort, Property.Type.Toggle, true),
   crystalAlertTime: new Property('CrystalAlertTime', page, ++sort, Property.Type.Integer, 1000, { desc: 'in ms', min: 0 }),
+  crystalAlertSound: new Property('CrystalAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
 
   // 9
   enablecmdalias: new Property('EnableCommandAliases', ++page, sort = 0, Property.Type.Toggle, true),
@@ -628,6 +632,7 @@ export const props = {
   rabbitBoxColor: new Property('RabbitTilsBoxColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
   rabbitBoxEsp: new Property('RabbitTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
   rabbitAlertTime: new Property('RabbitTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
+  rabbitAlertSound: new Property('RabbitTilsAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   rabbitShowBestUpgrade: new Property('RabbitTilsShowBestUpgrade', page, ++sort, Property.Type.Toggle, true, { desc: 'highlight most cost effective rabbit upgrade' }),
   rabbitCondenseChat: new Property('RabbitTilsCondenseChat', page, ++sort, Property.Type.Toggle, true, { desc: 'has been promoted lookin mf' }),
   rabbitAlertOnlyDinner: new Property('RabbitTilsOnlyAlertDinner', page, ++sort, Property.Type.Toggle, false, { desc: 'only ping on dinner eggs for peak afk' }),

@@ -75,6 +75,7 @@ const cheeseRenderReg = reg('renderWorld', () => {
 const muteReg = reg('soundPlay', (pos, name, vol, pitch, category, evn) => vol === 1 && (Math.abs(pitch - 1.19047) < 0.0001) && cancel(evn)).setCriteria('mob.bat.idle');
 
 export function init() {
+  settings._ratTilsAlertSound.onAfterChange(v => cheeseAlert.sound = v);
   settings._ratTilsMuteSound.onAfterChange(v => {
     if (v) muteReg.register();
     else muteReg.unregister();

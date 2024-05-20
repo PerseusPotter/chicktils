@@ -161,6 +161,7 @@ const promoteReg = reg('chat', (name, lvl, status, evn) => {
 }).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r');
 
 export function init() {
+  settings._rabbitAlertSound.onAfterChange(v => eggSpawnAlert.sound = eggFoundAlert.sound = v);
   settings._rabbitCondenseChat.onAfterChange(v => {
     if (v) promoteReg.register();
     else promoteReg.unregister();
