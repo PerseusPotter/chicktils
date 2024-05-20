@@ -74,7 +74,7 @@ public class ChickTilsHelper {
 
       String[] strs = new String[str.size()];
       for (int i = 0; i < str.size(); i++) strs[i] = trimReset(str.get(i));
-      for (int i = 0; i < strs.length; i++) {
+      for (int i = 0; i < lines.size(); i++) {
         if (System.currentTimeMillis() - start > 50) break;
         ChatLine c = lines.get(i);
         try {
