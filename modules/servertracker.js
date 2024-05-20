@@ -22,17 +22,71 @@ const unloadReg = reg('worldUnload', () => (Date.now() - lastWarp > 1000) && (cu
 
 let regs = [];
 let lastLoc = '';
-const tabComplete = tabCompletion(['home', 'island', 'hub', 'village', 'museum', 'da', 'ruins', 'castle', 'crypts', 'crypt', 'dungeon_hub', 'dungeons', 'dhub', 'barn', 'desert', 'trapper', 'park', 'howl', 'jungle', 'gold', 'deep', 'caverns', 'dwarves', 'dwarf', 'mines', 'forge', 'basecamp', 'crystals', 'crystal', 'hollows', 'ch', 'nucleus', 'spider', 'spiders', 'top', 'nest', 'arachne', 'sanctuary', 'end', 'drag', 'dragons', 'void', 'sepulture', 'isle', 'crimson', 'skull', 'kuudra', 'tomb', 'smold', 'smoldering_tomb', 'wasteland', 'dragontail', 'scarleton', 'garden', 'jerry']);
+const warpLocs = {
+  'home': 1,
+  'island': 1,
+  'hub': 2,
+  'village': 2,
+  'museum': 2,
+  'da': 2,
+  'castle': 2,
+  'crypts': 2,
+  'crypt': 2,
+  'dungeon_hub': 3,
+  'dungeons': 3,
+  'dhub': 3,
+  'barn': 4,
+  'desert': 4,
+  'trapper': 4,
+  'park': 5,
+  'howl': 5,
+  'jungle': 5,
+  'gold': 6,
+  'deep': 7,
+  'dwarves': 8,
+  'mines': 8,
+  'forge': 8,
+  'basecamp': 8,
+  'crystals': 9,
+  'hollows': 9,
+  'ch': 9,
+  'nucleus': 9,
+  'spider': 10,
+  'spiders': 10,
+  'top': 10,
+  'nest': 10,
+  'arachne': 10,
+  'end': 11,
+  'drag': 11,
+  'dragons': 11,
+  'void': 11,
+  'sepulture': 11,
+  'nether': 12,
+  'isle': 12,
+  'crimson': 12,
+  'skull': 12,
+  'kuudra': 12,
+  'smold': 12,
+  'smoldering_tomb': 12,
+  'wasteland': 12,
+  'dragontail': 12,
+  'scarleton': 12,
+  'garden': 13,
+  'jerry': 14
+};
+const tabComplete = tabCompletion(Object.keys(warpLocs));
 const loadReg = reg('worldLoad', () => {
   regs.forEach(v => v.unregister());
   regs = [];
   regs.push(reg('command', loc => {
     if (!loc) return ChatLib.command('warp');
     let t = Date.now() - lastWarp;
-    if (lastLoc !== loc && t < settings.serverTrackerTransferCd) {
+    // if (warpLocs[lastLoc] !== warpLocs[loc] && t < settings.serverTrackerTransferCd) {
+    if (t < settings.serverTrackerTransferCd) {
+      // yes warping in same server has cd (just no cd message appears)
       if (settings.serverTrackerCdMessage) log(settings.serverTrackerCdMessage);
       setTimeout(() => ChatLib.command('warp ' + loc), settings.serverTrackerTransferCd - t);
-    } else ChatLib.command('warp ' + loc)
+    } else ChatLib.command('warp ' + loc);
     lastLoc = loc;
   }).setTabCompletions(tabComplete).setName('warp', true));
   regs.push(reg('command', () => ChatLib.command('warp island', true)).setName('is', true));
