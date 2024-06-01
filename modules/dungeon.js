@@ -226,7 +226,7 @@ const tickReg = reg('tick', ticks => {
       if (!data && bloodOpenTime > 0) {
         const dx = dist(x, e.getLastX());
         const dz = dist(z, e.getLastZ());
-        if (y > 72 && ((dx > 0.01 && dx < 0.5) || (dz > 0.01 && dz < 0.5))) {
+        if (y > 71 && (dx > 0.01 || dz > 0.01) && dx < 0.5 && dz < 0.5) {
           bloodMobCount++;
           const ttl = (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
           data = {
@@ -442,8 +442,8 @@ const renderWorldReg = reg('renderWorld', () => {
       } else {
         const smoothFactor = dt / settings.dungeonCampSmoothTime;
         x = lerp(lastEstX, estX, smoothFactor);
-        y = lerp(lastEstX, estX, smoothFactor);
-        z = lerp(lastEstX, estX, smoothFactor);
+        y = lerp(lastEstY, estY, smoothFactor);
+        z = lerp(lastEstZ, estZ, smoothFactor);
       }
       const m = (maxTtl - ttl + getPing() / 50) / maxTtl;
       const br = ((settings.dungeonCampBoxColor >> 24) & 0xFF) / 256;
