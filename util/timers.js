@@ -36,3 +36,19 @@ export class FrameTimer {
     return true;
   }
 }
+
+export class DelayTimer {
+  delay = 0;
+  lastTick = 0;
+  constructor(delay) {
+    this.delay = delay;
+  }
+  shouldTick() {
+    const t = Date.now();
+    if (t - this.lastTick > this.delay) {
+      this.lastTick = t;
+      return true;
+    }
+    return false;
+  }
+}

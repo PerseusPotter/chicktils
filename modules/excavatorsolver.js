@@ -2,6 +2,7 @@ import settings from '../settings';
 import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
 import reg from '../util/registerer';
+import { DelayTimer } from '../util/timers';
 
 const fossilNames = [
   'Tusk',
@@ -121,7 +122,7 @@ const guiReg = reg('guiOpened', evn => {
       if (l.r === 2 || l.r === 3) y = f.h - y - 1;
       return f.arr[y][x];
     };
-    let lastUpdate = 0;
+    let updater = new DelayTimer(100);
     let wasChanged = false;
     function update(inv) {
       if (!wasChanged) return;
@@ -278,10 +279,8 @@ const guiReg = reg('guiOpened', evn => {
     const cb = new JavaAdapter(Java.type('net.minecraft.inventory.IInvBasic'), {
       func_76316_a(inv) {
         wasChanged = true;
-        const t = Date.now();
         // cringe shit gets called ~100 times per click
-        if (t - lastUpdate <= 100) return;
-        lastUpdate = t;
+        if (!updater.shouldTick()) return;
         update(inv);
         Client.scheduleTask(1, () => update(inv));
         Client.scheduleTask(2, () => update(inv));
