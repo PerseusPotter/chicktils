@@ -1,5 +1,3 @@
-import { log } from './log';
-
 export default class Grid {
   size = 0;
   key = 0;
@@ -20,7 +18,6 @@ export default class Grid {
       this.arrs.push([]);
       return this.arrs.length - 1;
     });
-    if (!this.arrs[key]) log(key, this.arrs.length);
     this.arrs[key].push(item);
   }
   _getById(id) {
