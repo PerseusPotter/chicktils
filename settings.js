@@ -444,7 +444,7 @@ class Settings {
     if (!p) throw 'Invalid Property: ' + prop;
     if (p.type === Property.Type.Action) p.actionListeners.forEach(v => v.call(p));
     else {
-      if (val !== undefined) p.set(p.parse(val));
+      if (val) p.set(p.parse(val));
       else p.set(p.defaultValue);
       this.save();
       log(`Set ${p.name} to ${p.toString()}`);
