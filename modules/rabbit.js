@@ -3,6 +3,7 @@ import { pointTo3D, drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawBeaconBea
 import settings from '../settings';
 import reg from '../util/registerer';
 import { getSbDate } from '../util/skyblock';
+import { StateProp } from '../util/state';
 
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');
@@ -27,6 +28,7 @@ function start() {
 }
 const unloadReg = reg('worldUnload', () => reset());
 function scanEgg() {
+  if (!settings.rabbitSniffer) return;
   const l = eggs.length;
   eggs = World.getAllEntities().filter(v => {
     if (v.getClassName() !== 'EntityArmorStand') return false;
@@ -35,7 +37,7 @@ function scanEgg() {
     const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
     return ['015adc61-0aba-3d4d-b3d1-ca47a68a154b', '55ae5624-c86b-359f-be54-e0ec7c175403', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].find((v, i) => activeEggs[i] === 2 && v === id);
   });
-  if (eggs.length > l) {
+  if (settings.rabbitAlertEggFound && eggs.length > l) {
     start();
     Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertTime));
   }
@@ -56,9 +58,9 @@ const eggSpawnReg = reg('step', () => {
 
   start();
   scanEgg();
-  if (!settings.rabbitAlertOnlyDinner || type === 2) eggSpawnAlert.show(settings.rabbitAlertTime);
-}).setDelay(5);
-const eggStepReg = reg('step', () => scanEgg()).setDelay(2);
+  if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || type === 2)) eggSpawnAlert.show(settings.rabbitAlertTime);
+}).setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
+const eggStepReg = reg('step', () => scanEgg()).setDelay(2).setEnabled(settings._rabbitSniffer);
 const types = {
   Breakfast: 0,
   Lunch: 1,
