@@ -109,7 +109,7 @@ const guiReg = reg('guiOpened', evn => {
     function update(inv) {
       if (!wasChanged) return;
       wasChanged = false;
-      const rabbits = [29, 30, 31, 32, 33]
+      const rabbits = [28, 29, 30, 31, 32, 33, 34]
         .map(v => ({ a: v, v: inv.func_70301_a(v) }))
         .filter(({ v }) => v &&
           whatIsThisCringeShit.func_177774_c(v.func_77973_b()).toString() === 'minecraft:skull'
