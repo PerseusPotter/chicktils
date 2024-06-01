@@ -629,11 +629,11 @@ export const props = {
 
   // 11
   enablerabbit: new Property('EnableRabbitTils', ++page, sort = 0, Property.Type.Toggle, false),
-  rabbitSniffer: new Property('RabbitTilsSniffEggs', page, ++sort, Property.Type.Toggle),
+  rabbitSniffer: new Property('RabbitTilsSniffEggs', page, ++sort, Property.Type.Toggle, false),
   rabbitBoxColor: new Property('RabbitTilsBoxColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
   rabbitBoxEsp: new Property('RabbitTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
-  rabbitAlertEggSpawn: new Property('RabbitTilsAlertEggSpawn', page, ++sort, Property.Type.Toggle),
-  rabbitAlertEggFound: new Property('RabbitTilsAlertEggFound', page, ++sort, Property.Type.Toggle),
+  rabbitAlertEggSpawn: new Property('RabbitTilsAlertEggSpawn', page, ++sort, Property.Type.Toggle, true),
+  rabbitAlertEggFound: new Property('RabbitTilsAlertEggFound', page, ++sort, Property.Type.Toggle, true),
   rabbitAlertTime: new Property('RabbitTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
   rabbitAlertSound: new Property('RabbitTilsAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   rabbitAlertOnlyDinner: new Property('RabbitTilsOnlyAlertDinner', page, ++sort, Property.Type.Toggle, false, { desc: 'only ping on dinner eggs for peak afk' }),
