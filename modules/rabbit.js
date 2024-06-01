@@ -1,7 +1,7 @@
 import createAlert from '../util/alert';
 import { pointTo3D, drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawBeaconBeam } from '../util/draw';
 import settings from '../settings';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');

@@ -3,7 +3,7 @@ import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
 import { colorForNumber } from '../util/format';
-import { reg, regForge } from '../util/registerer';
+import reg from '../util/registerer';
 import getPing from '../util/ping';
 import { StateProp, StateVar } from '../util/state';
 const { gsl_sf_lambert_W0: W, intersectPL } = require('../util/math');
@@ -270,8 +270,7 @@ const dirOverlayReg = reg('renderOverlay', () => {
   drawArrow2D(settings.kuudraArrowToKuudraColor, kt * Math.PI, 20, Player.getY() > 60 ? 0 : undefined);
 }).setEnabled(settings._kuudraDrawArrowToKuudra);
 
-let regInst = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn).setEnabled(new StateProp(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks));
-function entitySpawn(evn) {
+let regInst = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   if (evn.entity.getClass().getSimpleName() === 'EntityGiantZombie') {
     const e = new Entity(evn.entity);
     const y = e.getY();
@@ -279,7 +278,7 @@ function entitySpawn(evn) {
     else if (y < 67) supplies.push(e);
     else if (y < 80) chunks.push(e);
   }
-}
+}).setEnabled(new StateProp(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks));
 
 const cannonReg = reg('chat', () => {
   isOnCannon = true;

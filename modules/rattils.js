@@ -3,7 +3,7 @@ import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls } from '../util/draw';
 import settings from '../settings';
 import { _clearTimeout, _setTimeout } from '../util/timers';
 import { log } from '../util/log';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 const cheeseAlert = createAlert('Cheese !');
 let cheese = [];

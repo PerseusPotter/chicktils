@@ -1,7 +1,7 @@
 import createAlert from '../util/alert';
 import { renderWaypoints } from '../util/draw';
 import settings from '../settings';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 const crystalAlert = createAlert('crystals respawned', 2);
 let crystals = [];

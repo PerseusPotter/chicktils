@@ -1,6 +1,6 @@
 import { _setTimeout, _clearTimeout } from './timers';
 import createTextGui from './customtextgui';
-import { reg } from './registerer';
+import reg from './registerer';
 
 /**
  * @typedef {{

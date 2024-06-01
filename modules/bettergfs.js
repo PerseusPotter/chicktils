@@ -1,6 +1,6 @@
 import settings from '../settings';
 import { execCmd } from '../util/format';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 function sanitizeName(str) {
   return str.toUpperCase().replace(/[^A-Za-z0-9]/g, '');

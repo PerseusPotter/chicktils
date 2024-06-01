@@ -2,7 +2,7 @@ import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
 import { cleanNumber, colorForNumber } from '../util/format';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 const display = createTextGui(() => data.quiverLoc, () => ['&5Flint Arrow &fx&26969'].concat(settings.quiverShowRefill ? ['&fRefill: &9Social Life &fx&d6969 &8(Instant: &9&d6969&8)'] : []));
 const quivSizes = {

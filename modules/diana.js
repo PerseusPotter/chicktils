@@ -1,6 +1,6 @@
 import settings from '../settings';
 import data from '../data';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
 import { drawBeaconBeam, drawString, pointTo3D, renderWaypoints } from '../util/draw';

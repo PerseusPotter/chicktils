@@ -1,5 +1,5 @@
 import { urlToString } from '../util/net';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 import settings from '../settings';
 import { log } from '../util/log';
 import * as Party from '../util/party';
