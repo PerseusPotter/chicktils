@@ -218,7 +218,7 @@ const tickReg = reg('tick', () => {
         if (data.ttl <= 0) return void motionData.delete(uuid);
       } else if (bloodOpenTime > 0 && y > 72 && ((dx > 0.01 && dx < 0.5) || (dz > 0.01 && dz < 0.5))) {
         bloodMobCount++;
-        const ttl = (bloodMobCount <= 4 || t - bloodOpenTime > 24000) ? 40 : 80;
+        const ttl = (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
         motionData.set(uuid, { startX: x, startY: y, startZ: z, startT: t, estX: x, estY: y, estZ: z, lastEstX: x, lastEstY: y, lastEstZ: z, ttl, maxTtl: ttl, lastUpdate: t });
       }
       return true;
