@@ -86,24 +86,22 @@ const autocomplete = function(args) {
   if (a) return list.filter(v => v.toLowerCase().startsWith(a));
   return list;
 };
-const cmdReg = reg('command', cpv).setTabCompletions(autocomplete);
-const neuOverride = reg('command', cpv).setTabCompletions(autocomplete);
+const cmdReg = reg('command', cpv).setTabCompletions(autocomplete).setName('cpv');
+const neuOverride = reg('command', cpv).setTabCompletions(autocomplete).setName('pv', true).setEnabled(settings._cpvReplaceNeu);
 
 export function init() {
-  settings._cpvReplaceNeu.onAfterChange(v => {
-    if (v) neuOverride.setName('pv', true);
-    else neuOverride.unregister();
-  });
   settings._cpvAutoCompleteParty.onAfterChange(v => {
     if (v) Party.listen();
     else Party.unlisten();
   });
 }
 export function load() {
-  cmdReg.setName('cpv');
+  cmdReg.register();
+  neuOverride.register();
 }
 export function unload() {
   cmdReg.unregister();
+  neuOverride.unregister();
 }
 
 /* happened one time too many

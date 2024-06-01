@@ -11,8 +11,8 @@ import createTextGui from '../util/customtextgui';
 import { compareFloat, dist } from '../util/math';
 import Grid from '../util/grid';
 import { logDebug } from '../util/log';
+import { StateProp, StateVar } from '../util/state';
 
-let entSpawnReg = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn);
 function reset() {
   renderEntReg.unregister();
   renderEntPostReg.unregister();
@@ -31,9 +31,7 @@ function reset() {
   stairBreakReg.unregister();
 
   bloodOpenReg.unregister();
-  bloodEndReg.unregister();
-  bossEnterReg.unregister();
-  bossEndReg.unregister();
+  bossMessageReg.unregister();
   dungeonLeaveReg.unregister();
 
   shitterAlert.hide();
@@ -43,7 +41,7 @@ function reset() {
   }
 }
 function start() {
-  isInBoss = false;
+  isInBoss.set(false);
   boxMobs.clear();
   mobCand = [];
   nameCand = [];
@@ -56,7 +54,7 @@ function start() {
   lastRoom = '';
   motionData.clear();
   bloodOpenTime = 0;
-  bloodClosed = false;
+  bloodClosed.set(false);
   powerupCand = [];
   hiddenPowerups.clear();
   hiddenPowerupsBucket.clear();
@@ -81,13 +79,11 @@ function start() {
   stairBreakReg.register();
 
   bloodOpenReg.register();
-  bloodEndReg.register();
-  bossEnterReg.register();
-  bossEndReg.register();
+  bossMessageReg.register();
   dungeonLeaveReg.register();
 }
 
-let isInBoss = false;
+let isInBoss = new StateVar(false);
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
 let mobCand = [];
 let nameCand = [];
@@ -98,7 +94,7 @@ let bloodX = -1;
 let bloodZ = -1;
 const motionData = new Map();
 let bloodOpenTime = 0;
-let bloodClosed = false;
+let bloodClosed = new StateVar(false);
 let map;
 let mapId;
 const mapDisplay = createGui(() => data.dungeonMapLoc, renderMap, renderMapEdit);
@@ -123,6 +119,11 @@ const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () =
 let necronDragStart = 0;
 let isAtDev4 = false;
 const brokenStairBucket = new Grid({ size: 2, addNeighbors: 2 });
+
+const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
+const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
+const stateMap = new StateProp(settings._dungeonMap).and(new StateProp(settings._dungeonMapHideBoss).not().or(new StateProp(isInBoss).not()));
+
 function isDungeonMob(name) {
   return name === 'EntityZombie' ||
     name === 'EntitySkeleton' ||
@@ -175,31 +176,30 @@ function addSkull(skull) {
 function roundRoomCoords(c) {
   return ((c + 9) & 0b11111111111111111111111111100000) - 9;
 }
+let entSpawnReg = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp));
 function entitySpawn(evn) {
   const e = evn.entity;
   const c = e.getClass().getSimpleName();
   if (c === 'EntityArmorStand') {
     if (settings.dungeonHideHealerPowerups) powerupCand.push([Date.now(), e]);
-    if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) nameCand.push(e);
-    if (settings.dungeonCamp && !bloodClosed) possibleSkulls.push(e);
-  } else if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss) && isDungeonMob(c)) mobCand.push(e);
+    if (stateBoxMob.get()) nameCand.push(e);
+    if (stateCamp.get()) possibleSkulls.push(e);
+  } else if (stateBoxMob.get() && isDungeonMob(c)) mobCand.push(e);
 }
 
 const step2Reg = reg('step', () => {
-  if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
-    mobCandBucket.clear();
-    mobCand = mobCand.filter(e => {
-      if (e.field_70128_L) return false;
-      const n = e.func_70005_c_();
-      if (n === 'Shadow Assassin') {
-        boxMobs.put(e, { yO: 0, h: 2, c: rgbToJavaColor(settings.dungeonBoxSAColor) });
-        return false;
-      }
-      mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
-      return true;
-    });
-  }
-}).setFps(2);
+  mobCandBucket.clear();
+  mobCand = mobCand.filter(e => {
+    if (e.field_70128_L) return false;
+    const n = e.func_70005_c_();
+    if (n === 'Shadow Assassin') {
+      boxMobs.put(e, { yO: 0, h: 2, c: rgbToJavaColor(settings.dungeonBoxSAColor) });
+      return false;
+    }
+    mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
+    return true;
+  });
+}).setFps(2).setEnabled(stateBoxMob);
 
 const tickReg = reg('tick', () => {
   if (settings.dungeonCamp) {
@@ -260,7 +260,7 @@ const tickReg = reg('tick', () => {
   }
   isAtDev4 = dist(Player.getX(), 63) + dist(Player.getY(), 127) + dist(Player.getZ(), 35) < 3;
   new Thread(() => {
-    if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
+    if (stateBoxMob.get()) {
       nameCand.forEach(e => {
         if (e.field_70128_L) return;
         const n = e.func_70005_c_();
@@ -295,7 +295,7 @@ const tickReg = reg('tick', () => {
       });
       nameCand = [];
     }
-    if (settings.dungeonMap) {
+    if (stateMap.get()) {
       map = null;
       const mapI = Player.getInventory()?.getStackInSlot(8);
       if (mapI && mapI.getRegistryName() === 'minecraft:filled_map') {
@@ -312,7 +312,7 @@ const tickReg = reg('tick', () => {
       lastRoom = k;
     }
   }).start();
-});
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap));
 
 register('command', () => {
   const obj = {};
@@ -325,7 +325,6 @@ register('command', () => {
 }).setName('csmdump');
 
 const stepVarReg = reg('step', () => {
-  if (!settings.dungeonCamp) return;
   if (possibleSkulls.length) {
     possibleSkulls.forEach(e => {
       if (!isSkull(e)) return;
@@ -364,7 +363,7 @@ const stepVarReg = reg('step', () => {
     data.estZ = estZ;
     data.lastUpdate = t;
   });
-});
+}).setEnabled(settings._dungeonCamp);
 
 function onPuzzleFail(name) {
   let i = name.indexOf(' ');
@@ -374,18 +373,17 @@ function onPuzzleFail(name) {
   Client.scheduleTask(20, () => execCmd('gfs ARCHITECT_FIRST_DRAFT 1'));
   shitterAlert.show();
 }
-const puzzleFailReg = reg('chat', onPuzzleFail).setCriteria('&r&c&lPUZZLE FAIL! &r&${name} ${*}');
-const quizFailReg = reg('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the Omniscient&r&f: &r&${name} &r&cchose the wrong answer! I shall never forget this moment of misrememberance.&r');
-const architectUseReg = reg('chat', () => shitterAlert.hide()).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}');
+const puzzleFailReg = reg('chat', onPuzzleFail).setCriteria('&r&c&lPUZZLE FAIL! &r&${name} ${*}').setEnabled(settings._dungeonAutoArchitect);
+const quizFailReg = reg('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the Omniscient&r&f: &r&${name} &r&cchose the wrong answer! I shall never forget this moment of misrememberance.&r').setEnabled(settings._dungeonAutoArchitect);
+const architectUseReg = reg('chat', () => shitterAlert.hide()).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}').setEnabled(settings._dungeonAutoArchitect);
 
 const necronStartReg = reg('chat', () => {
   necronDragStart = Date.now();
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc = runHelper('InstaMidHelper');
-}).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r');
+}).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both'));
 
 const BlockStairs = Java.type('net.minecraft.block.BlockStairs');
 const stairBreakReg = reg('blockBreak', b => {
-  if (!settings.dungeonStairStonkHelper) return;
   if (!(b.type.mcBlock instanceof BlockStairs)) return;
   const x = b.getX();
   const y = b.getY();
@@ -406,17 +404,15 @@ const stairBreakReg = reg('blockBreak', b => {
       brokenStairBucket.add(x, z, [n, [x, y + 1.1, z + 0.76], [x + 1, y + 1.1, z + 0.76]]);
       break;
   }
-});
+}).setEnabled(settings._dungeonStairStonkHelper);
 
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
-  if (settings.dungeonHideHealerPowerups && hiddenPowerups.contains(e.entity)) cancel(evn);
-});
+  if (hiddenPowerups.contains(e.entity)) cancel(evn);
+}).setEnabled(settings._dungeonHideHealerPowerups);
 const renderEntPostReg = reg('postRenderEntity', (e, pos, partial) => {
-  if (settings.dungeonBoxMobs && (!isInBoss || !settings.dungeonBoxMobDisableInBoss)) {
-    const data = boxMobs.get(e.entity);
-    if (data) drawBoxPos(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, partial, settings.dungeonBoxMobEsp, false);
-  }
-});
+  const data = boxMobs.get(e.entity);
+  if (data) drawBoxPos(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, partial, settings.dungeonBoxMobEsp, false);
+}).setEnabled(stateBoxMob);
 
 const renderWorldReg = reg('renderWorld', () => {
   if (settings.dungeonCamp) {
@@ -469,7 +465,7 @@ const renderWorldReg = reg('renderWorld', () => {
       );
     });
   }
-});
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper));
 
 const renderOvlyReg = reg('renderOverlay', () => {
   if (settings.dungeonMap) {
@@ -482,7 +478,7 @@ const renderOvlyReg = reg('renderOverlay', () => {
       necronDragTimer.render();
     }
   }
-});
+}).setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen', 'Both').or(settings._dungeonMap));
 
 /**
  * @this typeof mapDisplay
@@ -533,15 +529,15 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
     if (b === 0 || b > 10) return;
     if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
   } catch (e) { }
-});
+}).setEnabled(new StateProp(settings._dungeonDev4Helper).equalsmult('Particles', 'Both').or(settings._dungeonHideHealerPowerups));
 
 const titleReg = reg('renderTitle', (t, s, evn) => {
-  if (isAtDev4 && (settings.dungeonDev4Helper === 'Titles' || settings.dungeonDev4Helper === 'Both') && (s === '§aThe gate has been destroyed!§r' || s.includes('activated a'))) return cancel(evn);
-});
+  if (isAtDev4 && (s === '§aThe gate has been destroyed!§r' || s.includes('activated a'))) return cancel(evn);
+}).setEnabled(new StateProp(settings._dungeonDev4Helper).equalsmult('Titles', 'Both'));
 
 const mapPacketReg = reg('packetReceived', p => {
   if (map && !mapId) mapId = p.func_149188_c();
-}).setFilteredClass(Java.type('net.minecraft.network.play.server.S34PacketMaps'));
+}).setFilteredClass(Java.type('net.minecraft.network.play.server.S34PacketMaps')).setEnabled(settings._dungeonMap);
 
 function onBossEnd() {
   if (settings.dungeonHecatombAlert) {
@@ -562,30 +558,22 @@ function onBossEnd() {
 // const dungeonJoinReq = reg('chat', () => dungeon.emit('dungeonJoin')).setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}');
 const dungeonStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
 const dungeonLeaveReg = reg('worldUnload', () => reset());
-const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = Date.now())).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r');
-const bloodEndReg = reg('chat', () => bloodClosed = true).setCriteria('&r&c[BOSS] The Watcher&r&f: That will be enough for now.&r');
-const bossEnterReg = reg('chat', (name, msg) => {
-  switch (name) {
-    case 'The Watcher':
-      if (!bloodOpenTime) bloodOpenTime = Date.now();
-      break;
-    case 'Scarf':
-      if (msg === `How can you move forward when you keep regretting the past?`) break;
-      if (msg === `If you win, you live. If you lose, you die. If you don't fight, you can't win.`) break;
-      if (msg === `If I had spent more time studying and less time watching anime, maybe mother would be here with me!`) break;
-    default:
-      isInBoss = true;
-  }
-}).setChatCriteria('&r&c[BOSS] ${name}&r&f: ${msg}&r');
-const bossEndReg = reg('chat', (name, msg) => {
+const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = Date.now())).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r').setEnabled(stateCamp)
+const bossMessageReg = reg('chat', (name, msg) => {
   if (name.endsWith('Livid') && msg === `Impossible! How did you figure out which one I was?!`) onBossEnd();
   switch (name) {
+    case 'The Watcher':
+      if (msg === 'That will be enough for now.') bloodClosed.set(true);
+      if (!bloodOpenTime) bloodOpenTime = Date.now();
+      return;
     case 'Bonzo':
       if (msg === `Alright, maybe I'm just weak after all..`) onBossEnd();
       break;
     case 'Scarf':
       if (msg === `Whatever...`) onBossEnd();
-      break;
+      if (msg === `How can you move forward when you keep regretting the past?`) return;
+      if (msg === `If you win, you live. If you lose, you die. If you don't fight, you can't win.`) return;
+      if (msg === `If I had spent more time studying and less time watching anime, maybe mother would be here with me!`) return;
     case 'The Professor':
       if (msg === `What?! My Guardian power is unbeatable!`) onBossEnd();
       break;
@@ -602,6 +590,7 @@ const bossEndReg = reg('chat', (name, msg) => {
       // if (msg === `Incredible. You did what I couldn't do myself.`) onBossEnd();
       break;
   }
+  isInBoss.set(true);
 }).setChatCriteria('&r&c[BOSS] ${name}&r&f: ${msg}&r');
 // const dungeonEndReg = reg('chat', () => dungeon.emit('dungeonEnd')).setChatCriteria('&r&f                            &r&fTeam Score:').setParameter('START');
 
@@ -613,10 +602,6 @@ export function init() {
   settings._moveDungeonMap.onAction(() => mapDisplay.edit());
   settings._dungeonHecatombAlertSound.onAfterChange(v => hecAlert.sound = v);
   settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());
-  settings._dungeonMap.onAfterChange(v => {
-    if (v) mapPacketReg.register();
-    else mapPacketReg.unregister();
-  });
 }
 export function load() {
   dungeonStartReg.register();

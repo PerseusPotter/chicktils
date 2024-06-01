@@ -20,7 +20,6 @@ const warpReg = reg('chat', id => {
 }).setCriteria('Sending to server ${id}...');
 const unloadReg = reg('worldUnload', () => (Date.now() - lastWarp > 1000) && (currServ = ''));
 
-let regs = [];
 let lastLoc = '';
 const warpLocs = {
   'home': 1,
@@ -75,10 +74,8 @@ const warpLocs = {
   'jerry': 14
 };
 const tabComplete = tabCompletion(Object.keys(warpLocs));
-const loadReg = reg('worldLoad', () => {
-  regs.forEach(v => v.unregister());
-  regs = [];
-  regs.push(reg('command', loc => {
+const regs = [
+  reg('command', loc => {
     if (!loc) return ChatLib.command('warp');
     let t = Date.now() - lastWarp;
     // if (warpLocs[lastLoc] !== warpLocs[loc] && t < settings.serverTrackerTransferCd) {
@@ -88,30 +85,22 @@ const loadReg = reg('worldLoad', () => {
       setTimeout(() => ChatLib.command('warp ' + loc), settings.serverTrackerTransferCd - t);
     } else ChatLib.command('warp ' + loc);
     lastLoc = loc;
-  }).setTabCompletions(tabComplete).setName('warp', true));
-  regs.push(reg('command', () => ChatLib.command('warp island', true)).setName('is', true));
-  regs.push(reg('command', () => ChatLib.command('warp hub', true)).setName('hub', true));
-  regs.push(reg('command', () => ChatLib.command('warp forge', true)).setName('warpforge', true));
-  regs.push(reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dn', true));
-  regs.push(reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dh', true));
-});
+  }).setTabCompletions(tabComplete).setName('warp', true),
+  reg('command', () => ChatLib.command('warp island', true)).setName('is', true),
+  reg('command', () => ChatLib.command('warp hub', true)).setName('hub', true),
+  reg('command', () => ChatLib.command('warp forge', true)).setName('warpforge', true),
+  reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dn', true),
+  reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dh', true)
+];
 
-export function init() {
-  let first = true;
-  settings._enableservertracker.onAfterChange(v => {
-    if (v && first) loadReg.forceTrigger();
-    first = false;
-  });
-}
+export function init() { }
 export function load() {
   warpReg.register();
   unloadReg.register();
-  loadReg.register();
   regs.forEach(v => v.register());
 }
 export function unload() {
   warpReg.unregister();
   unloadReg.unregister();
-  loadReg.unregister();
   regs.forEach(v => v.unregister());
 }
