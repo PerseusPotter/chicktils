@@ -4,6 +4,7 @@ import settings from '../settings';
 import reg from '../util/registerer';
 import { getSbDate } from '../util/skyblock';
 import { StateProp } from '../util/state';
+import { DelayTimer } from '../util/timers';
 
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');
@@ -106,7 +107,7 @@ const guiReg = reg('guiOpened', evn => {
   if (name !== 'Chocolate Factory') return;
   Client.scheduleTask(() => {
     if (inv.func_70301_a(0).func_77960_j() !== 15) return;
-    let lastUpdate = 0;
+    let updater = new DelayTimer(100);
     let wasChanged = false;
     function update(inv) {
       if (!wasChanged) return;
@@ -164,10 +165,8 @@ const guiReg = reg('guiOpened', evn => {
     const cb = new JavaAdapter(Java.type('net.minecraft.inventory.IInvBasic'), {
       func_76316_a(inv) {
         wasChanged = true;
-        const t = Date.now();
         // cringe shit gets called ~100 times per click
-        if (t - lastUpdate <= 100) return;
-        lastUpdate = t;
+        if (!updater.shouldTick()) return;
         update(inv);
         Client.scheduleTask(1, () => update(inv));
         Client.scheduleTask(2, () => update(inv));
