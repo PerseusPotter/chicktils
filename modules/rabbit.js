@@ -167,10 +167,12 @@ export function load() {
   eggSpawnReg.register();
   eggStepReg.register();
   guiReg.register();
+  promoteReg.register();
 }
 export function unload() {
   eggSpawnReg.unregister();
   eggStepReg.unregister();
   guiReg.unregister();
+  promoteReg.unregister();
   reset();
 }

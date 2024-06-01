@@ -163,6 +163,7 @@ export function init() {
 export function load() {
   blockNameCmd.register();
   removeOldestCmd.register();
+  worldUnloadReg.register();
   allChatReg.register();
   partyChatReg.register();
   coopChatReg.register();
@@ -176,6 +177,7 @@ export function load() {
 export function unload() {
   blockNameCmd.unregister();
   removeOldestCmd.unregister();
+  worldUnloadReg.register();
   allChatReg.unregister();
   partyChatReg.unregister();
   coopChatReg.unregister();
