@@ -72,14 +72,10 @@ const cheeseRenderReg = reg('renderWorld', () => {
     else drawBoxAtBlockNotVisThruWalls(x - 0.25, y, z - 0.25, r, g, b, 0.5, 0.5, a);
   });
 });
-const muteReg = reg('soundPlay', (pos, name, vol, pitch, category, evn) => vol === 1 && (Math.abs(pitch - 1.19047) < 0.0001) && cancel(evn)).setCriteria('mob.bat.idle');
+const muteReg = reg('soundPlay', (pos, name, vol, pitch, category, evn) => vol === 1 && (Math.abs(pitch - 1.19047) < 0.0001) && cancel(evn)).setCriteria('mob.bat.idle').setEnabled(settings._ratTilsMuteSound);
 
 export function init() {
   settings._ratTilsAlertSound.onAfterChange(v => cheeseAlert.sound = v);
-  settings._ratTilsMuteSound.onAfterChange(v => {
-    if (v) muteReg.register();
-    else muteReg.unregister();
-  });
 }
 export function load() {
   cheeseSpawnReg.register();

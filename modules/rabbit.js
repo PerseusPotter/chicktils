@@ -146,7 +146,7 @@ const guiReg = reg('guiOpened', evn => {
     inv.func_110134_a(cb);
     // inv.func_110132_b(cb); // remove hook
   });
-});
+}).setEnabled(settings._rabbitShowBestUpgrade);
 
 const prevMessages = {};
 const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
@@ -158,14 +158,10 @@ const promoteReg = reg('chat', (name, lvl, status, evn) => {
   const msg = new Message(`${name}&7 -> Lvl &b${lvl} ${status}`);
   msg.chat();
   prevMessages[n] = msg.getFormattedText();
-}).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r');
+}).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r').setEnabled(settings._rabbitCondenseChat);
 
 export function init() {
   settings._rabbitAlertSound.onAfterChange(v => eggSpawnAlert.sound = eggFoundAlert.sound = v);
-  settings._rabbitCondenseChat.onAfterChange(v => {
-    if (v) promoteReg.register();
-    else promoteReg.unregister();
-  })
 }
 export function load() {
   eggSpawnReg.register();

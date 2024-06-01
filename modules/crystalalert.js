@@ -38,6 +38,7 @@ function start() {
   dragonDieReg.register();
   stepReg.register();
   renderReg.register();
+  unloadReg.register();
   updateCrystals();
 }
 const dragonSpawnReg = reg('chat', (_) => start()).setCriteria('${*}Dragon has spawned!');
@@ -46,7 +47,6 @@ export function init() {
   settings._crystalAlertSound.onAfterChange(v => crystalAlert.sound = v);
 }
 export function load() {
-  unloadReg.register();
   dragonSpawnReg.register();
 }
 export function unload() {

@@ -4,14 +4,15 @@ import { execCmd, getPlayerName } from '../util/format';
 import { getLeader } from '../util/party';
 import { log, logMessage } from '../util/log';
 import { reg, regForge } from '../util/registerer';
+import { StateProp } from '../util/state';
 
 const blockedNames = new Set();
-reg('command', ign => {
+const blockNameCmd = reg('command', ign => {
   if (ign) blockedNames.add(ign);
-}).setName('ctschatwaypointblock');
+}).setName('ctschatwaypointblock').setEnabled(settings._chatTilsWaypoint);
 
 const coords = [];
-reg('command', () => coords.shift()).setName('ctsremoveoldestwaypoint');
+const removeOldestCmd = reg('command', () => coords.shift()).setName('ctsremoveoldestwaypoint').setEnabled(settings._chatTilsWaypoint);
 const worldRenderReg = reg('renderWorld', partial => {
   const c = settings.chatTilsWaypointColor;
   const r = ((c >> 24) & 0xFF) / 256;
@@ -28,7 +29,7 @@ const worldUnloadReg = reg('worldUnload', () => {
   coords.length = 0;
   worldRenderReg.unregister();
   waypointReloadNum++;
-});
+}).setEnabled(settings._chatTilsWaypointPersist);
 
 /**
  * @param {string} ign
@@ -92,7 +93,7 @@ const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 
 const allChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}).setCriteria(/^&r([^>]+?)&(?:7|f): (.+?)&r$/);
+}).setCriteria(/^&r([^>]+?)&(?:7|f): (.+?)&r$/).setEnabled(settings._chatTilsWaypoint);
 const partyChatReg = reg('chat', (ign, msg, evn) => {
   processMessageWaypoint(ign, msg);
 
@@ -114,22 +115,28 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
       return;
     }
   }
-}).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r');
+}).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
 const coopChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}).setCriteria('&r&bCo-op > ${ign}&f: &r${msg}&r');
+}).setCriteria('&r&bCo-op > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const wisperToReg = reg('chat', msg => {
   processMessageWaypoint(Player.getName(), msg);
-}).setCriteria('&dTo ${*}&7: &r&7${msg}&r');
+}).setCriteria('&dTo ${*}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const wisperFromReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}).setCriteria('&dFrom ${ign}&7: &r&7${msg}&r');
+}).setCriteria('&dFrom ${ign}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const guildChatReg = reg('chat', (ign, msg) => {
   // better not be able to contain [ in guild ranks
   if (ign.endsWith(']')) ign = ign.split(0, ign.lastIndexOf('['));
   processMessageWaypoint(ign, msg);
-}).setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r');
-const regs = [allChatReg, partyChatReg, coopChatReg, wisperToReg, wisperFromReg, guildChatReg];
+}).setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
+
+let cancelNextPing = false;
+const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
+  if (!cancelNextPing || name !== 'random.orb' || vol !== 1 || pitch !== 1) return;
+  cancel(evn);
+  cancelNextPing = false;
+}).setEnabled(new StateProp(settings._chatTilsHideBonzo).notequals('False').or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')));
 
 // https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/features/FasterMaddoxCalling.java#L24
 let lastFollowTime = 0;
@@ -143,51 +150,39 @@ const followReg = regForge(net.minecraftforge.client.event.ClientChatReceivedEve
   lastFollowTime = Date.now();
   lastFollowToken = evn.message.func_150256_b().func_150235_h()?.func_150668_b();
   log(`Open chat then click anywhere on-screen to follow &b${ign}`);
-});
+}).setEnabled(settings._chatTilsClickAnywhereFollow);
 const clickChatReg = regForge(net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post, undefined, evn => {
   if (Java.type('org.lwjgl.input.Mouse').getEventButtonState() || Java.type('org.lwjgl.input.Mouse').getEventButton() != 0 || !(evn.gui instanceof Java.type('net.minecraft.client.gui.GuiChat'))) return;
   if (!lastFollowToken || Date.now() - lastFollowTime > 10_000) return;
   execCmd(lastFollowToken.slice(1));
-});
+}).setEnabled(settings._chatTilsClickAnywhereFollow);
 
 export function init() {
-  settings._chatTilsWaypointPersist.onAfterChange(v => {
-    if (v) worldUnloadReg.unregister();
-    else worldUnloadReg.register();
-  });
   settings._chatTilsWaypointDuration.onBeforeChange(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
-  settings._chatTilsClickAnywhereFollow.onAfterChange(v => {
-    if (settings.enablechattils) {
-      if (v) {
-        followReg.register();
-        clickChatReg.register();
-      } else {
-        followReg.unregister();
-        clickChatReg.unregister();
-      }
-    }
-  });
 }
 export function load() {
-  regs.forEach(v => v.register());
+  blockNameCmd.register();
+  removeOldestCmd.register();
+  allChatReg.register();
+  partyChatReg.register();
+  coopChatReg.register();
+  wisperToReg.register();
+  wisperFromReg.register();
+  guildChatReg.register();
   chatPingReg.register();
-  if (settings.chatTilsClickAnywhereFollow) {
-    followReg.register();
-    clickChatReg.register();
-  }
+  followReg.register();
+  clickChatReg.register();
 }
 export function unload() {
-  regs.forEach(v => v.unregister());
-  worldUnloadReg.forceTrigger();
-  worldUnloadReg.unregister();
+  blockNameCmd.unregister();
+  removeOldestCmd.unregister();
+  allChatReg.unregister();
+  partyChatReg.unregister();
+  coopChatReg.unregister();
+  wisperToReg.unregister();
+  wisperFromReg.unregister();
+  guildChatReg.unregister();
   chatPingReg.unregister();
   followReg.unregister();
   clickChatReg.unregister();
 }
-
-let cancelNextPing = false;
-const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
-  if (!cancelNextPing || name !== 'random.orb' || vol !== 1 || pitch !== 1) return;
-  cancel(evn);
-  cancelNextPing = false;
-});

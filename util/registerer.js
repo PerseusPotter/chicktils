@@ -1,14 +1,18 @@
 import { registerForge, unregisterForge } from './forge';
+import { StateProp, StateVar } from './state';
 
 function wrap(orig, wrap, prop) {
   return function(...args) {
-    prop.apply(orig, args[0] === undefined ? args.slice(1) : args);
+    prop.apply(orig, args[0] === undefined && args.length === 1 ? [] : args);
     return wrap;
   }
 }
 
 /**
- * isRegistered: () => boolean;
+ * isRegistered() => boolean;
+ * setRegistered(v: boolean) => this;
+ * setEnabled(val: StateVar | import('../settings').Property) => this;
+ * update() => this;
  * forceTrigger(...args: any[]) => any;
  * @type {typeof register}
  */
@@ -16,68 +20,151 @@ let reg;
 reg = function reg(type, shit) {
   const rr = register(type, shit).unregister();
   let isReg = false;
+  let isAReg = false;
+  let regReq = new StateProp(true);
+  let cmdName = '';
+  let aliases = null;
+  let ov = false;
   const props = new Map();
   const prox = new Proxy({}, {
     get(t, p, r) {
-      if (p === 'register') {
-        if (!isReg) {
-          isReg = true;
-          return re;
-        }
-        return noop;
-      } else if (p === 'unregister') {
-        if (isReg) {
-          isReg = false;
-          return un;
-        }
-        return noop
-      } else if (p === 'isRegistered') {
-        return isR;
-      } else if (p === 'forceTrigger') {
-        return shit;
-      } else if (rr[p] instanceof Function) {
-        let w;
-        return props.get(p) || (
-          (w = wrap(rr, prox, rr[p])),
-          props.set(p, w),
-          w
-        );
+      switch (p) {
+        case 'register': return _register;
+        case 'unregister': return _unregister;
+        case 'isRegistered': return _isRegistered;
+        case 'setRegistered': return _setRegistered;
+        case 'setEnabled': return _setEnabled;
+        case 'update': return _update;
+        case 'forceTrigger': return shit;
+        case 'setCommandName':
+        case 'setName': return _setName;
+        case 'setAliases': return _setAliases;
       }
+      if (!rr[p]) return void 0;
+      let w;
+      return props.get(p) || (
+        (w = wrap(rr, prox, rr[p])),
+        props.set(p, w),
+        w
+      );
     }
   });
-  const re = wrap(rr, prox, rr.register);
-  const un = wrap(rr, prox, rr.unregister);
-  const isR = () => isReg;
-  const noop = wrap(rr, prox, Function.prototype);
+  const _register = wrap(rr, prox, () => {
+    if (!isAReg && regReq.get()) {
+      isAReg = true;
+      if (cmdName) {
+        rr.setName(cmdName, ov);
+        if (aliases) rr.setAliases.apply(rr, aliases);
+      } else rr.register();
+      cmdName = '';
+      aliases = null;
+    }
+    isReg = true;
+  });
+  const _unregister = wrap(rr, prox, () => {
+    if (isAReg) rr.register();
+    isReg = false;
+    isAReg = false;
+  });
+  const _isRegistered = () => isReg;
+  const _setRegistered = wrap(rr, prox, v => {
+    if (v) _register();
+    else _unregister();
+  });
+  const _setEnabled = wrap(rr, prox, val => {
+    if (!(val instanceof StateVar)) val = StateVar.wrapProp(val);
+    regReq = val;
+    regReq.listen(_update);
+    _update();
+  });
+  const _update = wrap({}, prox, () => {
+    if (!isReg) return;
+    if (regReq.get()) {
+      if (!isAReg) rr.register();
+      isAReg = true;
+    } else {
+      if (isAReg) rr.unregister();
+      isAReg = false;
+    }
+  });
+  const _setName = type === 'command' ? wrap(rr, prox, (n, o) => {
+    cmdName = n;
+    ov = o || false;
+  }) : void 0;
+  const _setAliases = type === 'command' ? wrap(rr, prox, ...a => aliases = a) : void 0;
   return prox;
-}
+};
 export { reg };
+
+/**
+ * @typedef {{
+ *  register() => ChickTilsForgeRegister;
+ *  unregister() => ChickTilsForgeRegister;
+ *  isRegistered() => boolean;
+ *  setRegistered(v: boolean) => ChickTilsForgeRegister;
+ *  setEnabled(val: StateVar | import('../settings').Property) => ChickTilsForgeRegister;
+ *  update() => ChickTilsForgeRegister;
+ *  forceTrigger(...args: any[]) => any;
+ * }} ChickTilsForgeRegister
+ */
 
 /**
  * @template {import('../../@types/External').JavaClass<'net.minecraftforge.fml.common.eventhandler.Event'>} C
  * @param {C} e
  * @param {import('../../@types/External').JavaEnumC<'HIGH' | 'HIGHEST' | 'LOW' | 'LOWEST' | 'NORMAL', 'net.minecraftforge.fml.common.eventhandler.EventPriority'>} prio
  * @param {(evn: C) => void} nshit
- * @returns {{ register: () => ReturnType<typeof regForge>, unregister: () => ReturnType<typeof regForge>, isRegistered: () => boolean }}
+ * @returns {ChickTilsForgeRegister}
  */
 export function regForge(e, prio, nshit) {
   let reg;
+  let isReg = false;
+  let isAReg = false;
+  let regReq = new StateProp(true);
   const prox = new Proxy({}, {
     get(t, p, r) {
-      if (p === 'register') {
-        return reg ? noop : re;
-      } else if (p === 'unregister') {
-        return reg ? un : noop;
-      } else if (p === 'isRegistered') {
-        return isR;
-      } else return void 0;
-      // else if (reg[p] instanceof Function) return reg[p].bind(reg);
-      // else return reg[p];
+      switch (p) {
+        case 'register': return _register;
+        case 'unregister': return _unregister;
+        case 'isRegistered': return _isRegistered;
+        case 'setRegistered': return _setRegistered;
+        case 'setEnabled': return _setEnabled;
+        case 'update': return _update;
+        case 'forceTrigger': return nshit;
+      }
     }
   });
-  const re = wrap({}, prox, () => reg = registerForge(e, prio, nshit));
-  const un = wrap({}, prox, () => reg = void unregisterForge(reg));
-  const isR = () => Boolean(reg);
-  const noop = wrap({}, prox, Function.prototype);
+  const _register = wrap({}, prox, () => {
+    if (!isAReg && regReq.get()) {
+      isAReg = true;
+      reg = registerForge(e, prio, nshit);
+    }
+    isReg = true;
+  });
+  const _unregister = wrap({}, prox, () => {
+    if (isAReg) reg = void unregisterForge(reg);
+    isReg = false;
+    isAReg = false;
+  });
+  const _isRegistered = () => isReg;
+  const _setRegistered = wrap({}, prox, v => {
+    if (v) _register();
+    else _unregister();
+  });
+  const _setEnabled = wrap({}, prox, val => {
+    if (!(val instanceof StateVar)) val = StateVar.wrapProp(val);
+    regReq = val;
+    regReq.listen(_update);
+    _update();
+  });
+  const _update = wrap({}, prox, () => {
+    if (!isReg) return;
+    if (regReq.get()) {
+      if (!isAReg) reg = registerForge(e, prio, nshit);
+      isAReg = true;
+    } else {
+      if (isAReg) reg = void unregisterForge(reg);
+      isAReg = false;
+    }
+  });
   return prox;
 }
