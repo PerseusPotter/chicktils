@@ -454,9 +454,9 @@ const AABB = Java.type('net.minecraft.util.AxisAlignedBB');
 export function drawBoxBB(bb, c, f, esp = false, lw = 5) {
   if (!esp && RenderUtil) return RenderUtil.drawOutlinedBoundingBox(bb, c, lw, f);
   const render = Client.getMinecraft().func_175606_aa();
-  const realX = lerp(render.field_70165_t, render.field_70142_S, f);
-  const realY = lerp(render.field_70163_u, render.field_70137_T, f);
-  const realZ = lerp(render.field_70161_v, render.field_70136_U, f);
+  const realX = lerp(render.field_70142_S, render.field_70165_t, f);
+  const realY = lerp(render.field_70137_T, render.field_70163_u, f);
+  const realZ = lerp(render.field_70136_U, render.field_70161_v, f);
   GlStateManager.func_179094_E();
   GlStateManager.func_179137_b(-realX, -realY, -realZ);
   GlStateManager.func_179090_x();
@@ -585,9 +585,9 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
   ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));
   const render = Client.getMinecraft().func_175606_aa();
-  const realX = lerp(render.field_70165_t, render.field_70142_S, Tessellator.partialTicks);
-  const realY = lerp(render.field_70163_u, render.field_70137_T, Tessellator.partialTicks);
-  const realZ = lerp(render.field_70161_v, render.field_70136_U, Tessellator.partialTicks);
+  const realX = lerp(render.field_70142_S, render.field_70165_t, Tessellator.partialTicks);
+  const realY = lerp(render.field_70137_T, render.field_70163_u, Tessellator.partialTicks);
+  const realZ = lerp(render.field_70136_U, render.field_70161_v, Tessellator.partialTicks);
   GlStateManager.func_179094_E();
   GlStateManager.func_179137_b(-realX, -realY, -realZ);
   GlStateManager.func_179090_x();
