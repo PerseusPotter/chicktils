@@ -228,7 +228,6 @@ export function drawArrow2D(color, theta, length = 20, yaw) {
 }
 
 /**
- * in radians
  * @param {number} color rgba
  * @param {number} theta radians
  * @param {number} phi radians
@@ -407,29 +406,26 @@ export function renderTracer(color, x, y, z) {
 
 const RenderUtil = Java.type('gg.skytils.skytilsmod.utils.RenderUtil');
 let interpolate;
-let _getRenderX;
-let _getRenderY;
-let _getRenderZ;
+let _getRenderX = () => 0;
+let _getRenderY = () => 0;
+let _getRenderZ = () => 0;
 /**
  * @type {() => number}
  */
 export function getRenderX() {
-  if (_getRenderX) return _getRenderX();
-  return 0;
+  return _getRenderX();
 }
 /**
  * @type {() => number}
  */
 export function getRenderY() {
-  if (_getRenderY) return _getRenderY();
-  return 0;
+  return _getRenderY();
 }
 /**
  * @type {() => number}
  */
 export function getRenderZ() {
-  if (_getRenderZ) return _getRenderZ();
-  return 0;
+  return _getRenderZ();
 }
 if (RenderUtil) {
   interpolate = RenderUtil.INSTANCE.interpolate.bind(RenderUtil.INSTANCE);
