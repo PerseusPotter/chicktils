@@ -1,6 +1,6 @@
 import settings from '../settings';
 import { drawBoxPos, rgbToJavaColor } from '../util/draw';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 let c;
 function updateColor() {

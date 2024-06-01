@@ -1,4 +1,4 @@
-import { reg } from './registerer';
+import reg from './registerer';
 
 const EventEmitter = require('./events');
 

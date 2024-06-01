@@ -1,7 +1,7 @@
 import settings from '../settings';
 import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
-import { reg, regForge } from '../util/registerer';
+import reg from '../util/registerer';
 
 const fossilNames = [
   'Tusk',
@@ -238,7 +238,8 @@ const guiReg = reg('guiOpened', evn => {
     }
     let cacheTTFossil;
     let cacheTTSlot;
-    function onToolTip(evn) {
+    tooltipReg?.unregister();
+    tooltipReg = reg(net.minecraftforge.event.entity.player.ItemTooltipEvent, evn => {
       if (Client.currentGui.get() !== gui) return tooltipReg.unregister();
       const item = evn.itemStack;
       if (!item || whatIsThisCringeShit.func_177774_c(item.func_77973_b()).toString() !== 'minecraft:stained_glass_pane') return;
@@ -273,9 +274,7 @@ const guiReg = reg('guiOpened', evn => {
           }
         }
       }
-    }
-    tooltipReg?.unregister();
-    tooltipReg = regForge(net.minecraftforge.event.entity.player.ItemTooltipEvent, undefined, onToolTip).register();
+    }).register();
     const cb = new JavaAdapter(Java.type('net.minecraft.inventory.IInvBasic'), {
       func_76316_a(inv) {
         wasChanged = true;

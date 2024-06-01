@@ -3,7 +3,7 @@ import { drawBeaconBeam, drawBoxAtBlock, drawString, renderWaypoints } from '../
 import { execCmd, getPlayerName } from '../util/format';
 import { getLeader } from '../util/party';
 import { log, logMessage } from '../util/log';
-import { reg, regForge } from '../util/registerer';
+import reg from '../util/registerer';
 import { StateProp } from '../util/state';
 
 const blockedNames = new Set();
@@ -141,7 +141,7 @@ const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
 // https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/features/FasterMaddoxCalling.java#L24
 let lastFollowTime = 0;
 let lastFollowToken = '';
-const followReg = regForge(net.minecraftforge.client.event.ClientChatReceivedEvent, undefined, evn => {
+const followReg = reg(net.minecraftforge.client.event.ClientChatReceivedEvent, evn => {
   const msg = evn.message.func_150254_d().match(/§9§l» (.+?) §eis traveling to (.+?) §e§lFOLLOW§r/);
   if (!msg) return;
   const ign = getPlayerName(msg[1]);
@@ -151,7 +151,7 @@ const followReg = regForge(net.minecraftforge.client.event.ClientChatReceivedEve
   lastFollowToken = evn.message.func_150256_b().func_150235_h()?.func_150668_b();
   log(`Open chat then click anywhere on-screen to follow &b${ign}`);
 }).setEnabled(settings._chatTilsClickAnywhereFollow);
-const clickChatReg = regForge(net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post, undefined, evn => {
+const clickChatReg = reg(net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post, evn => {
   if (Java.type('org.lwjgl.input.Mouse').getEventButtonState() || Java.type('org.lwjgl.input.Mouse').getEventButton() != 0 || !(evn.gui instanceof Java.type('net.minecraft.client.gui.GuiChat'))) return;
   if (!lastFollowToken || Date.now() - lastFollowTime > 10_000) return;
   execCmd(lastFollowToken.slice(1));

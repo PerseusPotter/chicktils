@@ -1,6 +1,6 @@
 import { getPlayerName } from './format';
 import { log } from './log';
-import { reg } from './registerer';
+import reg from './registerer';
 
 let _hasLoaded = false;
 let _inParty = false;

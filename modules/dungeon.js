@@ -3,7 +3,7 @@ import data from '../data';
 import createGui from '../util/customgui';
 import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbToJavaColor } from '../util/draw';
 import createAlert from '../util/alert';
-import { reg, regForge } from '../util/registerer';
+import reg from '../util/registerer';
 import { colorForNumber, execCmd } from '../util/format';
 import getPing from '../util/ping';
 import runHelper from '../util/runner';
@@ -176,8 +176,7 @@ function addSkull(skull) {
 function roundRoomCoords(c) {
   return ((c + 9) & 0b11111111111111111111111111100000) - 9;
 }
-let entSpawnReg = regForge(net.minecraftforge.event.entity.EntityJoinWorldEvent, undefined, entitySpawn).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp));
-function entitySpawn(evn) {
+let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
   const c = e.getClass().getSimpleName();
   if (c === 'EntityArmorStand') {
@@ -185,7 +184,7 @@ function entitySpawn(evn) {
     if (stateBoxMob.get()) nameCand.push(e);
     if (stateCamp.get()) possibleSkulls.push(e);
   } else if (stateBoxMob.get() && isDungeonMob(c)) mobCand.push(e);
-}
+}).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp));
 
 const step2Reg = reg('step', () => {
   mobCandBucket.clear();

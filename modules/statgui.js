@@ -1,7 +1,7 @@
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 const locs = [
   'Private Island',

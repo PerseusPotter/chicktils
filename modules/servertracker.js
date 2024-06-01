@@ -2,7 +2,7 @@ import { timeToStr } from '../util/format';
 import tabCompletion from '../util/tabcompletion';
 import settings from '../settings';
 import { log } from '../util/log';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 const servers = {};
 let lastWarp = 0;

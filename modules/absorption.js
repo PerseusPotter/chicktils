@@ -1,6 +1,6 @@
 import settings from '../settings';
 import { dist } from '../util/math';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 let hpUpdateC = 0;
 let updateC = 0;

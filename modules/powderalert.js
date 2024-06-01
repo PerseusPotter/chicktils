@@ -1,7 +1,7 @@
 import createAlert from '../util/alert';
 import { renderWaypoints } from '../util/draw';
 import settings from '../settings';
-import { reg } from '../util/registerer';
+import reg from '../util/registerer';
 
 let chests = [];
 const chestAlert = createAlert('chest');
