@@ -131,7 +131,7 @@ dist
 
 
 #\!*
-\!todo.txt
+\!*.txt
 chicktils.zip
 package-lock.json
 package.json
