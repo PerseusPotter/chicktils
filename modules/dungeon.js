@@ -49,10 +49,11 @@ function start() {
   possibleSkulls = [];
   bloodX = -1;
   bloodZ = -1;
+  bloodMobCount = 0;
+  motionData.clear();
   map = null;
   mapId = null;
   lastRoom = '';
-  motionData.clear();
   bloodOpenTime = 0;
   bloodClosed.set(false);
   powerupCand = [];
@@ -92,6 +93,7 @@ let bloodMobs = [];
 let possibleSkulls = [];
 let bloodX = -1;
 let bloodZ = -1;
+let bloodMobCount = 0;
 const motionData = new Map();
 let bloodOpenTime = 0;
 let bloodClosed = new StateVar(false);
@@ -214,8 +216,9 @@ const tickReg = reg('tick', () => {
         const data = motionData.get(uuid);
         data.ttl--;
         if (data.ttl <= 0) return void motionData.delete(uuid);
-      } else if (bloodOpenTime > 0 && (dx !== 0 || dz !== 0)) {
-        const ttl = (t - bloodOpenTime > 26000) ? 40 : 80;
+      } else if (bloodOpenTime > 0 && y > 72 && ((dx > 0.01 && dx < 0.5) || (dz > 0.01 && dz < 0.5))) {
+        bloodMobCount++;
+        const ttl = (bloodMobCount <= 4 || t - bloodOpenTime > 24000) ? 40 : 80;
         motionData.set(uuid, { startX: x, startY: y, startZ: z, startT: t, estX: x, estY: y, estZ: z, lastEstX: x, lastEstY: y, lastEstZ: z, ttl, maxTtl: ttl, lastUpdate: t });
       }
       return true;
@@ -564,6 +567,7 @@ const bossMessageReg = reg('chat', (name, msg) => {
   switch (name) {
     case 'The Watcher':
       if (msg === 'That will be enough for now.') bloodClosed.set(true);
+      if (msg === 'You have proven yourself. You may pass.') bloodClosed.set(true);
       if (!bloodOpenTime) bloodOpenTime = Date.now();
       return;
     case 'Bonzo':
