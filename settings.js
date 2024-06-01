@@ -660,6 +660,7 @@ export const props = {
 
   // 13
   enablediana: new Property('EnableDiana', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'requires skytils to work (not the meow solver)' }),
+  dianaArrowToBurrow: new Property('DianaArrowToBurrow', page, ++sort, Property.Type.Toggle, true, { desc: 'draw an arrow pointing to nearest burrow' }),
   dianaArrowToBurrowColor: new Property('DianaArrowToBurrowColor', page, ++sort, Property.Type.Color, 0x9FE2BF),
   dianaPreferFinish: new Property('DianaPreferFinishCurrentChain', page, ++sort, Property.Type.Toggle, true, { desc: 'whether you prefer to do one chain at a time\nor do 5-6 at a time' }),
   dianaAlertFoundBurrow: new Property('DianaAlertFoundBurrow', page, ++sort, Property.Type.Toggle, true, { desc: 'alert when burrow is found' }),
