@@ -2,21 +2,21 @@ import createAlert from '../util/alert';
 import { pointTo3D, drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawBeaconBeam } from '../util/draw';
 import settings from '../settings';
 import reg from '../util/registerer';
+import { getSbDate } from '../util/skyblock';
 
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');
 let eggs = [];
-let activeEggs = [2, 2, 2];
+let activeEggs = [0, 0, 0];
+let lastSpawnDays = [0, 0, 0];
 function reset() {
   eggs = [];
-  // activeEggs = [2, 2, 2];
   eggCollectReg.unregister();
   eggAlrCollectReg.unregister();
   // eggStepReg.unregister();
   eggRenWrldReg.unregister();
   eggRendOvReg.unregister();
   unloadReg.unregister();
-  eggStepReg.setDelay(2);
 }
 function start() {
   unloadReg.register();
@@ -24,7 +24,6 @@ function start() {
   eggAlrCollectReg.register();
   eggRenWrldReg.register();
   eggRendOvReg.register();
-  eggStepReg.setFps(5);
 }
 const unloadReg = reg('worldUnload', () => reset());
 function scanEgg() {
@@ -41,22 +40,30 @@ function scanEgg() {
     Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertTime));
   }
 }
+const eggSpawnReg = reg('step', () => {
+  const { year, month, day, hour } = getSbDate();
+  if (month > 3) return;
+  const dayHash = year * 631 * 631 + month * 631 + day;
+  let type;
+  if (hour === 7) type = 0;
+  else if (hour === 14) type = 1;
+  else if (hour === 21) type = 2;
+  else return;
+
+  if (lastSpawnDays[type] === dayHash) return;
+  lastSpawnDays[type] = dayHash;
+  activeEggs[type] = 2;
+
+  start();
+  scanEgg();
+  if (!settings.rabbitAlertOnlyDinner || type === 2) eggSpawnAlert.show(settings.rabbitAlertTime);
+}).setDelay(5);
+const eggStepReg = reg('step', () => scanEgg()).setDelay(2);
 const types = {
   Breakfast: 0,
   Lunch: 1,
   Dinner: 2
 };
-const eggSpawnReg = reg('chat', type => {
-  // if (type === 'Breakfast') eggs = activeEggs = [];
-  start();
-  for (let i = 0; i <= types[type]; i++) {
-    if (activeEggs[i] !== 1) activeEggs[i] = 2;
-  }
-  activeEggs[types[type]] = 2;
-  scanEgg();
-  if (!settings.rabbitAlertOnlyDinner || type === 'Dinner') eggSpawnAlert.show(settings.rabbitAlertTime);
-}).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dA &r&${*}Chocolate ${type} Egg &r&dhas appeared!&r');
-const eggStepReg = reg('step', () => scanEgg()).setDelay(2);
 function onCollect(type) {
   activeEggs[types[type]] = 1;
   Client.scheduleTask(() => scanEgg());
