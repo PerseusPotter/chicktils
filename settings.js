@@ -313,16 +313,16 @@ export class Property {
   }
 
   getMessage(module, name = this.name) {
-    const comps = [this.desc ? new TextComponent(`&f${name}`).setHover('show_text', this.desc) : `&f${name}`];
-    if (this.type === Property.Type.Action) comps.unshift(new TextComponent('&7[&eRUN&7]&r ').setClick('run_command', `/${module} config edit ${this.name}`));
+    const comps = [this.desc ? new TextComponent(` &f${name}`).setHover('show_text', this.desc) : ` &f${name}`];
+    if (this.type === Property.Type.Action) comps.unshift(new TextComponent('&7[&eRUN&7]&r').setClick('run_command', `/${module} config edit ${this.name}`));
     else {
       comps.unshift(
         new TextComponent('&7[&4RESET&7]&r').setClick('run_command', `/${module} config edit ${this.name}`),
-        new TextComponent('&7[&aEDIT&7]&r ').setClick('suggest_command', `/${module} config edit ${this.name} ${this.toString()}`)
+        new TextComponent('&7[&aEDIT&7]&r').setClick('suggest_command', `/${module} config edit ${this.name} ${this.toString()}`)
       );
       comps.push(`&7:&6 ${this.toString()}`);
     }
-    if (this.type === Property.Type.Toggle) comps[1] = new TextComponent('&7[&bTOGGLE&7]&r ').setClick('run_command', `/${module} config edit ${this.name} TOGGLE`);
+    if (this.type === Property.Type.Toggle) comps[1] = new TextComponent('&7[&bTOGGLE&7]&r').setClick('run_command', `/${module} config edit ${this.name} TOGGLE`);
     return new Message(...comps);
   }
 }
