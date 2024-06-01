@@ -1,5 +1,5 @@
 import RenderLib from '../../RenderLib/index';
-import { compareFloat, getAngle, rescale, rotate, toArray } from './math';
+import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
 import RenderLib2D from '../../RenderLib2D/index';
 import _drawBeaconBeam from '../../BeaconBeam/index';
 import settings from '../settings';
@@ -405,7 +405,6 @@ export function renderTracer(color, x, y, z) {
 }
 
 const RenderUtil = Java.type('gg.skytils.skytilsmod.utils.RenderUtil');
-let interpolate;
 let _getRenderX = () => 0;
 let _getRenderY = () => 0;
 let _getRenderZ = () => 0;
@@ -428,14 +427,10 @@ export function getRenderZ() {
   return _getRenderZ();
 }
 if (RenderUtil) {
-  interpolate = RenderUtil.INSTANCE.interpolate.bind(RenderUtil.INSTANCE);
   _getRenderX = RenderUtil.INSTANCE.getRenderX.bind(RenderUtil.INSTANCE);
   _getRenderY = RenderUtil.INSTANCE.getRenderY.bind(RenderUtil.INSTANCE);
   _getRenderZ = RenderUtil.INSTANCE.getRenderZ.bind(RenderUtil.INSTANCE);
 } else {
-  interpolate = function(currentValue, lastValue, multiplier) {
-    return lastValue + (currentValue - lastValue) * multiplier;
-  };
   const rm = Renderer.getRenderManager();
   const xa = rm.class.getDeclaredField('field_78725_b');
   xa.setAccessible(true);
@@ -459,9 +454,9 @@ const AABB = Java.type('net.minecraft.util.AxisAlignedBB');
 export function drawBoxBB(bb, c, f, esp = false, lw = 5) {
   if (!esp && RenderUtil) return RenderUtil.drawOutlinedBoundingBox(bb, c, lw, f);
   const render = Client.getMinecraft().func_175606_aa();
-  const realX = interpolate(render.field_70165_t, render.field_70142_S, f);
-  const realY = interpolate(render.field_70163_u, render.field_70137_T, f);
-  const realZ = interpolate(render.field_70161_v, render.field_70136_U, f);
+  const realX = lerp(render.field_70165_t, render.field_70142_S, f);
+  const realY = lerp(render.field_70163_u, render.field_70137_T, f);
+  const realZ = lerp(render.field_70161_v, render.field_70136_U, f);
   GlStateManager.func_179094_E();
   GlStateManager.func_179137_b(-realX, -realY, -realZ);
   GlStateManager.func_179090_x();
@@ -590,9 +585,9 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
   ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));
   const render = Client.getMinecraft().func_175606_aa();
-  const realX = interpolate(render.field_70165_t, render.field_70142_S, Tessellator.partialTicks);
-  const realY = interpolate(render.field_70163_u, render.field_70137_T, Tessellator.partialTicks);
-  const realZ = interpolate(render.field_70161_v, render.field_70136_U, Tessellator.partialTicks);
+  const realX = lerp(render.field_70165_t, render.field_70142_S, Tessellator.partialTicks);
+  const realY = lerp(render.field_70163_u, render.field_70137_T, Tessellator.partialTicks);
+  const realZ = lerp(render.field_70161_v, render.field_70136_U, Tessellator.partialTicks);
   GlStateManager.func_179094_E();
   GlStateManager.func_179137_b(-realX, -realY, -realZ);
   GlStateManager.func_179090_x();
@@ -673,9 +668,9 @@ function rescaleRender(x, y, z) {
   if (d >= rd * rd) {
     d = rd / Math.sqrt(d);
     return {
-      x: _getRenderX() + (x - _getRenderX()) * d,
-      y: _getRenderY() + (y - _getRenderY()) * d,
-      z: _getRenderZ() + (z - _getRenderZ()) * d
+      x: lerp(_getRenderX(), x, d),
+      y: lerp(_getRenderY(), y, d),
+      z: lerp(_getRenderZ(), z, d)
     };
   }
   return { x, y, z };

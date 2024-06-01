@@ -236,6 +236,15 @@ export function rescale(n, oldMin, oldMax, newMin, newMax) {
 }
 
 /**
+ * @param {number} oldValue
+ * @param {number} newValue
+ * @param {number} mult
+ */
+export function lerp(oldValue, newValue, mult) {
+  return oldValue + (newValue - oldValue) * mult;
+}
+
+/**
  * @param {number} x
  * @param {number} y
  * @param {number} z
