@@ -1,6 +1,0 @@
-assets
-modules
-util
-chicktilshelper
-chicktilshelper/build
-chicktilshelper/build/libs
