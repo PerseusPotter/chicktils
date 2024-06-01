@@ -1,4 +1,3 @@
-import { registerForge, unregisterForge } from './forge';
 import { StateProp, StateVar } from './state';
 
 function wrap(orig, wrap, prop) {
