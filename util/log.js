@@ -21,7 +21,7 @@ function format(obj, depth = 3) {
     case 'number': return Number.isInteger(obj) ? obj.toString() : obj.toFixed(2);
     case 'bigint': return obj.toString() + 'n';
     case 'boolean': return obj.toString();
-    case 'function': return `function ${obj.name}() {}`
+    case 'function': return `function ${'name' in obj ? obj.name : obj.class.getSimpleName()}() {}`
     case 'symbol': return '@@' + obj.description;
     case 'undefined': return 'undefined';
     case 'object':
