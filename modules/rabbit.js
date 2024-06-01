@@ -111,8 +111,33 @@ const guiReg = reg('guiOpened', evn => {
     function update(inv) {
       if (!wasChanged) return;
       wasChanged = false;
-      const rabbits = [28, 29, 30, 31, 32, 33, 34]
-        .map(v => ({ a: v, v: inv.func_70301_a(v) }))
+      const cp = inv.func_70301_a(45);
+      if (!cp || whatIsThisCringeShit.func_177774_c(cp.func_77973_b()).toString() !== 'minecraft:dye') return;
+      const tag = cp.func_77978_p().func_74775_l('display');
+      const lore = tag.func_150295_c('Lore', 8);
+      let cps;
+      let mul;
+      let ttb;
+      for (let i = 0; i < lore.func_74745_c(); i++) {
+        let m;
+        if (!cps && (m = lore.func_150307_f(i).match(/^§6([\d,.]+) Chocolate §8per second$/))) {
+          cps = +(m[1].replace(/,/g, ''));
+          continue;
+        }
+        if (!mul && (m = lore.func_150307_f(i).match(/^§7Total Multiplier: §6([\d,.]+)x$/))) {
+          mul = +(m[1].replace(/,/g, ''));
+          continue;
+        }
+        if (!ttb && (m = lore.func_150307_f(i).match(/^  §6+([\d,.]+)x §8(§dTime Tower§8)$/))) {
+          ttb = +(m[1].replace(/,/g, ''));
+          continue;
+        }
+      }
+      if (!cps || !mul) return;
+      if (ttb) mul -= ttb;
+      const rabbitP = [19, 20, 21, 22, 23, 24, 25, 43];
+      const rabbits = [28, 29, 30, 31, 32, 33, 34, 42]
+        .map((v, i) => ({ a: i, v: inv.func_70301_a(v) }))
         .filter(({ v }) => v &&
           whatIsThisCringeShit.func_177774_c(v.func_77973_b()).toString() === 'minecraft:skull'
         )
@@ -127,15 +152,13 @@ const guiReg = reg('guiOpened', evn => {
               break;
             }
           }
-          return { a, u: (a - 28) / cost, v };
+          return { a, u: (a === 7 ? cps * (mul + 0.01) / mul - cps : (a + 1) * mul) / cost, v };
         });
       if (rabbits.length > 0) {
         const bestRabbit = rabbits.reduce((a, v) => a.u < v.u ? v : a, rabbits[0]);
         if (bestRabbit.u === 0) return;
-        for (let i = 29; i <= 33; i++) {
-          inv.func_70301_a(i - 9).func_77964_b(15);
-        }
-        inv.func_70301_a(bestRabbit.a - 9).func_77964_b(5);
+        rabbitP.forEach(v => inv.func_70301_a(v).func_77964_b(15));
+        inv.func_70301_a(rabbitP[bestRabbit.a]).func_77964_b(5);
       }
     }
     const cb = new JavaAdapter(Java.type('net.minecraft.inventory.IInvBasic'), {
