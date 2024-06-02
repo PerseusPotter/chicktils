@@ -211,7 +211,7 @@ let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn 
     const p = players.find(v => v.ign === e.func_70005_c_());
     if (p) p.e = new Entity(e);
   }
-  if (settings.dungeonBoxWither && c === 'EntityWither') withers.push(new Entity(e));
+  if (settings.dungeonBoxWither && c === 'EntityWither') withers.push(new EntityLivingBase(e));
 }).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither));
 
 const step2Reg = reg('step', () => {
@@ -372,7 +372,7 @@ const tickReg = reg('tick', ticks => {
     isInGoldorDps = false;
     goldorDpsStartAlert.show(settings.dungeonGoldorDpsStartAlertTime);
   }
-  withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither');
+  withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither' && v.getMaxHP() !== 300);
   new Thread(() => {
     if (stateBoxMob.get()) {
       nameCand = nameCand.filter(e => {
