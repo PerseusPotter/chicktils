@@ -32,6 +32,7 @@ function reset() {
   stairBreakReg.unregister();
   terminalsEndReg.unregister();
   pickupKeyReg.unregister();
+  termCompleteReg.unregister();
 
   bloodOpenReg.unregister();
   bossMessageReg.unregister();
@@ -69,6 +70,7 @@ function start() {
   players = [];
   isInGoldorDps = false;
   withers = [];
+  teamTerms.clear();
 
   renderEntReg.register();
   renderEntPostReg.register();
@@ -86,6 +88,7 @@ function start() {
   stairBreakReg.register();
   terminalsEndReg.register();
   pickupKeyReg.register();
+  termCompleteReg.register();
 
   bloodOpenReg.register();
   bossMessageReg.register();
@@ -138,6 +141,7 @@ const goldorDpsStartAlert = createAlert('DPS!', 10);
 let isInGoldorDps = false;
 const iceSprayAlert = createAlert('ice spray :O', 10);
 let withers = [];
+const teamTerms = new Map();
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
@@ -493,12 +497,24 @@ function addPearls() {
 
 const terminalsEndReg = reg('chat', () => {
   isInGoldorDps = true;
-}).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(settings._dungeonGoldorDpsStartAlert);
+  if (settings.dungeonTerminalBreakdown) log('Terminals Breakdown:\n' + Array.from(teamTerms.entries()).sort((a, b) => b.terminal - a.terminal).map(([ign, data]) => `&b${ign}&r: Terminal x&a${data.terminal}&r | Lever x&a${data.lever}&r | Device x&a${data.device}`).join('\n'));
+}).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(new StateProp(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonTerminalBreakdown));
 
 const SecretSounds = Java.type('dulkirmod.features.dungeons.SecretSounds');
 const pickupKeyReg = reg('chat', () => {
   SecretSounds.INSTANCE.playSound();
 }).setCriteria('&r&e&lRIGHT CLICK &r&7on ${*} to open it. This key can only be used to open &r&a1&r&7 door!&r').setEnabled(new StateProp(Boolean(SecretSounds)).and(settings._dungeonPlaySoundKey));
+
+const termCompleteReg = reg('chat', (name, type) => {
+  const ign = getPlayerName(name);
+  let data = teamTerms.get(ign);
+  if (!data) teamTerms.set(ign, data = {
+    terminal: 0,
+    lever: 0,
+    device: 0
+  });
+  data[type]++;
+}).setCriteria(/^&r(.+?)&a (?:completed|activated) a (.+?)! \(&r&c\d&r&a\/(?:7|8)\)&r$/).setEnabled(settings._dungeonTerminalBreakdown);
 
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.contains(e.entity)) cancel(evn);

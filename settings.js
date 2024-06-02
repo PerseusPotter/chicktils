@@ -571,6 +571,8 @@ export const props = {
   dungeonGoldorDpsStartAlertTime: new Property('DungeonGoldorDpsStartAlertTime', page, ++sort, Property.Type.Integer, 500, { desc: 'in ms', min: 0 }),
   dungeonGoldorDpsStartAlertSound: new Property('DungeonGoldorDpsStartAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
 
+  dungeonTerminalBreakdown: new Property('DungeonTerminalBreakdown', page, ++sort, Property.Type.Toggle, false, { desc: 'displays terminals done by each person' }),
+
   dungeonPlaySoundKey: new Property('DungeonPlaySoundOnKey', page, ++sort, Property.Type.Toggle, false, { desc: 'play dulkir secret sound on pickup key, requires dulkir' }),
 
   dungeonIceSprayAlert: new Property('DungeonIceSprayAlert', page, ++sort, Property.Type.Toggle, true, { desc: 'alert on ice spray drop' }),
