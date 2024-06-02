@@ -563,6 +563,10 @@ export const props = {
 
   dungeonM7LBWaypoints: new Property('DungeonDragonLBWaypoints', page, ++sort, Property.Type.Toggle, false),
 
+  dungeonGoldorDpsStartAlert: new Property('DungeonGoldorDpsStartAlert', page, ++sort, Property.Type.Toggle, false),
+  dungeonGoldorDpsStartAlertTime: new Property('DungeonGoldorDpsStartAlertTime', page, ++sort, Property.Type.Integer, 500, { desc: 'in ms', min: 0 }),
+  dungeonGoldorDpsStartAlertSound: new Property('DungeonGoldorDpsStartAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
