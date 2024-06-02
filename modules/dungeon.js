@@ -4,7 +4,7 @@ import createGui from '../util/customgui';
 import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbaToJavaColor, drawString, drawBeaconBeam, JavaColorWrapper } from '../util/draw';
 import createAlert from '../util/alert';
 import reg from '../util/registerer';
-import { colorForNumber, execCmd } from '../util/format';
+import { colorForNumber, execCmd, getPlayerName } from '../util/format';
 import getPing from '../util/ping';
 import runHelper from '../util/runner';
 import createTextGui from '../util/customtextgui';
@@ -13,6 +13,7 @@ import Grid from '../util/grid';
 import { logDebug } from '../util/log';
 import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
+import * as Party from '../util/party';
 
 function reset() {
   renderEntReg.unregister();
@@ -63,6 +64,7 @@ function start() {
   necronDragStart = 0;
   isAtDev4 = false;
   brokenStairBucket.clear();
+  players = [];
 
   renderEntReg.register();
   renderEntPostReg.register();
@@ -125,6 +127,7 @@ const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () =
 let necronDragStart = 0;
 let isAtDev4 = false;
 const brokenStairBucket = new Grid({ size: 2, addNeighbors: 2 });
+let players = [];
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
@@ -190,7 +193,11 @@ let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn 
     if (settings.dungeonBoxMobs && !isInBoss.get()) nameCand.push(e);
     if (stateCamp.get()) possibleSkulls.push(e);
   } else if (stateBoxMob.get() && isDungeonMob(c)) mobCand.push(e);
-}).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp));
+  if (c === 'EntityOtherPlayerMP' && e.func_110124_au().version() === 4) {
+    const p = players.find(v => v.ign === e.func_70005_c_());
+    if (p) p.e = new Entity(e);
+  }
+}).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp).or(settings._dungeonBoxTeammates));
 
 const step2Reg = reg('step', () => {
   mobCandBucket.clear();
@@ -315,6 +322,34 @@ const tickReg = reg('tick', ticks => {
     } else instaMidProc = void 0;
   }
   isAtDev4 = dist(Player.getX(), 63) + dist(Player.getY(), 127) + dist(Player.getZ(), 35) < 3;
+  Party.testLoad();
+  if (players.length !== (Party.isInParty() ? Party.getMembers().size : 1)) {
+    players = [];
+    const tab = TabList.getNames();
+    let expectEmpty = false;
+    for (let i = 1; i < tab.length; i++) {
+      let s = tab[i];
+      if (expectEmpty) {
+        if (s !== '§r') break;
+        expectEmpty = false;
+        continue;
+      }
+      if (s === '§r' || /^§r§7and \d+ other players\.\.\.§r$/.test(s)) break;
+      if (s.startsWith('§r Revive Stones:')) {
+        expectEmpty = true;
+        continue;
+      }
+      if (s.startsWith('§r Ultimate:') || s.startsWith('§r         §r§a§lPlayers')) continue;
+      let m = s.match(/§r§f\(§r§d(\w+) \w+?§r§f\)§r$/);
+      if (!m) break; // "EMPTY"
+      players.push({ ign: getPlayerName(s), class: m[1], e: null });
+    }
+    if (players.length) World.getAllEntities().forEach(v => {
+      if (v.getClassName() !== 'EntityOtherPlayerMP') return;
+      const player = players.find(p => p.ign === v.getName());
+      if (player) player.e = v;
+    });
+  }
   new Thread(() => {
     if (stateBoxMob.get()) {
       nameCand = nameCand.filter(e => {
@@ -367,7 +402,7 @@ const tickReg = reg('tick', ticks => {
       lastRoom = k;
     }
   }).start();
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap));
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates));
 
 register('command', () => {
   const obj = {};
@@ -504,7 +539,22 @@ const renderWorldReg = reg('renderWorld', () => {
     drawBeaconBeam(82, 0, 96, 0, 0, 1, 1, true, 17);
     drawBeaconBeam(27, 0, 92, 0, 1, 0, 1, true, 17);
   }
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper));
+  if (settings.dungeonBoxTeammates) {
+    players.forEach(v => {
+      if (!v.e || v.e.isDead()) return;
+      const x = v.e.getRenderX();
+      const y = v.e.getRenderY();
+      const z = v.e.getRenderZ();
+      const c = settings[`dungeonBoxTeammates${v.class.slice(0, 4)}Color`] ?? settings.boxAllEntitiesColor;
+      const r = ((c >> 24) & 0xFF) / 256;
+      const g = ((c >> 16) & 0xFF) / 256;
+      const b = ((c >> 8) & 0xFF) / 256;
+      const a = ((c >> 0) & 0xFF) / 256;
+      if (settings.dungeonBoxTeammatesEsp) drawBoxAtBlock(x - 0.5, y, z - 0.5, r, g, b, 1, 2, a, 5);
+      else drawBoxAtBlockNotVisThruWalls(x - 0.5, y, z - 0.5, r, g, b, 1, 2, a, 5);
+    });
+  }
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper).or(settings._dungeonM7LBWaypoints).or(settings._dungeonBoxTeammates));
 
 const renderOvlyReg = reg('renderOverlay', () => {
   if (settings.dungeonMap) {

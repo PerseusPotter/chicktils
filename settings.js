@@ -502,14 +502,22 @@ export const props = {
   enabledungeon: new Property('EnableDungeon', ++page, sort = 0, Property.Type.Toggle, true),
 
   dungeonBoxMobs: new Property('DungeonBoxMobs', page, ++sort, Property.Type.Toggle, true, { desc: 'draws boxes around starred mobs\nonly mobs with both nametag and corresponding entity (no ghost nametags!)' }),
-  dungeonBoxMobColor: new Property('DungeonBoxMobColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color for basic mobs' }),
   dungeonBoxMobEsp: new Property('DungeonBoxMobEsp', page, ++sort, Property.Type.Toggle, false),
+  dungeonBoxMobColor: new Property('DungeonBoxMobColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color for basic mobs' }),
   dungeonBoxKeyColor: new Property('DungeonBoxKeyColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color for wither/blood keys' }),
   dungeonBoxSAColor: new Property('DungeonBoxSAColor', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: 'color for SAs' }),
   dungeonBoxFelColor: new Property('DungeonBoxFelColor', page, ++sort, Property.Type.Color, 0x00FF80FF, { desc: 'color for fels' }),
   dungeonBoxChonkColor: new Property('DungeonBoxChonkersColor', page, ++sort, Property.Type.Color, 0xFF0080FF, { desc: 'color for withermancers, commanders, lords, and super archers' }),
   dungeonBoxMiniColor: new Property('DungeonBoxMiniColor', page, ++sort, Property.Type.Color, 0xB400B4FF, { desc: 'color for LAs,  FAs, and AAs' }),
   dungeonBoxMobDisableInBoss: new Property('DungeonBoxMobDisableInBoss', page, ++sort, Property.Type.Toggle, false),
+
+  dungeonBoxTeammates: new Property('DungeonBoxTeammates', page, ++sort, Property.Type.Toggle, true),
+  dungeonBoxTeammatesEsp: new Property('DungeonBoxTeammatesEsp', page, ++sort, Property.Type.Toggle, true),
+  dungeonBoxTeammatesMageColor: new Property('DungeonBoxTeammatesMageColor', page, ++sort, Property.Type.Color, 0x1793C4FF),
+  dungeonBoxTeammatesArchColor: new Property('DungeonBoxTeammatesArchColor', page, ++sort, Property.Type.Color, 0xE80F0FFF),
+  dungeonBoxTeammatesBersColor: new Property('DungeonBoxTeammatesBersColor', page, ++sort, Property.Type.Color, 0xF77C1BFF),
+  dungeonBoxTeammatesTankColor: new Property('DungeonBoxTeammatesTankColor', page, ++sort, Property.Type.Color, 0xFF00FFFF),
+  dungeonBoxTeammatesHealColor: new Property('DungeonBoxTeammatesHealColor', page, ++sort, Property.Type.Color, 0x47D147FF),
 
   dungeonCamp: new Property('DungeonEnableCamp', page, ++sort, Property.Type.Toggle, true, { desc: 'blood camp helper' }),
   dungeonCampTimer: new Property('DungeonCampShowTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer underneath boxes' }),
