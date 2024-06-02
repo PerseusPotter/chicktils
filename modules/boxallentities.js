@@ -1,5 +1,5 @@
 import settings from '../settings';
-import { JavaColorWrapper, drawBoxPos, rgbToJavaColor } from '../util/draw';
+import { JavaColorWrapper, drawBoxPos, rgbaToJavaColor } from '../util/draw';
 import reg from '../util/registerer';
 
 let c = new JavaColorWrapper(settings._boxAllEntitiesColor);
