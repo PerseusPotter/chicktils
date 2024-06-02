@@ -106,22 +106,23 @@ const regs = [
   reg('chat', p => removeMember(p)).setCriteria('&eKicked ${p} because they were offline.&r'),
   reg('chat', p => removeMember(p)).setCriteria('${p} &r&ewas removed from your party because they disconnected.&r'),
   reg('chat', p => removeMember(p)).setCriteria('${p} &r&ehas been removed from the party.&r'),
+  reg('chat', p => removeMember(p)).setCriteria('${p} &r&ehas left the party.&r'),
 
   reg('chat', p => {
-    _hasLoaded = true;
+    clearParty();
     createParty();
     addMember(p);
     setLead(p);
   }).setCriteria('&eYou have joined ${p}\'s &r&eparty!&r'),
   reg('chat', names => names.split(', ').forEach(p => addMember(p))).setCriteria('&eYou\'ll be partying with: ${names}&r'),
   reg('chat', p => {
-    _hasLoaded = true;
+    clearParty();
     createParty();
     addMember(p);
     setLead(p);
-  }).setCriteria('&eParty Leader: ${p} &r&a●&r'),
-  reg('chat', names => names.split('&a ● ').forEach(p => addMember(p))).setCriteria('&eParty Moderators: ${names}&r'),
-  reg('chat', names => names.split('&a ● ').forEach(p => addMember(p))).setCriteria('&eParty Members: ${names}&r')
+  }).setCriteria('&eParty Leader: ${p} &r&${*}●&r'),
+  reg('chat', names => names.split(/&. ● /).forEach(p => addMember(p))).setCriteria('&eParty Moderators: ${names}&r'),
+  reg('chat', names => names.split(/&. ● /).forEach(p => addMember(p))).setCriteria('&eParty Members: ${names}&r')
 ];
 
 let activeListeners = 0;
