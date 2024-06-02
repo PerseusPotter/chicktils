@@ -654,9 +654,9 @@ export const props = {
 
   chatTilsHideBonzo: new Property('ChatTilsHideAzureBonzo', page, ++sort, Property.Type.Option, 'False', { desc: '"Bonzo Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
   chatTilsHidePhoenix: new Property('ChatTilsHideAzurePhoenix', page, ++sort, Property.Type.Option, 'False', { desc: '"Phoenix Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
-  chatTilsHideLeap: new Property('ChatTilsHideAzureLeap', page, ++sort, Property.Type.Option, 'False', { desc: '"Leaped to plinkingndriving" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
-  chatTilsHideMelody: new Property('ChatTilsHideAzureMelody', page, ++sort, Property.Type.Option, 'False', { desc: '"melody (1/4)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
-  chatTilsCompactMelody: new Property('ChatTilsCompactAzureMelody', page, ++sort, Property.Type.Toggle, true, { desc: 'only keep most recent melody message from a player' }),
+  chatTilsHideLeap: new Property('ChatTilsHidePartyChatLeaps', page, ++sort, Property.Type.Option, 'False', { desc: '"Leaped/Leaping to plinkingndriving" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
+  chatTilsHideMelody: new Property('ChatTilsHidePartyChatMelody', page, ++sort, Property.Type.Option, 'False', { desc: '"melody (1/4)/25%" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
+  chatTilsCompactMelody: new Property('ChatTilsCompactPartyChatMelody', page, ++sort, Property.Type.Toggle, true, { desc: 'only keep most recent melody message from a player' }),
 
   chatTilsClickAnywhereFollow: new Property('ChatTilsClickAnywhereFollow', page, ++sort, Property.Type.Toggle, false, { desc: 'click anywhere after opening chat to follow party member\n(mostly for diana/assfang/jumpy dt cube)' }),
   chatTilsClickAnywhereFollowOnlyLead: new Property('ChatTilsClickAnywhereFollowOnlyLead', page, ++sort, Property.Type.Toggle, true, { desc: 'only follow leader' }),

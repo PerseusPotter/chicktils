@@ -73,6 +73,12 @@ function processMessageWaypoint(ign, msg) {
 }
 
 const melodyMessages = new Map();
+const lastMessages = new Map();
+const odinMelodies = [
+  'Melody terminal is at 25%',
+  'Melody terminal is at 50%',
+  'Melody terminal is at 75%'
+];
 function hideMessage(option, evn) {
   if (option === 'False') return;
   cancelNextPing = true;
@@ -87,6 +93,15 @@ function tryMelody(ign, msg, evn, mel) {
       const prev = prog === 1 ? mel : `${mel} ${prog - 1}/4`;
       helper.deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
     }
+  } else {
+    const i = odinMelodies.indexOf(msg);
+    if (i >= 0) {
+      hideMessage(settings.chatTilsHideMelody, evn);
+      if (settings.chatTilsCompactMelody && helper) {
+        const prev = i === 0 ? mel : odinMelodies[i - 1];
+        helper.deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
+      }
+    }
   }
 }
 const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
@@ -99,21 +114,23 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
 
   if (settings.chatTilsHideBonzo !== 'False' && msg === 'Bonzo Procced (3s)') return hideMessage(settings.chatTilsHideBonzo, evn);
   if (settings.chatTilsHidePhoenix !== 'False' && msg === 'Phoenix Procced (3s)') return hideMessage(settings.chatTilsHidePhoenix, evn);
-  if (settings.chatTilsHideLeap !== 'False' && msg.startsWith('Leaped to ')) return hideMessage(settings.chatTilsHideLeap, evn);
+  if (settings.chatTilsHideLeap !== 'False' && (msg.startsWith('Leaped to ') || msg.startsWith('Leaping to '))) return hideMessage(settings.chatTilsHideLeap, evn);
   if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
     const lIgn = ign.toLowerCase();
     let mel = melodyMessages.get(lIgn);
     if (mel) return tryMelody(ign, msg, evn, mel);
-    if (msg === 'melody') {
+    if (msg === 'melody' || msg === 'Melody Terminal start!') {
       melodyMessages.set(lIgn, msg);
       hideMessage(settings.chatTilsHideMelody, evn);
-      return;
     } else if (msg.endsWith(' 1/4')) {
       mel = msg.slice(0, -4);
       melodyMessages.set(lIgn, mel);
       tryMelody(ign, msg, evn, mel);
-      return;
-    }
+    } else if (msg === odinMelodies[0]) {
+      melodyMessages.set(lIgn, lastMessages.get(lIgn));
+      tryMelody(ign, msg, evn, lastMessages.get(lIgn));
+    } else lastMessages.set(lIgn, msg);
+    log(melodyMessages.get(lIgn));
   }
 }).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
 const coopChatReg = reg('chat', (ign, msg) => {
