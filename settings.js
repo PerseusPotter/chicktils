@@ -46,10 +46,10 @@ export class Property {
     if (this.type === Property.Type.Action) return;
     if (!force && v === this.value) return;
     this.validate(v);
-    this.listeners0.forEach(cb => cb.call(this, v, old));
+    this.listeners0.forEach(cb => cb(v, old));
     const old = this.value;
     this.value = v;
-    this.listeners1.forEach(cb => cb.call(this, v, old));
+    this.listeners1.forEach(cb => cb(v, old));
   }
   validate(v) {
     switch (this.type) {
@@ -389,8 +389,8 @@ class Settings {
 
   refresh() {
     this.props.forEach(p => {
-      p.listeners0.forEach(v => v.call(p, p.value, p.value));
-      p.listeners1.forEach(v => v.call(p, p.value, p.value));
+      p.listeners0.forEach(v => v(p.value, p.value));
+      p.listeners1.forEach(v => v(p.value, p.value));
     });
   }
 
@@ -442,7 +442,7 @@ class Settings {
   update(prop, val) {
     const p = this.props.find(v => v.name.toLowerCase() === prop.toLowerCase());
     if (!p) throw 'Invalid Property: ' + prop;
-    if (p.type === Property.Type.Action) p.actionListeners.forEach(v => v.call(p));
+    if (p.type === Property.Type.Action) p.actionListeners.forEach(v => v());
     else {
       if (val) p.set(p.parse(val));
       else p.set(p.defaultValue);
