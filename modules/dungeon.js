@@ -30,6 +30,7 @@ function reset() {
   architectUseReg.unregister();
   necronStartReg.unregister();
   stairBreakReg.unregister();
+  terminalsEndReg.unregister();
 
   bloodOpenReg.unregister();
   bossMessageReg.unregister();
@@ -65,6 +66,7 @@ function start() {
   isAtDev4 = false;
   brokenStairBucket.clear();
   players = [];
+  isInGoldorDps = false;
 
   renderEntReg.register();
   renderEntPostReg.register();
@@ -80,6 +82,7 @@ function start() {
   architectUseReg.register();
   necronStartReg.register();
   stairBreakReg.register();
+  terminalsEndReg.register();
 
   bloodOpenReg.register();
   bossMessageReg.register();
@@ -128,6 +131,8 @@ let necronDragStart = 0;
 let isAtDev4 = false;
 const brokenStairBucket = new Grid({ size: 2, addNeighbors: 2 });
 let players = [];
+const goldorDpsStartAlert = createAlert('DPS!', 10);
+let isInGoldorDps = false;
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
@@ -197,7 +202,7 @@ let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn 
     const p = players.find(v => v.ign === e.func_70005_c_());
     if (p) p.e = new Entity(e);
   }
-}).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp).or(settings._dungeonBoxTeammates));
+}).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert));
 
 const step2Reg = reg('step', () => {
   mobCandBucket.clear();
@@ -350,6 +355,10 @@ const tickReg = reg('tick', ticks => {
       if (player) player.e = v;
     });
   }
+  if (isInGoldorDps && players.every(({ e }) => e.isDead() || (e.getX() > 40 && e.getX() < 69 && e.getY() > 110 && e.getY() < 150 && e.getZ() > 54 && e.getZ() < 120))) {
+    isInGoldorDps = false;
+    goldorDpsStartAlert.show(settings.dungeonGoldorDpsStartAlertTime);
+  }
   new Thread(() => {
     if (stateBoxMob.get()) {
       nameCand = nameCand.filter(e => {
@@ -402,7 +411,7 @@ const tickReg = reg('tick', ticks => {
       lastRoom = k;
     }
   }).start();
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates));
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert));
 
 register('command', () => {
   const obj = {};
@@ -428,9 +437,10 @@ const quizFailReg = reg('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the
 const architectUseReg = reg('chat', () => shitterAlert.hide()).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}').setEnabled(settings._dungeonAutoArchitect);
 
 const necronStartReg = reg('chat', () => {
+  isInGoldorDps = false;
   necronDragStart = Date.now();
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc = runHelper('InstaMidHelper');
-}).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both'));
+}).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both').or(settings._dungeonGoldorDpsStartAlert));
 
 const BlockStairs = Java.type('net.minecraft.block.BlockStairs');
 const stairBreakReg = reg('blockBreak', b => {
@@ -470,6 +480,10 @@ function addPearls() {
   const count = Math.max(0, settings.dungeonAutoRefillPearlsAmount - total);
   if (count > 0) ChatLib.command('gfs ender_pearl ' + count);
 }
+
+const terminalsEndReg = reg('chat', () => {
+  isInGoldorDps = true;
+}).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(settings._dungeonGoldorDpsStartAlert);
 
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.contains(e.entity)) cancel(evn);
@@ -694,6 +708,7 @@ export function init() {
   settings._dungeonHecatombAlertSound.onAfterChange(v => hecAlert.sound = v);
   settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());
   settings._moveDungeonCampSkipTimer.onAction(() => dialogueSkipTimer.edit());
+  settings._dungeonGoldorDpsStartAlertSound.onAfterChange(v => goldorDpsStartAlert.sound = v);
 }
 export function load() {
   dungeonStartReg.register();
