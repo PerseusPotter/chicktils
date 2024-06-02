@@ -52,6 +52,7 @@ export function drawBoxAtBlockNotVisThruWalls(x, y, z, colorR, colorG, colorB, w
   GlStateManager.func_179121_F();
   GL11.glEnable(GL11.GL_TEXTURE_2D);
   GL11.glDisable(GL11.GL_BLEND);
+  GL11.glLineWidth(3);
 };
 export function drawBoxAtBlock(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1, lw = 5) {
   ({ x, y, z } = rescaleRender(x, y, z));
@@ -92,6 +93,7 @@ export function drawBoxAtBlock(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a 
   GL11.glEnable(GL11.GL_DEPTH_TEST);
   GL11.glDepthMask(true);
   GL11.glDisable(GL11.GL_BLEND);
+  GL11.glLineWidth(3);
 };
 // soopy, the most consistent coder. wtf is he on
 export function drawFilledBox(x, y, z, w, h, red, green, blue, alpha, phase) {
@@ -476,6 +478,7 @@ export function drawBoxBB(bb, c, f, esp = false, lw = 5) {
   GlStateManager.func_179098_w();
   GlStateManager.func_179131_c(1, 1, 1, 1);
   GlStateManager.func_179121_F();
+  GL11.glLineWidth(3);
   if (esp) {
     GL11.glEnable(GL11.GL_DEPTH_TEST);
     GL11.glDepthMask(true);
@@ -614,6 +617,7 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   GlStateManager.func_179098_w();
   GlStateManager.func_179131_c(1, 1, 1, 1);
   GlStateManager.func_179121_F();
+  GL11.glLineWidth(3);
 }
 
 /**
