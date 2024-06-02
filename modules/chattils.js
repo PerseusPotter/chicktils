@@ -130,7 +130,6 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
       melodyMessages.set(lIgn, lastMessages.get(lIgn));
       tryMelody(ign, msg, evn, lastMessages.get(lIgn));
     } else lastMessages.set(lIgn, msg);
-    log(melodyMessages.get(lIgn));
   }
 }).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
 const coopChatReg = reg('chat', (ign, msg) => {
