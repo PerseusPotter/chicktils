@@ -1,3 +1,4 @@
+import { log } from './log';
 import { StateProp, StateVar } from './state';
 
 function wrap(orig, wrap, prop) {
@@ -61,7 +62,7 @@ reg = function reg(type, shit) {
     isReg = true;
   });
   const _unregister = wrap(rr, prox, () => {
-    if (isAReg) rr.register();
+    if (isAReg) rr.unregister();
     isReg = false;
     isAReg = false;
   });
