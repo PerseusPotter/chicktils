@@ -20,7 +20,7 @@ export function getMembers() {
   return _members;
 }
 
-function testLoad() {
+export function testLoad() {
   // if (!_hasLoaded) log('please run /pl');
   if (!_hasLoaded) {
     log('Loading Party...');
