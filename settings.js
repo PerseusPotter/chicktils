@@ -547,6 +547,9 @@ export const props = {
   dungeonStairStonkHelper: new Property('DungeonStairStonkHelper', page, ++sort, Property.Type.Toggle, false, { desc: 'same as soopy but does not cut fps in half' }),
   dungeonStairStonkHelperColor: new Property('DungeonStairStonkHelperColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
 
+  dungeonAutoRefillPearls: new Property('DungeonAutoRefillPearls', page, ++sort, Property.Type.Toggle, true, { desc: 'automatically run /gfs at start of each run to replenish used pearls' }),
+  dungeonAutoRefillPearlsAmount: new Property('DungeonAutoRefillPearlsAmount', page, ++sort, Property.Type.Integer, 16, { desc: 'amount of pearls you want to start run with', min: 0, max: 560 }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),

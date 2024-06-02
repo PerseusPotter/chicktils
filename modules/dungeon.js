@@ -81,6 +81,8 @@ function start() {
   bloodOpenReg.register();
   bossMessageReg.register();
   dungeonLeaveReg.register();
+
+  addPearls();
 }
 
 let isInBoss = new StateVar(false);
@@ -414,6 +416,21 @@ const stairBreakReg = reg('blockBreak', b => {
       break;
   }
 }).setEnabled(settings._dungeonStairStonkHelper);
+
+function addPearls() {
+  if (!settings.dungeonAutoRefillPearls) return;
+  const inv = Player.getInventory();
+  if (!inv) return;
+  let total = 0;
+  inv.getItems().forEach(v => {
+    if (!v) return;
+    const nbt = v.getNBT().getCompoundTag('tag').getCompoundTag('ExtraAttributes');
+    if (!nbt) return;
+    if (nbt.getString('id') === 'ENDER_PEARL') total += v.getStackSize();
+  });
+  const count = Math.max(0, settings.dungeonAutoRefillPearlsAmount - total);
+  if (count > 0) ChatLib.command('gfs ender_pearl ' + count);
+}
 
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.contains(e.entity)) cancel(evn);
