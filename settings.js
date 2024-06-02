@@ -516,6 +516,8 @@ export const props = {
   dungeonCampBoxColor: new Property('DungeonCampBoxColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color of shaded box' }),
   dungeonCampBoxEsp: new Property('DungeonCampBoxEsp', page, ++sort, Property.Type.Toggle, false),
   dungeonCampSmoothTime: new Property('DungeonCampSmoothTime', page, ++sort, Property.Type.Integer, 500, { desc: 'amount of time in ms spent lerping between different guesses\n(and how often to make guesses)', min: 1 }),
+  dungeonCampSkipTimer: new Property('DungeonCampDialogueSkipTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'timer until last of first 4 blood mobs spawn' }),
+  moveDungeonCampSkipTimer: new Property('MoveDungeonCampSkipTimer', page, ++sort, Property.Type.Action),
 
   dungeonHecatombAlert: new Property('DungeonHecatombAlert', page, ++sort, Property.Type.Toggle, false, { desc: 'alert before end of run to swap to hecatomb (does not work for f4/m4/m7)' }),
   dungeonHecatombAlertTime: new Property('DungeonHecatombAlertTime', page, ++sort, Property.Type.Integer, 5000, { desc: 'in ms', min: 0 }),

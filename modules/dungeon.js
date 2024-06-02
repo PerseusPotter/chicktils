@@ -51,6 +51,7 @@ function start() {
   bloodZ = -1;
   bloodMobCount = 0;
   motionData.clear();
+  lastSpawnedBloodMob = null;
   map = null;
   mapId = null;
   lastRoom = '';
@@ -96,6 +97,8 @@ let bloodX = -1;
 let bloodZ = -1;
 let bloodMobCount = 0;
 const motionData = new Map();
+const dialogueSkipTimer = createTextGui(() => data.dungeonCampSkipTimerLoc, () => ['§l§23.69s']);
+let lastSpawnedBloodMob;
 let bloodOpenTime = 0;
 let bloodClosed = new StateVar(false);
 let map;
@@ -243,17 +246,20 @@ const tickReg = reg('tick', ticks => {
             lastEstZ: z,
             ttl,
             maxTtl: ttl,
-            lastUpdate: t,
             startTick: ticks - 1,
+            startT: t,
+            lastUpdate: t,
+            lastTick: t,
             timer: new DelayTimer(settings.dungeonCampSmoothTime)
           };
           motionData.set(uuid, data);
+          if (ttl === 80 && bloodMobCount >= 4) lastSpawnedBloodMob = data;
         }
       }
       if (data) {
         data.ttl--;
         if (data.ttl <= 0) return void motionData.delete(uuid);
-
+        data.lastTick = t;
         if (data.timer.shouldTick()) {
           const dt = ticks - data.startTick;
           const dx = x - data.startX;
@@ -504,7 +510,12 @@ const renderOvlyReg = reg('renderOverlay', () => {
       necronDragTimer.render();
     }
   }
-}).setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen', 'Both').or(settings._dungeonMap));
+  if (settings.dungeonCampSkipTimer && lastSpawnedBloodMob && lastSpawnedBloodMob.ttl) {
+    const d = 50 - Date.now() + lastSpawnedBloodMob.lastTick + lastSpawnedBloodMob.ttl * 50;
+    dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
+    dialogueSkipTimer.render();
+  }
+}).setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen', 'Both').or(settings._dungeonMap).or(stateCamp.and(settings._dungeonCampSkipTimer)));
 
 /**
  * @this typeof mapDisplay
@@ -625,6 +636,7 @@ export function init() {
   settings._moveDungeonMap.onAction(() => mapDisplay.edit());
   settings._dungeonHecatombAlertSound.onAfterChange(v => hecAlert.sound = v);
   settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());
+  settings._moveDungeonCampSkipTimer.onAction(() => dialogueSkipTimer.edit());
 }
 export function load() {
   dungeonStartReg.register();
