@@ -1,7 +1,7 @@
 import settings from '../settings';
 import data from '../data';
 import createGui from '../util/customgui';
-import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbToJavaColor } from '../util/draw';
+import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbToJavaColor, drawString } from '../util/draw';
 import createAlert from '../util/alert';
 import reg from '../util/registerer';
 import { colorForNumber, execCmd } from '../util/format';
@@ -249,7 +249,6 @@ const tickReg = reg('tick', ticks => {
             startTick: ticks - 1,
             startT: t,
             lastUpdate: t,
-            lastTick: t,
             timer: new DelayTimer(settings.dungeonCampSmoothTime)
           };
           motionData.set(uuid, data);
@@ -259,7 +258,6 @@ const tickReg = reg('tick', ticks => {
       if (data) {
         data.ttl--;
         if (data.ttl <= 0) return void motionData.delete(uuid);
-        data.lastTick = t;
         if (data.timer.shouldTick()) {
           const dt = ticks - data.startTick;
           const dx = x - data.startX;
@@ -467,7 +465,6 @@ const renderWorldReg = reg('renderWorld', () => {
         y = lerp(lastEstY, estY, smoothFactor);
         z = lerp(lastEstZ, estZ, smoothFactor);
       }
-      const m = (maxTtl - ttl + getPing() / 50) / maxTtl;
       const br = ((settings.dungeonCampBoxColor >> 24) & 0xFF) / 256;
       const bg = ((settings.dungeonCampBoxColor >> 16) & 0xFF) / 256;
       const bb = ((settings.dungeonCampBoxColor >> 8) & 0xFF) / 256;
@@ -476,9 +473,12 @@ const renderWorldReg = reg('renderWorld', () => {
       const wg = ((settings.dungeonCampWireColor >> 16) & 0xFF) / 256;
       const wb = ((settings.dungeonCampWireColor >> 8) & 0xFF) / 256;
       const wa = ((settings.dungeonCampWireColor >> 0) & 0xFF) / 256;
+      const m = (maxTtl - ttl + 1 - Tessellator.partialTicks + getPing() / 50) / maxTtl;
       drawFilledBox(x, y + 2.5 - m, z, m, 2 * m, br, bg, bb, ba, settings.dungeonCampBoxEsp);
       if (settings.dungeonCampBoxEsp) drawBoxAtBlock(x - 0.5, y + 1.5, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
       else drawBoxAtBlockNotVisThruWalls(x - 0.5, y + 1.5, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
+
+      if (settings.dungeonCampTimer) drawString(((ttl + 1 - Tessellator.partialTicks) / 20).toFixed(2), x, y + 1, z);
     });
   }
   if (settings.dungeonMap) {
@@ -511,7 +511,7 @@ const renderOvlyReg = reg('renderOverlay', () => {
     }
   }
   if (settings.dungeonCampSkipTimer && lastSpawnedBloodMob && lastSpawnedBloodMob.ttl) {
-    const d = 50 - Date.now() + lastSpawnedBloodMob.lastTick + lastSpawnedBloodMob.ttl * 50;
+    const d = (lastSpawnedBloodMob.ttl + 1 - Tessellator.partialTicks) * 50;
     dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
     dialogueSkipTimer.render();
   }
