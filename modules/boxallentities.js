@@ -1,19 +1,13 @@
 import settings from '../settings';
-import { drawBoxPos, rgbToJavaColor } from '../util/draw';
+import { JavaColorWrapper, drawBoxPos, rgbToJavaColor } from '../util/draw';
 import reg from '../util/registerer';
 
-let c;
-function updateColor() {
-  c = rgbToJavaColor(settings.boxAllEntitiesColor);
-};
-updateColor();
+let c = new JavaColorWrapper(settings._boxAllEntitiesColor);
 const renderReg = reg('renderEntity', (ent, pos, part) => {
-  drawBoxPos(pos.getX(), pos.getY(), pos.getZ(), ent.getWidth(), ent.getHeight(), c, part, settings.boxAllEntitiesEsp, false);
+  drawBoxPos(pos.getX(), pos.getY(), pos.getZ(), ent.getWidth(), ent.getHeight(), c.get(), part, settings.boxAllEntitiesEsp, false);
 });
 
-export function init() {
-  settings._boxAllEntitiesColor.onAfterChange(() => updateColor());
-}
+export function init() { }
 export function load() {
   renderReg.register();
 }
