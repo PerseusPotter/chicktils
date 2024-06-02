@@ -1,7 +1,7 @@
 import settings from '../settings';
 import data from '../data';
 import createGui from '../util/customgui';
-import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbToJavaColor, drawString } from '../util/draw';
+import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbToJavaColor, drawString, drawBeaconBeam } from '../util/draw';
 import createAlert from '../util/alert';
 import reg from '../util/registerer';
 import { colorForNumber, execCmd } from '../util/format';
@@ -496,6 +496,13 @@ const renderWorldReg = reg('renderWorld', () => {
         2
       );
     });
+  }
+  if (settings.dungeonM7LBWaypoints && Player.getY() < 50) {
+    drawBeaconBeam(27, 0, 56, 1, 0, 0, 1, true, 17);
+    drawBeaconBeam(56, 0, 124, 0.5, 0, 0.5, 1, true, 17);
+    drawBeaconBeam(82, 0, 56, 1, 0.5, 0, 1, true, 17);
+    drawBeaconBeam(82, 0, 96, 0, 0, 1, 1, true, 17);
+    drawBeaconBeam(27, 0, 92, 0, 1, 0, 1, true, 17);
   }
 }).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper));
 
