@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.net.URLConnection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -63,6 +64,12 @@ public class ChickTilsHelper {
     return str.substring(l + 2, r);
   }
 
+  public static Pattern patcherCompactReg = Pattern.compile("§7 \\(\\d+\\)§r$");
+
+  public static String removePatcherCompact(String str) {
+    return patcherCompactReg.matcher(str).replaceAll("");
+  }
+
   public static void deleteMessages(List<String> str) {
     try {
       long start = System.currentTimeMillis();
@@ -79,7 +86,12 @@ public class ChickTilsHelper {
         ChatLine c = lines.get(i);
         try {
           if (
-            contains(strs, trimReset(c.getChatComponent().getFormattedText()))
+            contains(
+              strs,
+              trimReset(
+                removePatcherCompact(c.getChatComponent().getFormattedText())
+              )
+            )
             // str.contains(c.getChatComponent().getFormattedText().substring(4))
           ) lines.remove(i--);
         } catch (StringIndexOutOfBoundsException e) {}
