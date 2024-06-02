@@ -512,6 +512,7 @@ export const props = {
   dungeonBoxMobDisableInBoss: new Property('DungeonBoxMobDisableInBoss', page, ++sort, Property.Type.Toggle, false),
 
   dungeonCamp: new Property('DungeonEnableCamp', page, ++sort, Property.Type.Toggle, true, { desc: 'blood camp helper' }),
+  dungeonCampTimer: new Property('DungeonCampShowTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer underneath boxes' }),
   dungeonCampWireColor: new Property('DungeonCampWireColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color of wireframe' }),
   dungeonCampBoxColor: new Property('DungeonCampBoxColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color of shaded box' }),
   dungeonCampBoxEsp: new Property('DungeonCampBoxEsp', page, ++sort, Property.Type.Toggle, false),
