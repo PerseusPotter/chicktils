@@ -122,8 +122,8 @@ const regs = [
     addMember(p);
     setLead(p);
   }).setCriteria('&eParty Leader: ${p} &r&${*}●&r'),
-  reg('chat', names => names.split(/&. ● /).forEach(p => addMember(p))).setCriteria('&eParty Moderators: ${names}&r'),
-  reg('chat', names => names.split(/&. ● /).forEach(p => addMember(p))).setCriteria('&eParty Members: ${names}&r')
+  reg('chat', names => names.split(/&. ● /).slice(0, -1).forEach(p => addMember(p))).setCriteria('&eParty Moderators: ${names}&r'),
+  reg('chat', names => names.split(/&. ● /).slice(0, -1).forEach(p => addMember(p))).setCriteria('&eParty Members: ${names}&r')
 ];
 
 let activeListeners = 0;
