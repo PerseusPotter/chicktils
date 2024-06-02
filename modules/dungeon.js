@@ -182,7 +182,7 @@ let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn 
   const c = e.getClass().getSimpleName();
   if (c === 'EntityArmorStand') {
     if (settings.dungeonHideHealerPowerups) powerupCand.push([Date.now(), e]);
-    if (stateBoxMob.get()) nameCand.push(e);
+    if (settings.dungeonBoxMobs && !isInBoss.get()) nameCand.push(e);
     if (stateCamp.get()) possibleSkulls.push(e);
   } else if (stateBoxMob.get() && isDungeonMob(c)) mobCand.push(e);
 }).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp));
