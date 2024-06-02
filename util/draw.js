@@ -651,7 +651,7 @@ export function rgbaToARGB(c) {
   return ((c & 0xFF) << 24) | c >> 8;
 }
 
-export function rgbToJavaColor(c) {
+export function rgbaToJavaColor(c) {
   return new (Java.type('java.awt.Color'))(rgbaToARGB(c), true);
 }
 
@@ -661,8 +661,8 @@ export class JavaColorWrapper {
    * @param {import ('../settings').Property} prop
    */
   constructor(prop) {
-    this.cache = rgbToJavaColor(prop.valueOf());
-    prop.onAfterChange(v => this.cache = rgbToJavaColor(v));
+    this.cache = rgbaToJavaColor(prop.valueOf());
+    prop.onAfterChange(v => this.cache = rgbaToJavaColor(v));
   }
   get() {
     return this.cache;
