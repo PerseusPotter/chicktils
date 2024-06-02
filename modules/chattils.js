@@ -2,7 +2,7 @@ import settings from '../settings';
 import { drawBeaconBeam, drawBoxAtBlock, drawString, renderWaypoints } from '../util/draw';
 import { execCmd, getPlayerName } from '../util/format';
 import { getLeader } from '../util/party';
-import { log, logMessage } from '../util/log';
+import { log, logDebug, logMessage } from '../util/log';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
 
@@ -46,7 +46,7 @@ function processMessageWaypoint(ign, msg) {
   const pos = msg.match(/(?:x: )?(-?\d+)(?:, y:)? (-?\d+)(?:, z:)? (-?\d+)/);
   if (!pos) return;
 
-  coords.push({ x: pos[1], y: pos[2], z: pos[3], n: oIgn, c: waypointReloadNum });
+  coords.push({ x: +pos[1], y: +pos[2], z: +pos[3], n: oIgn, c: waypointReloadNum });
   if (settings.chatTilsWaypointDuration) Client.scheduleTask(settings.chatTilsWaypointDuration * 20, () => {
     if (coords.length === 0) return;
     if (coords[0].c !== waypointReloadNum) return;
