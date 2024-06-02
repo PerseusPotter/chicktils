@@ -10,7 +10,7 @@ import runHelper from '../util/runner';
 import createTextGui from '../util/customtextgui';
 import { compareFloat, dist, lerp } from '../util/math';
 import Grid from '../util/grid';
-import { logDebug } from '../util/log';
+import { log, logDebug } from '../util/log';
 import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
 import * as Party from '../util/party';
@@ -31,6 +31,7 @@ function reset() {
   necronStartReg.unregister();
   stairBreakReg.unregister();
   terminalsEndReg.unregister();
+  pickupKeyReg.unregister();
 
   bloodOpenReg.unregister();
   bossMessageReg.unregister();
@@ -83,6 +84,7 @@ function start() {
   necronStartReg.register();
   stairBreakReg.register();
   terminalsEndReg.register();
+  pickupKeyReg.register();
 
   bloodOpenReg.register();
   bossMessageReg.register();
@@ -485,6 +487,11 @@ const terminalsEndReg = reg('chat', () => {
   isInGoldorDps = true;
 }).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(settings._dungeonGoldorDpsStartAlert);
 
+const SecretSounds = Java.type('dulkirmod.features.dungeons.SecretSounds');
+const pickupKeyReg = reg('chat', () => {
+  SecretSounds.INSTANCE.playSound();
+}).setCriteria('&r&e&lRIGHT CLICK &r&7on ${*} to open it. This key can only be used to open &r&a1&r&7 door!&r').setEnabled(new StateProp(Boolean(SecretSounds)).and(settings._dungeonPlaySoundKey));
+
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.contains(e.entity)) cancel(evn);
 }).setEnabled(settings._dungeonHideHealerPowerups);
@@ -709,6 +716,7 @@ export function init() {
   settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());
   settings._moveDungeonCampSkipTimer.onAction(() => dialogueSkipTimer.edit());
   settings._dungeonGoldorDpsStartAlertSound.onAfterChange(v => goldorDpsStartAlert.sound = v);
+  settings._dungeonPlaySoundKey.onAfterChange(v => v && !SecretSounds && log('Dulkir not found. (will not work)'));
 }
 export function load() {
   dungeonStartReg.register();
