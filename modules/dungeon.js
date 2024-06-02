@@ -135,6 +135,7 @@ const brokenStairBucket = new Grid({ size: 2, addNeighbors: 2 });
 let players = [];
 const goldorDpsStartAlert = createAlert('DPS!', 10);
 let isInGoldorDps = false;
+const iceSprayAlert = createAlert('ice spray :O', 10);
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
@@ -207,18 +208,21 @@ let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn 
 }).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert));
 
 const step2Reg = reg('step', () => {
-  mobCandBucket.clear();
-  mobCand = mobCand.filter(e => {
-    if (e.field_70128_L) return false;
-    const n = e.func_70005_c_();
-    if (n === 'Shadow Assassin') {
-      boxMobs.put(e, { yO: 0, h: 2, c: rgbaToJavaColor(settings.dungeonBoxSAColor) });
-      return false;
-    }
-    mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
-    return true;
-  });
-}).setFps(2).setEnabled(stateBoxMob);
+  if (stateBoxMob.get()) {
+    mobCandBucket.clear();
+    mobCand = mobCand.filter(e => {
+      if (e.field_70128_L) return false;
+      const n = e.func_70005_c_();
+      if (n === 'Shadow Assassin') {
+        boxMobs.put(e, { yO: 0, h: 2, c: rgbaToJavaColor(settings.dungeonBoxSAColor) });
+        return false;
+      }
+      mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
+      return true;
+    });
+  }
+  if (settings.dungeonIceSprayAlert && World.getAllEntities().some(e => e.getClassName() === 'EntityArmorStand' && e.getName().includes('Ice Spray Wand'))) iceSprayAlert.show(settings.dungeonIceSprayAlertTime);
+}).setFps(2).setEnabled(stateBoxMob.or(settings._dungeonIceSprayAlert));
 
 const tickReg = reg('tick', ticks => {
   if (settings.dungeonCamp) {
@@ -717,6 +721,7 @@ export function init() {
   settings._moveDungeonCampSkipTimer.onAction(() => dialogueSkipTimer.edit());
   settings._dungeonGoldorDpsStartAlertSound.onAfterChange(v => goldorDpsStartAlert.sound = v);
   settings._dungeonPlaySoundKey.onAfterChange(v => v && !SecretSounds && log('Dulkir not found. (will not work)'));
+  settings._dungeonIceSprayAlertSound.onAfterChange(v => iceSprayAlert.sound = v);
 }
 export function load() {
   dungeonStartReg.register();
