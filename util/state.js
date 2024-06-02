@@ -15,7 +15,7 @@ export class StateVar {
     this.hooks.push(cb);
   }
   trigger() {
-    this.hooks.forEach(v => v.call(this));
+    this.hooks.forEach(v => v());
   }
   /**
    * @param {import('../settings').Property} p
