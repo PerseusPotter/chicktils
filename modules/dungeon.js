@@ -1,7 +1,7 @@
 import settings from '../settings';
 import data from '../data';
 import createGui from '../util/customgui';
-import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbaToJavaColor, drawString, drawBeaconBeam, JavaColorWrapper } from '../util/draw';
+import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbaToJavaColor, drawString, drawBeaconBeam } from '../util/draw';
 import createAlert from '../util/alert';
 import reg from '../util/registerer';
 import { colorForNumber, execCmd, getPlayerName } from '../util/format';
@@ -68,6 +68,7 @@ function start() {
   brokenStairBucket.clear();
   players = [];
   isInGoldorDps = false;
+  withers = [];
 
   renderEntReg.register();
   renderEntPostReg.register();
@@ -136,6 +137,7 @@ let players = [];
 const goldorDpsStartAlert = createAlert('DPS!', 10);
 let isInGoldorDps = false;
 const iceSprayAlert = createAlert('ice spray :O', 10);
+let withers = [];
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
@@ -205,7 +207,8 @@ let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn 
     const p = players.find(v => v.ign === e.func_70005_c_());
     if (p) p.e = new Entity(e);
   }
-}).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert));
+  if (settings.dungeonBoxWither && c === 'EntityWither') withers.push(new Entity(e));
+}).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither));
 
 const step2Reg = reg('step', () => {
   if (stateBoxMob.get()) {
@@ -365,6 +368,7 @@ const tickReg = reg('tick', ticks => {
     isInGoldorDps = false;
     goldorDpsStartAlert.show(settings.dungeonGoldorDpsStartAlertTime);
   }
+  withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither');
   new Thread(() => {
     if (stateBoxMob.get()) {
       nameCand = nameCand.filter(e => {
@@ -417,7 +421,7 @@ const tickReg = reg('tick', ticks => {
       lastRoom = k;
     }
   }).start();
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert));
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither));
 
 register('command', () => {
   const obj = {};
@@ -579,7 +583,20 @@ const renderWorldReg = reg('renderWorld', () => {
       else drawBoxAtBlockNotVisThruWalls(x - 0.5, y, z - 0.5, r, g, b, 1, 2, a, 5);
     });
   }
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper).or(settings._dungeonM7LBWaypoints).or(settings._dungeonBoxTeammates));
+  if (settings.dungeonBoxWither) {
+    const r = ((settings.dungeonBoxWitherColor >> 24) & 0xFF) / 256;
+    const g = ((settings.dungeonBoxWitherColor >> 16) & 0xFF) / 256;
+    const b = ((settings.dungeonBoxWitherColor >> 8) & 0xFF) / 256;
+    const a = ((settings.dungeonBoxWitherColor >> 0) & 0xFF) / 256;
+    withers.forEach(e => {
+      const x = e.getRenderX();
+      const y = e.getRenderY();
+      const z = e.getRenderZ();
+      if (settings.dungeonBoxWitherEsp) drawBoxAtBlock(x - 0.75, y - 0.25, z - 0.75, r, g, b, 1.5, 4, a, 5);
+      else drawBoxAtBlockNotVisThruWalls(x - 0.75, y - 0.25, z - 0.75, r, g, b, 1.5, 4, a, 5);
+    })
+  }
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper).or(settings._dungeonM7LBWaypoints).or(settings._dungeonBoxTeammates).or(settings._dungeonBoxWither));
 
 const renderOvlyReg = reg('renderOverlay', () => {
   if (settings.dungeonMap) {
