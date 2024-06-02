@@ -43,19 +43,10 @@ function processMessageWaypoint(ign, msg) {
   const isOwn = ign === Player.getName().toLowerCase();
   if (isOwn && !settings.chatTilsWaypointShowOwn) return;
 
-  const pos = [];
-  const re = /(?:\b|(?=-))(-?\d+(?:\.?\d+)?)\b/g;
-  let match;
-  let lastPos = 0;
-  while (match = re.exec(msg)) {
-    if (match.index - lastPos > 5) return;
-    pos.push(+match[1]);
-    lastPos = match.index + match[0].length;
-    if (pos.length > 3) return;
-  }
-  if (pos.length !== 3) return;
+  const pos = msg.match(/(?:x: )?(-?\d+)(?:, y:)? (-?\d+)(?:, z:)? (-?\d+)/);
+  if (!pos) return;
 
-  coords.push({ x: pos[0], y: pos[1], z: pos[2], n: oIgn, c: waypointReloadNum });
+  coords.push({ x: pos[1], y: pos[2], z: pos[3], n: oIgn, c: waypointReloadNum });
   if (settings.chatTilsWaypointDuration) Client.scheduleTask(settings.chatTilsWaypointDuration * 20, () => {
     if (coords.length === 0) return;
     if (coords[0].c !== waypointReloadNum) return;
