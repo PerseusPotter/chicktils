@@ -655,6 +655,20 @@ export function rgbToJavaColor(c) {
   return new (Java.type('java.awt.Color'))(rgbaToARGB(c), true);
 }
 
+export class JavaColorWrapper {
+  cache;
+  /**
+   * @param {import ('../settings').Property} prop
+   */
+  constructor(prop) {
+    this.cache = rgbToJavaColor(prop.valueOf());
+    prop.onAfterChange(v => this.cache = rgbToJavaColor(v));
+  }
+  get() {
+    return this.cache;
+  }
+}
+
 /**
  * @param {number} x
  * @param {number} y
