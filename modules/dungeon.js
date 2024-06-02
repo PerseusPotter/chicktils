@@ -497,7 +497,7 @@ function addPearls() {
 
 const terminalsEndReg = reg('chat', () => {
   isInGoldorDps = true;
-  if (settings.dungeonTerminalBreakdown) log('Terminals Breakdown:\n' + Array.from(teamTerms.entries()).sort((a, b) => b.terminal - a.terminal).map(([ign, data]) => `&b${ign}&r: Terminal x&a${data.terminal}&r | Lever x&a${data.lever}&r | Device x&a${data.device}`).join('\n'));
+  if (settings.dungeonTerminalBreakdown) log('Terminals Breakdown:\n' + Array.from(teamTerms.entries()).sort((a, b) => b[1].terminal - a[1].terminal).map(([ign, data]) => `&b${ign}&r: Terminal x&a${data.terminal}&r | Lever x&a${data.lever}&r | Device x&a${data.device}`).join('\n'));
 }).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(new StateProp(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonTerminalBreakdown));
 
 const SecretSounds = Java.type('dulkirmod.features.dungeons.SecretSounds');
