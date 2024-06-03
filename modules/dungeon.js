@@ -602,8 +602,8 @@ const renderWorldReg = reg('renderWorld', () => {
       const g = ((c >> 16) & 0xFF) / 256;
       const b = ((c >> 8) & 0xFF) / 256;
       const a = ((c >> 0) & 0xFF) / 256;
-      if (settings.dungeonBoxTeammatesEsp) drawBoxAtBlock(x - 0.5, y, z - 0.5, r, g, b, 1, 2, a, 5);
-      else drawBoxAtBlockNotVisThruWalls(x - 0.5, y, z - 0.5, r, g, b, 1, 2, a, 5);
+      if (settings.dungeonBoxTeammatesEsp) drawBoxAtBlock(x - 0.4, y, z - 0.4, r, g, b, 0.8, 2, a, 5);
+      else drawBoxAtBlockNotVisThruWalls(x - 0.4, y, z - 0.4, r, g, b, 0.8, 2, a, 5);
     });
   }
   if (settings.dungeonBoxWither) {
