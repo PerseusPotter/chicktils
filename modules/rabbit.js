@@ -59,7 +59,7 @@ const eggSpawnReg = reg('step', () => {
 
   start();
   scanEgg();
-  if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || type === 2)) eggSpawnAlert.show(settings.rabbitAlertTime);
+  if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertTime);
 }).setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
 const eggStepReg = reg('step', () => scanEgg()).setDelay(2).setEnabled(settings._rabbitSniffer);
 const types = {
