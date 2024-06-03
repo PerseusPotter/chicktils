@@ -258,7 +258,7 @@ const tickReg = reg('tick', ticks => {
         const dz = dist(z, e.getLastZ());
         if (y > 71 && (dx > 0.01 || dz > 0.01) && dx < 0.5 && dz < 0.5) {
           bloodMobCount++;
-          const ttl = (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
+          const ttl = t - bloodOpenTime < 32000 && (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
           data = {
             startX: x,
             startY: y,
