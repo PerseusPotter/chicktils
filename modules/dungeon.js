@@ -596,6 +596,7 @@ const renderWorldReg = reg('renderWorld', () => {
       if (!v.e) return;
       if (v.e === Player) {
         if (!settings.dungeonBoxTeammatesBoxSelf) return;
+        if (Client.settings.getSettings().field_74320_O === 0) return;
       } else if (v.e.isDead()) return;
       const x = v.e.getRenderX();
       const y = v.e.getRenderY();
