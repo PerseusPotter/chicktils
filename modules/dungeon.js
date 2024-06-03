@@ -31,6 +31,7 @@ function reset() {
   necronStartReg.unregister();
   stairBreakReg.unregister();
   terminalsEndReg.unregister();
+  goldorDpsStartReg.unregister();
   pickupKeyReg.unregister();
   termCompleteReg.unregister();
 
@@ -87,6 +88,7 @@ function start() {
   necronStartReg.register();
   stairBreakReg.register();
   terminalsEndReg.register();
+  goldorDpsStartReg.register();
   pickupKeyReg.register();
   termCompleteReg.register();
 
@@ -455,10 +457,9 @@ const quizFailReg = reg('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the
 const architectUseReg = reg('chat', () => shitterAlert.hide()).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}').setEnabled(settings._dungeonAutoArchitect);
 
 const necronStartReg = reg('chat', () => {
-  isInGoldorDps = false;
   necronDragStart = Date.now();
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc = runHelper('InstaMidHelper');
-}).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both').or(settings._dungeonGoldorDpsStartAlert));
+}).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None'));
 
 const BlockStairs = Java.type('net.minecraft.block.BlockStairs');
 const stairBreakReg = reg('blockBreak', b => {
@@ -503,6 +504,8 @@ const terminalsEndReg = reg('chat', () => {
   isInGoldorDps = true;
   if (settings.dungeonTerminalBreakdown) log('Terminals Breakdown:\n' + Array.from(teamTerms.entries()).sort((a, b) => b[1].terminal - a[1].terminal).map(([ign, data]) => `&b${ign}&r: Terminal x&a${data.terminal}&r | Lever x&a${data.lever}&r | Device x&a${data.device}`).join('\n'));
 }).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(new StateProp(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonTerminalBreakdown));
+
+const goldorDpsStartReg = reg('chat', () => isInGoldorDps = false).setCriteria('&r&4[BOSS] Goldor&r&c: &r&cYou have done it, you destroyed the factory…&r').setEnabled(settings._dungeonGoldorDpsStartAlert);
 
 const SecretSounds = Java.type('dulkirmod.features.dungeons.SecretSounds');
 const pickupKeyReg = reg('chat', () => {
