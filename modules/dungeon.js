@@ -362,13 +362,17 @@ const tickReg = reg('tick', ticks => {
       if (!m) break; // "EMPTY"
       players.push({ ign: getPlayerName(s), class: m[1], e: null });
     }
-    if (players.length) World.getAllEntities().forEach(v => {
-      if (v.getClassName() !== 'EntityOtherPlayerMP') return;
-      const player = players.find(p => p.ign === v.getName());
-      if (player) player.e = v;
-    });
+    if (players.length) {
+      World.getAllEntities().forEach(v => {
+        if (v.getClassName() !== 'EntityOtherPlayerMP') return;
+        const player = players.find(p => p.ign === v.getName());
+        if (player) player.e = v;
+      });
+      const player = players.find(p => p.ign === Player.getName());
+      if (player) player.e = Player;
+    }
   }
-  if (isInGoldorDps && players.every(({ e }) => !e || e.isDead() || (e.getX() > 40 && e.getX() < 69 && e.getY() > 110 && e.getY() < 150 && e.getZ() > 54 && e.getZ() < 120))) {
+  if (isInGoldorDps && players.every(({ e }) => !e || (e !== Player && e.isDead()) || (e.getX() > 40 && e.getX() < 69 && e.getY() > 110 && e.getY() < 150 && e.getZ() > 54 && e.getZ() < 120))) {
     isInGoldorDps = false;
     goldorDpsStartAlert.show(settings.dungeonGoldorDpsStartAlertTime);
   }
@@ -586,7 +590,10 @@ const renderWorldReg = reg('renderWorld', () => {
   }
   if (settings.dungeonBoxTeammates) {
     players.forEach(v => {
-      if (!v.e || v.e.isDead()) return;
+      if (!v.e) return;
+      if (v.e === Player) {
+        if (!settings.dungeonBoxTeammatesBoxSelf) return;
+      } else if (v.e.isDead()) return;
       const x = v.e.getRenderX();
       const y = v.e.getRenderY();
       const z = v.e.getRenderZ();
