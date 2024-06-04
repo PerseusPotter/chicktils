@@ -8,18 +8,66 @@ function add(n, i) {
   ids.push(i);
 }
 
+const cringeShit = {
+  'Brown Mushroom': ['Enchanted Brown Mushroom', 'Enchanted Brown Mushroom Block'],
+  'Cactus': ['Enchanted Cactus Green', 'Enchanted Cactus'],
+  'Carrot': ['Enchanted Carrot', 'Enchanted Golden Carrot'],
+  'Cocoa Beans': ['Enchanted Cocoa Beans', 'Enchanted Cookie'],
+  'Melon': ['Enchanted Melon', 'Enchanted Melon Block'],
+  'Nether Wart': ['Enchanted Nether Wart', 'Mutant Nether Wart'],
+  'Potato': ['Enchanted Potato', 'Enchanted Baked Potato', 'Enchanted Poisonous Potato'],
+  'Pumpkin': ['Enchanted Pumpkin', 'Polished Pumpkin'],
+  'Red Mushroom': ['Enchanted Red Mushroom', 'Enchanted Red Mushroom Block'],
+  'Seeds': ['Enchanted Seeds', 'Box of Seeds'],
+  'Sugar Cane': ['Enchanted Sugar', 'Enchanted Sugar Cane'],
+  'Wheat': ['Enchanted Bread', 'Enchanted Hay Bale', 'Tightly-Tied Hay Bale'],
+
+  'Coal': ['Enchanted Coal', 'Enchanted Coal Block'],
+  'Diamond': ['Enchanted Diamond', 'Enchanted Diamond Block'],
+  'Emerald': ['Enchanted Emerald', 'Enchanted Emerald Block'],
+  'Glowstone Dust': ['Enchanted Glowstone Dust', 'Enchanted Glowstone'],
+  'Gold Ingot': ['Enchanted Gold', 'Enchanted Gold Block'],
+  'Gravel': ['Enchanted Coal', 'Enchanted Coal Block'],
+  'Hard Stone': ['Enchanted Hard Stone', 'Concentrated Stone'],
+  'Iron Ingot': ['Enchanted Iron', 'Enchanted Iron Block'],
+  'Lapis Lazuli': ['Enchanted Lapis Lazuli', 'Enchanted Lapis Block'],
+  'Mycelium': ['Enchanted Mycelium', 'Enchanted Mycelium Cube'],
+  'Nether Quartz': ['Enchanted Quartz', 'Enchanted Quartz Block'],
+  'Red Sand': ['Enchanted Red Sand', 'Enchanted Red Sand Cube'],
+  'Redstone': ['Enchanted Redstone', 'Enchanted Redstone Block'],
+  'Sulphur': ['Enchanted Sulphur', 'Enchanted Sulphur Cube'],
+
+  'Blaze Rod': ['Enchanted Blaze Powder', 'Enchanted Blaze Rod'],
+  'Bone': ['Enchanted Bone', 'Enchanted Bone Block'],
+  'Chili Pepper': ['Stuffed Chili Pepper'],
+  'Ender Pearl': ['Enchanted Ender Pearl', 'Enchanted Eye of Ender', 'Absolute Ender Pearl'],
+  'Magma Cream': ['Enchanted Magma Cream', 'Whipped Magma Cream'],
+  'Slimeball': ['Enchanted Slimeball', 'Enchanted Slime Block']
+};
+
 https.get(url, res => {
   const chunks = [];
   res.on('data', c => chunks.push(c));
   res.on('close', () => {
     const items = JSON.parse(Buffer.concat(chunks)).items;
 
-    lore.forEach(v => v.tag.display.Lore.join(' ').replace(/§./g, '').replace(/\\u0027/g, '\'').match(/(?:Items:|materials:)(.+?)Capacity:/)[1].split(',').map(v => {
-      const n = v.trim();
+    function addName(n) {
       console.log(n);
       const i = items.find(v => v.name.replace(/§./g, '').replace(/%%.+?%%/g, '') === n).id;
       add(n, i);
-    }));
+    }
+
+    lore.forEach(sack => {
+      const isEnchanted = sack.tag.ExtraAttributes.id.includes('ENCHANTED');
+      sack.tag.display.Lore.join(' ').replace(/§./g, '').replace(/\\u0027/g, '\'').match(/(?:Items:|materials:)(.+?)Capacity:/)[1].split(',').map(v => {
+        let n = v.trim();
+        if (isEnchanted) {
+          if (n in cringeShit) return cringeShit[n].forEach(n => addName(n));
+          if (!n.startsWith('Enchanted')) n = 'Enchanted ' + n;
+        }
+        addName(n);
+      });
+    });
 
     console.log(JSON.stringify(names));
     console.log();
