@@ -12,7 +12,6 @@ let eggs = [];
 let activeEggs = [2, 2, 2];
 let lastSpawnDays = [0, 0, 0];
 function reset() {
-  eggs = [];
   eggCollectReg.unregister();
   eggAlrCollectReg.unregister();
   // eggStepReg.unregister();
@@ -21,6 +20,7 @@ function reset() {
   unloadReg.unregister();
 }
 function start() {
+  eggs = [];
   unloadReg.register();
   eggCollectReg.register();
   eggAlrCollectReg.register();
@@ -45,7 +45,8 @@ function scanEgg() {
 }
 const eggSpawnReg = reg('step', () => {
   const { year, month, day, hour } = getSbDate();
-  if (month > 3) return;
+  if (month > 3) return reset();
+  start();
   const dayHash = year * 631 * 631 + month * 631 + day;
   let type;
   if (hour === 7) type = 0;
@@ -57,7 +58,6 @@ const eggSpawnReg = reg('step', () => {
   lastSpawnDays[type] = dayHash;
   activeEggs[type] = 2;
 
-  start();
   scanEgg();
   if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertTime);
 }).setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
