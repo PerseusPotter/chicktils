@@ -40,7 +40,7 @@ function scanEgg() {
   });
   if (settings.rabbitAlertEggFound && eggs.length > l) {
     start();
-    Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertTime));
+    Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertFoundTime));
   }
 }
 const eggSpawnReg = reg('step', () => {
@@ -59,7 +59,7 @@ const eggSpawnReg = reg('step', () => {
   activeEggs[type] = 2;
 
   scanEgg();
-  if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertTime);
+  if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertFoundTime);
 }).setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
 const eggStepReg = reg('step', () => scanEgg()).setDelay(2).setEnabled(settings._rabbitSniffer);
 const types = {
@@ -196,7 +196,8 @@ const promoteReg = reg('chat', (name, lvl, status, evn) => {
 }).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r').setEnabled(settings._rabbitCondenseChat);
 
 export function init() {
-  settings._rabbitAlertSound.onAfterChange(v => eggSpawnAlert.sound = eggFoundAlert.sound = v);
+  settings._rabbitAlertSpawnSound.onAfterChange(v => eggSpawnAlert.sound = v);
+  settings._rabbitAlertFoundSound.onAfterChange(v => eggFoundAlert.sound = v);
 }
 export function load() {
   eggSpawnReg.register();
