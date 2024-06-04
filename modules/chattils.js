@@ -2,7 +2,7 @@ import settings from '../settings';
 import { drawBeaconBeam, drawBoxAtBlock, drawString, renderWaypoints } from '../util/draw';
 import { execCmd, getPlayerName } from '../util/format';
 import { getLeader } from '../util/party';
-import { log, logDebug, logMessage } from '../util/log';
+import { log, logMessage } from '../util/log';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
 
@@ -76,7 +76,7 @@ function hideMessage(option, evn) {
   if (option === 'Both') cancel(evn);
 }
 function tryMelody(ign, msg, evn, mel) {
-  if (mel === msg) hideMessage(settings.chatTilsHideMelody, evn);
+  if (mel.trim() === msg) hideMessage(settings.chatTilsHideMelody, evn);
   else if (msg.startsWith(mel) && msg.endsWith('/4')) {
     hideMessage(settings.chatTilsHideMelody, evn);
     if (settings.chatTilsCompactMelody && helper) {
