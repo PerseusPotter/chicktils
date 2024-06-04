@@ -138,7 +138,7 @@ const guiReg = reg('guiOpened', evn => {
       if (ttb) {
         cps /= mul;
         mul -= ttb;
-        // cps *= mul;
+        cps *= mul;
       }
       const rabbitP = [19, 20, 21, 22, 23, 24, 25, 43];
       const rabbits = [28, 29, 30, 31, 32, 33, 34, 42]
@@ -157,7 +157,7 @@ const guiReg = reg('guiOpened', evn => {
               break;
             }
           }
-          return { a, u: (a === 7 ? cps * (mul + 0.01) /* / mul */ - cps : (a + 1) * mul) / cost, v };
+          return { a, u: (a === 7 ? cps * (mul + 0.01) / mul - cps : (a + 1) * mul) / cost, v };
         });
       if (rabbits.length > 0) {
         const bestRabbit = rabbits.reduce((a, v) => a.u < v.u ? v : a, rabbits[0]);
