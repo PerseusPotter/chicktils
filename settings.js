@@ -557,6 +557,7 @@ export const props = {
 
   dungeonNecronDragTimer: new Property('DungeonNecronDragTimer', page, ++sort, Property.Type.Option, 'None', { desc: 'timer when necron does some dragging\n(timer will automatically pop up when instamidding!)', options: ['OnScreen', 'InstaMid', 'Both', 'None'] }),
   moveNecronDragTimer: new Property('MoveNecronDragTimer', page, ++sort, Property.Type.Action),
+  dungeonNecronDragDuration: new Property('DungeonNecronDragDuration', page, ++sort, Property.Type.Integer, 120, { desc: 'in ticks, 120 = move/leap, 163 = immunity', min: 0 }),
 
   dungeonDev4Helper: new Property('DungeonClearViewDev4', page, ++sort, Property.Type.Option, 'Both', { desc: 'clearer vision while doing 4th dev', options: ['None', 'Titles', 'Particles', 'Both'] }),
 
