@@ -8,7 +8,7 @@ import { colorForNumber, execCmd, getPlayerName } from '../util/format';
 import getPing from '../util/ping';
 import runHelper from '../util/runner';
 import createTextGui from '../util/customtextgui';
-import { compareFloat, dist, lerp } from '../util/math';
+import { compareFloat, dist, lerp, linReg } from '../util/math';
 import Grid from '../util/grid';
 import { log, logDebug } from '../util/log';
 import { StateProp, StateVar } from '../util/state';
@@ -262,9 +262,9 @@ const tickReg = reg('tick', ticks => {
           bloodMobCount++;
           const ttl = t - bloodOpenTime < 32000 && (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
           data = {
-            startX: x,
-            startY: y,
-            startZ: z,
+            posX: [e.getLastX()],
+            posY: [e.getLastY()],
+            posZ: [e.getLastZ()],
             estX: x,
             estY: y,
             estZ: z,
@@ -273,7 +273,6 @@ const tickReg = reg('tick', ticks => {
             lastEstZ: z,
             ttl,
             maxTtl: ttl,
-            startTick: ticks - 1,
             startT: t,
             lastUpdate: t,
             timer: new DelayTimer(settings.dungeonCampSmoothTime)
@@ -284,21 +283,20 @@ const tickReg = reg('tick', ticks => {
       }
       if (data) {
         data.ttl--;
+        data.posX.push(x);
+        data.posY.push(y);
+        data.posZ.push(z);
         if (data.ttl <= 0) return void motionData.delete(uuid);
         if (data.timer.shouldTick()) {
-          const dt = ticks - data.startTick;
-          const dx = x - data.startX;
-          const dy = y - data.startY;
-          const dz = z - data.startZ;
-          const estX = x + dx / dt * data.ttl;
-          const estY = y + dy / dt * data.ttl;
-          const estZ = z + dz / dt * data.ttl;
+          const { r: rX, b: bX } = linReg(data.posX.map((v, i) => [i, v]));
+          const { r: rY, b: bY } = linReg(data.posY.map((v, i) => [i, v]));
+          const { r: rZ, b: bZ } = linReg(data.posZ.map((v, i) => [i, v]));
           data.lastEstX = data.estX;
           data.lastEstY = data.estY;
           data.lastEstZ = data.estZ;
-          data.estX = estX;
-          data.estY = estY;
-          data.estZ = estZ;
+          data.estX = x + bX * data.ttl;
+          data.estY = y + bY * data.ttl;
+          data.estZ = z + bZ * data.ttl;
           data.lastUpdate = t;
         }
       }
