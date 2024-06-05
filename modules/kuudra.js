@@ -6,7 +6,7 @@ import { colorForNumber } from '../util/format';
 import reg from '../util/registerer';
 import getPing from '../util/ping';
 import { StateProp, StateVar } from '../util/state';
-import { createBossBar, setBossBar } from '../util/mc';
+import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 const { gsl_sf_lambert_W0: W, intersectPL } = require('../util/math');
 
 /**
@@ -154,7 +154,7 @@ const renderReg = reg('renderWorld', () => {
         Math.sin(phi) * Math.cos(theta),
         Math.cos(phi),
         Math.sin(phi) * Math.sin(theta),
-        getRenderX(), getRenderY(), getRenderZ(),
+        getRenderX(), getRenderY() + getEyeHeight(), getRenderZ(),
         0, 0, 1,
         0, 0, -80
       ),
@@ -178,7 +178,7 @@ const tickReg = reg('tick', () => {
     pearlLocs = dropLocs.map(({ x, y, z }) => {
       let { phi, theta, ticks } = solvePearl(
         x - Player.getX(),
-        y - (Player.getY() + 1.5),
+        y - (Player.getY() + getEyeHeight() - 0.1),
         z - Player.getZ()
       );
       if (Number.isNaN(phi)) return;
@@ -188,7 +188,7 @@ const tickReg = reg('tick', () => {
           Math.cos(phi),
           Math.sin(phi) * Math.sin(theta),
           getRenderX(),
-          getRenderY(),
+          getRenderY() + getEyeHeight(),
           getRenderZ(),
           0, 1, 0,
           0, 140, 0

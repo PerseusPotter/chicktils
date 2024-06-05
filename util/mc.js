@@ -65,3 +65,11 @@ const BossStatus = Java.type('net.minecraft.entity.boss.BossStatus');
 export function setBossBar(bar) {
   BossStatus.func_82824_a(bar, false);
 }
+
+/**
+ * @param {?import ('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>} ent
+ * @returns {number}
+ */
+export function getEyeHeight(ent) {
+  return (ent || Player.getPlayer())?.func_70047_e() || 0;
+}
