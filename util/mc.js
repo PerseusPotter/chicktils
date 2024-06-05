@@ -67,9 +67,26 @@ export function setBossBar(bar) {
 }
 
 /**
- * @param {?import ('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>} ent
+ * @param {import ('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>?} ent
  * @returns {number}
  */
 export function getEyeHeight(ent) {
   return (ent || Player.getPlayer())?.func_70047_e() || 0;
+}
+
+const Vec3 = Java.type('net.minecraft.util.Vec3');
+/**
+ * @param {{ x: number, y: number, z: number}} pos
+ * @returns {import ('../../@types/External').JavaClass<'net.minecraft.util.Vec3'>}
+ */
+export function toVec3({ x, y, z }) {
+  return new Vec3(x, y, z);
+}
+
+/**
+ * @param {import ('../../@types/External').JavaClass<'net.minecraft.util.Vec3'>} vec
+ * @returns {{ x: number, y: number, z: number}}
+ */
+export function fromVec3(vec) {
+  return { x: vec.field_72450_a, y: vec.field_72448_b, z: vec.field_72449_c };
 }
