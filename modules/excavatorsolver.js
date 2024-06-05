@@ -1,6 +1,7 @@
 import settings from '../settings';
 import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
+import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
 import reg from '../util/registerer';
 import { DelayTimer } from '../util/timers';
 
@@ -74,16 +75,13 @@ const fossils = [
 
 const route = [31, 32, 21, 22, 25, 12, 19, 23, 30, 40];
 
-const lowerInvF = Java.type('net.minecraft.client.gui.inventory.GuiChest').class.getDeclaredField('field_147015_w');
-lowerInvF.setAccessible(true);
-const whatIsThisCringeShit = Java.type('net.minecraft.item.Item').field_150901_e;
 let tooltipReg;
 const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 const guiReg = reg('guiOpened', evn => {
   const gui = evn.gui;
   if (gui.getClass().getSimpleName() !== 'GuiChest') return;
   // net.minecraft.client.player.inventory.ContainerLocalMenu
-  const inv = lowerInvF.get(gui);
+  const inv = getLowerContainer(gui);
   const name = inv.func_70005_c_();
   if (name !== 'Fossil Excavator') return;
   Client.scheduleTask(() => {
@@ -138,7 +136,7 @@ const guiReg = reg('guiOpened', evn => {
       for (let i = 0; i < 54; i++) {
         let item = inv.func_70301_a(i);
         if (item === null) continue;
-        if (whatIsThisCringeShit.func_177774_c(item.func_77973_b()).toString() !== 'minecraft:stained_glass_pane') continue;
+        if (getItemId(item) !== 'minecraft:stained_glass_pane') continue;
         let dmg = item.func_77960_j();
         dust[i] = dmg === 0;
         dirt[i] = dmg !== 0/* && dmg !== 5*/;
@@ -243,7 +241,7 @@ const guiReg = reg('guiOpened', evn => {
     tooltipReg = reg(net.minecraftforge.event.entity.player.ItemTooltipEvent, evn => {
       if (Client.currentGui.get() !== gui) return tooltipReg.unregister();
       const item = evn.itemStack;
-      if (!item || whatIsThisCringeShit.func_177774_c(item.func_77973_b()).toString() !== 'minecraft:stained_glass_pane') return;
+      if (!item || getItemId(item) !== 'minecraft:stained_glass_pane') return;
       const opt = item.func_77960_j() === 0 ? settings.excavatorSolverDustTooltip : settings.excavatorSolverDirtTooltip;
       if (opt === 'Default') return;
       else {
@@ -276,20 +274,16 @@ const guiReg = reg('guiOpened', evn => {
         }
       }
     }).register();
-    const cb = new JavaAdapter(Java.type('net.minecraft.inventory.IInvBasic'), {
-      func_76316_a(inv) {
-        wasChanged = true;
-        // cringe shit gets called ~100 times per click
-        if (!updater.shouldTick()) return;
-        update(inv);
-        Client.scheduleTask(1, () => update(inv));
-        Client.scheduleTask(2, () => update(inv));
-        Client.scheduleTask(3, () => update(inv));
-        Client.scheduleTask(4, () => update(inv));
-      }
+    listenInventory(inv, inv => {
+      wasChanged = true;
+      // cringe shit gets called ~100 times per click
+      if (!updater.shouldTick()) return;
+      update(inv);
+      Client.scheduleTask(1, () => update(inv));
+      Client.scheduleTask(2, () => update(inv));
+      Client.scheduleTask(3, () => update(inv));
+      Client.scheduleTask(4, () => update(inv));
     });
-    inv.func_110134_a(cb);
-    // inv.func_110132_b(cb); // remove hook
   });
 });
 

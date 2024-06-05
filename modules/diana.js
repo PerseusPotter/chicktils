@@ -7,6 +7,7 @@ import { drawBeaconBeam, drawString, pointTo3D, renderWaypoints } from '../util/
 import { dist, linReg, lineRectColl } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateVar } from '../util/state';
+import { getItemId, getLowerContainer } from '../util/mc';
 
 const warps = [
   {
@@ -42,21 +43,17 @@ const warps = [
   }
 ];
 
-const lowerInvF = Java.type('net.minecraft.client.gui.inventory.GuiChest').class.getDeclaredField('field_147015_w');
-lowerInvF.setAccessible(true);
-const whatIsThisCringeShit = Java.type('net.minecraft.item.Item').field_150901_e;
 const warpOpenReg = reg('guiOpened', evn => {
   const gui = evn.gui;
   if (gui.getClass().getSimpleName() !== 'GuiChest') return;
   // net.minecraft.client.player.inventory.ContainerLocalMenu
-  const inv = lowerInvF.get(gui);
+  const inv = getLowerContainer(gui);
   const name = inv.func_70005_c_();
   if (name !== 'Hub Warps') return;
   Client.scheduleTask(() => {
     data.unlockedHubWarps = warps.map(v => {
       const item = inv.func_70301_a(v.pos);
-      if (!item) return false;
-      return whatIsThisCringeShit.func_177774_c(item.func_77973_b()).toString() === 'minecraft:paper';
+      return item && getItemId(item) === 'minecraft:paper';
     });
   });
 });

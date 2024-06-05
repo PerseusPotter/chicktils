@@ -6,6 +6,7 @@ import { colorForNumber } from '../util/format';
 import reg from '../util/registerer';
 import getPing from '../util/ping';
 import { StateProp, StateVar } from '../util/state';
+import { createBossBar, setBossBar } from '../util/mc';
 const { gsl_sf_lambert_W0: W, intersectPL } = require('../util/math');
 
 /**
@@ -199,22 +200,12 @@ const tickReg = reg('tick', () => {
     }).filter(Boolean);
   }
 }).setEnabled(settings._kuudraRenderPearlTarget);
-const kuudraName = new TextComponent('§6﴾ §c§lKuudra§6 ﴿').chatComponentText;
-// https://github.com/Marcelektro/MCP-919/blob/main/temp/src/minecraft/net/minecraft/entity/boss/BossStatus.java
-const customBossBar = new JavaAdapter(Java.type('net.minecraft.entity.boss.IBossDisplayData'), {
-  func_145748_c_() {
-    return kuudraName;
-  },
-  func_110143_aJ() {
-    if (!kuuder) return 100_000;
-    const h = kuuder.getHP();
-    if (h <= 25_000) return h * 4;
-    return (h - 25_000) / 3 * 4;
-  },
-  func_110138_aP() {
-    return 100_000;
-  }
-});
+const customBossBar = createBossBar('§6﴾ §c§lKuudra§6 ﴿', () => {
+  if (!kuuder) return 100_000;
+  const h = kuuder.getHP();
+  if (h <= 25_000) return h * 4;
+  return (h - 25_000) / 3 * 4;
+}, 100_000);
 const updateReg1 = reg('step', () => {
   World.getAllEntities().forEach(e => {
     if (e.getName() === '§a§l✓ SUPPLIES RECEIVED ✓') {
@@ -228,7 +219,7 @@ const updateReg1 = reg('step', () => {
   if (settings.kuudraBoxChunks) chunks = chunks.filter(v => !v.isDead());
 }).setFps(1);
 const bossBarReg = reg('renderBossHealth', () => {
-  Java.type('net.minecraft.entity.boss.BossStatus').func_82824_a(customBossBar, false);
+  setBossBar(customBossBar, false);
 }).setEnabled(new StateProp(settings._kuudraCustomBossBar).and(isT5));
 
 const supplyPickReg = reg('renderTitle', (title, sub) => {
