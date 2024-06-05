@@ -34,6 +34,7 @@ function format(obj, depth = 3) {
         if (depth === 0) return `Array(${obj.length})`;
         return `[${obj.map(v => format(v, depth - 1)).join(', ')}]`;
       }
+      if (obj instanceof Java.type('net.minecraft.util.Vec3')) return `<${format(obj.field_72450_a)}, ${format(obj.field_72448_b)}, ${format(obj.field_72449_c)}>`;
       if (depth === 0) return `[object ${obj.constructor ? obj.constructor.name : 'Object'}]`;
       const ent = Object.entries(obj);
       if (ent.length === 0) return '{}';
