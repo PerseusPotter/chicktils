@@ -329,6 +329,7 @@ export function linReg(arr) {
   const xStd = Math.sqrt(arr.reduce((a, v) => a + (v[0] - xMean) ** 2, 0)); // should be / (n - 1)
   const yStd = Math.sqrt(arr.reduce((a, v) => a + (v[1] - yMean) ** 2, 0)); // should be / (n - 1)
   const r = arr.reduce((a, v) => a + (v[0] - xMean) * (v[1] - yMean), 0) / (xStd * yStd);
+  if (Number.isNaN(r)) return { r: 0, b: 0 };
   const b = r * yStd / xStd;
   return { r, b };
 }
