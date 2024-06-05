@@ -127,7 +127,7 @@ const guiReg = reg('guiOpened', evn => {
           mul = +(m[1].replace(/,/g, ''));
           continue;
         }
-        if (!ttb && (m = lore.func_150307_f(i).match(/^  §6+([\d,.]+)x §8(§dTime Tower§8)$/))) {
+        if (!ttb && (m = lore.func_150307_f(i).match(/^  §6\+([\d,.]+)x §8\(§dTime Tower§8\)$/))) {
           ttb = +(m[1].replace(/,/g, ''));
           continue;
         }
