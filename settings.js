@@ -511,7 +511,7 @@ export const props = {
   dungeonBoxMiniColor: new Property('DungeonBoxMiniColor', page, ++sort, Property.Type.Color, 0xB400B4FF, { desc: 'color for LAs,  FAs, and AAs' }),
   dungeonBoxMobDisableInBoss: new Property('DungeonBoxMobDisableInBoss', page, ++sort, Property.Type.Toggle, false),
 
-  dungeonBoxWither: new Property('DungeonBoxWither', page, ++sort, Property.Type.Toggle, true, { desc: 'independent from box mobs' }),
+  dungeonBoxWither: new Property('DungeonBoxWither', page, ++sort, Property.Type.Toggle, false, { desc: 'independent from box mobs' }),
   dungeonBoxWitherEsp: new Property('DungeonBoxWitherEsp', page, ++sort, Property.Type.Toggle, true),
   dungeonBoxWitherColor: new Property('DungeonBoxWitherColor', page, ++sort, Property.Type.Color, 0x515A0BFF),
 
