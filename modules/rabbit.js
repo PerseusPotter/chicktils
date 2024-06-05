@@ -5,6 +5,7 @@ import reg from '../util/registerer';
 import { getSbDate } from '../util/skyblock';
 import { StateProp } from '../util/state';
 import { DelayTimer } from '../util/timers';
+import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
 
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');
@@ -94,15 +95,12 @@ const eggRendOvReg = reg('renderOverlay', () => {
   pointTo3D(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
 });
 
-const lowerInvF = Java.type('net.minecraft.client.gui.inventory.GuiChest').class.getDeclaredField('field_147015_w');
-lowerInvF.setAccessible(true);
-const whatIsThisCringeShit = Java.type('net.minecraft.item.Item').field_150901_e;
 const guiReg = reg('guiOpened', evn => {
   if (!settings.rabbitShowBestUpgrade) return;
   const gui = evn.gui;
   if (gui.getClass().getSimpleName() !== 'GuiChest') return;
   // net.minecraft.client.player.inventory.ContainerLocalMenu
-  const inv = lowerInvF.get(gui);
+  const inv = getLowerContainer(gui);
   const name = inv.func_70005_c_();
   if (name !== 'Chocolate Factory') return;
   Client.scheduleTask(() => {
@@ -113,7 +111,7 @@ const guiReg = reg('guiOpened', evn => {
       if (!wasChanged) return;
       wasChanged = false;
       const cp = inv.func_70301_a(45);
-      if (!cp || whatIsThisCringeShit.func_177774_c(cp.func_77973_b()).toString() !== 'minecraft:dye') return;
+      if (!cp || getItemId(cp) !== 'minecraft:dye') return;
       const tag = cp.func_77978_p().func_74775_l('display');
       const lore = tag.func_150295_c('Lore', 8);
       let cps;
@@ -143,9 +141,7 @@ const guiReg = reg('guiOpened', evn => {
       const rabbitP = [19, 20, 21, 22, 23, 24, 25, 43];
       const rabbits = [28, 29, 30, 31, 32, 33, 34, 42]
         .map((v, i) => ({ a: i, v: inv.func_70301_a(v) }))
-        .filter(({ v }) => v &&
-          whatIsThisCringeShit.func_177774_c(v.func_77973_b()).toString() === 'minecraft:skull'
-        )
+        .filter(({ v }) => v && getItemId(v) === 'minecraft:skull')
         .map(({ a, v }) => {
           const tag = v.func_77978_p().func_74775_l('display');
           const lore = tag.func_150295_c('Lore', 8);
@@ -166,20 +162,16 @@ const guiReg = reg('guiOpened', evn => {
         inv.func_70301_a(rabbitP[bestRabbit.a]).func_77964_b(5);
       }
     }
-    const cb = new JavaAdapter(Java.type('net.minecraft.inventory.IInvBasic'), {
-      func_76316_a(inv) {
-        wasChanged = true;
-        // cringe shit gets called ~100 times per click
-        if (!updater.shouldTick()) return;
-        update(inv);
-        Client.scheduleTask(1, () => update(inv));
-        Client.scheduleTask(2, () => update(inv));
-        Client.scheduleTask(3, () => update(inv));
-        Client.scheduleTask(4, () => update(inv));
-      }
+    listenInventory(inv, inv => {
+      wasChanged = true;
+      // cringe shit gets called ~100 times per click
+      if (!updater.shouldTick()) return;
+      update(inv);
+      Client.scheduleTask(1, () => update(inv));
+      Client.scheduleTask(2, () => update(inv));
+      Client.scheduleTask(3, () => update(inv));
+      Client.scheduleTask(4, () => update(inv));
     });
-    inv.func_110134_a(cb);
-    // inv.func_110132_b(cb); // remove hook
   });
 }).setEnabled(settings._rabbitShowBestUpgrade);
 
