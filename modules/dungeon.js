@@ -21,7 +21,8 @@ function reset() {
   renderWorldReg.unregister();
   renderOvlyReg.unregister();
   step2Reg.unregister();
-  tickReg.unregister();
+  clientTickReg.unregister();
+  serverTickReg.unregister();
   particleReg.unregister();
   titleReg.unregister();
   entSpawnReg.unregister();
@@ -65,7 +66,7 @@ function start() {
   powerupCand = [];
   hiddenPowerups.clear();
   hiddenPowerupsBucket.clear();
-  necronDragStart = 0;
+  necronDragTicks = 0;
   isAtDev4 = false;
   brokenStairBucket.clear();
   players = [];
@@ -78,7 +79,8 @@ function start() {
   renderWorldReg.register();
   renderOvlyReg.register();
   step2Reg.register();
-  tickReg.register();
+  clientTickReg.register();
+  serverTickReg.register();
   particleReg.register();
   titleReg.register();
   entSpawnReg.register();
@@ -135,7 +137,7 @@ const hiddenPowerupsBucket = new Grid({ addNeighbors: 1 });
 const shitterAlert = createAlert('Shitter', 10);
 let instaMidProc;
 const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () => ['§l§26.42s']);
-let necronDragStart = 0;
+let necronDragTicks = 0;
 let isAtDev4 = false;
 const brokenStairBucket = new Grid({ size: 2, addNeighbors: 2 });
 let players = [];
@@ -233,7 +235,7 @@ const step2Reg = reg('step', () => {
   if (settings.dungeonIceSprayAlert && World.getAllEntities().some(e => e.getClassName() === 'EntityArmorStand' && e.getName().includes('Ice Spray Wand'))) iceSprayAlert.show(settings.dungeonIceSprayAlertTime);
 }).setFps(2).setEnabled(stateBoxMob.or(settings._dungeonIceSprayAlert));
 
-const tickReg = reg('tick', ticks => {
+const clientTickReg = reg('tick', () => {
   if (settings.dungeonCamp) {
     possibleSkulls.forEach(e => {
       if (!isSkull(e)) return;
@@ -247,61 +249,6 @@ const tickReg = reg('tick', ticks => {
       } else addSkull(ent);
     });
     possibleSkulls = [];
-
-    const t = Date.now();
-    bloodMobs = bloodMobs.filter(e => {
-      const uuid = e.getUUID().toString();
-      let data = motionData.get(uuid);
-      const x = e.getX();
-      const y = e.getY();
-      const z = e.getZ();
-      if (!data && bloodOpenTime > 0) {
-        const dx = dist(x, e.getLastX());
-        const dz = dist(z, e.getLastZ());
-        if (y > 71 && (dx > 0.01 || dz > 0.01) && dx < 0.5 && dz < 0.5) {
-          bloodMobCount++;
-          const ttl = t - bloodOpenTime < 32000 && (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
-          data = {
-            posX: [e.getLastX()],
-            posY: [e.getLastY()],
-            posZ: [e.getLastZ()],
-            estX: x,
-            estY: y,
-            estZ: z,
-            lastEstX: x,
-            lastEstY: y,
-            lastEstZ: z,
-            ttl,
-            maxTtl: ttl,
-            startT: t,
-            lastUpdate: t,
-            timer: new DelayTimer(settings.dungeonCampSmoothTime)
-          };
-          motionData.set(uuid, data);
-          if (ttl === 80 && bloodMobCount >= 4) lastSpawnedBloodMob = data;
-        }
-      }
-      if (data) {
-        data.ttl--;
-        data.posX.push(x);
-        data.posY.push(y);
-        data.posZ.push(z);
-        if (data.ttl <= 0) return void motionData.delete(uuid);
-        if (data.timer.shouldTick()) {
-          const { r: rX, b: bX } = linReg(data.posX.map((v, i) => [i, v]));
-          const { r: rY, b: bY } = linReg(data.posY.map((v, i) => [i, v]));
-          const { r: rZ, b: bZ } = linReg(data.posZ.map((v, i) => [i, v]));
-          data.lastEstX = data.estX;
-          data.lastEstY = data.estY;
-          data.lastEstZ = data.estZ;
-          data.estX = x + bX * data.ttl;
-          data.estY = y + bY * data.ttl;
-          data.estZ = z + bZ * data.ttl;
-          data.lastUpdate = t;
-        }
-      }
-      return true;
-    });
   }
   if (settings.dungeonHideHealerPowerups) {
     const t = Date.now();
@@ -431,6 +378,66 @@ const tickReg = reg('tick', ticks => {
   }).start();
 }).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither));
 
+const serverTickReg = reg('packetReceived', () => {
+  if (settings.dungeonCamp) {
+    const t = Date.now();
+    bloodMobs = bloodMobs.filter(e => {
+      const uuid = e.getUUID().toString();
+      let data = motionData.get(uuid);
+      const x = e.getX();
+      const y = e.getY();
+      const z = e.getZ();
+      if (!data && bloodOpenTime > 0) {
+        const dx = dist(x, e.getLastX());
+        const dz = dist(z, e.getLastZ());
+        if (y > 71 && (dx > 0.01 || dz > 0.01) && dx < 0.5 && dz < 0.5) {
+          bloodMobCount++;
+          const ttl = t - bloodOpenTime < 32000 && (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
+          data = {
+            posX: [e.getLastX()],
+            posY: [e.getLastY()],
+            posZ: [e.getLastZ()],
+            estX: x,
+            estY: y,
+            estZ: z,
+            lastEstX: x,
+            lastEstY: y,
+            lastEstZ: z,
+            ttl,
+            maxTtl: ttl,
+            startT: t,
+            lastUpdate: t,
+            timer: new DelayTimer(settings.dungeonCampSmoothTime)
+          };
+          motionData.set(uuid, data);
+          if (ttl === 80 && bloodMobCount >= 4) lastSpawnedBloodMob = data;
+        }
+      }
+      if (data) {
+        data.ttl--;
+        data.posX.push(x);
+        data.posY.push(y);
+        data.posZ.push(z);
+        if (data.ttl <= 0) return void motionData.delete(uuid);
+        if (data.timer.shouldTick()) {
+          const { r: rX, b: bX } = linReg(data.posX.map((v, i) => [i, v]));
+          const { r: rY, b: bY } = linReg(data.posY.map((v, i) => [i, v]));
+          const { r: rZ, b: bZ } = linReg(data.posZ.map((v, i) => [i, v]));
+          data.lastEstX = data.estX;
+          data.lastEstY = data.estY;
+          data.lastEstZ = data.estZ;
+          data.estX = x + bX * data.ttl;
+          data.estY = y + bY * data.ttl;
+          data.estZ = z + bZ * data.ttl;
+          data.lastUpdate = t;
+        }
+      }
+      return true;
+    });
+  }
+  if (necronDragTicks > 0) necronDragTicks--;
+}).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').or(settings._dungeonCamp));
+
 register('command', () => {
   const obj = {};
   if (map) map.field_76203_h.forEach((k, v) => obj[k] = `${v.func_176110_a()}, ${v.func_176112_b()}, ${v.func_176113_c()}, ${v.func_176111_d()}`);
@@ -455,7 +462,7 @@ const quizFailReg = reg('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the
 const architectUseReg = reg('chat', () => shitterAlert.hide()).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}').setEnabled(settings._dungeonAutoArchitect);
 
 const necronStartReg = reg('chat', () => {
-  necronDragStart = Date.now();
+  necronDragTicks = settings.dungeonNecronDragDuration;
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc = runHelper('InstaMidHelper');
 }).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None'));
 
@@ -627,12 +634,10 @@ const renderOvlyReg = reg('renderOverlay', () => {
   if (settings.dungeonMap) {
     mapDisplay.render();
   }
-  if (necronDragStart > 0 && (settings.dungeonNecronDragTimer === 'OnScreen' || settings.dungeonNecronDragTimer === 'Both')) {
-    const d = settings.dungeonNecronDragDuration * 50 - Date.now() + necronDragStart;
-    if (d >= 0) {
-      necronDragTimer.setLine(`§l${colorForNumber(d, settings.dungeonNecronDragDuration * 50)}${(d / 1000).toFixed(2)}s`.toString());
-      necronDragTimer.render();
-    }
+  if (necronDragTicks > 0 && (settings.dungeonNecronDragTimer === 'OnScreen' || settings.dungeonNecronDragTimer === 'Both')) {
+    const d = necronDragTicks * 50;
+    necronDragTimer.setLine(`§l${colorForNumber(d, settings.dungeonNecronDragDuration * 50)}${(d / 1000).toFixed(2)}s`.toString());
+    necronDragTimer.render();
   }
   if (settings.dungeonCampSkipTimer && lastSpawnedBloodMob && lastSpawnedBloodMob.ttl) {
     const d = (lastSpawnedBloodMob.ttl + 1 - Tessellator.partialTicks) * 50;
