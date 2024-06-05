@@ -278,6 +278,15 @@ export function rotate(x, y, z, t, p, r) {
 
 /**
  * @param {{ x: number, y: number, z: number }} pos
+ * @returns {{ x: number, y: number, z: number }}
+ */
+export function normalize({ x, y, z }) {
+  const d = Math.hypot(x, y, z) || 1;
+  return { x: x / d, y: y / d, z: z / d };
+}
+
+/**
+ * @param {{ x: number, y: number, z: number }} pos
  * @returns {[number, number, number]}
  */
 export function toArray(pos) {
