@@ -276,13 +276,19 @@ export function rotate(x, y, z, t, p, r) {
   };
 }
 
+// why is rhino so shit
+// normalize({ x, y, z }, newLength = 1)
+// normalize({ ... });
+// newLength = [object Object]
 /**
  * @param {{ x: number, y: number, z: number }} pos
+ * @param {number?} newLength (1)
  * @returns {{ x: number, y: number, z: number }}
  */
-export function normalize({ x, y, z }) {
-  const d = Math.hypot(x, y, z) || 1;
-  return { x: x / d, y: y / d, z: z / d };
+export function normalize(pos, newLength = 1) {
+  const { x, y, z } = pos;
+  const d = newLength / (Math.hypot(x, y, z) || 1);
+  return { x: x * d, y: y * d, z: z * d };
 }
 
 /**
