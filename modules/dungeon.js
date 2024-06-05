@@ -8,12 +8,13 @@ import { colorForNumber, execCmd, getPlayerName } from '../util/format';
 import getPing from '../util/ping';
 import runHelper from '../util/runner';
 import createTextGui from '../util/customtextgui';
-import { compareFloat, dist, lerp, linReg } from '../util/math';
+import { compareFloat, dist, lerp, linReg, normalize, rotate } from '../util/math';
 import Grid from '../util/grid';
 import { log, logDebug } from '../util/log';
 import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
 import * as Party from '../util/party';
+import { fromVec3, getItemId, toVec3 } from '../util/mc';
 
 function reset() {
   renderEntReg.unregister();
@@ -73,6 +74,10 @@ function start() {
   isInGoldorDps = false;
   withers = [];
   teamTerms.clear();
+  allMobs = [];
+  allMobsBucket.clear();
+  itemCand = [];
+  frozenMobs.clear();
 
   renderEntReg.register();
   renderEntPostReg.register();
@@ -146,11 +151,23 @@ let isInGoldorDps = false;
 const iceSprayAlert = createAlert('ice spray :O', 10);
 let withers = [];
 const teamTerms = new Map();
+let allMobs = [];
+const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
+let itemCand = [];
+let frozenMobs = new (Java.type('java.util.HashMap'))();
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
 const stateMap = new StateProp(settings._dungeonMap).and(new StateProp(settings._dungeonMapHideBoss).not().or(new StateProp(isInBoss).not()));
 
+function isMob(name) {
+  return isDungeonMob(name) ||
+    name === 'EntityWither' ||
+    name === 'EntityGiantZombie' ||
+    name === 'EntityIronGolem' ||
+    // name === 'EntityDragon' ||
+    name === 'EntityDragonPart';
+}
 function isDungeonMob(name) {
   return name === 'EntityZombie' ||
     name === 'EntitySkeleton' ||
@@ -210,13 +227,19 @@ let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn 
     if (settings.dungeonHideHealerPowerups) powerupCand.push([Date.now(), e]);
     if (settings.dungeonBoxMobs && !isInBoss.get()) nameCand.push(e);
     if (stateCamp.get()) possibleSkulls.push(e);
-  } else if (stateBoxMob.get() && isDungeonMob(c)) mobCand.push(e);
+  } else {
+    if (stateBoxMob.get() && isDungeonMob(c)) mobCand.push(e);
+    if (settings.dungeonBoxIceSprayed) {
+      if (isMob(c)) allMobs.push(e);
+      else if (c === 'EntityItem') itemCand.push(e);
+    }
+  }
   if (c === 'EntityOtherPlayerMP' && e.func_110124_au().version() === 4) {
     const p = players.find(v => v.ign === e.func_70005_c_());
-    if (p) p.e = new Entity(e);
+    if (p) p.e = new EntityLivingBase(e);
   }
   if (settings.dungeonBoxWither && c === 'EntityWither') withers.push(new EntityLivingBase(e));
-}).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither));
+}).setEnabled(new StateProp(settings.dungeonHideHealerPowerups).or(stateBoxMob).or(stateCamp).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed));
 
 const step2Reg = reg('step', () => {
   if (stateBoxMob.get()) {
@@ -233,7 +256,15 @@ const step2Reg = reg('step', () => {
     });
   }
   if (settings.dungeonIceSprayAlert && World.getAllEntities().some(e => e.getClassName() === 'EntityArmorStand' && e.getName().includes('Ice Spray Wand'))) iceSprayAlert.show(settings.dungeonIceSprayAlertTime);
-}).setFps(2).setEnabled(stateBoxMob.or(settings._dungeonIceSprayAlert));
+  if (settings.dungeonBoxIceSprayed) {
+    allMobsBucket.clear();
+    allMobs = allMobs.filter(e => {
+      if (e.field_70128_L) return false;
+      allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
+      return true;
+    });
+  }
+}).setFps(2).setEnabled(stateBoxMob.or(settings._dungeonIceSprayAlert).or(settings._dungeonBoxIceSprayed));
 
 const clientTickReg = reg('tick', () => {
   if (settings.dungeonCamp) {
@@ -313,7 +344,7 @@ const clientTickReg = reg('tick', () => {
       World.getAllEntities().forEach(v => {
         if (v.getClassName() !== 'EntityOtherPlayerMP') return;
         const player = players.find(p => p.ign === v.getName());
-        if (player) player.e = v;
+        if (player) player.e = new EntityLivingBase(v.entity);
       });
       const player = players.find(p => p.ign === Player.getName());
       if (player) player.e = Player;
@@ -323,7 +354,57 @@ const clientTickReg = reg('tick', () => {
     isInGoldorDps = false;
     goldorDpsStartAlert.show(settings.dungeonGoldorDpsStartAlertTime);
   }
-  withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither' && v.getMaxHP() !== 300);
+  if (settings.dungeonBoxWither) withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither' && v.getMaxHP() !== 300);
+  if (settings.dungeonBoxIceSprayed) {
+    const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');
+    itemCand = [];
+    if (hasIce) {
+      const icers = players.filter(({ e }) => {
+        if (!e) return;
+        const heldItem = e === Player ? e.getHeldItem() : e.getItemInSlot(0);
+        return heldItem && heldItem.getNBT().getCompoundTag('tag').getCompoundTag('ExtraAttributes').getString('id') === 'ICE_SPRAY_WAND';
+      });
+      icers.forEach(({ e: p }) => {
+        const ent = (p === Player ? p.getPlayer() : p.entity);
+        if (!ent) return;
+        let look = ent.func_70040_Z();
+        const w = 0.8;
+        const l = 7;
+        const h = toVec3(normalize(rotate(look.field_72450_a, 0, look.field_72449_c, Math.PI / 2, 0, 0), w));
+        const v = toVec3(normalize(rotate(look.field_72450_a, look.field_72448_b, look.field_72449_c, 0, Math.PI / 2, 0), w));
+        const p1 = ent.func_174824_e(1);
+        const p2 = p1.func_178787_e(h).func_178787_e(v);
+        const p3 = p1.func_178787_e(h).func_178788_d(v);
+        const p4 = p1.func_178788_d(h).func_178787_e(v);
+        const p5 = p1.func_178788_d(h).func_178788_d(v);
+        look = toVec3(normalize(fromVec3(look), l));
+        const f1 = p1.func_178787_e(look);
+        const f2 = p2.func_178787_e(look);
+        const f3 = p3.func_178787_e(look);
+        const f4 = p4.func_178787_e(look);
+        const f5 = p5.func_178787_e(look);
+        allMobsBucket.get(p.getX(), p.getZ()).forEach(e => {
+          const aabb = e.func_174813_aQ();
+          if (
+            aabb.func_72327_a(p1, f1) ||
+            aabb.func_72327_a(p2, f2) ||
+            aabb.func_72327_a(p3, f3) ||
+            aabb.func_72327_a(p4, f4) ||
+            aabb.func_72327_a(p5, f5)
+          ) {
+            const c = e.getClass().getSimpleName();
+            if (c === 'EntityDragonPart') frozenMobs.put(e.field_70259_a, 5 * 20);
+            else if (c === 'EntityOtherPlayerMP') {
+              const n = e.func_70005_c_();
+              if (players.find(v => v.ign === n)) return;
+            } else if (c === 'EntityWither') {
+              if (e.func_110138_aP() === 300) return;
+            } else frozenMobs.put(e, 5 * 20);
+          }
+        });
+      });
+    }
+  }
   new Thread(() => {
     if (stateBoxMob.get()) {
       nameCand = nameCand.filter(e => {
@@ -376,7 +457,7 @@ const clientTickReg = reg('tick', () => {
       lastRoom = k;
     }
   }).start();
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither));
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed));
 
 const serverTickReg = reg('packetReceived', () => {
   if (settings.dungeonCamp) {
@@ -436,7 +517,12 @@ const serverTickReg = reg('packetReceived', () => {
     });
   }
   if (necronDragTicks > 0) necronDragTicks--;
-}).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').or(settings._dungeonCamp));
+  if (settings.dungeonBoxIceSprayed) frozenMobs.entrySet().forEach(e => {
+    const v = e.getValue() - 1;
+    if (v === 0) frozenMobs.remove(e.getKey());
+    else frozenMobs.put(e.getKey(), v);
+  });
+}).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').or(settings._dungeonCamp).or(settings._dungeonBoxIceSprayed));
 
 register('command', () => {
   const obj = {};
@@ -536,7 +622,7 @@ const renderEntPostReg = reg('postRenderEntity', (e, pos, partial) => {
   if (data) drawBoxPos(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, partial, settings.dungeonBoxMobEsp, false);
 }).setEnabled(stateBoxMob);
 
-const renderWorldReg = reg('renderWorld', () => {
+const renderWorldReg = reg('renderWorld', partial => {
   if (settings.dungeonCamp) {
     // bloodMobs.forEach(e => motionData.has(e.getUUID().toString()) || drawBoxAtBlock(e.getX() - 0.5, e.getY() + 1.5, e.getZ() - 0.5, 1, +(!e.isDead()), +(e.getX() === e.getLastX()), 1, 1));
     // drawBoxAtBlock(bloodX, 69, bloodZ, 1, 0, 0, 32, 16);
@@ -628,7 +714,29 @@ const renderWorldReg = reg('renderWorld', () => {
       else drawBoxAtBlockNotVisThruWalls(x - 0.75, y - 0.25, z - 0.75, r, g, b, 1.5, 4, a, 5);
     })
   }
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper).or(settings._dungeonM7LBWaypoints).or(settings._dungeonBoxTeammates).or(settings._dungeonBoxWither));
+  if (settings.dungeonBoxIceSprayed) {
+    const or = ((settings.dungeonBoxIceSprayedOutlineColor >> 24) & 0xFF) / 256;
+    const og = ((settings.dungeonBoxIceSprayedOutlineColor >> 16) & 0xFF) / 256;
+    const ob = ((settings.dungeonBoxIceSprayedOutlineColor >> 8) & 0xFF) / 256;
+    const oa = ((settings.dungeonBoxIceSprayedOutlineColor >> 0) & 0xFF) / 256;
+    const fr = ((settings.dungeonBoxIceSprayedFillColor >> 24) & 0xFF) / 256;
+    const fg = ((settings.dungeonBoxIceSprayedFillColor >> 16) & 0xFF) / 256;
+    const fb = ((settings.dungeonBoxIceSprayedFillColor >> 8) & 0xFF) / 256;
+    const fa = ((settings.dungeonBoxIceSprayedFillColor >> 0) & 0xFF) / 256;
+    frozenMobs.forEach(e => {
+      if (e.field_70128_L) return;
+      const x = lerp(e.field_70169_q, e.field_70165_t, partial);
+      const y = lerp(e.field_70167_r, e.field_70163_u, partial);
+      const z = lerp(e.field_70166_s, e.field_70161_v, partial);
+      const w = e.field_70130_N + 0.2;
+      const h = e.field_70131_O + 0.2;
+      if (settings.dungeonBoxIceSprayedEsp) drawBoxAtBlock(x - w / 2, y, z - w / 2, or, og, ob, w, h, oa, 5);
+      else drawBoxAtBlockNotVisThruWalls(x - w / 2, y, z - w / 2, or, og, ob, w, h, oa, 5);
+
+      drawFilledBox(x, y, z, w, h, fr, fg, fb, fa, settings.dungeonBoxIceSprayedEsp);
+    });
+  }
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper).or(settings._dungeonM7LBWaypoints).or(settings._dungeonBoxTeammates).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed));
 
 const renderOvlyReg = reg('renderOverlay', () => {
   if (settings.dungeonMap) {
