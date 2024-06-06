@@ -13,7 +13,6 @@ import Grid from '../util/grid';
 import { log, logDebug } from '../util/log';
 import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
-import * as Party from '../util/party';
 import { fromVec3, getItemId, toVec3 } from '../util/mc';
 
 function reset() {
@@ -318,9 +317,7 @@ const clientTickReg = reg('tick', () => {
     } else instaMidProc = void 0;
   }
   isAtDev4 = dist(Player.getX(), 63) + dist(Player.getY(), 127) + dist(Player.getZ(), 35) < 3;
-  Party.testLoad();
-  if (players.length !== (Party.isInParty() ? Party.getMembers().size : 1)) {
-    players = [];
+  if (players.length === 0) {
     const tab = TabList.getNames();
     let expectEmpty = false;
     for (let i = 1; i < tab.length; i++) {
