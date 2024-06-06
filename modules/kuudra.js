@@ -261,7 +261,7 @@ const dirOverlayReg = reg('renderOverlay', () => {
   drawArrow2D(settings.kuudraArrowToKuudraColor, kt * Math.PI, 20, Player.getY() > 60 ? 0 : undefined);
 }).setEnabled(settings._kuudraDrawArrowToKuudra);
 
-let regInst = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
+const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   if (evn.entity.getClass().getSimpleName() === 'EntityGiantZombie') {
     const e = new Entity(evn.entity);
     const y = e.getY();
@@ -305,7 +305,7 @@ function onBuildStart() {
 }
 
 function reset() {
-  regInst.unregister();
+  entSpawnReg.unregister();
   onBuildStart();
   renderReg.unregister();
   tickReg.unregister();
@@ -326,7 +326,7 @@ function reset() {
 function start() {
   kuuder = null;
   isT5.set((Scoreboard.getLines().map(v => v.getName()).find(v => v.includes('⏣')) || '').slice(-2, -1) === '5');
-  regInst.register();
+  entSpawnReg.register();
   dropLocs = dropLocsStatic.slice();
   renderReg.register();
   tickReg.register();
