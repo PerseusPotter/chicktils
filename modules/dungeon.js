@@ -377,7 +377,7 @@ const clientTickReg = reg('tick', () => {
       const l = 8;
       const ls = l * l;
       const wE = 3.7;
-      const n = 4;
+      const n = 5;
       icers.forEach(({ e: p }) => {
         const ent = (p === Player ? p.getPlayer() : p.entity);
         if (!ent) return;
