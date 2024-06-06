@@ -348,3 +348,12 @@ export function linReg(arr) {
   const b = r * yStd / xStd;
   return { r, b };
 }
+
+/**
+ * @param {number[]} arr
+ * @returns {number}
+ */
+export function calcMedian(arr) {
+  arr.sort((a, b) => a - b);
+  return (arr[(arr.length - 1) >> 1] + arr[arr.length >> 1]) / 2;
+}
