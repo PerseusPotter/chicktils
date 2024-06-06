@@ -276,6 +276,20 @@ export function rotate(x, y, z, t, p, r) {
   };
 }
 
+/**
+ *
+ * @param {{ x: number, y: number, z: number }} pos1
+ * @param {{ x: number, y: number, z: number }} pos2
+ * @returns {{ x: number, y: number, z: number }}
+ */
+export function cross(pos1, pos2) {
+  return {
+    x: pos1.y * pos2.z - pos1.z * pos2.y,
+    y: pos1.z * pos2.x - pos1.x * pos2.z,
+    z: pos1.x * pos2.y - pos1.y * pos2.x
+  }
+}
+
 // why is rhino so shit
 // normalize({ x, y, z }, newLength = 1)
 // normalize({ ... });
