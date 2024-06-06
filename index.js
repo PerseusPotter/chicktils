@@ -10,7 +10,7 @@ import { getRegs } from './util/registerer';
 import { calcMedian } from './util/math';
 setIsMainS();
 setIsMainD();
-const VERSION = '0.3.3';
+const VERSION = '0.3.4';
 
 let sev;
 function tryUpdate(delay = 0) {
