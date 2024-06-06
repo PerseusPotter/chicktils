@@ -4,8 +4,10 @@ import { setIsMain as setIsMainD } from './data';
 import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
-import { centerMessage } from './util/format';
+import { centerMessage, cleanNumber } from './util/format';
 import getPing from './util/ping';
+import { getRegs } from './util/registerer';
+import { calcMedian } from './util/math';
 setIsMainS();
 setIsMainD();
 const VERSION = '0.3.3';
@@ -103,7 +105,8 @@ register('command', ...args => {
           ' &3/chicktils unload &l-> &bunloads modules',
           ' &3/chicktils config view [<page>] &l-> &bopens the settings',
           ' &3/chicktils config edit <name> [<value>] &l-> &bopens the settings',
-          ' &3/chicktils config search <search term> &l-> &bsearches the settings'
+          ' &3/chicktils config search <search term> &l-> &bsearches the settings',
+          ' &3/chicktils stats &l-> &bshows stats'
         ].forEach(v => ChatLib.chat(v));
         break;
       case 'update':
@@ -137,6 +140,37 @@ register('command', ...args => {
       case 'unload':
         unload();
         break;
+      case 'stats': {
+        function format(t) {
+          return Object.entries(t).sort((a, b) => b[1] - a[1]).map(v => `&7x${v[1]} ${v[0]} `).join('\n');
+        }
+        let countT = 0;
+        let typesT = {};
+        const count = [0, 0, 0];
+        const types = [{}, {}, {}];
+        getRegs().forEach(v => {
+          const i = v.getIsReg() + v.getIsAReg();
+          const t = types[i];
+          t[v.type] = (t[v.type] || 0) + 1;
+          count[i]++;
+          countT++;
+          typesT[v.type] = (typesT[v.type] || 0) + 1;
+        });
+        new Message(
+          centerMessage(`&9&lChickTils &r&5v${VERSION}`) + '\n',
+          new TextComponent(`Registers Defined: &3${countT}\n`)
+            .setHover('show_text', format(typesT)),
+          new TextComponent(`Registers Idle: &3${count[0]}\n`)
+            .setHover('show_text', format(types[0])),
+          new TextComponent(`Registers Disabled: &3${count[1]}\n`)
+            .setHover('show_text', format(types[1])),
+          new TextComponent(`Registers Active: &3${count[2]}\n`)
+            .setHover('show_text', format(types[2])),
+          new TextComponent('&6CLICK HERE').setClick('run_command', '/ChickTilsRunTest'),
+          '&r to run performance tests'
+        ).chat();
+        break;
+      }
       default:
         throw 'Unknown command: ' + cmdName;
     }
@@ -170,3 +204,50 @@ const worldLoadOnce = register('worldLoad', () => {
     worldLoadOnce.unregister();
   }).start();
 });
+
+let isTesting = false;
+register('command', () => {
+  if (isTesting) return log('already running test!');
+  isTesting = true;
+  new Thread(() => {
+    let renderTicks = [];
+    let lastRenderTick = 0;
+    let gameTicks = [];
+    let lastGameTick = 0;
+    const System = Java.type('java.lang.System');
+    Thread.sleep(1000);
+    const renderReg = register(net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent, evn => {
+      if (evn.phase.toString() === 'START') {
+        lastRenderTick = System.nanoTime();
+      } else if (lastRenderTick) {
+        renderTicks.push(System.nanoTime() - lastRenderTick);
+        lastRenderTick = 0;
+      }
+    });
+    const gameReg = register(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, evn => {
+      if (evn.phase.toString() === 'START') {
+        lastGameTick = System.nanoTime();
+      } else if (lastGameTick) {
+        gameTicks.push(System.nanoTime() - lastGameTick);
+        lastGameTick = 0;
+      }
+    });
+    Thread.sleep(5000);
+    const loadedRenderMedian = calcMedian(renderTicks);
+    const loadedGameMedian = calcMedian(gameTicks);
+    const state = getRegs().map(v => v.getIsReg());
+    getRegs().forEach(v => v.reg.unregister());
+    renderTicks = [];
+    gameTicks = [];
+    Thread.sleep(5000);
+    const unloadedRenderMedian = calcMedian(renderTicks);
+    const unloadedGameMedian = calcMedian(gameTicks);
+    renderReg.unregister();
+    gameReg.unregister();
+    log('cost of using ChickTils (lower better):');
+    log(`Frame Time: ${cleanNumber(unloadedRenderMedian / 1e6)}ms -> ${cleanNumber(loadedRenderMedian / 1e6)}ms (${loadedRenderMedian > unloadedRenderMedian ? '+' : '-'}${cleanNumber(Math.abs(loadedRenderMedian / unloadedRenderMedian * 100 - 100))}%)`);
+    log(`Tick Time: ${cleanNumber(unloadedGameMedian / 1e6)}ms -> ${cleanNumber(loadedGameMedian / 1e6)}ms (${loadedGameMedian > unloadedGameMedian ? '+' : '-'}${cleanNumber(Math.abs(loadedGameMedian / unloadedGameMedian * 100 - 100))}%)`);
+    getRegs().forEach((v, i) => v.reg.setRegistered(state[i]));
+    isTesting = false;
+  }).start();
+}).setName('ChickTilsRunTest');

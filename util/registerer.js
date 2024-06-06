@@ -1,4 +1,3 @@
-import { log } from './log';
 import { StateProp, StateVar } from './state';
 
 function wrap(orig, wrap, prop) {
@@ -6,6 +5,15 @@ function wrap(orig, wrap, prop) {
     prop.apply(orig, args[0] === undefined && args.length === 1 ? [] : args);
     return wrap;
   }
+}
+
+/**
+ * @type {{ type: string, getIsReg: () => boolean, getIsAReg: () => boolean, reg: any }[]}
+ */
+const allRegs = [];
+
+export function getRegs() {
+  return allRegs;
 }
 
 /**
@@ -92,6 +100,7 @@ reg = function reg(type, shit) {
     ov = o || false;
   }) : void 0;
   const _setAliases = type === 'command' ? wrap(rr, prox, ...a => aliases = a) : void 0;
+  allRegs.push({ type: typeof type === 'string' ? type : type.class.getName(), reg: prox, getIsReg: () => isReg, getIsAReg: () => isAReg });
   return prox;
 };
 export default reg;
