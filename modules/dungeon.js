@@ -8,7 +8,7 @@ import { colorForNumber, execCmd, getPlayerName } from '../util/format';
 import getPing from '../util/ping';
 import runHelper from '../util/runner';
 import createTextGui from '../util/customtextgui';
-import { compareFloat, dist, lerp, linReg, normalize, rotate } from '../util/math';
+import { compareFloat, cross, dist, lerp, linReg, normalize, rotate } from '../util/math';
 import Grid from '../util/grid';
 import { log, logDebug } from '../util/log';
 import { StateProp, StateVar } from '../util/state';
@@ -227,9 +227,15 @@ let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn 
     if (settings.dungeonBoxMobs && !isInBoss.get()) nameCand.push(e);
     if (stateCamp.get()) possibleSkulls.push(e);
   } else {
-    if (stateBoxMob.get() && isDungeonMob(c)) mobCand.push(e);
+    if (stateBoxMob.get() && isDungeonMob(c)) {
+      mobCand.push(e);
+      mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
+    }
     if (settings.dungeonBoxIceSprayed) {
-      if (isMob(c)) allMobs.push(e);
+      if (isMob(c)) {
+        allMobs.push(e);
+        allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
+      }
       else if (c === 'EntityItem') itemCand.push(e);
     }
   }
@@ -259,6 +265,13 @@ const step2Reg = reg('step', () => {
     allMobsBucket.clear();
     allMobs = allMobs.filter(e => {
       if (e.field_70128_L) return false;
+      const c = e.getClass().getSimpleName();
+      if (c === 'EntityOtherPlayerMP') {
+        const n = e.func_70005_c_();
+        if (players.find(v => v.ign === n)) return false;
+      } else if (c === 'EntityWither') {
+        if (e.func_110138_aP() === 300) return false;
+      }
       allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
       return true;
     });
@@ -361,42 +374,70 @@ const clientTickReg = reg('tick', () => {
         const heldItem = e === Player ? e.getHeldItem() : e.getItemInSlot(0);
         return heldItem && heldItem.getNBT().getCompoundTag('tag').getCompoundTag('ExtraAttributes').getString('id') === 'ICE_SPRAY_WAND';
       });
+      const wS = 1;
+      const l = 8;
+      const ls = l * l;
+      const wE = 3.7;
+      const n = 4;
       icers.forEach(({ e: p }) => {
         const ent = (p === Player ? p.getPlayer() : p.entity);
         if (!ent) return;
-        let look = ent.func_70040_Z();
-        const w = 0.8;
-        const l = 7;
-        const h = toVec3(normalize(rotate(look.field_72450_a, 0, look.field_72449_c, Math.PI / 2, 0, 0), w));
-        const v = toVec3(normalize(rotate(look.field_72450_a, look.field_72448_b, look.field_72449_c, 0, Math.PI / 2, 0), w));
-        const p1 = ent.func_174824_e(1);
-        const p2 = p1.func_178787_e(h).func_178787_e(v);
-        const p3 = p1.func_178787_e(h).func_178788_d(v);
-        const p4 = p1.func_178788_d(h).func_178787_e(v);
-        const p5 = p1.func_178788_d(h).func_178788_d(v);
-        look = toVec3(normalize(fromVec3(look), l));
-        const f1 = p1.func_178787_e(look);
-        const f2 = p2.func_178787_e(look);
-        const f3 = p3.func_178787_e(look);
-        const f4 = p4.func_178787_e(look);
-        const f5 = p5.func_178787_e(look);
+        const look = ent.func_70040_Z();
+        const h = rotate(look.field_72450_a, 0, look.field_72449_c, Math.PI / 2, 0, 0);
+        // const v = rotate(look.field_72450_a, look.field_72448_b, look.field_72449_c, 0, Math.PI / 2, 0);
+        const v = cross(fromVec3(look), h);
+        const vs = [];
+        const ve = [];
+        const hso = toVec3(normalize(h, wS / n));
+        const vso = toVec3(normalize(v, wS / n));
+        const heo = toVec3(normalize(h, wE / n));
+        const veo = toVec3(normalize(v, wE / n));
+        vs.push(ent.func_174824_e(1));
+        ve.push(toVec3(normalize(fromVec3(look), l)).func_178787_e(vs[0]));
+        for (let i = 0; i < n; i++) {
+          vs.push(vs[i].func_178787_e(hso));
+          ve.push(ve[i].func_178787_e(heo));
+        }
+        for (let i = 0; i < n; i++) {
+          vs.push(vs[i === 0 ? 0 : vs.length - 1].func_178788_d(hso));
+          ve.push(ve[i === 0 ? 0 : ve.length - 1].func_178788_d(heo));
+        }
+        for (let x = 0; x <= n; x++) {
+          for (let y = 0; y < n; y++) {
+            vs.push(vs[y === 0 ? x : vs.length - 1].func_178787_e(vso));
+            ve.push(ve[y === 0 ? x : ve.length - 1].func_178787_e(veo));
+          }
+        }
+        for (let x = 0; x <= n; x++) {
+          for (let y = 0; y < n; y++) {
+            vs.push(vs[y === 0 ? x : vs.length - 1].func_178788_d(vso));
+            ve.push(ve[y === 0 ? x : ve.length - 1].func_178788_d(veo));
+          }
+        }
+        for (let x = 0; x < n; x++) {
+          for (let y = 0; y < n; y++) {
+            vs.push(vs[y === 0 ? x + n + 1 : vs.length - 1].func_178787_e(vso));
+            ve.push(ve[y === 0 ? x + n + 1 : ve.length - 1].func_178787_e(veo));
+          }
+        }
+        for (let x = 0; x < n; x++) {
+          for (let y = 0; y < n; y++) {
+            vs.push(vs[y === 0 ? x + n + 1 : vs.length - 1].func_178788_d(vso));
+            ve.push(ve[y === 0 ? x + n + 1 : ve.length - 1].func_178788_d(veo));
+          }
+        }
+        const pAABB = ent.func_174813_aQ().func_72314_b(0.2, 0, 0.2);
         allMobsBucket.get(p.getX(), p.getZ()).forEach(e => {
-          const aabb = e.func_174813_aQ();
           if (
-            aabb.func_72327_a(p1, f1) ||
-            aabb.func_72327_a(p2, f2) ||
-            aabb.func_72327_a(p3, f3) ||
-            aabb.func_72327_a(p4, f4) ||
-            aabb.func_72327_a(p5, f5)
-          ) {
+            (ent.field_70165_t - e.field_70165_t) ** 2 +
+            (ent.field_70163_u - e.field_70163_u) ** 2 +
+            (ent.field_70161_v - e.field_70161_v) ** 2 > ls
+          ) return;
+          const aabb = e.func_174813_aQ();
+          if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) {
             const c = e.getClass().getSimpleName();
             if (c === 'EntityDragonPart') frozenMobs.put(e.field_70259_a, 5 * 20);
-            else if (c === 'EntityOtherPlayerMP') {
-              const n = e.func_70005_c_();
-              if (players.find(v => v.ign === n)) return;
-            } else if (c === 'EntityWither') {
-              if (e.func_110138_aP() === 300) return;
-            } else frozenMobs.put(e, 5 * 20);
+            else frozenMobs.put(e, 5 * 20);
           }
         });
       });
