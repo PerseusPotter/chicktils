@@ -267,8 +267,7 @@ const step2Reg = reg('step', () => {
       if (e.field_70128_L) return false;
       const c = e.getClass().getSimpleName();
       if (c === 'EntityOtherPlayerMP') {
-        const n = e.func_70005_c_();
-        if (players.find(v => v.ign === n)) return false;
+        if (e.func_110124_au().version() === 4) return false;
       } else if (c === 'EntityWither') {
         if (e.func_110138_aP() === 300) return false;
       }
