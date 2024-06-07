@@ -572,6 +572,7 @@ export const props = {
   dungeonAutoRefillPearls: new Property('DungeonAutoRefillPearls', page, ++sort, Property.Type.Toggle, false, { desc: 'automatically run /gfs to replenish used pearls' }),
   dungeonAutoRefillPearlsAmount: new Property('DungeonAutoRefillPearlsAmount', page, ++sort, Property.Type.Integer, 16, { desc: 'amount of pearls you want to have at a time', min: 0, max: 560 }),
   dungeonAutoRefillPearlsThreshold: new Property('DungeonAutoRefillPearlsThreshold', page, ++sort, Property.Type.Integer, 0, { desc: 'automatically replenish pearls mid run when below this amount\n0 to disable', min: 0, max: 560 }),
+  dungeonAutoRefillPearlsGhostPickFix: new Property('DungeonAutoRefillPearlsGhostPickFix', page, ++sort, Property.Type.Toggle, false, { desc: 'dont replenish when ghost pick\n(turn on if you ghost using pearls)' }),
 
   dungeonM7LBWaypoints: new Property('DungeonDragonLBWaypoints', page, ++sort, Property.Type.Toggle, false),
 

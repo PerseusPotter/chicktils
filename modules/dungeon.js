@@ -158,7 +158,7 @@ let allMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
 let itemCand = [];
 let frozenMobs = new (Java.type('java.util.HashMap'))();
-const pearlRefillDelay = new DelayTimer(5_000);
+const pearlRefillDelay = new DelayTimer(2_000);
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
@@ -447,9 +447,28 @@ const clientTickReg = reg('tick', () => {
       });
     }
   }
-  if (settings.dungeonAutoRefillPearls) {
+  if (settings.dungeonAutoRefillPearlsAmount) {
     const c = countItems('ENDER_PEARL');
-    if (c < settings.dungeonAutoRefillPearlsThreshold && c < settings.dungeonAutoRefillPearlsAmount && pearlRefillDelay.shouldTick()) execCmd('gfs ENDER_PEARL ' + (settings.dungeonAutoRefillPearlsAmount - c));
+    if (
+      c < settings.dungeonAutoRefillPearlsThreshold &&
+      c < settings.dungeonAutoRefillPearlsAmount &&
+      pearlRefillDelay.shouldTick()
+    ) Client.scheduleTask(6, () => {
+      const inv = Player.getInventory();
+      if (!inv) return;
+      if (getSbId(inv.getStackInSlot(0)) === 'HAUNT_ABILITY') return;
+      const c = countItems('ENDER_PEARL');
+      if (c >= settings.dungeonAutoRefillPearlsThreshold || c >= settings.dungeonAutoRefillPearlsAmount) return;
+      if (settings.dungeonAutoRefillPearlsGhostPickFix) {
+        let pickCount = 0;
+        if (inv.getItems().some(v => {
+          if (!v) return;
+          if (v.getRegistryName().endsWith('_pickaxe')) pickCount++;
+          return pickCount === 2;
+        })) return;
+      }
+      execCmd('gfs ENDER_PEARL ' + (settings.dungeonAutoRefillPearlsAmount - c));
+    });
   }
 
   new Thread(() => {
