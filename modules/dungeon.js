@@ -169,8 +169,7 @@ function isMob(name) {
     name === 'EntityWither' ||
     name === 'EntityGiantZombie' ||
     name === 'EntityIronGolem' ||
-    // name === 'EntityDragon' ||
-    name === 'EntityDragonPart';
+    name === 'EntityDragon';
 }
 function isDungeonMob(name) {
   return name === 'EntityZombie' ||
@@ -381,7 +380,7 @@ const clientTickReg = reg('tick', () => {
       const wS = 1;
       const l = 8;
       const ls = l * l;
-      const wE = 3.7;
+      const wE = 3.4;
       const n = 5;
       icers.forEach(({ e: p }) => {
         const ent = (p === Player ? p.getPlayer() : p.entity);
@@ -438,11 +437,7 @@ const clientTickReg = reg('tick', () => {
             (ent.field_70161_v - e.field_70161_v) ** 2 > ls
           ) return;
           const aabb = e.func_174813_aQ();
-          if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) {
-            const c = e.getClass().getSimpleName();
-            if (c === 'EntityDragonPart') frozenMobs.put(e.field_70259_a, 5 * 20);
-            else frozenMobs.put(e, 5 * 20);
-          }
+          if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) frozenMobs.put(e, 5 * 20);
         });
       });
     }
@@ -583,11 +578,20 @@ const serverTickReg = reg('packetReceived', () => {
     });
   }
   if (necronDragTicks > 0) necronDragTicks--;
-  if (settings.dungeonBoxIceSprayed) frozenMobs.entrySet().forEach(e => {
-    const v = e.getValue() - 1;
-    if (v === 0) frozenMobs.remove(e.getKey());
-    else frozenMobs.put(e.getKey(), v);
-  });
+  if (settings.dungeonBoxIceSprayed) {
+    // const it = frozenMobs.entrySet().iterator();
+    // while (it.hasNext()) {
+    //   let pair = it.next();
+    //   let v = pair.getValue() - 1;
+    //   if (v === 0) it.remove();
+    //   else it.setValue(v);
+    // }
+    frozenMobs.entrySet().forEach(p => {
+      const v = p.getValue() - 1;
+      if (v === 0) frozenMobs.remove(p.getKey());
+      else frozenMobs.replace(p.getKey(), v);
+    });
+  }
 }).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').or(settings._dungeonCamp).or(settings._dungeonBoxIceSprayed));
 
 register('command', () => {
@@ -774,7 +778,7 @@ const renderWorldReg = reg('renderWorld', partial => {
     const fg = ((settings.dungeonBoxIceSprayedFillColor >> 16) & 0xFF) / 256;
     const fb = ((settings.dungeonBoxIceSprayedFillColor >> 8) & 0xFF) / 256;
     const fa = ((settings.dungeonBoxIceSprayedFillColor >> 0) & 0xFF) / 256;
-    frozenMobs.forEach(e => {
+    frozenMobs.keySet().forEach(e => {
       if (e.field_70128_L) return;
       const x = lerp(e.field_70169_q, e.field_70165_t, partial);
       const y = lerp(e.field_70167_r, e.field_70163_u, partial);
