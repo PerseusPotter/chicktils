@@ -13,7 +13,7 @@ import Grid from '../util/grid';
 import { log, logDebug } from '../util/log';
 import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
-import { fromVec3, getItemId, toVec3 } from '../util/mc';
+import { fromVec3, getItemId, getLowerContainer, toVec3 } from '../util/mc';
 import { countItems, getSbId } from '../util/skyblock';
 
 function reset() {
@@ -36,6 +36,7 @@ function reset() {
   goldorDpsStartReg.unregister();
   pickupKeyReg.unregister();
   termCompleteReg.unregister();
+  termOpenReg.unregister();
 
   bloodOpenReg.unregister();
   bossMessageReg.unregister();
@@ -78,6 +79,7 @@ function start() {
   allMobsBucket.clear();
   itemCand = [];
   frozenMobs.clear();
+  origGuiSize.set(-1);
 
   renderEntReg.register();
   renderEntPostReg.register();
@@ -98,6 +100,7 @@ function start() {
   goldorDpsStartReg.register();
   pickupKeyReg.register();
   termCompleteReg.register();
+  termOpenReg.register();
 
   bloodOpenReg.register();
   bossMessageReg.register();
@@ -159,6 +162,7 @@ const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
 let itemCand = [];
 let frozenMobs = new (Java.type('java.util.HashMap'))();
 const pearlRefillDelay = new DelayTimer(2_000);
+const origGuiSize = new StateVar(-1);
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
@@ -465,6 +469,10 @@ const clientTickReg = reg('tick', () => {
       execCmd('gfs ENDER_PEARL ' + (settings.dungeonAutoRefillPearlsAmount - c));
     });
   }
+  if (origGuiSize.get() >= 0 && !Client.currentGui.get()) {
+    Client.settings.video.setGuiScale(origGuiSize.get());
+    origGuiSize.set(-1);
+  }
 
   new Thread(() => {
     if (stateBoxMob.get()) {
@@ -518,7 +526,7 @@ const clientTickReg = reg('tick', () => {
       lastRoom = k;
     }
   }).start();
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed).or(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls)));
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed).or(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls)).or(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1))));
 
 const serverTickReg = reg('packetReceived', () => {
   if (settings.dungeonCamp) {
@@ -671,6 +679,34 @@ const termCompleteReg = reg('chat', (name, type) => {
   });
   data[type]++;
 }).setCriteria(/^&r(.+?)&a (?:completed|activated) a (.+?)! \(&r&c\d&r&a\/(?:7|8)\)&r$/).setEnabled(settings._dungeonTerminalBreakdown);
+
+const termOpenReg = reg('guiOpened', evn => {
+  const gui = evn.gui;
+  if (gui.getClass().getSimpleName() !== 'GuiChest') return;
+  // net.minecraft.client.player.inventory.ContainerLocalMenu
+  const inv = getLowerContainer(gui);
+  const name = inv.func_70005_c_();
+  if (!(
+    name === 'Change all to same color!' ||
+    name === 'Click in order!' ||
+    name === 'Correct all the panes!' ||
+    name === 'Click the button on time!' ||
+    name.startsWith('Select all the') ||
+    name.startsWith('What starts with:')
+  )) return;
+
+  origGuiSize.set(Client.settings.video.getGuiScale());
+  Client.settings.video.setGuiScale(function() {
+    switch (settings.dungeonTerminalsGuiSize) {
+      case 'Small': return 1;
+      case 'Normal': return 2;
+      case 'Large': return 3;
+      case '4x': return 4;
+      case '5x': return 5;
+      case 'Auto': return 0;
+    }
+  }());
+}).setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1)));
 
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.contains(e.entity)) cancel(evn);

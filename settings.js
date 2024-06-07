@@ -588,6 +588,8 @@ export const props = {
   dungeonIceSprayAlertTime: new Property('DungeonIceSprayAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
   dungeonIceSprayAlertSound: new Property('DungeonIceSprayAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
 
+  dungeonTerminalsGuiSize: new Property('DungeonTerminalGuiSize', page, ++sort, Property.Type.Option, 'Unchanged', { desc: 'change gui size while in terminals', options: ['Unchanged', 'Small', 'Normal', 'Large', '4x', '5x', 'Auto'] }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
