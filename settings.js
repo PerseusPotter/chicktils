@@ -569,8 +569,9 @@ export const props = {
   dungeonStairStonkHelper: new Property('DungeonStairStonkHelper', page, ++sort, Property.Type.Toggle, false, { desc: 'same as soopy but does not cut fps in half' }),
   dungeonStairStonkHelperColor: new Property('DungeonStairStonkHelperColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
 
-  dungeonAutoRefillPearls: new Property('DungeonAutoRefillPearls', page, ++sort, Property.Type.Toggle, false, { desc: 'automatically run /gfs at start of each run to replenish used pearls' }),
-  dungeonAutoRefillPearlsAmount: new Property('DungeonAutoRefillPearlsAmount', page, ++sort, Property.Type.Integer, 16, { desc: 'amount of pearls you want to start run with', min: 0, max: 560 }),
+  dungeonAutoRefillPearls: new Property('DungeonAutoRefillPearls', page, ++sort, Property.Type.Toggle, false, { desc: 'automatically run /gfs to replenish used pearls' }),
+  dungeonAutoRefillPearlsAmount: new Property('DungeonAutoRefillPearlsAmount', page, ++sort, Property.Type.Integer, 16, { desc: 'amount of pearls you want to have at a time', min: 0, max: 560 }),
+  dungeonAutoRefillPearlsThreshold: new Property('DungeonAutoRefillPearlsThreshold', page, ++sort, Property.Type.Integer, 0, { desc: 'automatically replenish pearls mid run when below this amount\n0 to disable', min: 0, max: 560 }),
 
   dungeonM7LBWaypoints: new Property('DungeonDragonLBWaypoints', page, ++sort, Property.Type.Toggle, false),
 

@@ -158,6 +158,7 @@ let allMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
 let itemCand = [];
 let frozenMobs = new (Java.type('java.util.HashMap'))();
+const pearlRefillDelay = new DelayTimer(5_000);
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
@@ -446,6 +447,11 @@ const clientTickReg = reg('tick', () => {
       });
     }
   }
+  if (settings.dungeonAutoRefillPearls) {
+    const c = countItems('ENDER_PEARL');
+    if (c < settings.dungeonAutoRefillPearlsThreshold && c < settings.dungeonAutoRefillPearlsAmount && pearlRefillDelay.shouldTick()) execCmd('gfs ENDER_PEARL ' + (settings.dungeonAutoRefillPearlsAmount - c));
+  }
+
   new Thread(() => {
     if (stateBoxMob.get()) {
       nameCand = nameCand.filter(e => {
@@ -498,7 +504,7 @@ const clientTickReg = reg('tick', () => {
       lastRoom = k;
     }
   }).start();
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed));
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed).or(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls)));
 
 const serverTickReg = reg('packetReceived', () => {
   if (settings.dungeonCamp) {
