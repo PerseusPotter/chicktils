@@ -7,6 +7,7 @@ import reg from '../util/registerer';
 import getPing from '../util/ping';
 import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
+import { countItems } from '../util/skyblock';
 const { gsl_sf_lambert_W0: W, intersectPL } = require('../util/math');
 
 /**
@@ -276,21 +277,6 @@ const cannonReg = reg('chat', () => {
   Client.scheduleTask(200, () => isOnCannon = false);
 }).setChatCriteria('&r&aYou purchased Human Cannonball!&r').setEnabled(settings._kuudraShowCannonAim);
 
-function addPearls() {
-  if (!settings.kuudraAutoRefillPearls) return;
-  const inv = Player.getInventory();
-  if (!inv) return;
-  let total = 0;
-  inv.getItems().forEach(v => {
-    if (!v) return;
-    const nbt = v.getNBT().getCompoundTag('tag').getCompoundTag('ExtraAttributes');
-    if (!nbt) return;
-    if (nbt.getString('id') === 'ENDER_PEARL') total += v.getStackSize();
-  });
-  const count = Math.max(0, settings.kuudraAutoRefillPearlsAmount - total);
-  if (count > 0) ChatLib.command('gfs ender_pearl ' + count);
-}
-
 function onBuildStart() {
   dropLocs = [];
   pearlLocs = [];
@@ -340,7 +326,10 @@ function start() {
   kuudraLeaveReg.register();
   kuudraEndReg.register();
 
-  addPearls();
+  if (settings.kuudraAutoRefillPearls) {
+    const c = settings.kuudraAutoRefillPearlsAmount - countItems('ENDER_PEARL');
+    if (c > 0) execCmd('gfs ENDER_PEARL ' + c);
+  }
 }
 
 // const kuudraJoinReg = reg('chat', () => kuudra.emit('kuudraJoin')).setChatCriteria('&e[NPC] &cElle&f: &rTalk with me to begin!&r');

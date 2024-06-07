@@ -32,3 +32,22 @@ export const getSbDate = (function() {
     return { year, month, day, hour, minute };
   };
 }());
+
+/**=
+ * @param {Item} item
+ * @returns {string}
+ */
+export function getSbId(item) {
+  if (!item) return '';
+  return item.getNBT().getCompoundTag('tag')?.getCompoundTag('ExtraAttributes')?.getString('id') || '';
+}
+
+/**
+ * @param {string} sbId
+ * @returns {number}
+ */
+export function countItems(sbId) {
+  const inv = Player.getInventory();
+  if (!inv) return 0;
+  return inv.getItems().reduce((a, v) => a + (getSbId(v) === sbId ? v.getStackSize() : 0), 0);
+}
