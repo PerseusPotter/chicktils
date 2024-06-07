@@ -14,6 +14,7 @@ import { log, logDebug } from '../util/log';
 import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
 import { fromVec3, getItemId, toVec3 } from '../util/mc';
+import { countItems, getSbId } from '../util/skyblock';
 
 function reset() {
   renderEntReg.unregister();
@@ -102,7 +103,10 @@ function start() {
   bossMessageReg.register();
   dungeonLeaveReg.register();
 
-  addPearls();
+  if (settings.dungeonAutoRefillPearls) {
+    const c = settings.dungeonAutoRefillPearlsAmount - countItems('ENDER_PEARL');
+    if (c > 0) execCmd('gfs ENDER_PEARL ' + c);
+  }
 }
 
 let isInBoss = new StateVar(false);
@@ -371,7 +375,7 @@ const clientTickReg = reg('tick', () => {
       const icers = players.filter(({ e }) => {
         if (!e) return;
         const heldItem = e === Player ? e.getHeldItem() : e.getItemInSlot(0);
-        return heldItem && heldItem.getNBT().getCompoundTag('tag').getCompoundTag('ExtraAttributes').getString('id') === 'ICE_SPRAY_WAND';
+        return heldItem && getSbId(heldItem) === 'ICE_SPRAY_WAND';
       });
       const wS = 1;
       const l = 8;
@@ -612,21 +616,6 @@ const stairBreakReg = reg('blockBreak', b => {
       break;
   }
 }).setEnabled(settings._dungeonStairStonkHelper);
-
-function addPearls() {
-  if (!settings.dungeonAutoRefillPearls) return;
-  const inv = Player.getInventory();
-  if (!inv) return;
-  let total = 0;
-  inv.getItems().forEach(v => {
-    if (!v) return;
-    const nbt = v.getNBT().getCompoundTag('tag').getCompoundTag('ExtraAttributes');
-    if (!nbt) return;
-    if (nbt.getString('id') === 'ENDER_PEARL') total += v.getStackSize();
-  });
-  const count = Math.max(0, settings.dungeonAutoRefillPearlsAmount - total);
-  if (count > 0) ChatLib.command('gfs ender_pearl ' + count);
-}
 
 const terminalsEndReg = reg('chat', () => {
   if (settings.dungeonGoldorDpsStartAlert) isInGoldorDps = true;
