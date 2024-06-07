@@ -648,7 +648,10 @@ const stairBreakReg = reg('blockBreak', b => {
 
 const terminalsEndReg = reg('chat', () => {
   if (settings.dungeonGoldorDpsStartAlert) isInGoldorDps = true;
-  if (settings.dungeonTerminalBreakdown) log('Terminals Breakdown:\n' + Array.from(teamTerms.entries()).sort((a, b) => b[1].terminal - a[1].terminal).map(([ign, data]) => `&b${ign}&r: Terminal x&a${data.terminal}&r | Lever x&a${data.lever}&r | Device x&a${data.device}`).join('\n'));
+  if (settings.dungeonTerminalBreakdown) {
+    log('Terminals Breakdown:');
+    Array.from(teamTerms.entries()).sort((a, b) => b[1].terminal - a[1].terminal).forEach(([ign, data]) => log(`&b${ign}&r: Terminal x&a${data.terminal}&r | Lever x&a${data.lever}&r | Device x&a${data.device}`));
+  }
 }).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(new StateProp(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonTerminalBreakdown));
 
 const goldorDpsStartReg = reg('chat', () => isInGoldorDps = false).setCriteria('&r&4[BOSS] Goldor&r&c: &r&cYou have done it, you destroyed the factory…&r').setEnabled(settings._dungeonGoldorDpsStartAlert);
