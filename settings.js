@@ -590,6 +590,15 @@ export const props = {
 
   dungeonTerminalsGuiSize: new Property('DungeonTerminalGuiSize', page, ++sort, Property.Type.Option, 'Unchanged', { desc: 'change gui size while in terminals', options: ['Unchanged', 'Small', 'Normal', 'Large', '4x', '5x', 'Auto'] }),
 
+  dungeonSpiritBearHelper: new Property('DungeonSpiritBearHelper', page, ++sort, Property.Type.Toggle, false, { desc: 'predict spirit bear spawn location' }),
+  dungeonSpiritBearTimer: new Property('DungeonSpiritBearShowTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer above box' }),
+  dungeonSpiritBearWireColor: new Property('DungeonSpiritBearWireColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color of wireframe' }),
+  dungeonSpiritBearBoxColor: new Property('DungeonSpiritBearBoxColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color of shaded box' }),
+  dungeonSpiritBearBoxEsp: new Property('DungeonSpiritBearBoxEsp', page, ++sort, Property.Type.Toggle, false),
+  dungeonSpiritBearSmoothTime: new Property('DungeonSpiritBearSmoothTime', page, ++sort, Property.Type.Integer, 500, { desc: 'amount of time in ms spent lerping between different guesses\n(and how often to make guesses)', min: 1 }),
+  dungeonSpiritBearTimerHud: new Property('DungeonSpiritBearTimerHud', page, ++sort, Property.Type.Toggle, true, { desc: 'show spirit bear timer on hud' }),
+  moveSpiritBearTimerHud: new Property('MoveSpiritBearTimerHud', page, ++sort, Property.Type.Action),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),

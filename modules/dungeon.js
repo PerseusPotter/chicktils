@@ -1,3 +1,4 @@
+// 🍝
 import settings from '../settings';
 import data from '../data';
 import createGui from '../util/customgui';
@@ -37,6 +38,9 @@ function reset() {
   pickupKeyReg.unregister();
   termCompleteReg.unregister();
   termOpenReg.unregister();
+  fm4StartReg.unregister();
+  spiritBearSpawnReg.unregister();
+  spiritBowDropReg.unregister();
 
   bloodOpenReg.unregister();
   bossMessageReg.unregister();
@@ -80,6 +84,7 @@ function start() {
   itemCand = [];
   frozenMobs.clear();
   origGuiSize.set(-1);
+  stateInFM4.set(false);
 
   renderEntReg.register();
   renderEntPostReg.register();
@@ -101,6 +106,9 @@ function start() {
   pickupKeyReg.register();
   termCompleteReg.register();
   termOpenReg.register();
+  fm4StartReg.register();
+  spiritBearSpawnReg.register();
+  spiritBowDropReg.register();
 
   bloodOpenReg.register();
   bossMessageReg.register();
@@ -162,11 +170,27 @@ let itemCand = [];
 let frozenMobs = new (Java.type('java.util.HashMap'))();
 const pearlRefillDelay = new DelayTimer(2_000);
 const origGuiSize = new StateVar(-1);
+const bearSpawnTicks = 70;
+const bearParticleHeightCap = 80;
+const bearSpawnRadius = 0.8;
+const fm4Center = { x: 5.5, y: 69, z: 5.5 };
+const spiritBearVars = {
+  particles: [],
+  ticks: 0,
+  est: null,
+  estPrev: null,
+  prevTime: 0,
+  lastY: bearParticleHeightCap,
+  updateGrace: Number.POSITIVE_INFINITY
+};
+const spiritBearGuessDelay = new DelayTimer(settings.dungeonSpiritBearSmoothTime);
+const spiritBearTimer = createTextGui(() => data.dungeonSpiritBearTimerLoc, () => ['§l§26.42s']);
 
 const stateIsInBoss = new StateVar(false);
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(stateIsInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
 const stateMap = new StateProp(settings._dungeonMap).and(new StateProp(settings._dungeonMapHideBoss).not().or(new StateProp(stateIsInBoss).not()));
+const stateInFM4 = new StateVar(false);
 
 function isMob(name) {
   return isDungeonMob(name) ||
@@ -473,6 +497,25 @@ const clientTickReg = reg('tick', () => {
     Client.settings.video.setGuiScale(origGuiSize.get());
     origGuiSize.set(-1);
   }
+  if (stateInFM4.get() && spiritBearVars.ticks === 0) {
+    const t = Date.now();
+    if (t > spiritBearVars.updateGrace && World.getBlockAt(7, 77, 34).type.getID() === 169) {
+      spiritBearVars.prevTime = t;
+      spiritBearVars.ticks = bearSpawnTicks;
+      const thorn = World.getAllEntities().find(v => v.getClassName() === 'EntityGhast');
+      if (!thorn) {
+        log('cannot find thorn');
+        spiritBearVars.est = spiritBearVars.estPrev = fm4Center;
+      } else {
+        const d = bearSpawnRadius / Math.hypot(thorn.getX() - fm4Center.x, thorn.getZ() - fm4Center.z);
+        spiritBearVars.est = spiritBearVars.estPrev = {
+          x: lerp(fm4Center.x, thorn.getX(), d),
+          y: fm4Center.y,
+          z: lerp(fm4Center.z, thorn.getZ(), d)
+        };
+      }
+    }
+  }
 
   new Thread(() => {
     if (stateBoxMob.get()) {
@@ -526,7 +569,7 @@ const clientTickReg = reg('tick', () => {
       lastRoom = k;
     }
   }).start();
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed).or(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls)).or(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1))));
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonHideHealerPowerups).or(new StateProp(settings._dungeonNecronDragTimer).equalsmult('InstaMid', 'Both')).or(new StateProp(settings._dungeonDev4Helper).notequals('None')).or(stateBoxMob).or(stateMap).or(settings._dungeonBoxTeammates).or(settings._dungeonGoldorDpsStartAlert).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed).or(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls)).or(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1))).or(stateInFM4));
 
 const serverTickReg = reg('packetReceived', () => {
   if (settings.dungeonCamp) {
@@ -600,7 +643,10 @@ const serverTickReg = reg('packetReceived', () => {
       else frozenMobs.replace(p.getKey(), v);
     });
   }
-}).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').or(settings._dungeonCamp).or(settings._dungeonBoxIceSprayed));
+  if (stateInFM4.get()) {
+    if (spiritBearVars.ticks > 0) spiritBearVars.ticks--;
+  }
+}).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').or(settings._dungeonCamp).or(settings._dungeonBoxIceSprayed).or(stateInFM4));
 
 register('command', () => {
   const obj = {};
@@ -629,6 +675,43 @@ const necronStartReg = reg('chat', () => {
   necronDragTicks = settings.dungeonNecronDragDuration;
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc = runHelper('InstaMidHelper');
 }).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None'));
+
+const particleReg = reg('spawnParticle', (part, id, evn) => {
+  if (isAtDev4 && (settings.dungeonDev4Helper === 'Particles' || settings.dungeonDev4Helper === 'Both')) return cancel(evn);
+  const i = id.toString();
+  if (i === 'SPELL_MOB' && stateInFM4.get() && spiritBearVars.ticks > 0) {
+    const pos = { x: part.getX(), y: part.getY(), z: part.getZ(), t: spiritBearVars.ticks };
+    if (pos.y < fm4Center.y || pos.y > spiritBearVars.lastY || Math.hypot(pos.x - fm4Center.x, pos.z - fm4Center.z) > 10) return;
+
+    spiritBearVars.lastY = pos.y;
+    spiritBearVars.particles.push(pos);
+    if (spiritBearGuessDelay.shouldTick()) {
+      const { r: rX, b: bX } = linReg(spiritBearVars.particles.map(v => [v.t, v.x]));
+      const { r: rZ, b: bZ } = linReg(spiritBearVars.particles.map(v => [v.t, v.z]));
+
+      const d = bearSpawnRadius / Math.hypot(bX - fm4Center.x, bZ - fm4Center.z);
+      spiritBearVars.estPrev = spiritBearVars.est;
+      spiritBearVars.est = {
+        x: lerp(fm4Center.x, bX, d),
+        y: fm4Center.y,
+        z: lerp(fm4Center.z, bZ, d)
+      };
+    }
+  }
+  if (i === 'REDSTONE' && settings.dungeonHideHealerPowerups) {
+    try {
+      // chattriggers :clown:
+      // org.mozilla.javascript.WrappedException: Wrapped java.lang.IllegalArgumentException: Color parameter outside of expected range: Green Blue
+      const b = part.getColor().getBlue();
+      if (b === 0 || b > 10) return;
+      if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
+    } catch (e) { }
+  }
+}).setEnabled(new StateProp(settings._dungeonDev4Helper).equalsmult('Particles', 'Both').or(settings._dungeonHideHealerPowerups).or(stateInFM4));
+
+const titleReg = reg('renderTitle', (t, s, evn) => {
+  if (isAtDev4 && (s === '§aThe gate has been destroyed!§r' || s.includes('activated a'))) return cancel(evn);
+}).setEnabled(new StateProp(settings._dungeonDev4Helper).equalsmult('Titles', 'Both'));
 
 const BlockStairs = Java.type('net.minecraft.block.BlockStairs');
 const stairBreakReg = reg('blockBreak', b => {
@@ -707,6 +790,26 @@ const termOpenReg = reg('guiOpened', evn => {
     }
   }());
 }).setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1)));
+
+function resetFM4Vars() {
+  spiritBearVars.particles = [];
+  spiritBearVars.ticks = 0;
+  spiritBearVars.est = null;
+  spiritBearVars.estPrev = null;
+  spiritBearVars.prevTime = 0;
+  spiritBearVars.lastY = bearParticleHeightCap;
+  spiritBearVars.updateGrace = Number.POSITIVE_INFINITY;
+}
+const fm4StartReg = reg('chat', () => stateInFM4.set(true)).setCriteria('&r&c[BOSS] Thorn&r&f: Welcome Adventurers! I am Thorn, the Spirit! And host of the Vegan Trials!&r').setEnabled(settings._dungeonSpiritBearHelper);
+
+const spiritBearSpawnReg = reg('chat', () => {
+  resetFM4Vars();
+  spiritBearVars.ticks = -1;
+}).setCriteria('&r&a&lA &r&5&lSpirit Bear &r&a&lhas appeared!&r').setEnabled(stateInFM4);
+const spiritBowDropReg = reg('chat', () => {
+  spiritBearVars.ticks = 0;
+  spiritBearVars.updateGrace = Date.now() + 1000;
+}).setCriteria('&r&a&lThe &r&5&lSpirit Bow &r&a&lhas dropped!&r').setEnabled(stateInFM4);
 
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.contains(e.entity)) cancel(evn);
@@ -830,7 +933,37 @@ const renderWorldReg = reg('renderWorld', partial => {
       drawFilledBox(x, y, z, w, h, fr, fg, fb, fa, settings.dungeonBoxIceSprayedEsp);
     });
   }
-}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper).or(settings._dungeonM7LBWaypoints).or(settings._dungeonBoxTeammates).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed));
+  if (stateInFM4.get() && spiritBearVars.est) {
+    const dt = Date.now() - spiritBearVars.prevTime;
+    let x;
+    let y;
+    let z;
+    if (dt > settings.dungeonSpiritBearSmoothTime) {
+      x = spiritBearVars.est.x;
+      y = spiritBearVars.est.y;
+      z = spiritBearVars.est.z;
+    } else {
+      const smoothFactor = dt / settings.dungeonSpiritBearSmoothTime;
+      x = lerp(spiritBearVars.estPrev.x, spiritBearVars.est.x, smoothFactor);
+      y = lerp(spiritBearVars.estPrev.y, spiritBearVars.est.y, smoothFactor);
+      z = lerp(spiritBearVars.estPrev.z, spiritBearVars.est.z, smoothFactor);
+    }
+    const br = ((settings.dungeonSpiritBearBoxColor >> 24) & 0xFF) / 256;
+    const bg = ((settings.dungeonSpiritBearBoxColor >> 16) & 0xFF) / 256;
+    const bb = ((settings.dungeonSpiritBearBoxColor >> 8) & 0xFF) / 256;
+    const ba = ((settings.dungeonSpiritBearBoxColor >> 0) & 0xFF) / 256;
+    const wr = ((settings.dungeonSpiritBearWireColor >> 24) & 0xFF) / 256;
+    const wg = ((settings.dungeonSpiritBearWireColor >> 16) & 0xFF) / 256;
+    const wb = ((settings.dungeonSpiritBearWireColor >> 8) & 0xFF) / 256;
+    const wa = ((settings.dungeonSpiritBearWireColor >> 0) & 0xFF) / 256;
+    const m = (bearSpawnTicks - spiritBearVars.ticks - Tessellator.partialTicks + getPing() / 50) / bearSpawnTicks;
+    drawFilledBox(x, y + 1 - m, z, m, 2 * m, br, bg, bb, ba, settings.dungeonSpiritBearBoxEsp);
+    if (settings.dungeonSpiritBearBoxEsp) drawBoxAtBlock(x - 0.5, y, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
+    else drawBoxAtBlockNotVisThruWalls(x - 0.5, y, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
+
+    if (settings.dungeonSpiritBearTimer) drawString(((spiritBearVars.ticks - Tessellator.partialTicks) / 20).toFixed(2), x, y + 2.5, z);
+  }
+}).setEnabled(new StateProp(settings._dungeonCamp).or(settings._dungeonMap).or(settings._dungeonStairStonkHelper).or(settings._dungeonM7LBWaypoints).or(settings._dungeonBoxTeammates).or(settings._dungeonBoxWither).or(settings._dungeonBoxIceSprayed).or(stateInFM4));
 
 const renderOvlyReg = reg('renderOverlay', () => {
   if (settings.dungeonMap) {
@@ -846,7 +979,12 @@ const renderOvlyReg = reg('renderOverlay', () => {
     dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
     dialogueSkipTimer.render();
   }
-}).setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen', 'Both').or(settings._dungeonMap).or(stateCamp.and(settings._dungeonCampSkipTimer)));
+  if (settings.dungeonSpiritBearTimerHud && stateInFM4.get() && spiritBearVars.ticks > 0) {
+    const d = (spiritBearVars.ticks + 1 - Tessellator.partialTicks) * 50;
+    spiritBearTimer.setLine(`§l${colorForNumber(d, bearSpawnTicks * 50)}${(d / 1000).toFixed(2)}s`.toString());
+    spiritBearTimer.render();
+  }
+}).setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen', 'Both').or(settings._dungeonMap).or(stateCamp.and(settings._dungeonCampSkipTimer)).or(new StateProp(settings._dungeonSpiritBearTimerHud).and(stateInFM4)));
 
 /**
  * @this typeof mapDisplay
@@ -885,23 +1023,6 @@ function renderDoor() {
 
   });
 }
-
-const particleReg = reg('spawnParticle', (part, id, evn) => {
-  if (isAtDev4 && (settings.dungeonDev4Helper === 'Particles' || settings.dungeonDev4Helper === 'Both')) return cancel(evn);
-  if (!settings.dungeonHideHealerPowerups) return;
-  if (id.toString() !== 'REDSTONE') return;
-  try {
-    // chattriggers :clown:
-    // org.mozilla.javascript.WrappedException: Wrapped java.lang.IllegalArgumentException: Color parameter outside of expected range: Green Blue
-    const b = part.getColor().getBlue();
-    if (b === 0 || b > 10) return;
-    if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
-  } catch (e) { }
-}).setEnabled(new StateProp(settings._dungeonDev4Helper).equalsmult('Particles', 'Both').or(settings._dungeonHideHealerPowerups));
-
-const titleReg = reg('renderTitle', (t, s, evn) => {
-  if (isAtDev4 && (s === '§aThe gate has been destroyed!§r' || s.includes('activated a'))) return cancel(evn);
-}).setEnabled(new StateProp(settings._dungeonDev4Helper).equalsmult('Titles', 'Both'));
 
 const mapPacketReg = reg('packetReceived', p => {
   if (map && !mapId) mapId = p.func_149188_c();
@@ -972,6 +1093,8 @@ export function init() {
   settings._dungeonGoldorDpsStartAlertSound.onAfterChange(v => goldorDpsStartAlert.sound = v);
   settings._dungeonPlaySoundKey.onAfterChange(v => v && !SecretSounds && log('Dulkir not found. (will not work)'));
   settings._dungeonIceSprayAlertSound.onAfterChange(v => iceSprayAlert.sound = v);
+  settings._dungeonSpiritBearSmoothTime.onAfterChange(v => spiritBearGuessDelay.delay = v);
+  settings._moveSpiritBearTimerHud.onAction(() => spiritBearTimer.edit());
 }
 export function load() {
   dungeonStartReg.register();
