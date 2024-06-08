@@ -13,6 +13,7 @@ let eggs = [];
 let activeEggs = [2, 2, 2];
 let lastSpawnDays = [0, 0, 0];
 function reset() {
+  eggs = [];
   eggCollectReg.unregister();
   eggAlrCollectReg.unregister();
   // eggStepReg.unregister();
@@ -21,7 +22,6 @@ function reset() {
   unloadReg.unregister();
 }
 function start() {
-  if (!unloadReg.isRegistered()) eggs = [];
   unloadReg.register();
   eggCollectReg.register();
   eggAlrCollectReg.register();
