@@ -367,7 +367,7 @@ const clientTickReg = reg('tick', () => {
       if (player) player.e = Player;
     }
   }
-  if (isInGoldorDps && players.every(({ e }) => !e || (e !== Player && e.isDead()) || (e.getX() > 40 && e.getX() < 69 && e.getY() > 110 && e.getY() < 150 && e.getZ() > 54 && e.getZ() < 120))) {
+  if (isInGoldorDps && players.every(({ e }) => !e || (e !== Player && e.isDead()) || (e.getX() > 40 && e.getX() < 69 && e.getY() > 110 && e.getY() < 150 && e.getZ() > 53.5 && e.getZ() < 120))) {
     isInGoldorDps = false;
     goldorDpsStartAlert.show(settings.dungeonGoldorDpsStartAlertTime);
   }
