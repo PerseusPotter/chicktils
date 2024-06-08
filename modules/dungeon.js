@@ -842,7 +842,7 @@ const renderOvlyReg = reg('renderOverlay', () => {
     necronDragTimer.render();
   }
   if (settings.dungeonCampSkipTimer && lastSpawnedBloodMob && lastSpawnedBloodMob.ttl) {
-    const d = (lastSpawnedBloodMob.ttl + 1 - Tessellator.partialTicks) * 50;
+    const d = (lastSpawnedBloodMob.ttl + 1 + 10 - Tessellator.partialTicks) * 50;
     dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
     dialogueSkipTimer.render();
   }
