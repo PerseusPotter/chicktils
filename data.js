@@ -21,7 +21,8 @@ export function setIsMain() {
  *  dungeonMapLoc: Location,
  *  dungeonNecronDragTimerLoc: TextLocation,
  *  unlockedHubWarps: boolean[],
- *  dianaWarpKey: number
+ *  dianaWarpKey: number,
+ *  dungeonSpiritBearTimerLoc: TextLocation
  * }}
  */
 const data = new PogObject('chicktils', {
@@ -33,7 +34,8 @@ const data = new PogObject('chicktils', {
   dungeonMapLoc: { x: 50, y: 50, s: 1 },
   dungeonNecronDragTimerLoc: { x: 50, y: 50, s: 1, a: 0 },
   unlockedHubWarps: [],
-  dianaWarpKey: 0
+  dianaWarpKey: 0,
+  dungeonSpiritBearTimerLoc: { x: 50, y: 50, s: 1, a: 0 }
 }, 'data.json');
 
 register('gameUnload', () => isMainData && data.save());
