@@ -3,6 +3,7 @@ import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
 import RenderLib2D from '../../RenderLib2D/index';
 import _drawBeaconBeam from '../../BeaconBeam/index';
 import settings from '../settings';
+import { getEyeHeight } from './mc';
 if (!GlStateManager) {
   var GL11 = Java.type("org.lwjgl.opengl.GL11");
   var GlStateManager = Java.type("net.minecraft.client.renderer.GlStateManager");
@@ -680,15 +681,18 @@ export class JavaColorWrapper {
  * @returns {{x: number, y: number, z: number}}
  */
 function rescaleRender(x, y, z) {
-  let d = (_getRenderX() - x) ** 2 + (_getRenderY() - y) ** 2 + (_getRenderZ() - z) ** 2;
+  const rx = _getRenderX();
+  const ry = _getRenderY() + getEyeHeight();
+  const rz = _getRenderZ();
+  let d = (rx - x) ** 2 + (ry - y) ** 2 + (rz - z) ** 2;
 
   const rd = Client.settings.video.getRenderDistance() << 4;
   if (d >= rd * rd) {
     d = rd / Math.sqrt(d);
     return {
-      x: lerp(_getRenderX(), x, d),
-      y: lerp(_getRenderY(), y, d),
-      z: lerp(_getRenderZ(), z, d)
+      x: lerp(rx, x, d),
+      y: lerp(ry, y, d),
+      z: lerp(rz, z, d)
     };
   }
   return { x, y, z };
