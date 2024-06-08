@@ -21,7 +21,7 @@ function reset() {
   unloadReg.unregister();
 }
 function start() {
-  eggs = [];
+  if (!unloadReg.isRegistered()) eggs = [];
   unloadReg.register();
   eggCollectReg.register();
   eggAlrCollectReg.register();
