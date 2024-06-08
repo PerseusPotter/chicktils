@@ -47,7 +47,6 @@ function scanEgg() {
 const eggSpawnReg = reg('step', () => {
   const { year, month, day, hour } = getSbDate();
   if (month > 3) return reset();
-  start();
   const dayHash = year * 631 * 631 + month * 631 + day;
   let type;
   if (hour === 7) type = 0;
@@ -59,7 +58,6 @@ const eggSpawnReg = reg('step', () => {
   lastSpawnDays[type] = dayHash;
   activeEggs[type] = 2;
 
-  scanEgg();
   if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertFoundTime);
 }).setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
 const eggStepReg = reg('step', () => scanEgg()).setDelay(2).setEnabled(settings._rabbitSniffer);
