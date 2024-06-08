@@ -49,7 +49,7 @@ function reset() {
   }
 }
 function start() {
-  isInBoss.set(false);
+  stateIsInBoss.set(false);
   boxMobs.clear();
   mobCand = [];
   nameCand = [];
@@ -112,7 +112,6 @@ function start() {
   }
 }
 
-let isInBoss = new StateVar(false);
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
 let mobCand = [];
 let nameCand = [];
@@ -164,9 +163,10 @@ let frozenMobs = new (Java.type('java.util.HashMap'))();
 const pearlRefillDelay = new DelayTimer(2_000);
 const origGuiSize = new StateVar(-1);
 
-const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(isInBoss).not()));
+const stateIsInBoss = new StateVar(false);
+const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(stateIsInBoss).not()));
 const stateCamp = new StateProp(bloodClosed).not().and(settings._dungeonCamp);
-const stateMap = new StateProp(settings._dungeonMap).and(new StateProp(settings._dungeonMapHideBoss).not().or(new StateProp(isInBoss).not()));
+const stateMap = new StateProp(settings._dungeonMap).and(new StateProp(settings._dungeonMapHideBoss).not().or(new StateProp(stateIsInBoss).not()));
 
 function isMob(name) {
   return isDungeonMob(name) ||
@@ -232,7 +232,7 @@ let entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn 
   const c = e.getClass().getSimpleName();
   if (c === 'EntityArmorStand') {
     if (settings.dungeonHideHealerPowerups) powerupCand.push([Date.now(), e]);
-    if (settings.dungeonBoxMobs && !isInBoss.get()) nameCand.push(e);
+    if (settings.dungeonBoxMobs && !stateIsInBoss.get()) nameCand.push(e);
     if (stateCamp.get()) possibleSkulls.push(e);
   } else {
     if (stateBoxMob.get() && isDungeonMob(c)) {
@@ -959,7 +959,7 @@ const bossMessageReg = reg('chat', (name, msg) => {
       // if (msg === `Incredible. You did what I couldn't do myself.`) onBossEnd();
       break;
   }
-  isInBoss.set(true);
+  stateIsInBoss.set(true);
 }).setChatCriteria('&r&c[BOSS] ${name}&r&f: ${msg}&r');
 // const dungeonEndReg = reg('chat', () => dungeon.emit('dungeonEnd')).setChatCriteria('&r&f                            &r&fTeam Score:').setParameter('START');
 
