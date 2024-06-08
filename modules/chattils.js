@@ -105,7 +105,7 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
 
   if (settings.chatTilsHideBonzo !== 'False' && msg === 'Bonzo Procced (3s)') return hideMessage(settings.chatTilsHideBonzo, evn);
   if (settings.chatTilsHidePhoenix !== 'False' && msg === 'Phoenix Procced (3s)') return hideMessage(settings.chatTilsHidePhoenix, evn);
-  if (settings.chatTilsHideLeap !== 'False' && (msg.startsWith('Leaped to ') || msg.startsWith('Leaping to '))) return hideMessage(settings.chatTilsHideLeap, evn);
+  if (settings.chatTilsHideLeap !== 'False' && (msg.startsWith('Leaped to ') || msg.startsWith('Leaping to ') || msg.startsWith('I\'m leaping to '))) return hideMessage(settings.chatTilsHideLeap, evn);
   if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
     const lIgn = ign.toLowerCase();
     let mel = melodyMessages.get(lIgn);
