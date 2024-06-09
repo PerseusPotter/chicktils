@@ -113,7 +113,7 @@ export function start() {
   mobCandBucket.clear();
 
   entSpawnReg.register();
-  Client.scheduleTask(3, step2Reg.register());
+  Client.scheduleTask(3, () => step2Reg.register());
   tickReg.register();
   renderEntPostReg.register();
 }
