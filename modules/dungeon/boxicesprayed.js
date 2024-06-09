@@ -158,7 +158,7 @@ export function start() {
   frozenMobs.clear();
 
   entSpawnReg.register();
-  Client.scheduleTask(0, step2Reg.register());
+  Client.scheduleTask(0, () => step2Reg.register());
   tickReg.register();
   serverTickReg.register();
   renderWorldReg.register();
