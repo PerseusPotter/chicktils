@@ -79,7 +79,7 @@ export function init() {
 }
 export function load() {
   cheeseSpawnReg.register();
-  if (settings.ratTilsMuteSound) muteReg.register();
+  muteReg.register();
 }
 export function unload() {
   cheeseSpawnReg.unregister();
