@@ -58,7 +58,7 @@ function processMessageWaypoint(ign, msg) {
   if (isOwn) log('&7Loaded waypoint from chat.');
   else logMessage(new Message(
     `&7Loaded waypoint from &3${ign}&7. `,
-    new TextComponent('&6CLICK HERE').setClick('run_command', 'ctschatwaypointblock ' + ign),
+    new TextComponent('&6CLICK HERE').setClick('run_command', '/ctschatwaypointblock ' + ign),
     ' &7to ignore waypoints from them. (until game restart)'
   ));
 }
