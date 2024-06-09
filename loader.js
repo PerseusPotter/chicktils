@@ -13,12 +13,12 @@ export const modules = new Map();
 function RequireNoCache(name) {
   if (!settings.isDev) {
     if (modules.has(name)) return modules.get(name);
-    return require('./modules/' + name);
+    return require('./modules/' + name + '.js');
   }
 
   // StrongCachingModuleScriptProvider = new StrongCachingModuleScriptProviderClass(UrlModuleSourceProviderInstance);
   // CTRequire = new JSLoader.CTRequire(StrongCachingModuleScriptProvider);
-  return CTRequire('./modules/' + name);
+  return CTRequire('./modules/' + name + '.js');
 }
 
 export function unload() {
