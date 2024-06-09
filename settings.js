@@ -554,11 +554,11 @@ export const props = {
   dungeonMapBoxLockedDoorOutlineColor: new Property('DungeonMapBoxLockedDoorOutlineColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   dungeonMapBoxLockedDoorFillColor: new Property('DungeonMapBoxLockedDoorFillColor', page, ++sort, Property.Type.Color, 0xFF000050),
 
-  dungeonShowSecrets: new Property('DungeonShowSecrets', page, ++sort, Property.Type.Option, 'None', { desc: 'does not work yet', options: ['None', 'Wire', 'Waypoint'] }),
+  dungeonShowSecrets: new Property('DungeonShowSecrets', page, ++sort, Property.Type.Option, 'None', { desc: 'does not work yet, requires map to be on', options: ['None', 'Wire', 'Waypoint'] }),
 
   dungeonHideHealerPowerups: new Property('DungeonHideHealerPowerups', page, ++sort, Property.Type.Toggle, true, { desc: 'hide healer power orbs (and particles!)' }),
 
-  dungeonAutoArchitect: new Property('DungeonAutoGFSArchitect', page, ++sort, Property.Type.Toggle, true, { desc: 'auto gfs on puzzle fail, and a friendly reminder' }),
+  dungeonAutoArchitect: new Property('DungeonAutoGFSArchitect', page, ++sort, Property.Type.Toggle, false, { desc: 'auto gfs on puzzle fail, and a friendly reminder' }),
 
   dungeonNecronDragTimer: new Property('DungeonNecronDragTimer', page, ++sort, Property.Type.Option, 'None', { desc: 'timer when necron does some dragging\n(timer will automatically pop up when instamidding!)', options: ['OnScreen', 'InstaMid', 'Both', 'None'] }),
   moveNecronDragTimer: new Property('MoveNecronDragTimer', page, ++sort, Property.Type.Action),
