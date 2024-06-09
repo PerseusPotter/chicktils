@@ -14,7 +14,7 @@ export function init() {
   settings._dungeonIceSprayAlertSound.onAfterChange(v => iceSprayAlert.sound = v);
 }
 export function start() {
-  step2Reg.register();
+  Client.scheduleTask(6, step2Reg.register());
 }
 export function reset() {
   step2Reg.unregister();
