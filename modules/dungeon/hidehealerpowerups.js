@@ -20,7 +20,7 @@ const hiddenPowerupsBucket = new Grid({ addNeighbors: 1 });
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
   if (e.getClass().getSimpleName() === 'EntityArmorStand') powerupCand.push([Date.now(), e]);
-}).setEnabled(settings._dungeonHideHealerPowerups);
+}, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const tickReg = reg('tick', () => {
   const t = Date.now();
   powerupCand = powerupCand.filter(v => {
@@ -50,7 +50,7 @@ const tickReg = reg('tick', () => {
     }
     return false;
   });
-}).setEnabled(settings._dungeonHideHealerPowerups);
+}, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (id.toString() !== 'REDSTONE') return;
   try {
@@ -60,10 +60,10 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
     if (b === 0 || b > 10) return;
     if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
   } catch (e) { }
-}).triggerIfCanceled(false).setEnabled(settings._dungeonHideHealerPowerups);
+}, 'dungeon/hidehealerpowerups').triggerIfCanceled(false).setEnabled(settings._dungeonHideHealerPowerups);
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.contains(e.entity)) cancel(evn);
-}).setEnabled(settings._dungeonHideHealerPowerups);
+}, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 
 export function init() { }
 export function start() {

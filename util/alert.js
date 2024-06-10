@@ -16,7 +16,7 @@ import reg from './registerer';
  * @type {Alert}
  */
 let activeAlert;
-const renderReg = reg('renderOverlay', () => activeAlert._display.render());
+const renderReg = reg('renderOverlay', () => activeAlert._display.render(), 'alert');
 
 const createAlert = (function() {
   const alertSound = new Sound({ source: 'orb.ogg', priority: true, attenuation: 0, pitch: 0.5, volume: 1 });

@@ -60,7 +60,7 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
     const p = players.find(v => v.ign === e.func_70005_c_());
     if (p) p.e = new EntityLivingBase(e);
   }
-});
+}, 'dungeon');
 const getPlayersTickReg = reg('tick', () => {
   const tab = TabList.getNames();
   let expectEmpty = false;
@@ -91,11 +91,11 @@ const getPlayersTickReg = reg('tick', () => {
     if (player) player.e = Player;
     getPlayersTickReg.unregister();
   }
-});
+}, 'dungeon');
 
-// const dungeonJoinReq = reg('chat', () => dungeon.emit('dungeonJoin')).setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}');
-const dungeonStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
-const dungeonLeaveReg = reg('worldUnload', () => reset());
+// const dungeonJoinReq = reg('chat', () => dungeon.emit('dungeonJoin'), 'dungeon').setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}');
+const dungeonStartReg = reg('chat', () => start(), 'dungeon').setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
+const dungeonLeaveReg = reg('worldUnload', () => reset(), 'dungeon');
 const bossMessageReg = reg('chat', (name, msg) => {
   bossCbs.forEach(v => v(name, msg));
   if (name === 'The Watcher') return;
@@ -105,8 +105,8 @@ const bossMessageReg = reg('chat', (name, msg) => {
     if (msg === `If I had spent more time studying and less time watching anime, maybe mother would be here with me!`) return;
   }
   stateIsInBoss.set(true);
-}).setCriteria(/^&r&(?:c|4)\[BOSS\] (.+?)&r&(?:f|c): (?:&.)*(.+?)&r$/);
-// const dungeonEndReg = reg('chat', () => dungeon.emit('dungeonEnd')).setChatCriteria('&r&f                            &r&fTeam Score:').setParameter('START');
+}, 'dungeon').setCriteria(/^&r&(?:c|4)\[BOSS\] (.+?)&r&(?:f|c): (?:&.)*(.+?)&r$/);
+// const dungeonEndReg = reg('chat', () => dungeon.emit('dungeonEnd'), 'dungeon').setChatCriteria('&r&f                            &r&fTeam Score:').setParameter('START');
 
 export function init() {
   modules = [

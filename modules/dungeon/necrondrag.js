@@ -17,17 +17,17 @@ const tickReg = reg('tick', () => {
     inst.getOutputStream().write(10);
     inst.getOutputStream().flush();
   } else instaMidProc.set(void 0);
-}).setEnabled(new StateProp(instaMidProc).notequals(undefined));
-const serverTickReg = reg('packetReceived', () => necronDragTicks.set(necronDragTicks.get() - 1)).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(new StateProp(necronDragTicks).notequals(0));
+}, 'dungeon/necrondrag').setEnabled(new StateProp(instaMidProc).notequals(undefined));
+const serverTickReg = reg('packetReceived', () => necronDragTicks.set(necronDragTicks.get() - 1), 'dungeon/necrondrag').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(new StateProp(necronDragTicks).notequals(0));
 const necronStartReg = reg('chat', () => {
   necronDragTicks.set(settings.dungeonNecronDragDuration);
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc.set(runHelper('InstaMidHelper'));
-}).setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').and(stateIsInBoss));
+}, 'dungeon/necrondrag').setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').and(stateIsInBoss));
 const renderOverlayReg = reg('renderOverlay', () => {
   const d = necronDragTicks.get() * 50;
   necronDragTimer.setLine(`§l${colorForNumber(d, settings.dungeonNecronDragDuration * 50)}${(d / 1000).toFixed(2)}s`.toString());
   necronDragTimer.render();
-}).setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen', 'Both').and(new StateProp(necronDragTicks).notequals(0)));
+}, 'dungeon/necrondrag').setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen', 'Both').and(new StateProp(necronDragTicks).notequals(0)));
 
 export function init() {
   settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());

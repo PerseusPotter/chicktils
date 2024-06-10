@@ -22,7 +22,7 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
     }
     else if (c === 'EntityItem') itemCand.push(e);
   }
-}).setEnabled(settings._dungeonBoxIceSprayed);
+}, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
   allMobsBucket.clear();
   allMobs = allMobs.filter(e => {
@@ -36,7 +36,7 @@ const step2Reg = reg('step', () => {
     allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
     return true;
   });
-}).setFps(2).setEnabled(settings._dungeonBoxIceSprayed);
+}, 'dungeon/boxicesprayed').setFps(2).setEnabled(settings._dungeonBoxIceSprayed);
 const tickReg = reg('tick', () => {
   const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');
   itemCand = [];
@@ -110,7 +110,7 @@ const tickReg = reg('tick', () => {
       });
     });
   }
-}).setEnabled(settings._dungeonBoxIceSprayed);
+}, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const serverTickReg = reg('packetReceived', () => {
   // const it = frozenMobs.entrySet().iterator();
   // while (it.hasNext()) {
@@ -124,7 +124,7 @@ const serverTickReg = reg('packetReceived', () => {
     if (v === 0) frozenMobs.remove(p.getKey());
     else frozenMobs.replace(p.getKey(), v);
   });
-}).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(settings._dungeonBoxIceSprayed);
+}, 'dungeon/boxicesprayed').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(settings._dungeonBoxIceSprayed);
 const renderWorldReg = reg('renderWorld', () => {
   const or = ((settings.dungeonBoxIceSprayedOutlineColor >> 24) & 0xFF) / 256;
   const og = ((settings.dungeonBoxIceSprayedOutlineColor >> 16) & 0xFF) / 256;
@@ -146,7 +146,7 @@ const renderWorldReg = reg('renderWorld', () => {
 
     drawFilledBox(x, y, z, w, h, fr, fg, fb, fa, settings.dungeonBoxIceSprayedEsp);
   });
-}).setEnabled(settings._dungeonBoxIceSprayed);
+}, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 
 export function init() {
   registerTrackPlayers(settings._dungeonBoxIceSprayed);

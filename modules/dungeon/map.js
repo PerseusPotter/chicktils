@@ -62,12 +62,12 @@ const tickReg = reg('tick', () => {
     // TODO: check if room coords are in same room based on map doors
     lastRoom = k;
   }).start();
-}).setEnabled(stateMap);
-const renderWorldReg = reg('renderWorld', () => { }).setEnabled(stateMap.and(settings._dungeonMapBoxDoors));
-const renderOverlayReg = reg('renderOverlay', () => mapDisplay.render()).setEnabled(stateMap);
+}, 'dungeon/map').setEnabled(stateMap);
+const renderWorldReg = reg('renderWorld', () => { }, 'dungeon/map').setEnabled(stateMap.and(settings._dungeonMapBoxDoors));
+const renderOverlayReg = reg('renderOverlay', () => mapDisplay.render(), 'dungeon/map').setEnabled(stateMap);
 const mapPacketReg = reg('packetReceived', p => {
   if (map && !mapId) mapId = p.func_149188_c();
-}).setFilteredClass(Java.type('net.minecraft.network.play.server.S34PacketMaps')).setEnabled(stateMap);
+}, 'dungeon/map').setFilteredClass(Java.type('net.minecraft.network.play.server.S34PacketMaps')).setEnabled(stateMap);
 register('command', () => {
   const obj = {};
   if (map) map.field_76203_h.forEach((k, v) => obj[k] = `${v.func_176110_a()}, ${v.func_176112_b()}, ${v.func_176113_c()}, ${v.func_176111_d()}`);

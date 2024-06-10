@@ -14,8 +14,8 @@ function updateCrystals() {
     crystalAlert.show(settings.crystalAlertTime);
   });
 }
-const destroyReg = reg('chat', () => updateCrystals()).setCriteria('${*}destroyed an Ender Crystal!');
-const stepReg = reg('step', () => updateCrystals()).setFps(1);
+const destroyReg = reg('chat', () => updateCrystals(), 'crystalalert').setCriteria('${*}destroyed an Ender Crystal!');
+const stepReg = reg('step', () => updateCrystals(), 'crystalalert').setFps(1);
 const renderReg = reg('renderWorld', () => {
   const c = settings.crystalBoxColor;
   const r = ((c >> 24) & 0xFF) / 256;
@@ -23,7 +23,7 @@ const renderReg = reg('renderWorld', () => {
   const b = ((c >> 8) & 0xFF) / 256;
   // const a = ((c >> 24) & 0xFF) / 256;
   renderWaypoints(crystals, r, g, b, settings.crystalBoxEsp, false);
-});
+}, 'crystalalert');
 function reset() {
   crystals = [];
   destroyReg.unregister();
@@ -31,8 +31,8 @@ function reset() {
   stepReg.unregister();
   renderReg.unregister();
 }
-const unloadReg = reg('worldUnload', () => reset());
-const dragonDieReg = reg('chat', () => reset()).setCriteria('${*}DRAGON DOWN!');
+const unloadReg = reg('worldUnload', () => reset(), 'crystalalert');
+const dragonDieReg = reg('chat', () => reset(), 'crystalalert').setCriteria('${*}DRAGON DOWN!');
 function start() {
   destroyReg.register();
   dragonDieReg.register();
@@ -41,7 +41,7 @@ function start() {
   unloadReg.register();
   updateCrystals();
 }
-const dragonSpawnReg = reg('chat', (_) => start()).setCriteria('${*}Dragon has spawned!');
+const dragonSpawnReg = reg('chat', (_) => start(), 'crystalalert').setCriteria('${*}Dragon has spawned!');
 
 export function init() {
   settings._crystalAlertSound.onAfterChange(v => crystalAlert.sound = v);

@@ -56,8 +56,8 @@ const tickReg = reg('tick', () => {
       };
     }
   }
-}).setEnabled(new StateProp(ticks).equals(0).and(stateInFM4));
-const serverTickReg = reg('packetReceived', () => ticks.set(ticks.get() - 1)).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBearSpawning);
+}, 'dungeon/spiritbear').setEnabled(new StateProp(ticks).equals(0).and(stateInFM4));
+const serverTickReg = reg('packetReceived', () => ticks.set(ticks.get() - 1), 'dungeon/spiritbear').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBearSpawning);
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (id.toString() !== 'SPELL_MOB') return;
   const pos = { x: part.getX(), y: part.getY(), z: part.getZ(), t: ticks.get() };
@@ -77,16 +77,16 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
       z: lerp(fm4Center.z, bZ, d)
     };
   }
-}).setEnabled(stateBearSpawning);
-const fm4StartReg = reg('chat', () => stateInFM4.set(true)).setCriteria('&r&c[BOSS] Thorn&r&f: Welcome Adventurers! I am Thorn, the Spirit! And host of the Vegan Trials!&r').setEnabled(new StateProp(stateIsInBoss).and(settings._dungeonSpiritBearHelper));
+}, 'dungeon/spiritbear').setEnabled(stateBearSpawning);
+const fm4StartReg = reg('chat', () => stateInFM4.set(true), 'dungeon/spiritbear').setCriteria('&r&c[BOSS] Thorn&r&f: Welcome Adventurers! I am Thorn, the Spirit! And host of the Vegan Trials!&r').setEnabled(new StateProp(stateIsInBoss).and(settings._dungeonSpiritBearHelper));
 const spiritBearSpawnReg = reg('chat', () => {
   resetFM4Vars();
   ticks.set(-1);
-}).setCriteria('&r&a&lA &r&5&lSpirit Bear &r&a&lhas appeared!&r').setEnabled(stateInFM4);
+}, 'dungeon/spiritbear').setCriteria('&r&a&lA &r&5&lSpirit Bear &r&a&lhas appeared!&r').setEnabled(stateInFM4);
 const spiritBowDropReg = reg('chat', () => {
   ticks.set(-1);
   updateGrace = Date.now() + 1000;
-}).setCriteria('&r&a&lThe &r&5&lSpirit Bow &r&a&lhas dropped!&r').setEnabled(stateInFM4);
+}, 'dungeon/spiritbear').setCriteria('&r&a&lThe &r&5&lSpirit Bow &r&a&lhas dropped!&r').setEnabled(stateInFM4);
 const renderWorldReg = reg('renderWorld', () => {
   if (!est) return;
   const dt = Date.now() - prevTime;
@@ -117,12 +117,12 @@ const renderWorldReg = reg('renderWorld', () => {
   else drawBoxAtBlockNotVisThruWalls(x - 0.5, y, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
 
   if (settings.dungeonSpiritBearTimer) drawString(((ticks.get() - Tessellator.partialTicks) / 20).toFixed(2), x, y + 2.5, z);
-}).setEnabled(stateBearSpawning);
+}, 'dungeon/spiritbear').setEnabled(stateBearSpawning);
 const renderOvlyReg = reg('renderOverlay', () => {
   const d = (ticks + 1 - Tessellator.partialTicks) * 50;
   spiritBearTimer.setLine(`§l${colorForNumber(d, bearSpawnTicks * 50)}${(d / 1000).toFixed(2)}s`.toString());
   spiritBearTimer.render();
-}).setEnabled(new StateProp(settings._dungeonSpiritBearTimerHud).and(stateBearSpawning));
+}, 'dungeon/spiritbear').setEnabled(new StateProp(settings._dungeonSpiritBearTimerHud).and(stateBearSpawning));
 
 export function init() {
   settings._dungeonSpiritBearSmoothTime.onAfterChange(v => spiritBearGuessDelay.delay = v);

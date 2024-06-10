@@ -273,7 +273,7 @@ const guiReg = reg('guiOpened', evn => {
           }
         }
       }
-    }).register();
+    }, 'excavatorsolver').register();
     listenInventory(inv, inv => {
       wasChanged = true;
       // cringe shit gets called ~100 times per click
@@ -285,7 +285,7 @@ const guiReg = reg('guiOpened', evn => {
       Client.scheduleTask(4, () => update(inv));
     });
   });
-});
+}, 'excavatorsolver');
 
 export function init() { }
 export function load() {

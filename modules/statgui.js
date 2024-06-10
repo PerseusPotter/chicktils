@@ -55,16 +55,16 @@ function loadListeners(tries = 0) {
     renderReg.register();
   } else unloadListeners();
 }
-const loadReg = reg('worldLoad', () => setTimeout(() => loadListeners(10), 1000));
+const loadReg = reg('worldLoad', () => setTimeout(() => loadListeners(10), 1000), 'statgui');
 
 function unloadListeners() {
   // currLoc = -1;
   updateReg.unregister();
   renderReg.unregister();
 }
-const unloadReg = reg('worldUnload', unloadListeners);
+const unloadReg = reg('worldUnload', unloadListeners, 'statgui');
 
-const renderReg = reg('renderOverlay', () => display.render());
+const renderReg = reg('renderOverlay', () => display.render(), 'statgui');
 const updateReg = reg('step', () => {
   const lines = TabList.getNames();
   // locs[16] === 'Catacombs'
@@ -74,7 +74,7 @@ const updateReg = reg('step', () => {
   if (endI < 0) endI = lines.length;
 
   display.setLines(lines.slice(startI + 1, endI));
-}).setFps(2);
+}, 'statgui').setFps(2);
 
 export function init() {
   for (let i = 0; i < locs.length; i++) {

@@ -172,7 +172,7 @@ const renderReg = reg('renderWorld', () => {
     if (settings.kuudraBoxKuudraEsp) drawBoxAtBlock(kuuder.getX() - 7.5, kuuder.getY(), kuuder.getZ() - 7.5, r, g, b, 15, 15, a);
     else drawBoxAtBlockNotVisThruWalls(kuuder.getX() - 7.5, kuuder.getY(), kuuder.getZ() - 7.5, r, g, b, 15, 15, a);
   }
-}).setEnabled(new StateProp(settings._kuudraRenderPearlTarget).or(settings._kuudraRenderEmptySupplySpot).or(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks).or(settings._kuudraShowCannonAim).or(settings._kuudraBoxKuudra));
+}, 'kuudra').setEnabled(new StateProp(settings._kuudraRenderPearlTarget).or(settings._kuudraRenderEmptySupplySpot).or(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks).or(settings._kuudraShowCannonAim).or(settings._kuudraBoxKuudra));
 
 const tickReg = reg('tick', () => {
   if (settings.kuudraRenderPearlTarget) {
@@ -200,7 +200,7 @@ const tickReg = reg('tick', () => {
       };
     }).filter(Boolean);
   }
-}).setEnabled(settings._kuudraRenderPearlTarget);
+}, 'kuudra').setEnabled(settings._kuudraRenderPearlTarget);
 const customBossBar = createBossBar('§6﴾ §c§lKuudra§6 ﴿', () => {
   if (!kuuder) return 100_000;
   const h = kuuder.getHP();
@@ -218,10 +218,10 @@ const updateReg1 = reg('step', () => {
   });
   if (settings.kuudraBoxSupplies) supplies = supplies.filter(v => !v.isDead());
   if (settings.kuudraBoxChunks) chunks = chunks.filter(v => !v.isDead());
-}).setFps(1);
+}, 'kuudra').setFps(1);
 const bossBarReg = reg('renderBossHealth', () => {
   setBossBar(customBossBar, false);
-}).setEnabled(new StateProp(settings._kuudraCustomBossBar).and(isT5));
+}, 'kuudra').setEnabled(new StateProp(settings._kuudraCustomBossBar).and(isT5));
 
 const supplyPickReg = reg('renderTitle', (title, sub) => {
   if (sub !== '§cDon\'t Move!§r') return;
@@ -239,9 +239,9 @@ const supplyPickReg = reg('renderTitle', (title, sub) => {
   if (lastPickUpdate > 0) return;
   ticksUntilPickup = Math.floor(100 / progress) * 500;
   lastPickUpdate = progress;
-}).setEnabled(settings._kuudraRenderPearlTarget);
+}, 'kuudra').setEnabled(settings._kuudraRenderPearlTarget);
 
-const hideTitleReg = reg('renderTitle', (_, __, evn) => cancel(evn)).setEnabled(settings._kuudraDrawHpGui);
+const hideTitleReg = reg('renderTitle', (_, __, evn) => cancel(evn), 'kuudra').setEnabled(settings._kuudraDrawHpGui);
 const hpOverlayReg = reg('renderOverlay', () => {
   if (kuuder) {
     let h = kuuder.getHP();
@@ -251,7 +251,7 @@ const hpOverlayReg = reg('renderOverlay', () => {
     } else hpDisplay.setLine(`${colorForNumber(h / 1000, 100)}${(h / 1000).toFixed(settings.kuudraDrawHpDec)}%`);
   } else hpDisplay.setLine('&4where is octo boi');
   hpDisplay.render();
-}).setEnabled(settings._kuudraDrawHpGui);
+}, 'kuudra').setEnabled(settings._kuudraDrawHpGui);
 const dirOverlayReg = reg('renderOverlay', () => {
   if (!kuuder) return;
   const kt =
@@ -260,7 +260,7 @@ const dirOverlayReg = reg('renderOverlay', () => {
         kuuder.getX() < -120 ? 1 :
           1.5;
   drawArrow2D(settings.kuudraArrowToKuudraColor, kt * Math.PI, 20, Player.getY() > 60 ? 0 : undefined);
-}).setEnabled(settings._kuudraDrawArrowToKuudra);
+}, 'kuudra').setEnabled(settings._kuudraDrawArrowToKuudra);
 
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   if (evn.entity.getClass().getSimpleName() === 'EntityGiantZombie') {
@@ -270,12 +270,12 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
     else if (y < 67) supplies.push(e);
     else if (y < 80) chunks.push(e);
   }
-}).setEnabled(new StateProp(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks));
+}, 'kuudra').setEnabled(new StateProp(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks));
 
 const cannonReg = reg('chat', () => {
   isOnCannon = true;
   Client.scheduleTask(200, () => isOnCannon = false);
-}).setChatCriteria('&r&aYou purchased Human Cannonball!&r').setEnabled(settings._kuudraShowCannonAim);
+}, 'kuudra').setChatCriteria('&r&aYou purchased Human Cannonball!&r').setEnabled(settings._kuudraShowCannonAim);
 
 function onBuildStart() {
   dropLocs = [];
@@ -332,18 +332,18 @@ function start() {
   }
 }
 
-// const kuudraJoinReg = reg('chat', () => kuudra.emit('kuudraJoin')).setChatCriteria('&e[NPC] &cElle&f: &rTalk with me to begin!&r');
-const kuudraStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &cElle&f: &rOkay adventurers, I will go and fish up Kuudra!&r');
-// const supplyStartReg = reg('chat', () => kuudra.emit('supplyStart')).setChatCriteria('&e[NPC] &cElle&f: &rNot again!&r');
-const buildStartReg = reg('chat', () => onBuildStart()).setCriteria('&e[NPC] &cElle&f: &rOMG! Great work collecting my supplies!&r');
-const buildEndReg = reg('chat', () => hpOverlayReg.register()).setCriteria('&e[NPC] &cElle&f: &rPhew! The Ballista is finally ready! It should be strong enough to tank Kuudra\'s blows now!&r');
-// const stunReg = reg('chat', () => kuudra.emit('stun')).setChatCriteria('&e[NPC] &cElle&f: &rThat looks like it hurt! Quickly, while &cKuudra is distracted, shoot him with the Ballista&f!&r');
+// const kuudraJoinReg = reg('chat', () => kuudra.emit('kuudraJoin'), 'kuudra').setChatCriteria('&e[NPC] &cElle&f: &rTalk with me to begin!&r');
+const kuudraStartReg = reg('chat', () => start(), 'kuudra').setChatCriteria('&e[NPC] &cElle&f: &rOkay adventurers, I will go and fish up Kuudra!&r');
+// const supplyStartReg = reg('chat', () => kuudra.emit('supplyStart'), 'kuudra').setChatCriteria('&e[NPC] &cElle&f: &rNot again!&r');
+const buildStartReg = reg('chat', () => onBuildStart(), 'kuudra').setCriteria('&e[NPC] &cElle&f: &rOMG! Great work collecting my supplies!&r');
+const buildEndReg = reg('chat', () => hpOverlayReg.register(), 'kuudra').setCriteria('&e[NPC] &cElle&f: &rPhew! The Ballista is finally ready! It should be strong enough to tank Kuudra\'s blows now!&r');
+// const stunReg = reg('chat', () => kuudra.emit('stun'), 'kuudra').setChatCriteria('&e[NPC] &cElle&f: &rThat looks like it hurt! Quickly, while &cKuudra is distracted, shoot him with the Ballista&f!&r');
 const dpsStartReg = reg('chat', () => {
   hideTitleReg.register();
   dirOverlayReg.register();
-}).setChatCriteria('&e[NPC] &cElle&f: &rPOW! SURELY THAT\'S IT! I don\'t think he has any more in him!&r');
-const kuudraEndReg = reg('chat', () => reset()).setChatCriteria('&r&f                               &r&6&lKUUDRA DOWN!&r');
-const kuudraLeaveReg = reg('worldUnload', () => reset());
+}, 'kuudra').setChatCriteria('&e[NPC] &cElle&f: &rPOW! SURELY THAT\'S IT! I don\'t think he has any more in him!&r');
+const kuudraEndReg = reg('chat', () => reset(), 'kuudra').setChatCriteria('&r&f                               &r&6&lKUUDRA DOWN!&r');
+const kuudraLeaveReg = reg('worldUnload', () => reset(), 'kuudra');
 
 export function init() {
   settings._moveKuudraHp.onAction(() => hpDisplay.edit());

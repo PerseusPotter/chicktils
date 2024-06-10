@@ -93,7 +93,7 @@ const arrowTypes = {
   }
 };
 let shouldRender = false;
-const renderReg = reg('renderOverlay', () => shouldRender && display.render());
+const renderReg = reg('renderOverlay', () => shouldRender && display.render(), 'quiver');
 const updateReg = reg('step', () => {
   shouldRender = false;
   const inv = Player.getInventory();
@@ -137,7 +137,7 @@ const updateReg = reg('step', () => {
     }
     display.addLine(`&fRefill: ${data.unit} &fx&d${costStr}`);
   }
-}).setFps(5);
+}, 'quiver').setFps(5);
 
 export function init() {
   settings._moveQuiver.onAction(() => display.edit());

@@ -29,7 +29,7 @@ const renderReg = reg('renderOverlay', () => {
 
   Renderer.drawStringWithShadow('&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str, 50, 20);
   Renderer.drawCircle(0xFF0000FF, x, y, 5, 10);
-});
+}, 'customtextgui');
 
 let lastX = -1;
 let lastY = -1;
