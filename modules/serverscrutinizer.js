@@ -13,7 +13,7 @@ function getCurrentTPS() {
   const f = ticks[0];
   let i = 1;
   while (ticks.length > i && f - ticks[i] <= 1_000) i++;
-  return i;
+  return Math.min(20, i);
 }
 function getAverageTPS() {
   return ticks.length / MAX_TICK_AGE * 1000;
@@ -80,7 +80,7 @@ const lastTickDisplay = createTextGui(() => data.serverScrutinizerLastPacketDisp
 const rendOvLTD = reg('renderOverlay', () => {
   const t = Date.now() - ticks[0];
   if (t < settings.serverScrutinizerLastTickThreshold) return;
-  lastTickDisplay.setLine(`zzz for ${colorForNumber(1000 - t, 1000)}${(t / 1000).toFixed(2)}s`);
+  lastTickDisplay.setLine(`zzz for ${colorForNumber(2000 - t, 2000)}${(t / 1000).toFixed(2)}s`);
   lastTickDisplay.render();
 }, 'serverscrutinizer').setEnabled(settings._serverScrutinizerLastTickDisplay);
 
