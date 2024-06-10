@@ -2,6 +2,7 @@ import settings from '../../settings';
 import reg from '../../util/registerer';
 import { dist } from '../../util/math';
 import Grid from '../../util/grid';
+import { run } from '../../util/threading';
 
 const orbNames = [
   '§c§lABILITY DAMAGE',
@@ -22,7 +23,7 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
   if (e.getClass().getSimpleName() === 'EntityArmorStand') powerupCand.push([Date.now(), e]);
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const tickReg = reg('tick', () => {
-  new Thread(() => {
+  run(() => {
     const t = Date.now();
     powerupCand = powerupCand.filter(v => {
       const e = v[1];
@@ -52,7 +53,7 @@ const tickReg = reg('tick', () => {
       }
       return false;
     });
-  }).start();
+  });
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (id.toString() !== 'REDSTONE') return;

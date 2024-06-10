@@ -6,6 +6,7 @@ import Grid from '../../util/grid';
 import { fromVec3, getItemId, toVec3 } from '../../util/mc';
 import { getSbId } from '../../util/skyblock';
 import { getPlayers, isMob, registerTrackPlayers } from '../dungeon.js';
+import { run } from '../../util/threading.js';
 
 let allMobs = [];
 let newAllMobs = [];
@@ -20,7 +21,7 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
   else if (c === 'EntityItem') itemCand.push(e);
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
-  new Thread(() => {
+  run(() => {
     allMobsBucket.clear();
     allMobs = allMobs.filter(e => {
       if (e.field_70128_L) return false;
@@ -33,10 +34,10 @@ const step2Reg = reg('step', () => {
       allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
       return true;
     });
-  }).start();
+  });
 }, 'dungeon/boxicesprayed').setFps(2).setEnabled(settings._dungeonBoxIceSprayed);
 const tickReg = reg('tick', () => {
-  new Thread(() => {
+  run(() => {
     newAllMobs.forEach(e => {
       allMobs.push(e);
       allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
@@ -115,7 +116,7 @@ const tickReg = reg('tick', () => {
         });
       });
     }
-  }).start();
+  });
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const serverTickReg = reg('packetReceived', () => {
   // const it = frozenMobs.entrySet().iterator();

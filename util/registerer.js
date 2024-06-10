@@ -53,7 +53,7 @@ if (trackPerformance) {
     performanceDataTick = {};
   });
   register('command', () => {
-    FileLib.write('chicktils', 'performancedata.json', JSON.stringify(performanceDataHist, null, 2));
+    FileLib.write('chicktils', 'performancedata.json', JSON.stringify(performanceDataHist));
   }).setName('chicktilsdumpperformancedataregister');
 }
 

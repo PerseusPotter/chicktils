@@ -5,6 +5,7 @@ import { compareFloat, dist } from '../../util/math';
 import Grid from '../../util/grid';
 import { StateProp } from '../../util/state';
 import { isDungeonMob, stateIsInBoss } from '../dungeon.js';
+import { run } from '../../util/threading.js';
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(stateIsInBoss).not()));
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
@@ -51,7 +52,7 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
   } else if (isDungeonMob(c)) newMobCands.push(e);
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const step2Reg = reg('step', () => {
-  new Thread(() => {
+  run(() => {
     mobCandBucket.clear();
     mobCand = mobCand.filter(e => {
       if (e.field_70128_L) return false;
@@ -63,10 +64,10 @@ const step2Reg = reg('step', () => {
       mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
       return true;
     });
-  }).start();
+  });
 }, 'dungeon/boxmobs').setFps(2).setEnabled(stateBoxMob);
 const tickReg = reg('tick', () => {
-  new Thread(() => {
+  run(() => {
     newMobCands.forEach(e => {
       mobCand.push(e);
       mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
@@ -105,7 +106,7 @@ const tickReg = reg('tick', () => {
       }
       boxMobs.put(ent, { yO: 0, h, c: rgbaToJavaColor(c) });
     });
-  }).start();
+  });
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos, partial) => {
   const data = boxMobs.get(e.entity);
