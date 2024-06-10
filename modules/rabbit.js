@@ -6,6 +6,7 @@ import { getSbDate } from '../util/skyblock';
 import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
 import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
+import { run } from '../util/threading';
 
 const stateIsSpring = new StateVar(false);
 
@@ -17,7 +18,7 @@ let lastSpawnDays = [0, 0, 0];
 const unloadReg = reg('worldUnload', () => eggs = [], 'rabbit').setEnabled(stateIsSpring);
 function scanEgg() {
   if (!settings.rabbitSniffer) return;
-  new Thread(() => {
+  run(() => {
     const l = eggs.length;
     eggs = World.getAllEntities().filter(v => {
       if (v.getClassName() !== 'EntityArmorStand') return false;
@@ -27,7 +28,7 @@ function scanEgg() {
       return ['015adc61-0aba-3d4d-b3d1-ca47a68a154b', '55ae5624-c86b-359f-be54-e0ec7c175403', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].find((v, i) => activeEggs[i] === 2 && v === id);
     });
     if (settings.rabbitAlertEggFound && eggs.length > l) Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertFoundTime));
-  }).start();
+  });
 }
 const eggSpawnReg = reg('step', () => {
   const { year, month, day, hour } = getSbDate();

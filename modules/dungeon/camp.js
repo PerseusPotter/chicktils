@@ -10,6 +10,7 @@ import { StateProp, StateVar } from '../../util/state';
 import { DelayTimer } from '../../util/timers';
 import { getItemId } from '../../util/mc';
 import { listenBossMessages, roundRoomCoords, stateIsInBoss } from '../dungeon.js';
+import { run } from '../../util/threading.js';
 
 let bloodMobs = [];
 let possibleSkulls = [];
@@ -42,7 +43,7 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
   if (e.getClass().getSimpleName() === 'EntityArmorStand') possibleSkulls.push(e);
 }, 'dungeon/camp').setEnabled(stateCamp);
 const tickReg = reg('tick', () => {
-  new Thread(() => {
+  run(() => {
     possibleSkulls.forEach(e => {
       if (!isSkull(e)) return;
       if (bloodX === -1) {
@@ -57,11 +58,11 @@ const tickReg = reg('tick', () => {
       } else addSkull(new Entity(e));
     });
     possibleSkulls = [];
-  }).start();
+  });
 }, 'dungeon/camp').setEnabled(stateCamp);
 const serverTickReg = reg('packetReceived', () => {
   if (bloodOpenTime === 0) return;
-  new Thread(() => {
+  run(() => {
     const t = Date.now();
     bloodMobs = bloodMobs.filter(e => {
       const uuid = e.getUUID().toString();
@@ -116,7 +117,7 @@ const serverTickReg = reg('packetReceived', () => {
       }
       return true;
     });
-  }).start();
+  });
 }, 'dungeon/camp').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateCampFinal);
 const renderWorldReg = reg('renderWorld', () => {
   // bloodMobs.forEach(e => motionData.has(e.getUUID().toString()) || drawBoxAtBlock(e.getX() - 0.5, e.getY() + 1.5, e.getZ() - 0.5, 1, +(!e.isDead()), +(e.getX() === e.getLastX()), 1, 1));

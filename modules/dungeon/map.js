@@ -5,6 +5,7 @@ import reg from '../../util/registerer';
 import { logDebug } from '../../util/log';
 import { StateProp } from '../../util/state';
 import { registerTrackPlayers, roundRoomCoords, stateIsInBoss } from '../dungeon.js';
+import { run } from '../../util/threading.js';
 
 let map;
 let mapId;
@@ -46,7 +47,7 @@ function renderMapEdit() {
 }
 
 const tickReg = reg('tick', () => {
-  new Thread(() => {
+  run(() => {
     map = null;
     const mapI = Player.getInventory()?.getStackInSlot(8);
     if (mapI && mapI.getRegistryName() === 'minecraft:filled_map') {
@@ -61,7 +62,7 @@ const tickReg = reg('tick', () => {
     // TODO: update doors
     // TODO: check if room coords are in same room based on map doors
     lastRoom = k;
-  }).start();
+  });
 }, 'dungeon/map').setEnabled(stateMap);
 const renderWorldReg = reg('renderWorld', () => { }, 'dungeon/map').setEnabled(stateMap.and(settings._dungeonMapBoxDoors));
 const renderOverlayReg = reg('renderOverlay', () => mapDisplay.render(), 'dungeon/map').setEnabled(stateMap);

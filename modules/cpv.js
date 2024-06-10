@@ -4,6 +4,7 @@ import settings from '../settings';
 import { log } from '../util/log';
 import * as Party from '../util/party';
 import { getPlayerName } from '../util/format';
+import { run } from '../util/threading';
 
 const userUUIDC = new Map();
 function _getUUID(user) {
@@ -29,7 +30,7 @@ function cpv(user) {
   if (!NotEnoughUpdates) return log('you need neu silly');
   // if (!user) user = Player.getName();
   user = user?.toLowerCase();
-  new Thread(() => {
+  run(() => {
     try {
       const uuid = getUUID(user);
       if (!uuid) return log('Player not found.');
@@ -57,7 +58,7 @@ function cpv(user) {
       log('something went wrong');
       if (settings.isDev) log(e.toString(), e.stack);
     }
-  }).start();
+  });
 }
 
 const autocomplete = function(args) {
