@@ -132,6 +132,7 @@ dist
 
 #\!*
 \!*.txt
+\!perf
 chicktils.zip
 package-lock.json
 package.json
