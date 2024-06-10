@@ -77,11 +77,10 @@ const updateReg = reg('step', () => {
 }, 'statgui').setFps(2);
 
 export function init() {
-  for (let i = 0; i < locs.length; i++) {
-    const _ = i;
+  locs.forEach((_, i) => {
     settings['_loc' + i].onAfterChange(() => loadListeners());
-    settings['_moveLoc' + i].onAction(() => editLocation(_));
-  }
+    settings['_moveLoc' + i].onAction(() => editLocation(i));
+  });
 }
 export function load() {
   loadReg.register();
