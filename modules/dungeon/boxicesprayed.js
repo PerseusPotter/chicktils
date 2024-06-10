@@ -121,7 +121,7 @@ const tickReg = reg('tick', () => {
 const serverTickReg = reg('packetReceived', () => {
   frozenMobs = frozenMobs.filter(v => --v[1] > 0);
 }, 'dungeon/boxicesprayed').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(settings._dungeonBoxIceSprayed);
-const renderWorldReg = reg('renderWorld', () => {
+const renderWorldReg = reg('renderWorld', partial => {
   const or = ((settings.dungeonBoxIceSprayedOutlineColor >> 24) & 0xFF) / 256;
   const og = ((settings.dungeonBoxIceSprayedOutlineColor >> 16) & 0xFF) / 256;
   const ob = ((settings.dungeonBoxIceSprayedOutlineColor >> 8) & 0xFF) / 256;
