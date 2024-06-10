@@ -16,7 +16,7 @@ export function getRegs() {
   return allRegs;
 }
 
-const trackPerformance = true;
+const trackPerformance = false;
 /**
  * @typedef {{ cum: number, num: number, min: number, max: number }} PerfomanceData
  */
@@ -72,7 +72,7 @@ reg = function reg(type, shit, modN) {
     const key = `${modN}-${type}`;
     const System = Java.type('java.lang.System');
     const oshit = shit;
-    const isRend = typeof type === 'string' && (type.includes('render') || type === 'step');
+    const isRend = typeof type === 'string' && (type.toLowerCase().includes('render') || type === 'step');
     shit = function() {
       const start = System.nanoTime();
       oshit.apply(null, arguments);
