@@ -18,7 +18,7 @@ const termCompleteReg = reg('chat', (name, type) => {
     device: 0
   });
   data[type]++;
-}).setCriteria(/^&r(.+?)&a (?:completed|activated) a (.+?)! \(&r&c\d&r&a\/(?:7|8)\)&r$/).setEnabled(stateTermBreakdown);
+}, 'dungeon/terminalbreakdown').setCriteria(/^&r(.+?)&a (?:completed|activated) a (.+?)! \(&r&c\d&r&a\/(?:7|8)\)&r$/).setEnabled(stateTermBreakdown);
 const terminalsEndReg = reg('chat', () => {
   getPlayers().forEach(v => !teamTerms.has(v.ign) && teamTerms.set(v.ign, {
     terminal: 0,
@@ -27,7 +27,7 @@ const terminalsEndReg = reg('chat', () => {
   }));
   log('Terminals Breakdown:');
   Array.from(teamTerms.entries()).sort((a, b) => b[1].terminal - a[1].terminal).forEach(([ign, data]) => log(`&b${ign}&r: Terminal x&a${data.terminal}&r | Lever x&a${data.lever}&r | Device x&a${data.device}`));
-}).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(stateTermBreakdown);
+}, 'dungeon/terminalbreakdown').setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(stateTermBreakdown);
 
 export function init() {
   registerTrackPlayers(stateTermBreakdown);

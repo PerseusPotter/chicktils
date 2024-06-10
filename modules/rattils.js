@@ -17,7 +17,7 @@ function reset() {
   cheeseRenderReg.unregister();
   unloadReg.unregister();
 }
-const unloadReg = reg('worldUnload', () => reset());
+const unloadReg = reg('worldUnload', () => reset(), 'rattils');
 function scanCheese() {
   cheese = World.getAllEntities().filter(v => {
     if (v.getClassName() !== 'EntityItem') return false;
@@ -50,14 +50,14 @@ const cheeseSpawnReg = reg('chat', () => {
   scanCheese();
   cheeseAlert.show(settings.ratTilsAlertTime);
   if (settings.ratTilsMessage) ChatLib.command('pc [RatTils] ' + settings.ratTilsMessage);
-}).setCriteria('CHEESE! You smell Cheese nearby!');
-const cheeseStepReg = reg('step', () => scanCheese()).setFps(5);
+}, 'rattils').setCriteria('CHEESE! You smell Cheese nearby!');
+const cheeseStepReg = reg('step', () => scanCheese(), 'rattils').setFps(5);
 const cheesePickReg = reg('chat', (name, t) => {
   Client.scheduleTask(() => scanCheese());
   ChatLib.command(`pc [RatTils] Buffed ${name}`);
   if (name in players) _clearTimeout(players[name]);
   players[name] = _setTimeout(() => log(`Rat Buff to ${name} has expired.`), t * 1000);
-}).setCriteria('CHEESE! You buffed ${name} giving them +${*}✯ Magic Find for ${t} seconds!').unregister();
+}, 'rattils').setCriteria('CHEESE! You buffed ${name} giving them +${*}✯ Magic Find for ${t} seconds!').unregister();
 const cheeseRenderReg = reg('renderWorld', () => {
   const c = settings.ratTilsBoxColor;
   const r = ((c >> 24) & 0xFF) / 256;
@@ -71,8 +71,8 @@ const cheeseRenderReg = reg('renderWorld', () => {
     if (settings.ratTilsBoxEsp) drawBoxAtBlock(x - 0.25, y, z - 0.25, r, g, b, 0.5, 0.5, a);
     else drawBoxAtBlockNotVisThruWalls(x - 0.25, y, z - 0.25, r, g, b, 0.5, 0.5, a);
   });
-});
-const muteReg = reg('soundPlay', (pos, name, vol, pitch, category, evn) => vol === 1 && (Math.abs(pitch - 1.19047) < 0.0001) && cancel(evn)).setCriteria('mob.bat.idle').setEnabled(settings._ratTilsMuteSound);
+}, 'rattils');
+const muteReg = reg('soundPlay', (pos, name, vol, pitch, category, evn) => vol === 1 && (Math.abs(pitch - 1.19047) < 0.0001) && cancel(evn), 'rattils').setCriteria('mob.bat.idle').setEnabled(settings._ratTilsMuteSound);
 
 export function init() {
   settings._ratTilsAlertSound.onAfterChange(v => cheeseAlert.sound = v);

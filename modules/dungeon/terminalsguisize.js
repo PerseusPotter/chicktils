@@ -11,7 +11,7 @@ const tickReg = reg('tick', () => {
     Client.settings.video.setGuiScale(origGuiSize.get());
     origGuiSize.set(-1);
   }
-}).setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).notequals(-1)).and(stateIsInBoss));
+}, 'dungeon/terminalsguisize').setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).notequals(-1)).and(stateIsInBoss));
 const termOpenReg = reg('guiOpened', evn => {
   const gui = evn.gui;
   if (gui.getClass().getSimpleName() !== 'GuiChest') return;
@@ -38,7 +38,7 @@ const termOpenReg = reg('guiOpened', evn => {
       case 'Auto': return 0;
     }
   }());
-}).setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1)).and(stateIsInBoss));
+}, 'dungeon/terminalsguisize').setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1)).and(stateIsInBoss));
 
 export function init() { }
 export function start() {

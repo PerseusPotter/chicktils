@@ -27,7 +27,7 @@ const stairBreakReg = reg('blockBreak', b => {
       brokenStairBucket.add(x, z, [n, [x, y + 1.1, z + 0.76], [x + 1, y + 1.1, z + 0.76]]);
       break;
   }
-}).setEnabled(settings._dungeonStairStonkHelper);
+}, 'dungeon/stairstonkhelper').setEnabled(settings._dungeonStairStonkHelper);
 const renderWorldReg = reg('renderWorld', () => {
   brokenStairBucket.get(Player.getX(), Player.getZ()).forEach(v => {
     // average rhino L
@@ -40,7 +40,7 @@ const renderWorldReg = reg('renderWorld', () => {
       2
     );
   });
-}).setEnabled(settings._dungeonStairStonkHelper);
+}, 'dungeon/stairstonkhelper').setEnabled(settings._dungeonStairStonkHelper);
 
 export function init() { }
 export function start() {

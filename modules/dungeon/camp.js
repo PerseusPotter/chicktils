@@ -40,7 +40,7 @@ function addSkull(skull) {
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
   if (e.getClass().getSimpleName() === 'EntityArmorStand') possibleSkulls.push(e);
-}).setEnabled(stateCamp);
+}, 'dungeon/camp').setEnabled(stateCamp);
 const tickReg = reg('tick', () => {
   possibleSkulls.forEach(e => {
     if (!isSkull(e)) return;
@@ -54,7 +54,7 @@ const tickReg = reg('tick', () => {
     } else addSkull(ent);
   });
   possibleSkulls = [];
-}).setEnabled(stateCamp);
+}, 'dungeon/camp').setEnabled(stateCamp);
 const serverTickReg = reg('packetReceived', () => {
   if (bloodOpenTime === 0) return;
   const t = Date.now();
@@ -111,7 +111,7 @@ const serverTickReg = reg('packetReceived', () => {
     }
     return true;
   });
-}).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateCampFinal);
+}, 'dungeon/camp').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateCampFinal);
 const renderWorldReg = reg('renderWorld', () => {
   // bloodMobs.forEach(e => motionData.has(e.getUUID().toString()) || drawBoxAtBlock(e.getX() - 0.5, e.getY() + 1.5, e.getZ() - 0.5, 1, +(!e.isDead()), +(e.getX() === e.getLastX()), 1, 1));
   // drawBoxAtBlock(bloodX, 69, bloodZ, 1, 0, 0, 32, 16);
@@ -147,15 +147,15 @@ const renderWorldReg = reg('renderWorld', () => {
 
     if (settings.dungeonCampTimer) drawString(((ttl - Tessellator.partialTicks) / 20).toFixed(2), x, y + 1, z);
   });
-}).setEnabled(stateCampFinal);
+}, 'dungeon/camp').setEnabled(stateCampFinal);
 const renderOverlayReg = reg('renderOverlay', () => {
   if (lastSpawnedBloodMob && lastSpawnedBloodMob.ttl) {
     const d = (lastSpawnedBloodMob.ttl + 1 - Tessellator.partialTicks) * 50;
     dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
     dialogueSkipTimer.render();
   }
-}).setEnabled(stateCamp.and(settings._dungeonCampSkipTimer));
-const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = Date.now())).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r').setEnabled(stateCamp);
+}, 'dungeon/camp').setEnabled(stateCamp.and(settings._dungeonCampSkipTimer));
+const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = Date.now()), 'dungeon/camp').setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r').setEnabled(stateCamp);
 
 export function init() {
   listenBossMessages((name, msg) => {

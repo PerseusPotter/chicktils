@@ -109,7 +109,7 @@ const cmdReg = reg('command', ...args => {
   const cmd = fix(args, false);
   if (cmd[0].length !== 1) execCmd(['gfs', ...args].join(' '));
   else execCmd(cmd.map(v => v[0]).join(' '));
-}).setTabCompletions(args => fix(args)[args.length] || []).setName('gfs', true);
+}, 'bettergfs').setTabCompletions(args => fix(args)[args.length] || []).setName('gfs', true);
 
 export function init() { }
 export function load() {

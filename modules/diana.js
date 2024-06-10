@@ -56,7 +56,7 @@ const warpOpenReg = reg('guiOpened', evn => {
       return item && getItemId(item) === 'minecraft:paper';
     });
   });
-});
+}, 'diana');
 
 const burrowFoundAlert = createAlert('Burrow Found');
 let numNotStartBurrows = 0;
@@ -66,7 +66,7 @@ let guessLoc = null;
 const renderOvReg = reg('renderOverlay', () => {
   const l = targetLoc || guessLoc;
   if (l) pointTo3D(settings.dianaArrowToBurrowColor, l[0], l[1] + 1, l[2], false);
-}).setEnabled(settings._dianaArrowToBurrow);
+}, 'diana').setEnabled(settings._dianaArrowToBurrow);
 const renderWrldReg = reg('renderWorld', () => {
   if (guessLoc) {
     const c = settings.dianaGuessFromParticlesColor;
@@ -78,7 +78,7 @@ const renderWrldReg = reg('renderWorld', () => {
     drawBeaconBeam(guessLoc[0] - 0.5, guessLoc[1] + 1, guessLoc[2] - 0.5, r, g, b, a, false);
     // drawString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
   }
-}).setEnabled(settings._dianaGuessFromParticles);
+}, 'diana').setEnabled(settings._dianaGuessFromParticles);
 const GriffinBurrows = Java.type('gg.skytils.skytilsmod.features.impl.events.GriffinBurrows');
 // 0 repetition, clean code
 const tickReg = reg('tick', () => {
@@ -144,7 +144,7 @@ const tickReg = reg('tick', () => {
   });
   if (closest) targetLoc = [closest.getX() + 0.5, closest.getY(), closest.getZ() + 0.5];
   else targetLoc = null;
-}).setEnabled(new StateVar(Boolean(GriffinBurrows)));
+}, 'diana').setEnabled(new StateVar(Boolean(GriffinBurrows)));
 
 let prevSounds = [];
 let prevParticles = [];
@@ -209,7 +209,7 @@ const soundPlayReg = reg('soundPlay', (pos, name, vol, pit, cat, evn) => {
   const { r, b } = linReg(prevSounds.map((v, i) => [i, v[1]]));
   guessD = Math.E / b;
   updateGuess();
-}).setEnabled(settings._dianaGuessFromParticles);
+}, 'diana').setEnabled(settings._dianaGuessFromParticles);
 const spawnPartReg = reg('spawnParticle', (part, id, evn) => {
   if (id.toString() !== 'DRIP_LAVA') return;
   const t = Date.now();
@@ -230,7 +230,7 @@ const spawnPartReg = reg('spawnParticle', (part, id, evn) => {
   guessDir[0] = m;
   guessDir[1] = b * m;
   updateGuess();
-}).setEnabled(settings._dianaGuessFromParticles);
+}, 'diana').setEnabled(settings._dianaGuessFromParticles);
 
 const startBurrowReg = reg('chat', () => {
   numNotStartBurrows = 0;
@@ -246,7 +246,7 @@ const startBurrowReg = reg('chat', () => {
   soundPlayReg.register();
   spawnPartReg.register();
   unloadReg.register();
-}).setCriteria('&r&eYou dug out a Griffin Burrow! &r&7(1/4)&r');
+}, 'diana').setCriteria('&r&eYou dug out a Griffin Burrow! &r&7(1/4)&r');
 const unloadReg = reg('worldUnload', () => {
   renderOvReg.unregister();
   renderWrldReg.unregister();
@@ -254,7 +254,7 @@ const unloadReg = reg('worldUnload', () => {
   fixStReg.unregister();
   targetLoc = null;
   guessLoc = null;
-});
+}, 'diana');
 
 const warpKey = new KeyBind('Diana Warp', data.dianaWarpKey, 'ChickTils');
 warpKey.registerKeyRelease(() => {
@@ -290,7 +290,7 @@ const fixStReg = reg('command', () => {
     });
     guess.remove(oldestK);
   }
-}).setName('ctsmanualfixstdiana').setEnabled(new StateVar(Boolean(GriffinBurrows)));
+}, 'diana').setName('ctsmanualfixstdiana').setEnabled(new StateVar(Boolean(GriffinBurrows)));
 
 export function init() {
   settings._dianaAlertFoundBurrowSound.onAfterChange(v => burrowFoundAlert.sound = v);

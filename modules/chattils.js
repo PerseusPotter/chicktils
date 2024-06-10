@@ -9,10 +9,10 @@ import { StateProp } from '../util/state';
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
   if (ign) blockedNames.add(ign);
-}).setName('ctschatwaypointblock').setEnabled(settings._chatTilsWaypoint);
+}, 'chattils').setName('ctschatwaypointblock').setEnabled(settings._chatTilsWaypoint);
 
 const coords = [];
-const removeOldestCmd = reg('command', () => coords.shift()).setName('ctsremoveoldestwaypoint').setEnabled(settings._chatTilsWaypoint);
+const removeOldestCmd = reg('command', () => coords.shift(), 'chattils').setName('ctsremoveoldestwaypoint').setEnabled(settings._chatTilsWaypoint);
 const worldRenderReg = reg('renderWorld', partial => {
   const c = settings.chatTilsWaypointColor;
   const r = ((c >> 24) & 0xFF) / 256;
@@ -23,13 +23,13 @@ const worldRenderReg = reg('renderWorld', partial => {
   if (settings.chatTilsWaypointType === 'Wireframe') coords.forEach(v => drawBoxAtBlock(v.x, v.y, v.z, r, g, b, 1, 1, a));
   if (settings.chatTilsWaypointBeacon) coords.forEach(v => drawBeaconBeam(v.x, v.y + 1, v.z, r, g, b, a, false));
   if (settings.chatTilsWaypointName) coords.forEach(v => drawString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(c)*/));
-});
+}, 'chattils');
 let waypointReloadNum = 0;
 const worldUnloadReg = reg('worldUnload', () => {
   coords.length = 0;
   worldRenderReg.unregister();
   waypointReloadNum++;
-}).setEnabled(settings._chatTilsWaypointPersist);
+}, 'chattils').setEnabled(settings._chatTilsWaypointPersist);
 
 /**
  * @param {string} ign
@@ -99,7 +99,7 @@ const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 
 const allChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}).setCriteria(/^&r([^>]+?)&(?:7|f): (.+?)&r$/).setEnabled(settings._chatTilsWaypoint);
+}, 'chattils').setCriteria(/^&r([^>]+?)&(?:7|f): (.+?)&r$/).setEnabled(settings._chatTilsWaypoint);
 const partyChatReg = reg('chat', (ign, msg, evn) => {
   processMessageWaypoint(ign, msg);
 
@@ -122,28 +122,28 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
       tryMelody(ign, msg, evn, lastMessages.get(lIgn));
     } else lastMessages.set(lIgn, msg);
   }
-}).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
+}, 'chattils').setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
 const coopChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}).setCriteria('&r&bCo-op > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
+}, 'chattils').setCriteria('&r&bCo-op > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const wisperToReg = reg('chat', msg => {
   processMessageWaypoint(Player.getName(), msg);
-}).setCriteria('&dTo ${*}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
+}, 'chattils').setCriteria('&dTo ${*}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const wisperFromReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}).setCriteria('&dFrom ${ign}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
+}, 'chattils').setCriteria('&dFrom ${ign}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const guildChatReg = reg('chat', (ign, msg) => {
   // better not be able to contain [ in guild ranks
   if (ign.endsWith(']')) ign = ign.split(0, ign.lastIndexOf('['));
   processMessageWaypoint(ign, msg);
-}).setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
+}, 'chattils').setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
 
 let cancelNextPing = false;
 const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
   if (!cancelNextPing || name !== 'random.orb' || vol !== 1 || pitch !== 1) return;
   cancel(evn);
   cancelNextPing = false;
-}).setEnabled(new StateProp(settings._chatTilsHideBonzo).notequals('False').or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')));
+}, 'chattils').setEnabled(new StateProp(settings._chatTilsHideBonzo).notequals('False').or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')));
 
 // https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/features/FasterMaddoxCalling.java#L24
 let lastFollowTime = 0;
@@ -157,12 +157,12 @@ const followReg = reg(net.minecraftforge.client.event.ClientChatReceivedEvent, e
   lastFollowTime = Date.now();
   lastFollowToken = evn.message.func_150256_b().func_150235_h()?.func_150668_b();
   log(`Open chat then click anywhere on-screen to follow &b${ign}`);
-}).setEnabled(settings._chatTilsClickAnywhereFollow);
+}, 'chattils').setEnabled(settings._chatTilsClickAnywhereFollow);
 const clickChatReg = reg(net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post, evn => {
   if (Java.type('org.lwjgl.input.Mouse').getEventButtonState() || Java.type('org.lwjgl.input.Mouse').getEventButton() != 0 || !(evn.gui instanceof Java.type('net.minecraft.client.gui.GuiChat'))) return;
   if (!lastFollowToken || Date.now() - lastFollowTime > 10_000) return;
   execCmd(lastFollowToken.slice(1));
-}).setEnabled(settings._chatTilsClickAnywhereFollow);
+}, 'chattils').setEnabled(settings._chatTilsClickAnywhereFollow);
 
 export function init() {
   settings._chatTilsWaypointDuration.onBeforeChange(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));

@@ -21,7 +21,7 @@ const renderWorldReg = reg('renderWorld', () => {
     if (settings.dungeonBoxTeammatesEsp) drawBoxAtBlock(x - 0.4, y, z - 0.4, r, g, b, 0.8, 2, a, 5);
     else drawBoxAtBlockNotVisThruWalls(x - 0.4, y, z - 0.4, r, g, b, 0.8, 2, a, 5);
   });
-}).setEnabled(settings._dungeonBoxTeammates);
+}, 'dungeon/boxteammates').setEnabled(settings._dungeonBoxTeammates);
 export function init() {
   registerTrackPlayers(settings._dungeonBoxTeammates);
 }

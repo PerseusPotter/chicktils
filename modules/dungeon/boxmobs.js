@@ -51,7 +51,7 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
     mobCand.push(e);
     mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
   }
-}).setEnabled(stateBoxMob);
+}, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const step2Reg = reg('step', () => {
   mobCandBucket.clear();
   mobCand = mobCand.filter(e => {
@@ -64,7 +64,7 @@ const step2Reg = reg('step', () => {
     mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
     return true;
   });
-}).setFps(2).setEnabled(stateBoxMob);
+}, 'dungeon/boxmobs').setFps(2).setEnabled(stateBoxMob);
 const tickReg = reg('tick', () => {
   new Thread(() => {
     nameCand = nameCand.filter(e => {
@@ -100,11 +100,11 @@ const tickReg = reg('tick', () => {
       boxMobs.put(ent, { yO: 0, h, c: rgbaToJavaColor(c) });
     });
   }).start();
-}).setEnabled(stateBoxMob);
+}, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos, partial) => {
   const data = boxMobs.get(e.entity);
   if (data) drawBoxPos(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, partial, settings.dungeonBoxMobEsp, false);
-}).setEnabled(stateBoxMob);
+}, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 
 export function init() { }
 export function start() {

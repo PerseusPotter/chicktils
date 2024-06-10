@@ -14,9 +14,9 @@ const tickReg = reg('tick', () => {
     stateIsInGoldorDps.set(false);
     goldorDpsStartAlert.show(settings.dungeonGoldorDpsStartAlertTime);
   }
-}).setEnabled(stateIsInGoldorDps);
-const terminalsEndReg = reg('chat', () => stateIsInGoldorDps.set(true)).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(stateGoldorDps);
-const goldorDpsStartReg = reg('chat', () => stateIsInGoldorDps.set(false)).setCriteria('&r&4[BOSS] Goldor&r&c: &r&cYou have done it, you destroyed the factory…&r').setEnabled(stateGoldorDps);
+}, 'dungeon/goldordpsalert').setEnabled(stateIsInGoldorDps);
+const terminalsEndReg = reg('chat', () => stateIsInGoldorDps.set(true), 'dungeon/goldordpsalert').setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(stateGoldorDps);
+const goldorDpsStartReg = reg('chat', () => stateIsInGoldorDps.set(false), 'dungeon/goldordpsalert').setCriteria('&r&4[BOSS] Goldor&r&c: &r&cYou have done it, you destroyed the factory…&r').setEnabled(stateGoldorDps);
 
 export function init() {
   settings._dungeonGoldorDpsStartAlert.onAfterChange(v => !v && stateIsInGoldorDps.set(false));

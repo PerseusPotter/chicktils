@@ -10,8 +10,8 @@ const stateBoxWithers = new StateProp(settings._dungeonBoxWither).and(stateIsInB
 
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   if (evn.entity.getClass().getSimpleName() === 'EntityWither') withers.push(new EntityLivingBase(evn.entity));
-}).setEnabled(stateBoxWithers);
-const tickReg = reg('tick', () => withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither' && v.getMaxHP() !== 300)).setEnabled(stateBoxWithers);
+}, 'dungeon/boxwithers').setEnabled(stateBoxWithers);
+const tickReg = reg('tick', () => withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither' && v.getMaxHP() !== 300), 'dungeon/boxwithers').setEnabled(stateBoxWithers);
 const renderWorldReg = reg('renderWorld', () => {
   const r = ((settings.dungeonBoxWitherColor >> 24) & 0xFF) / 256;
   const g = ((settings.dungeonBoxWitherColor >> 16) & 0xFF) / 256;
@@ -24,7 +24,7 @@ const renderWorldReg = reg('renderWorld', () => {
     if (settings.dungeonBoxWitherEsp) drawBoxAtBlock(x - 0.75, y - 0.25, z - 0.75, r, g, b, 1.5, 4, a, 5);
     else drawBoxAtBlockNotVisThruWalls(x - 0.75, y - 0.25, z - 0.75, r, g, b, 1.5, 4, a, 5);
   });
-}).setEnabled(stateBoxWithers);
+}, 'dungeon/boxwithers').setEnabled(stateBoxWithers);
 
 export function init() { }
 export function start() {
