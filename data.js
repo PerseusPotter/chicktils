@@ -14,15 +14,17 @@ export function setIsMain() {
  */
 /**
  * @type {{
- *  statLocs: TextLocation[],
- *  quiverLoc: TextLocation,
- *  kuudraHpLoc: TextLocation,
- *  dungeonCampSkipTimerLoc: TextLocation,
- *  dungeonMapLoc: Location,
- *  dungeonNecronDragTimerLoc: TextLocation,
- *  unlockedHubWarps: boolean[],
- *  dianaWarpKey: number,
- *  dungeonSpiritBearTimerLoc: TextLocation
+ *  statLocs: TextLocation[];
+ *  quiverLoc: TextLocation;
+ *  kuudraHpLoc: TextLocation;
+ *  dungeonCampSkipTimerLoc: TextLocation;
+ *  dungeonMapLoc: Location;
+ *  dungeonNecronDragTimerLoc: TextLocation;
+ *  unlockedHubWarps: boolean[];
+ *  dianaWarpKey: number;
+ *  dungeonSpiritBearTimerLoc: TextLocation;
+ *  serverScrutinizerTPSDisplay: TextLocation;
+ *  serverScrutinizerLastPacketDisplay: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', {
@@ -35,7 +37,9 @@ const data = new PogObject('chicktils', {
   dungeonNecronDragTimerLoc: { x: 50, y: 50, s: 1, a: 0 },
   unlockedHubWarps: [],
   dianaWarpKey: 0,
-  dungeonSpiritBearTimerLoc: { x: 50, y: 50, s: 1, a: 0 }
+  dungeonSpiritBearTimerLoc: { x: 50, y: 50, s: 1, a: 0 },
+  serverScrutinizerTPSDisplay: { x: 50, y: 50, s: 1, a: 0 },
+  serverScrutinizerLastPacketDisplay: { x: 50, y: 50, s: 1, a: 0 }
 }, 'data.json');
 
 register('gameUnload', () => isMainData && data.save());
