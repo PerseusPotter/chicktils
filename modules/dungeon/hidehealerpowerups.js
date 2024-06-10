@@ -15,41 +15,44 @@ const orbIds = [
 ];
 let powerupCand = [];
 const hiddenPowerups = new (Java.type('java.util.HashSet'))();
-const hiddenPowerupsBucket = new Grid({ addNeighbors: 1 });
+const hiddenPowerupsBucket = new Grid({ size: 0, addNeighbors: 1 });
 
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
   if (e.getClass().getSimpleName() === 'EntityArmorStand') powerupCand.push([Date.now(), e]);
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const tickReg = reg('tick', () => {
-  const t = Date.now();
-  powerupCand = powerupCand.filter(v => {
-    const e = v[1];
-    const n = e.func_70005_c_();
-    if (n === 'Armor Stand') {
-      let i = e.func_71124_b(4);
-      let b = i && i.func_77978_p();
-      if (b) {
-        const d = b.func_74775_l('ExtraAttributes').func_74779_i('id');
-        if (orbIds.some(v => d === v)) {
+  new Thread(() => {
+    const t = Date.now();
+    powerupCand = powerupCand.filter(v => {
+      const e = v[1];
+      const n = e.func_70005_c_();
+      if (n === 'Armor Stand') {
+        let i = e.func_71124_b(4);
+        let b = i && i.func_77978_p();
+        if (b) {
+          const d = b.func_74775_l('ExtraAttributes').func_74779_i('id');
+          if (orbIds.some(v => d === v)) {
+            hiddenPowerups.add(e);
+            hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
+            return false;
+          }
+        }
+        i = e.func_71124_b(0);
+        b = i && i.func_77978_p();
+        if (b && b.func_74775_l('SkullOwner').func_74775_l('Properties').func_150295_c('textures', 10).func_150305_b(0).func_74775_l('Value').func_74775_l('textures').func_74775_l('SKIN').func_74779_i('url') === 'http://textures.minecraft.net/texture/96c3e31cfc66733275c42fcfb5d9a44342d643b55cd14c9c77d273a2352') {
           hiddenPowerups.add(e);
           hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
           return false;
         }
-      }
-      i = e.func_71124_b(0);
-      b = i && i.func_77978_p();
-      if (b && b.func_74775_l('SkullOwner').func_74775_l('Properties').func_150295_c('textures', 10).func_150305_b(0).func_74775_l('Value').func_74775_l('textures').func_74775_l('SKIN').func_74779_i('url') === 'http://textures.minecraft.net/texture/96c3e31cfc66733275c42fcfb5d9a44342d643b55cd14c9c77d273a2352') {
+        return t - v[0] < 500;
+      } else if (orbNames.some(v => n.startsWith(v))) {
         hiddenPowerups.add(e);
         hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
       }
-      return t - v[0] < 500;
-    } else if (orbNames.some(v => n.startsWith(v))) {
-      hiddenPowerups.add(e);
-      hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
-    }
-    return false;
-  });
+      return false;
+    });
+  }).start();
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (id.toString() !== 'REDSTONE') return;

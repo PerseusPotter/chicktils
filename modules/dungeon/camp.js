@@ -42,75 +42,81 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
   if (e.getClass().getSimpleName() === 'EntityArmorStand') possibleSkulls.push(e);
 }, 'dungeon/camp').setEnabled(stateCamp);
 const tickReg = reg('tick', () => {
-  possibleSkulls.forEach(e => {
-    if (!isSkull(e)) return;
-    const ent = new Entity(e);
-    // const texture = item.getNBT().getCompoundTag('tag').getCompoundTag('SkullOwner').getCompoundTag('Properties').getTagList('textures', 10).func_150305_b(0).func_74779_i('Value');
-    const ownerUUID = new Item(e.func_71124_b(4)).getNBT().getCompoundTag('tag').getCompoundTag('SkullOwner').getString('Id');
-    if (ownerUUID === Player.getUUID() && bloodX === -1) {
-      bloodX = roundRoomCoords(ent.getX());
-      bloodZ = roundRoomCoords(ent.getZ());
-      World.getAllEntitiesOfType(net.minecraft.entity.item.EntityArmorStand).forEach(e => isSkull(e.getEntity()) && addSkull(e));
-    } else addSkull(ent);
-  });
-  possibleSkulls = [];
+  new Thread(() => {
+    possibleSkulls.forEach(e => {
+      if (!isSkull(e)) return;
+      if (bloodX === -1) {
+        const i = e.func_71124_b(4);
+        const b = i && i.func_77978_p();
+        if (b && b.func_74775_l('SkullOwner').func_74779_i('Id') === Player.getUUID()) {
+          const ent = new Entity(e);
+          bloodX = roundRoomCoords(ent.getX());
+          bloodZ = roundRoomCoords(ent.getZ());
+          World.getAllEntitiesOfType(net.minecraft.entity.item.EntityArmorStand).forEach(e => isSkull(e.entity) && addSkull(e));
+        }
+      } else addSkull(new Entity(e));
+    });
+    possibleSkulls = [];
+  }).start();
 }, 'dungeon/camp').setEnabled(stateCamp);
 const serverTickReg = reg('packetReceived', () => {
   if (bloodOpenTime === 0) return;
-  const t = Date.now();
-  bloodMobs = bloodMobs.filter(e => {
-    const uuid = e.getUUID().toString();
-    let data = motionData.get(uuid);
-    const x = e.getX();
-    const y = e.getY();
-    const z = e.getZ();
-    if (!data) {
-      const dx = dist(x, e.getLastX());
-      const dz = dist(z, e.getLastZ());
-      if (y > 71 && (dx > 0.01 || dz > 0.01) && dx < 0.5 && dz < 0.5) {
-        bloodMobCount++;
-        const ttl = t - bloodOpenTime < 32000 && (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
-        data = {
-          posX: [e.getLastX()],
-          posY: [e.getLastY()],
-          posZ: [e.getLastZ()],
-          estX: x,
-          estY: y,
-          estZ: z,
-          lastEstX: x,
-          lastEstY: y,
-          lastEstZ: z,
-          ttl,
-          maxTtl: ttl,
-          startT: t,
-          lastUpdate: t,
-          timer: new DelayTimer(settings.dungeonCampSmoothTime)
-        };
-        motionData.set(uuid, data);
-        if (ttl === 80 && bloodMobCount >= 4) lastSpawnedBloodMob = data;
+  new Thread(() => {
+    const t = Date.now();
+    bloodMobs = bloodMobs.filter(e => {
+      const uuid = e.getUUID().toString();
+      let data = motionData.get(uuid);
+      const x = e.getX();
+      const y = e.getY();
+      const z = e.getZ();
+      if (!data) {
+        const dx = dist(x, e.getLastX());
+        const dz = dist(z, e.getLastZ());
+        if (y > 71 && (dx > 0.01 || dz > 0.01) && dx < 0.5 && dz < 0.5) {
+          bloodMobCount++;
+          const ttl = t - bloodOpenTime < 32000 && (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
+          data = {
+            posX: [e.getLastX()],
+            posY: [e.getLastY()],
+            posZ: [e.getLastZ()],
+            estX: x,
+            estY: y,
+            estZ: z,
+            lastEstX: x,
+            lastEstY: y,
+            lastEstZ: z,
+            ttl,
+            maxTtl: ttl,
+            startT: t,
+            lastUpdate: t,
+            timer: new DelayTimer(settings.dungeonCampSmoothTime)
+          };
+          motionData.set(uuid, data);
+          if (ttl === 80 && bloodMobCount >= 4) lastSpawnedBloodMob = data;
+        }
       }
-    }
-    if (data) {
-      data.ttl--;
-      if (data.ttl <= 0) return void motionData.delete(uuid);
-      data.posX.push(x);
-      data.posY.push(y);
-      data.posZ.push(z);
-      if (data.timer.shouldTick()) {
-        const { r: rX, b: bX } = linReg(data.posX.map((v, i) => [i, v]));
-        const { r: rY, b: bY } = linReg(data.posY.map((v, i) => [i, v]));
-        const { r: rZ, b: bZ } = linReg(data.posZ.map((v, i) => [i, v]));
-        data.lastEstX = data.estX;
-        data.lastEstY = data.estY;
-        data.lastEstZ = data.estZ;
-        data.estX = x + bX * data.ttl;
-        data.estY = y + bY * data.ttl;
-        data.estZ = z + bZ * data.ttl;
-        data.lastUpdate = t;
+      if (data) {
+        data.ttl--;
+        if (data.ttl <= 0) return void motionData.delete(uuid);
+        data.posX.push(x);
+        data.posY.push(y);
+        data.posZ.push(z);
+        if (data.timer.shouldTick()) {
+          const { r: rX, b: bX } = linReg(data.posX.map((v, i) => [i, v]));
+          const { r: rY, b: bY } = linReg(data.posY.map((v, i) => [i, v]));
+          const { r: rZ, b: bZ } = linReg(data.posZ.map((v, i) => [i, v]));
+          data.lastEstX = data.estX;
+          data.lastEstY = data.estY;
+          data.lastEstZ = data.estZ;
+          data.estX = x + bX * data.ttl;
+          data.estY = y + bY * data.ttl;
+          data.estZ = z + bZ * data.ttl;
+          data.lastUpdate = t;
+        }
       }
-    }
-    return true;
-  });
+      return true;
+    });
+  }).start();
 }, 'dungeon/camp').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateCampFinal);
 const renderWorldReg = reg('renderWorld', () => {
   // bloodMobs.forEach(e => motionData.has(e.getUUID().toString()) || drawBoxAtBlock(e.getX() - 0.5, e.getY() + 1.5, e.getZ() - 0.5, 1, +(!e.isDead()), +(e.getX() === e.getLastX()), 1, 1));
