@@ -1,12 +1,13 @@
 import reg from '../util/registerer';
 import { getPlayerName } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
+import { run } from '../util/threading';
 
 function reset() {
   dungeonLeaveReg.unregister();
   bossMessageReg.unregister();
   entSpawnReg.unregister();
-  getPlayersTickReg.unregister();
+  getPlayersStep2Reg.unregister();
 
   modules.forEach(v => v.reset());
 }
@@ -17,7 +18,7 @@ function start() {
   dungeonLeaveReg.register();
   bossMessageReg.register();
   entSpawnReg.register();
-  getPlayersTickReg.register();
+  getPlayersStep2Reg.register();
 
   modules.forEach(v => v.start());
 }
@@ -61,37 +62,39 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
     if (p) p.e = new EntityLivingBase(e);
   }
 }, 'dungeon');
-const getPlayersTickReg = reg('tick', () => {
-  const tab = TabList.getNames();
-  let expectEmpty = false;
-  for (let i = 1; i < tab.length; i++) {
-    let s = tab[i];
-    if (expectEmpty) {
-      if (s !== '§r') break;
-      expectEmpty = false;
-      continue;
+const getPlayersStep2Reg = reg('step', () => {
+  run(() => {
+    const tab = TabList.getNames();
+    let expectEmpty = false;
+    for (let i = 1; i < tab.length; i++) {
+      let s = tab[i];
+      if (expectEmpty) {
+        if (s !== '§r') break;
+        expectEmpty = false;
+        continue;
+      }
+      if (s === '§r' || /^§r§7and \d+ other players\.\.\.§r$/.test(s)) break;
+      if (s.startsWith('§r Revive Stones:')) {
+        expectEmpty = true;
+        continue;
+      }
+      if (s.startsWith('§r Ultimate:') || s.startsWith('§r         §r§a§lPlayers')) continue;
+      let m = s.match(/§r§f\(§r§d(\w+) \w+?§r§f\)§r$/);
+      if (!m) break; // "EMPTY"
+      players.push({ ign: getPlayerName(s), class: m[1], e: null });
     }
-    if (s === '§r' || /^§r§7and \d+ other players\.\.\.§r$/.test(s)) break;
-    if (s.startsWith('§r Revive Stones:')) {
-      expectEmpty = true;
-      continue;
+    if (players.length) {
+      World.getAllEntities().forEach(v => {
+        if (v.getClassName() !== 'EntityOtherPlayerMP') return;
+        const player = players.find(p => p.ign === v.getName());
+        if (player) player.e = new EntityLivingBase(v.entity);
+      });
+      const player = players.find(p => p.ign === Player.getName());
+      if (player) player.e = Player;
+      getPlayersStep2Reg.unregister();
     }
-    if (s.startsWith('§r Ultimate:') || s.startsWith('§r         §r§a§lPlayers')) continue;
-    let m = s.match(/§r§f\(§r§d(\w+) \w+?§r§f\)§r$/);
-    if (!m) break; // "EMPTY"
-    players.push({ ign: getPlayerName(s), class: m[1], e: null });
-  }
-  if (players.length) {
-    World.getAllEntities().forEach(v => {
-      if (v.getClassName() !== 'EntityOtherPlayerMP') return;
-      const player = players.find(p => p.ign === v.getName());
-      if (player) player.e = new EntityLivingBase(v.entity);
-    });
-    const player = players.find(p => p.ign === Player.getName());
-    if (player) player.e = Player;
-    getPlayersTickReg.unregister();
-  }
-}, 'dungeon');
+  });
+}, 'dungeon').setFps(2);
 
 // const dungeonJoinReq = reg('chat', () => dungeon.emit('dungeonJoin'), 'dungeon').setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}');
 const dungeonStartReg = reg('chat', () => start(), 'dungeon').setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
@@ -134,7 +137,7 @@ export function init() {
   modules.forEach(v => v.init());
 
   entSpawnReg.setEnabled(stateTrackPlayers);
-  getPlayersTickReg.setEnabled(stateTrackPlayers);
+  getPlayersStep2Reg.setEnabled(stateTrackPlayers);
 }
 export function load() {
   dungeonStartReg.register();
