@@ -4,6 +4,8 @@ import reg from '../../util/registerer';
 import Grid from '../../util/grid';
 
 const brokenStairBucket = new Grid({ size: 2, addNeighbors: 2 });
+let cID = NaN;
+let cArr = null;
 
 const BlockStairs = Java.type('net.minecraft.block.BlockStairs');
 const stairBreakReg = reg('blockBreak', b => {
@@ -13,6 +15,7 @@ const stairBreakReg = reg('blockBreak', b => {
   const z = b.getZ();
   const n = x * 631 * 631 + y * 631 + z;
   if (brokenStairBucket.get(x, z).some(v => v[0] === n)) return;
+  cID = NaN;
   switch (b.getMetadata()) {
     case 0:
       brokenStairBucket.add(x, z, [n, [x + 0.24, y + 1.1, z], [x + 0.24, y + 1.1, z + 1]]);
@@ -28,8 +31,20 @@ const stairBreakReg = reg('blockBreak', b => {
       break;
   }
 }, 'dungeon/stairstonkhelper').setEnabled(settings._dungeonStairStonkHelper);
+const tickReg = reg('tick', () => {
+  const id = brokenStairBucket._getId(Player.getX(), Player.getZ());
+  if (id !== cID) {
+    cID = id;
+    cArr = brokenStairBucket._getById(id);
+  }
+}, 'stairstonkhelper');
 const renderWorldReg = reg('renderWorld', () => {
-  brokenStairBucket.get(Player.getX(), Player.getZ()).forEach(v => {
+  if (!cArr) {
+    const id = brokenStairBucket._getId(Player.getX(), Player.getZ());
+    cID = id;
+    cArr = brokenStairBucket._getById(id);
+  }
+  cArr.forEach(v => {
     // average rhino L
     // java.lang.ClassCastException: java.lang.Boolean cannot be cast to [Ljava.lang.Object;
     // drawLine(settings.dungeonStairStonkHelperColor, ...v[1], ...v[2], 2);
@@ -45,11 +60,15 @@ const renderWorldReg = reg('renderWorld', () => {
 export function init() { }
 export function start() {
   brokenStairBucket.clear();
+  cID = NaN;
+  cArr = null;
 
   stairBreakReg.register();
+  tickReg.register();
   renderWorldReg.register();
 }
 export function reset() {
   stairBreakReg.unregister();
+  tickReg.unregister();
   renderWorldReg.unregister();
 }
