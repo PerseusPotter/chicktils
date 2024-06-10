@@ -39,7 +39,7 @@ export const getSbDate = (function() {
  */
 export function getSbId(item) {
   if (!item) return '';
-  return item.getNBT().getCompoundTag('tag')?.getCompoundTag('ExtraAttributes')?.getString('id') || '';
+  return item.itemStack.func_77978_p()?.func_74775_l('ExtraAttributes')?.func_74779_i('id');
 }
 
 /**
