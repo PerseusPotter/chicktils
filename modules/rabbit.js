@@ -3,50 +3,36 @@ import { pointTo3D, drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawBeaconBea
 import settings from '../settings';
 import reg from '../util/registerer';
 import { getSbDate } from '../util/skyblock';
-import { StateProp } from '../util/state';
+import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
 import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
+
+const stateIsSpring = new StateVar(false);
 
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');
 let eggs = [];
 let activeEggs = [2, 2, 2];
 let lastSpawnDays = [0, 0, 0];
-function reset() {
-  eggs = [];
-  eggCollectReg.unregister();
-  eggAlrCollectReg.unregister();
-  // eggStepReg.unregister();
-  eggRenWrldReg.unregister();
-  eggRendOvReg.unregister();
-  unloadReg.unregister();
-}
-function start() {
-  unloadReg.register();
-  eggCollectReg.register();
-  eggAlrCollectReg.register();
-  eggRenWrldReg.register();
-  eggRendOvReg.register();
-}
-const unloadReg = reg('worldUnload', () => reset(), 'rabbit');
+const unloadReg = reg('worldUnload', () => eggs = [], 'rabbit').setEnabled(stateIsSpring);
 function scanEgg() {
   if (!settings.rabbitSniffer) return;
-  const l = eggs.length;
-  eggs = World.getAllEntities().filter(v => {
-    if (v.getClassName() !== 'EntityArmorStand') return false;
-    const nbt = v.entity.func_71124_b(4)?.func_77978_p();
-    if (!nbt) return false;
-    const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
-    return ['015adc61-0aba-3d4d-b3d1-ca47a68a154b', '55ae5624-c86b-359f-be54-e0ec7c175403', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].find((v, i) => activeEggs[i] === 2 && v === id);
-  });
-  if (settings.rabbitAlertEggFound && eggs.length > l) {
-    start();
-    Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertFoundTime));
-  }
+  new Thread(() => {
+    const l = eggs.length;
+    eggs = World.getAllEntities().filter(v => {
+      if (v.getClassName() !== 'EntityArmorStand') return false;
+      const nbt = v.entity.func_71124_b(4)?.func_77978_p();
+      if (!nbt) return false;
+      const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
+      return ['015adc61-0aba-3d4d-b3d1-ca47a68a154b', '55ae5624-c86b-359f-be54-e0ec7c175403', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].find((v, i) => activeEggs[i] === 2 && v === id);
+    });
+    if (settings.rabbitAlertEggFound && eggs.length > l) Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertFoundTime));
+  }).start();
 }
 const eggSpawnReg = reg('step', () => {
   const { year, month, day, hour } = getSbDate();
-  if (month > 3) return reset();
+  stateIsSpring.set(month <= 3);
+  if (month > 3) return;
   const dayHash = year * 631 * 631 + month * 631 + day;
   let type;
   if (hour === 7) type = 0;
@@ -60,7 +46,7 @@ const eggSpawnReg = reg('step', () => {
 
   if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertFoundTime);
 }, 'rabbit').setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
-const eggStepReg = reg('step', () => scanEgg(), 'rabbit').setDelay(2).setEnabled(settings._rabbitSniffer);
+const eggStepReg = reg('step', () => scanEgg(), 'rabbit').setDelay(2).setEnabled(new StateProp(stateIsSpring).and(settings._rabbitSniffer));
 const types = {
   Breakfast: 0,
   Lunch: 1,
@@ -70,8 +56,8 @@ function onCollect(type) {
   activeEggs[types[type]] = 1;
   Client.scheduleTask(() => scanEgg());
 }
-const eggCollectReg = reg('chat', onCollect, 'rabbit').setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').unregister();
-const eggAlrCollectReg = reg('chat', onCollect, 'rabbit').setCriteria('&r&cYou have already collected this Chocolate ${type} Egg&r&c! Try again when it respawns!&r').unregister();
+const eggCollectReg = reg('chat', onCollect, 'rabbit').setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').setEnabled(stateIsSpring);
+const eggAlrCollectReg = reg('chat', onCollect, 'rabbit').setCriteria('&r&cYou have already collected this Chocolate ${type} Egg&r&c! Try again when it respawns!&r').setEnabled(stateIsSpring);
 const eggRenWrldReg = reg('renderWorld', () => {
   const c = settings.rabbitBoxColor;
   const r = ((c >> 24) & 0xFF) / 256;
@@ -86,12 +72,12 @@ const eggRenWrldReg = reg('renderWorld', () => {
     else drawBoxAtBlockNotVisThruWalls(x - 0.25, y + 1.5, z - 0.25, r, g, b, 0.5, 0.5, a);
     drawBeaconBeam(x - 0.5, y + 2.5, z - 0.5, r, g, b, a, !settings.rabbitBoxEsp);
   });
-}, 'rabbit');
+}, 'rabbit').setEnabled(stateIsSpring);
 const eggRendOvReg = reg('renderOverlay', () => {
   if (eggs.length === 0) return;
   eggs.sort((a, b) => Player.asPlayerMP().distanceTo(a) - Player.asPlayerMP().distanceTo(b));
   pointTo3D(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
-}, 'rabbit');
+}, 'rabbit').setEnabled(stateIsSpring);
 
 const guiReg = reg('guiOpened', evn => {
   if (!settings.rabbitShowBestUpgrade) return;
@@ -194,11 +180,20 @@ export function load() {
   eggStepReg.register();
   guiReg.register();
   promoteReg.register();
+  unloadReg.register();
+  eggCollectReg.register();
+  eggAlrCollectReg.register();
+  eggRenWrldReg.register();
+  eggRendOvReg.register();
 }
 export function unload() {
   eggSpawnReg.unregister();
   eggStepReg.unregister();
   guiReg.unregister();
   promoteReg.unregister();
-  reset();
+  unloadReg.unregister();
+  eggCollectReg.unregister();
+  eggAlrCollectReg.unregister();
+  eggRenWrldReg.unregister();
+  eggRendOvReg.unregister();
 }
