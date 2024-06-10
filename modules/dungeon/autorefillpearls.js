@@ -7,7 +7,7 @@ import { countItems, getSbId } from '../../util/skyblock';
 
 const pearlRefillDelay = new DelayTimer(2_000);
 
-const tickReg = reg('tick', () => {
+const step1Reg = reg('step', () => {
   const c = countItems('ENDER_PEARL');
   if (
     c < settings.dungeonAutoRefillPearlsThreshold &&
@@ -29,7 +29,7 @@ const tickReg = reg('tick', () => {
     }
     execCmd('gfs ENDER_PEARL ' + (settings.dungeonAutoRefillPearlsAmount - c));
   });
-}, 'dungeon/autorefillpearls').setEnabled(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls));
+}, 'dungeon/autorefillpearls').setDelay(1).setEnabled(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls));
 
 export function init() { }
 export function start() {
@@ -38,8 +38,8 @@ export function start() {
     if (c > 0) execCmd('gfs ENDER_PEARL ' + c);
   }
 
-  tickReg.register();
+  step1Reg.register();
 }
 export function reset() {
-  tickReg.unregister();
+  step1Reg.unregister();
 }
