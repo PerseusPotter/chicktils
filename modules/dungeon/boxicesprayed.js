@@ -12,7 +12,7 @@ let allMobs = [];
 let newAllMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
 let itemCand = [];
-const frozenMobs = new (Java.type('java.util.HashMap'))();
+let frozenMobs = [];
 
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
@@ -112,25 +112,14 @@ const tickReg = reg('tick', () => {
             (ent.field_70161_v - e.field_70161_v) ** 2 > ls
           ) return;
           const aabb = e.func_174813_aQ();
-          if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) frozenMobs.put(e, 5 * 20);
+          if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) frozenMobs.push([e, 5 * 20]);
         });
       });
     }
   });
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const serverTickReg = reg('packetReceived', () => {
-  // const it = frozenMobs.entrySet().iterator();
-  // while (it.hasNext()) {
-  //   let pair = it.next();
-  //   let v = pair.getValue() - 1;
-  //   if (v === 0) it.remove();
-  //   else it.setValue(v);
-  // }
-  frozenMobs.entrySet().forEach(p => {
-    const v = p.getValue() - 1;
-    if (v === 0) frozenMobs.remove(p.getKey());
-    else frozenMobs.replace(p.getKey(), v);
-  });
+  frozenMobs = frozenMobs.filter(v => --v[1] > 0);
 }, 'dungeon/boxicesprayed').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(settings._dungeonBoxIceSprayed);
 const renderWorldReg = reg('renderWorld', () => {
   const or = ((settings.dungeonBoxIceSprayedOutlineColor >> 24) & 0xFF) / 256;
@@ -141,7 +130,7 @@ const renderWorldReg = reg('renderWorld', () => {
   const fg = ((settings.dungeonBoxIceSprayedFillColor >> 16) & 0xFF) / 256;
   const fb = ((settings.dungeonBoxIceSprayedFillColor >> 8) & 0xFF) / 256;
   const fa = ((settings.dungeonBoxIceSprayedFillColor >> 0) & 0xFF) / 256;
-  frozenMobs.keySet().forEach(e => {
+  frozenMobs.forEach(([e]) => {
     if (e.field_70128_L) return;
     const x = lerp(e.field_70169_q, e.field_70165_t, partial);
     const y = lerp(e.field_70167_r, e.field_70163_u, partial);
@@ -163,7 +152,7 @@ export function start() {
   newAllMobs = [];
   allMobsBucket.clear();
   itemCand = [];
-  frozenMobs.clear();
+  frozenMobs = [];
 
   entSpawnReg.register();
   Client.scheduleTask(0, () => step2Reg.register());
