@@ -61,16 +61,16 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
 
   lastY = pos.y;
   particles.push(pos);
-  if (spiritBearGuessDelay.shouldTick()) {
+  if (particles.length >= 2 && spiritBearGuessDelay.shouldTick()) {
     const { r: rX, b: bX } = linReg(particles.map(v => [v.t, v.x]));
     const { r: rZ, b: bZ } = linReg(particles.map(v => [v.t, v.z]));
 
-    const d = bearSpawnRadius / Math.hypot(bX - fm4Center.x, bZ - fm4Center.z);
+    const d = bearSpawnRadius / Math.hypot(bX, bZ);
     estPrev = est;
     est = {
-      x: lerp(fm4Center.x, bX, d),
+      x: bX * d + fm4Center.x,
       y: fm4Center.y,
-      z: lerp(fm4Center.z, bZ, d)
+      z: bZ * d + fm4Center.z
     };
   }
 }, 'dungeon/spiritbear').setEnabled(stateBearSpawning);
