@@ -75,10 +75,12 @@ export class StateProp extends StateVar {
   }
 
   not() {
+    if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).not();
     this.op = StateProp.Operator.NOT;
     return this;
   }
   and(v) {
+    if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).and(v);
     const n = new StateProp(v);
     n.right = this;
     n.add(this);
@@ -86,6 +88,7 @@ export class StateProp extends StateVar {
     return n;
   }
   or(v) {
+    if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).or(v);
     const n = new StateProp(v);
     n.right = this;
     n.add(this);
