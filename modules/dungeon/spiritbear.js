@@ -79,7 +79,7 @@ const spiritBearSpawnReg = reg('chat', () => {
   ticks.set(-1);
 }, 'dungeon/spiritbear').setCriteria('&r&a&lA &r&5&lSpirit Bear &r&a&lhas appeared!&r').setEnabled(stateInFM4);
 const spiritBowDropReg = reg('chat', () => {
-  ticks.set(0);
+  Client.scheduleTask(5, () => ticks.set(0));
 }, 'dungeon/spiritbear').setCriteria('&r&a&lThe &r&5&lSpirit Bow &r&a&lhas dropped!&r').setEnabled(stateInFM4);
 const renderWorldReg = reg('renderWorld', () => {
   if (!est) return;
