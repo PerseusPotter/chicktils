@@ -17,6 +17,7 @@ const bearSpawnRadius = 0.8;
 const fm4Center = { x: 5.5, y: 69, z: 5.5 };
 let particles = [];
 const ticks = new StateVar(0);
+let justSpawned = false;
 let est = null;
 let estPrev = null;
 let prevTime = 0;
@@ -30,6 +31,7 @@ const stateBearSpawning = new StateProp(ticks).equalsmult(0, -1).not().and(state
 function resetFM4Vars() {
   particles = [];
   ticks.set(0);
+  justSpawned = false;
   est = null;
   estPrev = null;
   prevTime = 0;
@@ -37,7 +39,8 @@ function resetFM4Vars() {
 }
 
 const tickReg = reg('tick', () => {
-  if (World.getBlockAt(7, 77, 34).type.getID() !== 169) return;
+  if (World.getBlockAt(7, 77, 34).type.getID() !== 169) return justSpawned = false;
+  if (justSpawned) return;
   prevTime = Date.now();
   ticks.set(bearSpawnTicks);
   const thorn = World.getAllEntities().find(v => v.getClassName() === 'EntityGhast');
@@ -79,7 +82,8 @@ const spiritBearSpawnReg = reg('chat', () => {
   ticks.set(-1);
 }, 'dungeon/spiritbear').setCriteria('&r&a&lA &r&5&lSpirit Bear &r&a&lhas appeared!&r').setEnabled(stateInFM4);
 const spiritBowDropReg = reg('chat', () => {
-  Client.scheduleTask(5, () => ticks.set(0));
+  ticks.set(0);
+  justSpawned = true;
 }, 'dungeon/spiritbear').setCriteria('&r&a&lThe &r&5&lSpirit Bow &r&a&lhas dropped!&r').setEnabled(stateInFM4);
 const renderWorldReg = reg('renderWorld', () => {
   if (!est) return;
@@ -124,6 +128,8 @@ export function init() {
   listenBossMessages((name, msg) => settings.dungeonSpiritBearHelper && name === 'Thorn' && msg === 'Welcome Adventurers! I am Thorn, the Spirit! And host of the Vegan Trials!' && stateInFM4.set(true));
 }
 export function start() {
+  resetFM4Vars();
+
   tickReg.register();
   serverTickReg.register();
   particleReg.register();
