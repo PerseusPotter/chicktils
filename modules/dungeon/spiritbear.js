@@ -9,7 +9,7 @@ import { lerp, linReg } from '../../util/math';
 import { log } from '../../util/log';
 import { StateProp, StateVar } from '../../util/state';
 import { DelayTimer } from '../../util/timers';
-import { stateIsInBoss } from '../dungeon.js';
+import { listenBossMessages } from '../dungeon.js';
 
 const bearSpawnTicks = 70;
 const bearParticleHeightCap = 80;
@@ -21,7 +21,6 @@ let est = null;
 let estPrev = null;
 let prevTime = 0;
 let lastY = bearParticleHeightCap;
-let updateGrace = Number.POSITIVE_INFINITY;
 const spiritBearGuessDelay = new DelayTimer(settings.dungeonSpiritBearSmoothTime);
 const spiritBearTimer = createTextGui(() => data.dungeonSpiritBearTimerLoc, () => ['§l§26.42s']);
 
@@ -35,26 +34,23 @@ function resetFM4Vars() {
   estPrev = null;
   prevTime = 0;
   lastY = bearParticleHeightCap;
-  updateGrace = Number.POSITIVE_INFINITY;
 }
 
 const tickReg = reg('tick', () => {
-  const t = Date.now();
-  if (t > updateGrace && World.getBlockAt(7, 77, 34).type.getID() === 169) {
-    prevTime = t;
-    ticks.set(bearSpawnTicks);
-    const thorn = World.getAllEntities().find(v => v.getClassName() === 'EntityGhast');
-    if (!thorn) {
-      log('cannot find thorn');
-      est = estPrev = fm4Center;
-    } else {
-      const d = bearSpawnRadius / Math.hypot(thorn.getX() - fm4Center.x, thorn.getZ() - fm4Center.z);
-      est = estPrev = {
-        x: lerp(fm4Center.x, thorn.getX(), d),
-        y: fm4Center.y,
-        z: lerp(fm4Center.z, thorn.getZ(), d)
-      };
-    }
+  if (World.getBlockAt(7, 77, 34).type.getID() !== 169) return;
+  prevTime = Date.now();
+  ticks.set(bearSpawnTicks);
+  const thorn = World.getAllEntities().find(v => v.getClassName() === 'EntityGhast');
+  if (!thorn) {
+    log('cannot find thorn');
+    est = estPrev = fm4Center;
+  } else {
+    const d = bearSpawnRadius / Math.hypot(thorn.getX() - fm4Center.x, thorn.getZ() - fm4Center.z);
+    est = estPrev = {
+      x: lerp(fm4Center.x, thorn.getX(), d),
+      y: fm4Center.y,
+      z: lerp(fm4Center.z, thorn.getZ(), d)
+    };
   }
 }, 'dungeon/spiritbear').setEnabled(new StateProp(ticks).equals(0).and(stateInFM4));
 const serverTickReg = reg('packetReceived', () => ticks.set(ticks.get() - 1), 'dungeon/spiritbear').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBearSpawning);
@@ -78,14 +74,12 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
     };
   }
 }, 'dungeon/spiritbear').setEnabled(stateBearSpawning);
-const fm4StartReg = reg('chat', () => stateInFM4.set(true), 'dungeon/spiritbear').setCriteria('&r&c[BOSS] Thorn&r&f: Welcome Adventurers! I am Thorn, the Spirit! And host of the Vegan Trials!&r').setEnabled(new StateProp(stateIsInBoss).and(settings._dungeonSpiritBearHelper));
 const spiritBearSpawnReg = reg('chat', () => {
   resetFM4Vars();
   ticks.set(-1);
 }, 'dungeon/spiritbear').setCriteria('&r&a&lA &r&5&lSpirit Bear &r&a&lhas appeared!&r').setEnabled(stateInFM4);
 const spiritBowDropReg = reg('chat', () => {
-  ticks.set(-1);
-  updateGrace = Date.now() + 1000;
+  ticks.set(0);
 }, 'dungeon/spiritbear').setCriteria('&r&a&lThe &r&5&lSpirit Bow &r&a&lhas dropped!&r').setEnabled(stateInFM4);
 const renderWorldReg = reg('renderWorld', () => {
   if (!est) return;
@@ -119,7 +113,7 @@ const renderWorldReg = reg('renderWorld', () => {
   if (settings.dungeonSpiritBearTimer) drawString(((ticks.get() - Tessellator.partialTicks) / 20).toFixed(2), x, y + 2.5, z);
 }, 'dungeon/spiritbear').setEnabled(stateBearSpawning);
 const renderOvlyReg = reg('renderOverlay', () => {
-  const d = (ticks + 1 - Tessellator.partialTicks) * 50;
+  const d = (ticks.get() + 1 - Tessellator.partialTicks) * 50;
   spiritBearTimer.setLine(`§l${colorForNumber(d, bearSpawnTicks * 50)}${(d / 1000).toFixed(2)}s`.toString());
   spiritBearTimer.render();
 }, 'dungeon/spiritbear').setEnabled(new StateProp(settings._dungeonSpiritBearTimerHud).and(stateBearSpawning));
@@ -127,12 +121,12 @@ const renderOvlyReg = reg('renderOverlay', () => {
 export function init() {
   settings._dungeonSpiritBearSmoothTime.onAfterChange(v => spiritBearGuessDelay.delay = v);
   settings._moveSpiritBearTimerHud.onAction(() => spiritBearTimer.edit());
+  listenBossMessages((name, msg) => settings.dungeonSpiritBearHelper && name === 'Thorn' && msg === 'Welcome Adventurers! I am Thorn, the Spirit! And host of the Vegan Trials!' && stateInFM4.set(true));
 }
 export function start() {
   tickReg.register();
   serverTickReg.register();
   particleReg.register();
-  fm4StartReg.register();
   spiritBearSpawnReg.register();
   spiritBowDropReg.register();
   renderWorldReg.register();
@@ -142,7 +136,6 @@ export function reset() {
   tickReg.unregister();
   serverTickReg.unregister();
   particleReg.unregister();
-  fm4StartReg.unregister();
   spiritBearSpawnReg.unregister();
   spiritBowDropReg.unregister();
   renderWorldReg.unregister();
