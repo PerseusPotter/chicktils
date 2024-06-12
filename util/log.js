@@ -47,3 +47,8 @@ export function logDebug(obj, escapeFormatting = false) {
   if (escapeFormatting) str = str.replace(/(&|§)/g, '$1﻿');
   log(str);
 }
+
+export function logState(state, name) {
+  log(name, 'value:', state.get());
+  state.listen(() => log(name, 'changed:', state.get()));
+}
