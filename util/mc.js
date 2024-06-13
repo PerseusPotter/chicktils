@@ -90,3 +90,15 @@ export function toVec3({ x, y, z }) {
 export function fromVec3(vec) {
   return { x: vec.field_72450_a, y: vec.field_72448_b, z: vec.field_72449_c };
 }
+
+/**
+ * @param {import ('../../@types/External').JavaClass<'net.minecraft.util.BlockPos'>} bPos
+ * @returns {{ x: number, y: number, z: number}}
+ */
+export function getBlockPos(bPos) {
+  return {
+    x: bPos.func_177958_n(),
+    y: bPos.func_177956_o(),
+    z: bPos.func_177952_p()
+  };
+}

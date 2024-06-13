@@ -7,7 +7,7 @@ import { drawBeaconBeam, drawString, pointTo3D, renderWaypoints } from '../util/
 import { dist, linReg, lineRectColl } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateVar } from '../util/state';
-import { getItemId, getLowerContainer } from '../util/mc';
+import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
 
 const warps = [
   {
@@ -177,18 +177,7 @@ const soundPlayReg = reg('soundPlay', (pos, name, vol, pit, cat, evn) => {
   let pY;
   let pZ;
   if (prevSounds.length === 0) {
-    try {
-      if (GriffinBurrows && GriffinBurrows.INSTANCE.getLastDugParticleBurrow()) {
-        pX = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().getX();
-        pY = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().getY();
-        pZ = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().getZ();
-      }
-    } catch (e) {
-      // MutableBlockPos because why the fuck not
-      pX = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().func_177958_n();
-      pY = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().func_177956_o();
-      pZ = GriffinBurrows.INSTANCE.getLastDugParticleBurrow().func_177952_p();
-    }
+    ({ x: pX, y: pY, z: pY } = getBlockPos(GriffinBurrows.INSTANCE.getLastDugParticleBurrow()));
     if (pX === undefined || ((Player.getX() - pX) ** 2 + (Player.getY() - pY) ** 2 + (Player.getZ() - pZ) ** 2) > 25) {
       pX = Player.getX();
       pY = Player.getY();
