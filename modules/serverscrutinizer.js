@@ -6,7 +6,7 @@ import { log } from '../util/log';
 import reg from '../util/registerer';
 
 let tpsC = 0;
-let ticks = [];
+let ticks = [Date.now()];
 const MAX_TICK_AGE = 5_000;
 function getCurrentTPS() {
   if (ticks.length === 0) return 0;
