@@ -2,7 +2,7 @@ import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawArrow2D, renderWaypo
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
-import { colorForNumber } from '../util/format';
+import { colorForNumber, execCmd } from '../util/format';
 import reg from '../util/registerer';
 import getPing from '../util/ping';
 import { StateProp, StateVar } from '../util/state';
