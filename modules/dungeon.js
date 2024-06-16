@@ -55,7 +55,7 @@ export function isDungeonMob(name) {
     name === 'EntityEnderman';
 }
 export function roundRoomCoords(c) {
-  return ((c + 9) & 0b11111111111111111111111111100000) - 9;
+  return ((c + 8) & 0b11111111111111111111111111100000) - 8;
 }
 
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
