@@ -2,11 +2,11 @@ import settings from '../../settings';
 import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock } from '../../util/draw';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
-import { stateIsInBoss } from '../dungeon.js';
+import { stateFloor, stateIsInBoss } from '../dungeon.js';
 
 let withers = [];
 
-const stateBoxWithers = new StateProp(settings._dungeonBoxWither).and(stateIsInBoss);
+const stateBoxWithers = new StateProp(stateFloor).equalsmult('F7', 'M7').and(settings._dungeonBoxWither).and(stateIsInBoss);
 
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   if (evn.entity.getClass().getSimpleName() === 'EntityWither') withers.push(new EntityLivingBase(evn.entity));

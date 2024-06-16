@@ -5,7 +5,7 @@ import { colorForNumber } from '../../util/format';
 import runHelper from '../../util/runner';
 import createTextGui from '../../util/customtextgui';
 import { StateProp, StateVar } from '../../util/state';
-import { stateIsInBoss } from '../dungeon.js';
+import { stateFloor, stateIsInBoss } from '../dungeon.js';
 
 const instaMidProc = new StateVar(undefined);
 const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () => ['§l§26.42s']);
@@ -22,7 +22,7 @@ const serverTickReg = reg('packetReceived', () => necronDragTicks.set(necronDrag
 const necronStartReg = reg('chat', () => {
   necronDragTicks.set(settings.dungeonNecronDragDuration);
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc.set(runHelper('InstaMidHelper'));
-}, 'dungeon/necrondrag').setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').and(stateIsInBoss));
+}, 'dungeon/necrondrag').setCriteria('&r&4[BOSS] Necron&r&c: &r&cYou went further than any human before, congratulations.&r').setEnabled(new StateProp(settings._dungeonNecronDragTimer).notequals('None').and(new StateProp(stateFloor).equalsmult('F7', 'M7')).and(stateIsInBoss));
 const renderOverlayReg = reg('renderOverlay', () => {
   const d = necronDragTicks.get() * 50;
   necronDragTimer.setLine(`§l${colorForNumber(d, settings.dungeonNecronDragDuration * 50)}${(d / 1000).toFixed(2)}s`.toString());

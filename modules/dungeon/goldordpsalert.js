@@ -2,11 +2,11 @@ import settings from '../../settings';
 import createAlert from '../../util/alert';
 import reg from '../../util/registerer';
 import { StateProp, StateVar } from '../../util/state';
-import { getPlayers, registerTrackPlayers, stateIsInBoss } from '../dungeon.js';
+import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss } from '../dungeon.js';
 
 const goldorDpsStartAlert = createAlert('DPS!', 10);
 
-const stateGoldorDps = new StateProp(settings._dungeonGoldorDpsStartAlert).and(stateIsInBoss);
+const stateGoldorDps = new StateProp(stateFloor).equalsmult('F7', 'M7').and(settings._dungeonGoldorDpsStartAlert).and(stateIsInBoss);
 const stateIsInGoldorDps = new StateVar(false);
 
 const tickReg = reg('tick', () => {

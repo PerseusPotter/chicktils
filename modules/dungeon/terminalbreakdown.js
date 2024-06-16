@@ -3,11 +3,11 @@ import reg from '../../util/registerer';
 import { getPlayerName } from '../../util/format';
 import { log } from '../../util/log';
 import { StateProp } from '../../util/state';
-import { getPlayers, registerTrackPlayers, stateIsInBoss } from '../dungeon.js';
+import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss } from '../dungeon.js';
 
 const teamTerms = new Map();
 
-const stateTermBreakdown = new StateProp(settings._dungeonTerminalBreakdown).and(stateIsInBoss);
+const stateTermBreakdown = new StateProp(stateFloor).equalsmult('F7', 'M7').and(settings._dungeonTerminalBreakdown).and(stateIsInBoss);
 
 const termCompleteReg = reg('chat', (name, type) => {
   const ign = getPlayerName(name);

@@ -14,6 +14,8 @@ function reset() {
 function start() {
   players = [];
   stateIsInBoss.set(false);
+  const floor = Scoreboard.getLines(false)[4].getName().match(/^ §7⏣ §cThe Catac🍭§combs §7\(([MF][1-7]|E)\)$/);
+  stateFloor.set(floor ? floor[1] : '');
 
   dungeonLeaveReg.register();
   bossMessageReg.register();
@@ -35,6 +37,7 @@ export function registerTrackPlayers(cond) {
 export function getPlayers() {
   return players;
 }
+export const stateFloor = new StateVar('');
 export function listenBossMessages(cb) {
   bossCbs.push(cb);
 }
