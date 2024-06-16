@@ -2,7 +2,7 @@ import settings from '../../settings';
 import reg from '../../util/registerer';
 import { StateProp, StateVar } from '../../util/state';
 import { getLowerContainer } from '../../util/mc';
-import { stateIsInBoss } from '../dungeon.js';
+import { stateFloor, stateIsInBoss } from '../dungeon.js';
 
 const origGuiSize = new StateVar(-1);
 
@@ -38,7 +38,7 @@ const termOpenReg = reg('guiOpened', evn => {
       case 'Auto': return 0;
     }
   }());
-}, 'dungeon/terminalsguisize').setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1)).and(stateIsInBoss));
+}, 'dungeon/terminalsguisize').setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1)).and(stateIsInBoss).and(new StateProp(stateFloor).equalsmult('F7', 'M7')));
 
 export function init() { }
 export function start() {
