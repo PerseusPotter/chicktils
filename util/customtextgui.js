@@ -78,11 +78,25 @@ editGui.registerScrolled((x, y, d) => {
  */
 let dlPool = [];
 function getLine() {
-  if (dlPool.length === 0) return new DisplayLine('');
+  if (dlPool.length === 0) return createNonShitDisplayLineFuckChatTriggers();
   return dlPool.pop();
 }
 function freeLines(lines) {
   dlPool = dlPool.concat(lines);
+}
+const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
+const MouseListener = Java.type('com.chattriggers.ctjs.minecraft.listeners.MouseListener')
+const clickListenersF = MouseListener.class.getDeclaredField('clickListeners');
+clickListenersF.setAccessible(true);
+const draggedListenersF = MouseListener.class.getDeclaredField('draggedListeners');
+draggedListenersF.setAccessible(true);
+function createNonShitDisplayLineFuckChatTriggers() {
+  const line = new DisplayLine('');
+  if (helper) {
+    helper.removeLastElement(clickListenersF, MouseListener);
+    helper.removeLastElement(draggedListenersF, MouseListener);
+  }
+  return line;
 }
 
 /**
@@ -101,23 +115,20 @@ function freeLines(lines) {
  *  clearLines(): CustomTextGui;
  * }} CustomTextGui
  */
-// const DisplayHandler = Java.type('com.chattriggers.ctjs.minecraft.objects.display.DisplayHandler');
-const displaysF = DisplayHandler.class.getDeclaredField('displays');
-const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
-displaysF.setAccessible(true);
 /**
  * @param {() => import('../data').TextLocation} getLoc
  * @param {() => string[]} getEditText
  * @param {string?} customEditMsg
  * @returns {CustomTextGui}
  */
+const displaysF = DisplayHandler.class.getDeclaredField('displays');
+displaysF.setAccessible(true);
 export default function createTextGui(getLoc, getEditText, str = '') {
   /**
    * @type {CustomTextGui}
    */
   const obj = new EventEmitter();
   obj.display = new Display();
-  const dlPool = [];
   const isRemoved = helper ? helper.removeLastElement(displaysF, DisplayHandler) : false;
   obj.display.setShouldRender(isRemoved);
   obj.getLoc = getLoc;
