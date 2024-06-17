@@ -42,7 +42,6 @@ function _getMinimumTPS() {
 const serverTickReg = reg('packetReceived', () => {
   const t = Date.now();
   ticks.unshift(t);
-  while (t - ticks[ticks.length - 1] > MAX_TICK_AGE) ticks.pop();
   tpsC++;
 }, 'serverscrutinizer').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
 
@@ -72,6 +71,7 @@ function formatTps(curr, avg, min) {
 }
 const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11));
 const rendOvTps = reg('renderOverlay', () => {
+  while (t - ticks[ticks.length - 1] > MAX_TICK_AGE) ticks.pop();
   tpsDisplay.setLines(formatTps(getCurrentTPS(), getAverageTPS(), getMinimumTPS()));
   tpsDisplay.render();
 }, 'serverscrutinizer').setEnabled(settings._serverScrutinizerTPSDisplay);
