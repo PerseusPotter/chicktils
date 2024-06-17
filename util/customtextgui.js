@@ -74,6 +74,18 @@ editGui.registerScrolled((x, y, d) => {
 });
 
 /**
+ * @type {DisplayLine[]}
+ */
+let dlPool = [];
+function getLine() {
+  if (dlPool.length === 0) return new DisplayLine('');
+  return dlPool.pop();
+}
+function freeLines(lines) {
+  dlPool = dlPool.concat(lines);
+}
+
+/**
  * @typedef {import('./events').EventEmitterImpl<'editClose' | 'editKey'> & {
  *  display: Display
  *  getLoc: () => import('../data').TextLocation;
@@ -105,6 +117,7 @@ export default function createTextGui(getLoc, getEditText, str = '') {
    */
   const obj = new EventEmitter();
   obj.display = new Display();
+  const dlPool = [];
   const isRemoved = helper ? helper.removeLastElement(displaysF, DisplayHandler) : false;
   obj.display.setShouldRender(isRemoved);
   obj.getLoc = getLoc;
@@ -157,11 +170,10 @@ export default function createTextGui(getLoc, getEditText, str = '') {
   let cll = 0;
   obj.setLine = function(str) {
     if (str !== cstr) {
+      this.clearLines();
       cstr = str;
-      obj.display.clearLines();
-      obj.display.addLine(str);
-      obj.display.getLine(0).setScale(cs);
       cll = 1;
+      this.display.addLine(getLine().setText(cstr).setScale(cs));
     }
     return this;
   };
@@ -172,8 +184,7 @@ export default function createTextGui(getLoc, getEditText, str = '') {
   };
   obj.addLine = function(str) {
     const i = (ca & 2) ? 0 : cll;
-    this.display.addLine(i, str);
-    this.display.getLine(i).setScale(cs);
+    this.display.addLine(i, getLine().setText(str).setScale(cs));
     cll++;
     cstr = 'googoogAA gaa';
     return this;
@@ -183,6 +194,7 @@ export default function createTextGui(getLoc, getEditText, str = '') {
     return this;
   };
   obj.clearLines = function() {
+    freeLines(obj.display.getLines());
     this.display.clearLines();
     cll = 0;
     cstr = 'googoogAA gaa';
