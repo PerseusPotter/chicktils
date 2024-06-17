@@ -44,6 +44,9 @@ const cringeShit = {
   'Magma Cream': ['Enchanted Magma Cream', 'Whipped Magma Cream'],
   'Slimeball': ['Enchanted Slimeball', 'Enchanted Slime Block']
 };
+const cringeShitV2 = {
+  'Nether Star': 'CORRUPTED_NETHER_STAR'
+};
 
 https.get(url, res => {
   const chunks = [];
@@ -65,7 +68,10 @@ https.get(url, res => {
           if (n in cringeShit) return cringeShit[n].forEach(n => addName(n));
           if (!n.startsWith('Enchanted')) n = 'Enchanted ' + n;
         }
-        addName(n);
+        if (n in cringeShitV2) {
+          console.log(n);
+          add(n, cringeShitV2[n]);
+        } else addName(n);
       });
     });
 
