@@ -3,7 +3,6 @@ package com.perseuspotter.chicktilshelper;
 import java.lang.reflect.Field;
 import java.net.URLConnection;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -133,7 +132,7 @@ public class ChickTilsHelper {
   // not scuffed tf you mean?
   public static boolean removeLastElement(Field f, Object o) {
     try {
-      CopyOnWriteArrayList<?> arr = (CopyOnWriteArrayList<?>) f.get(o);
+      List<?> arr = (List<?>) f.get(o);
       arr.remove(arr.size() - 1);
       return true;
     } catch (Exception e) {
