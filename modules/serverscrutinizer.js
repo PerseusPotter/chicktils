@@ -6,7 +6,7 @@ import { log } from '../util/log';
 import reg from '../util/registerer';
 
 let ticks = [];
-let lastLoadTime = 0;
+let lastLoadTime = Date.now();
 const MAX_TICK_AGE = 5_000;
 const cap = n => settings.serverScrutinizerTPSDisplayCap20 ? Math.min(20, n) : n;
 function getCurrentTPS() {
@@ -22,13 +22,21 @@ function getAverageTPS() {
 function getMinimumTPS() {
   if (ticks.length <= 1) return ticks.length;
   const t = ticks.slice();
-  let l = 0;
-  let r = 1;
+  let r = -1;
   let m = Number.POSITIVE_INFINITY;
-  while (t.length > r) {
-    while (t.length > r && t[l] - t[r] <= 1_000) r++;
-    if (r - l < m) m = r - l;
-    l++;
+  for (let l = 0; l < t.length; l++) {
+    let lr = r;
+    while (r < t.length && t[l] - t[r + 1] <= 1_000) r++;
+    if (r === lr) continue;
+    let d = r - l + 1;
+    if (
+      r === l &&
+      (
+        r < t.length - 1 && t[r] - t[r + 1] > 1_000 ||
+        r > 0 && t[r - 1] - t[r] > 1_000
+      )
+    ) d = 0;
+    m = Math.min(m, d);
   }
   return cap(m);
 }
