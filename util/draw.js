@@ -176,7 +176,6 @@ export function drawFilledBox(x, y, z, w, h, red, green, blue, alpha, phase) {
  * @param {number} b
  * @param {boolean?} phase
  * @param {boolean?} isCentered
- * @returns
  */
 export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = true) {
   if (waypoints.length === 0) return;

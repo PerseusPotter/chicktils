@@ -287,7 +287,7 @@ export function cross(pos1, pos2) {
     x: pos1.y * pos2.z - pos1.z * pos2.y,
     y: pos1.z * pos2.x - pos1.x * pos2.z,
     z: pos1.x * pos2.y - pos1.y * pos2.x
-  }
+  };
 }
 
 // why is rhino so shit
