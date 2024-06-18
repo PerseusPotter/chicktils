@@ -1,4 +1,4 @@
-import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawArrow2D, renderWaypoints, getRenderX, getRenderY, getRenderZ, drawBeaconBeam } from '../util/draw';
+import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawArrow2D, renderWaypoints, getRenderX, getRenderY, getRenderZ, drawBeaconBeam, drawLine3D, drawString, rgbaToARGB } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
@@ -94,14 +94,12 @@ const hpDisplay = createTextGui(() => data.kuudraHpLoc, () => ['&d300M']);
 const renderReg = reg('renderWorld', () => {
   if (settings.kuudraRenderPearlTarget && pearlLocs.length > 0) {
     const c = settings.kuudraPearlTargetColor;
-    const r = ((c >> 24) & 0xFF) / 256;
-    const g = ((c >> 16) & 0xFF) / 256;
-    const b = ((c >> 8) & 0xFF) / 256;
-    // const a = ((c >> 0) & 0xFF) / 256;
-
     const timeLeft = ticksUntilPickup - (Date.now() - pickupStart) - getPing();
-    pearlLocs.forEach(v => v.text = Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's');
-    renderWaypoints(pearlLocs, r, g, b);
+    pearlLocs.forEach(v => {
+      drawLine3D(c, v.x - 1, v.y, v.z - 1, v.x + 1, v.y, v.z + 1, 5);
+      drawLine3D(c, v.x - 1, v.y, v.z + 1, v.x + 1, v.y, v.z - 1, 5);
+      drawString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', v.x, v.y + 1, v.z, rgbaToARGB(c));
+    });
   }
   if (settings.kuudraRenderEmptySupplySpot && dropLocs.length > 0) {
     const c = settings.kuudraEmptySupplySpotColor;
@@ -194,8 +192,6 @@ const tickReg = reg('tick', () => {
           0, 1, 0,
           0, 140, 0
         ),
-        w: 1,
-        h: 1,
         ticks
       };
     }).filter(Boolean);
