@@ -11,8 +11,8 @@ const MAX_TICK_AGE = 5_000;
 const cap = n => settings.serverScrutinizerTPSDisplayCap20 ? Math.min(20, n) : n;
 function getCurrentTPS() {
   if (ticks.length === 0) return 0;
-  const f = ticks[0];
-  let i = 1;
+  const f = Date.now();
+  let i = 0;
   while (ticks.length > i && f - ticks[i] <= 1_000) i++;
   return cap(i);
 }
@@ -72,6 +72,7 @@ function formatTps(curr, avg, min) {
 }
 const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11));
 const rendOvTps = reg('renderOverlay', () => {
+  const t = Date.now();
   while (t - ticks[ticks.length - 1] > MAX_TICK_AGE) ticks.pop();
   tpsDisplay.setLines(formatTps(getCurrentTPS(), getAverageTPS(), getMinimumTPS()));
   tpsDisplay.render();
