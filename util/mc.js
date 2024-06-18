@@ -32,7 +32,7 @@ export function listenInventory(inv, cb) {
 }
 
 function wrapString(str) {
-  return typeof str === 'string' ? new TextComponent('§6﴾ §c§lKuudra§6 ﴿').chatComponentText : str;
+  return typeof str === 'string' ? new TextComponent(str).chatComponentText : str;
 }
 
 /**
