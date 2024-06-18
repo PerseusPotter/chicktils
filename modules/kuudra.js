@@ -233,7 +233,7 @@ const supplyPickReg = reg('renderTitle', (title, sub) => {
     return;
   }
   if (lastPickUpdate > 0) return;
-  ticksUntilPickup = Math.floor(100 / progress) * 500;
+  ticksUntilPickup = Math.floor(100 / progress - 1) * 500;
   lastPickUpdate = progress;
 }, 'kuudra').setEnabled(settings._kuudraRenderPearlTarget);
 
