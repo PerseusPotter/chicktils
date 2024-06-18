@@ -8,15 +8,16 @@ import reg from '../util/registerer';
 let tpsC = 0;
 let ticks = [Date.now()];
 const MAX_TICK_AGE = 5_000;
+const cap = n => settings.serverScrutinizerTPSDisplayCap20 ? Math.min(20, n) : n;
 function getCurrentTPS() {
   if (ticks.length === 0) return 0;
   const f = ticks[0];
   let i = 1;
   while (ticks.length > i && f - ticks[i] <= 1_000) i++;
-  return Math.min(20, i);
+  return cap(i);
 }
 function getAverageTPS() {
-  return ticks.length / MAX_TICK_AGE * 1000;
+  return cap(ticks.length / MAX_TICK_AGE * 1000);
 }
 let minTPSC = 0;
 let minTPSV = -1;
@@ -36,7 +37,7 @@ function _getMinimumTPS() {
     if (r - l < m) m = r - l;
     l++;
   }
-  return m;
+  return cap(m);
 }
 
 const serverTickReg = reg('packetReceived', () => {

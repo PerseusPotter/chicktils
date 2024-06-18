@@ -735,6 +735,7 @@ export const props = {
 
   enableserverscrutinizer: new Property('EnableServerScrutinizer', page, ++sort, Property.Type.Toggle, false, { desc: 'scrutinizes the server\'s tps and things' }),
   serverScrutinizerTPSDisplay: new Property('ServerScrutinizerTPSDisplay', page, ++sort, Property.Type.Toggle, true, { desc: 'tracks tps' }),
+  serverScrutinizerTPSDisplayCap20: new Property('ServerScrutinizerCapTPS', page, ++sort, Property.Type.Toggle, true, { desc: 'caps all tps at 20' }),
   serverScrutinizerTPSDisplayCurr: new Property('ServerScrutinizerDisplayCurrentTPS', page, ++sort, Property.Type.Toggle, false, { desc: 'show current tps' }),
   serverScrutinizerTPSDisplayAvg: new Property('ServerScrutinizerDisplayAverageTPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show average tps (last 5s)' }),
   serverScrutinizerTPSDisplayMin: new Property('ServerScrutinizerDisplayMinimumTPS', page, ++sort, Property.Type.Toggle, false, { desc: 'show minimum tps (last 5s)' }),
