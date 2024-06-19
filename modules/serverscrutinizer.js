@@ -7,6 +7,7 @@ import reg from '../util/registerer';
 
 let ticks = [];
 let lastLoadTime = Date.now();
+let lastTickTime = Date.now();
 const MAX_TICK_AGE = 5_000;
 const cap = n => settings.serverScrutinizerTPSDisplayCap20 ? Math.min(20, n) : n;
 function getCurrentTPS() {
@@ -48,7 +49,7 @@ function trimTicks() {
 const serverTickReg = reg('packetReceived', () => ticks.unshift(Date.now()), 'serverscrutinizer').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
 const worldLoadReg = reg('worldLoad', () => {
   ticks = [];
-  lastLoadTime = Date.now();
+  lastLoadTime = lastTickTime = Date.now();
 }, 'serverscrutinizer');
 
 function getTPSColor(tps) {
@@ -89,7 +90,7 @@ const rendOvLTD = reg('renderOverlay', () => {
   const d = Date.now();
   if (d - lastLoadTime < 11_000) return;
   trimTicks();
-  const t = d - (ticks.length ? ticks[0] : lastLoadTime);
+  const t = d - (ticks.length ? ticks[0] : lastTickTime);
   if (t < settings.serverScrutinizerLastTickThreshold) return;
   lastTickDisplay.setLine(`zzz for ${colorForNumber(2000 - t, 2000)}${(t / 1000).toFixed(2)}s`);
   lastTickDisplay.render();
