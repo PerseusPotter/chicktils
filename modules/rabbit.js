@@ -13,7 +13,7 @@ const stateIsSpring = new StateVar(false);
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');
 let eggs = [];
-let activeEggs = [0, 0, 0];
+let activeEggs = [2, 2, 2];
 let lastSpawnDays = [0, 0, 0];
 const unloadReg = reg('worldUnload', () => eggs = [], 'rabbit').setEnabled(stateIsSpring);
 function scanEgg() {
