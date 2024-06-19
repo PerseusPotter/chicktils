@@ -14,7 +14,7 @@ function reset() {
 function start() {
   players = [];
   stateIsInBoss.set(false);
-  const floor = Scoreboard.getLines(false)[4].getName().match(/^ §7⏣ §cThe Catac🍭§combs §7\(([MF][1-7]|E)\)$/);
+  const floor = Scoreboard.getLines(false)[4].getName().match(/^ §7⏣ §cThe Catac..§combs §7\(([MF][1-7]|E)\)$/);
   stateFloor.set(floor ? floor[1] : '');
 
   dungeonLeaveReg.register();
