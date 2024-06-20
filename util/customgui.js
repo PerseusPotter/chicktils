@@ -14,10 +14,10 @@ const renderReg = reg('renderOverlay', () => {
   const { x, y, s } = curr.getLoc();
 
   Renderer.drawStringWithShadow('&7[&21&7] &fReset &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str, 50, 20);
-  const x1 = x - 2;
-  const x2 = x + 100 * s + 2;
-  const y1 = y - 2;
-  const y2 = y + 100 * s + 2;
+  const x1 = x + 1;
+  const x2 = x + 100 * s - 1;
+  const y1 = y + 1;
+  const y2 = y + 100 * s - 1;
   Renderer.drawLine(0xFFFF0000, x1, y1, x2, y1, 2);
   Renderer.drawLine(0xFFFF0000, x2, y1, x2, y2, 2);
   Renderer.drawLine(0xFFFF0000, x2, y2, x1, y2, 2);
