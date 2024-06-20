@@ -1,22 +1,20 @@
 import { _setTimeout, _clearTimeout } from './timers';
 import createTextGui from './customtextgui';
 import reg from './registerer';
+import { StateProp, StateVar } from './state';
 
 /**
  * @typedef {{
-   *  _display: import('./customtextgui').CustomTextGui;
-*  sound: boolean;
-*  text: string;
-*  _timeout: number?;
-*  show: (time?: number) => void;
-*  hide: () => void;
-* }} Alert
+ *  _display: import('./customtextgui').CustomTextGui;
+ *  sound: boolean;
+ *  text: string;
+ *  _timeout: number?;
+ *  show: (time?: number) => void;
+ *  hide: () => void;
+ * }} Alert
  */
-/**
- * @type {Alert}
- */
-let activeAlert;
-const renderReg = reg('renderOverlay', () => activeAlert._display.render(), 'alert');
+const activeAlert = new StateVar(null);
+const renderReg = reg('renderOverlay', () => activeAlert.get()._display.render(), 'alert').setEnabled(new StateProp(activeAlert).notequals(null));
 
 const createAlert = (function() {
   const alertSound = new Sound({ source: 'orb.ogg', priority: true, attenuation: 0, pitch: 0.5, volume: 1 });
@@ -26,7 +24,7 @@ const createAlert = (function() {
     _display: undefined,
     show(time) {
       this.hide();
-      activeAlert = this;
+      activeAlert.set(this);
       renderReg.register();
       if (time) {
         if (this._timeout !== undefined) _clearTimeout(this._timeout);
@@ -37,10 +35,7 @@ const createAlert = (function() {
       } catch (e) { }
     },
     hide() {
-      if (activeAlert === this) {
-        renderReg.unregister();
-        activeAlert = null;
-      }
+      if (activeAlert.get() === this) activeAlert.set(null);
       if (this._timeout !== undefined) this._timeout = void (_clearTimeout(this._timeout));
     }
   };
