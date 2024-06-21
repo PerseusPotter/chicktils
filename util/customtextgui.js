@@ -85,7 +85,7 @@ function freeLines(lines) {
   dlPool = dlPool.concat(lines);
 }
 const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
-const MouseListener = Java.type('com.chattriggers.ctjs.minecraft.listeners.MouseListener')
+const MouseListener = Java.type('com.chattriggers.ctjs.minecraft.listeners.MouseListener');
 const clickListenersF = MouseListener.class.getDeclaredField('clickListeners');
 clickListenersF.setAccessible(true);
 const draggedListenersF = MouseListener.class.getDeclaredField('draggedListeners');
