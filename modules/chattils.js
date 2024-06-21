@@ -4,7 +4,7 @@ import { execCmd, getPlayerName } from '../util/format';
 import { getLeader } from '../util/party';
 import { log, logMessage } from '../util/log';
 import reg from '../util/registerer';
-import { StateProp } from '../util/state';
+import { StateProp, StateVar } from '../util/state';
 
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
@@ -72,7 +72,7 @@ const odinMelodies = [
 ];
 function hideMessage(option, evn) {
   if (option === 'False') return;
-  cancelNextPing = true;
+  stateCancelNextPing.set(true);
   if (option === 'Both') cancel(evn);
 }
 function tryMelody(ign, msg, evn, mel) {
@@ -138,12 +138,12 @@ const guildChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
 }, 'chattils').setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
 
-let cancelNextPing = false;
+const stateCancelNextPing = new StateVar(false);
 const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
-  if (!cancelNextPing || name !== 'random.orb' || vol !== 1 || pitch !== 1) return;
+  if (name !== 'random.orb' || vol !== 1 || pitch !== 1) return;
   cancel(evn);
-  cancelNextPing = false;
-}, 'chattils').setEnabled(new StateProp(settings._chatTilsHideBonzo).notequals('False').or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')));
+  stateCancelNextPing.set(false);
+}, 'chattils').setEnabled(new StateProp(stateCancelNextPing).and(new StateProp(settings._chatTilsHideBonzo).notequals('False').or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False'))));
 
 // https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/features/FasterMaddoxCalling.java#L24
 let lastFollowTime = 0;
