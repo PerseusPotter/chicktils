@@ -46,7 +46,11 @@ function trimTicks() {
   while (t - ticks[ticks.length - 1] > MAX_TICK_AGE) ticks.pop();
 }
 
-const serverTickReg = reg('packetReceived', () => ticks.unshift(Date.now()), 'serverscrutinizer').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
+const serverTickReg = reg('packetReceived', () => {
+  const t = Date.now();
+  ticks.unshift(t);
+  lastTickTime = t;
+}, 'serverscrutinizer').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
 const worldLoadReg = reg('worldLoad', () => {
   ticks = [];
   lastLoadTime = lastTickTime = Date.now();
