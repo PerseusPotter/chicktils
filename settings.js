@@ -314,7 +314,7 @@ export class Property {
 
   getMessage(module, name = this.name) {
     const comps = [this.desc ? new TextComponent(` &f${name}`).setHover('show_text', this.desc) : ` &f${name}`];
-    if (this.type === Property.Type.Action) comps.unshift(new TextComponent('&7[&eRUN&7]&r').setClick('run_command', `/${module} config edit ${this.name}`));
+    if (this.type === Property.Type.Action) comps.unshift(new TextComponent('&7[&dRUN&7]&r').setClick('run_command', `/${module} config edit ${this.name}`));
     else {
       comps.unshift(
         new TextComponent('&7[&4RESET&7]&r').setClick('run_command', `/${module} config edit ${this.name}`),
