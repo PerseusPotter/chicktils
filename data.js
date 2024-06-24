@@ -25,6 +25,7 @@ export function setIsMain() {
  *  dungeonSpiritBearTimerLoc: TextLocation;
  *  serverScrutinizerTPSDisplay: TextLocation;
  *  serverScrutinizerLastPacketDisplay: TextLocation;
+ *  dungeonSilverfishHasteTimerLoc: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', {
@@ -39,7 +40,8 @@ const data = new PogObject('chicktils', {
   dianaWarpKey: 0,
   dungeonSpiritBearTimerLoc: { x: 50, y: 50, s: 1, a: 0 },
   serverScrutinizerTPSDisplay: { x: 50, y: 50, s: 1, a: 0 },
-  serverScrutinizerLastPacketDisplay: { x: 50, y: 50, s: 1, a: 0 }
+  serverScrutinizerLastPacketDisplay: { x: 50, y: 50, s: 1, a: 0 },
+  dungeonSilverfishHasteTimerLoc: { x: 50, y: 50, s: 1, a: 0 }
 }, 'data.json');
 
 register('gameUnload', () => isMainData && data.save());

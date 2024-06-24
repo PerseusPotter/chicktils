@@ -600,6 +600,9 @@ export const props = {
   dungeonSpiritBearTimerHud: new Property('DungeonSpiritBearTimerHud', page, ++sort, Property.Type.Toggle, true, { desc: 'show spirit bear timer on hud' }),
   moveSpiritBearTimerHud: new Property('MoveSpiritBearTimerHud', page, ++sort, Property.Type.Action),
 
+  dungeonSilverfishHasteTimer: new Property('DungeonSilverfishHasteTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render how much longer haste from silverfish will last' }),
+  moveSilverfishHasteTimer: new Property('MoveSilverfishHasteTimer', page, ++sort, Property.Type.Action),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
