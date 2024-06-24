@@ -57,7 +57,7 @@ const cheesePickReg = reg('chat', (name, t) => {
   ChatLib.command(`pc [RatTils] Buffed ${name}`);
   if (name in players) _clearTimeout(players[name]);
   players[name] = _setTimeout(() => log(`Rat Buff to ${name} has expired.`), t * 1000);
-}, 'rattils').setCriteria('CHEESE! You buffed ${name} giving them +${*}✯ Magic Find for ${t} seconds!').unregister();
+}, 'rattils').setCriteria('CHEESE! You buffed ${name} giving them +${*}✯ Magic Find for ${t} seconds!');
 const cheeseRenderReg = reg('renderWorld', () => {
   const c = settings.ratTilsBoxColor;
   const r = ((c >> 24) & 0xFF) / 256;
