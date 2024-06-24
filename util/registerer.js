@@ -149,13 +149,8 @@ reg = function reg(type, shit, modN) {
   });
   const _update = wrap({}, prox, () => {
     if (!isReg) return;
-    if (regReq.get()) {
-      if (!isAReg) rr.register();
-      isAReg = true;
-    } else {
-      if (isAReg) rr.unregister();
-      isAReg = false;
-    }
+    if (regReq.get()) _register();
+    else _unregister();
   });
   const _setName = type === 'command' ? wrap(rr, prox, (n, o) => {
     cmdName = n;
