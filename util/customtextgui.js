@@ -115,14 +115,14 @@ function createNonShitDisplayLineFuckChatTriggers() {
  *  clearLines(): CustomTextGui;
  * }} CustomTextGui
  */
+const displaysF = DisplayHandler.class.getDeclaredField('displays');
+displaysF.setAccessible(true);
 /**
  * @param {() => import('../data').TextLocation} getLoc
  * @param {() => string[]} getEditText
  * @param {string?} customEditMsg
  * @returns {CustomTextGui}
  */
-const displaysF = DisplayHandler.class.getDeclaredField('displays');
-displaysF.setAccessible(true);
 export default function createTextGui(getLoc, getEditText, str = '') {
   /**
    * @type {CustomTextGui}
