@@ -5,6 +5,9 @@ import { getLeader } from '../util/party';
 import { log, logMessage } from '../util/log';
 import reg from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
+import { run } from '../util/threading';
+import { dither, fromImage, fromURL, grayscale, guassian, resize, sharpen, sobel } from '../util/image';
+import { getImage } from '../util/clipboard';
 
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
@@ -95,8 +98,8 @@ function tryMelody(ign, msg, evn, mel) {
     }
   }
 }
-const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 
+const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 const allChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
 }, 'chattils').setCriteria(/^&r([^>]+?)&(?:7|f): (.+?)&r$/).setEnabled(settings._chatTilsWaypoint);
@@ -164,6 +167,149 @@ const clickChatReg = reg(net.minecraftforge.client.event.GuiScreenEvent.MouseInp
   execCmd(lastFollowToken.slice(1));
 }, 'chattils').setEnabled(settings._chatTilsClickAnywhereFollow);
 
+let imgArtLines = [];
+let imgArtId = 0;
+let blankLines = ['.', ',', '\'', '"', '`', '^'];
+const genImgArtReg = (function() {
+  function loadFromUrl(url) {
+    if (url) try {
+      return fromURL(url);
+    } catch (e) {
+      log('unable to load image from url');
+      if (settings.isDev) {
+        log(e.message);
+        log(e.stack);
+      }
+    }
+  }
+  /**
+   * @param {import('../../@types/External').JavaClass<'java.awt.image.BufferedImage'>} img
+   * @link https://github.com/505e06b2/Image-to-Braille/blob/master/braille.js
+   */
+  function encodeBraille(img) {
+    const w = img.getWidth();
+    const h = img.getHeight();
+    const l = h * w;
+    const mh = ((h + 7) & ~7);
+    const output = [];
+    const pixels = img.getRaster().getDataBuffer().getData();
+    const n = i => {
+      const p = i >= l ? 0 : pixels[i];
+      return settings.chatTilsImageArtInvert ? p >= 0 : p <= 0;
+    };
+
+    for (let y = 0; y < mh; y += 4) {
+      output.push([]);
+      for (let x = 0; x < w; x += 2) {
+        let i = y * w + x;
+        let offset =
+          (n(i + 0) << 0) |
+          (n(i + 1) << 3) |
+          (n(i + w + 0) << 1) |
+          (n(i + w + 1) << 4) |
+          (n(i + w + w + 0) << 2) |
+          (n(i + w + w + 1) << 5) |
+          (n(i + w + w + w + 0) << 6) |
+          (n(i + w + w + w + 1) << 7);
+
+        // if (offset === 0) offset = 4;
+        output[output.length - 1].push(0x2800 | offset);
+      }
+    }
+
+    return output.map(v => String.fromCharCode.apply(null, v));
+  }
+  const ab = '$@B%8WM#oahkbdpqwmZOQLCJUYXzcvunxrjft/|()1{}[]?-_+~<>!l;:,\"^`\'. '.split('');
+  // ab.length === 64
+  /**
+   * @param {import('../../@types/External').JavaClass<'java.awt.image.BufferedImage'>} img
+   */
+  function encodeASCII(img) {
+    const w = img.getWidth();
+    const h = img.getHeight();
+    const output = [];
+    const pixels = img.getRaster().getDataBuffer().getData();
+
+    for (let y = 0; y < h; y++) {
+      output.push([]);
+      for (let x = 0; x < w; x++) {
+        let i = y * w + x;
+        let p = (pixels[i] + 128) >> 2;
+        output[output.length - 1].push(ab[settings.chatTilsImageArtInvert ? 63 - p : p]);
+      }
+    }
+
+    return output.map(v => v.join(''));
+  }
+  return reg('command', url => {
+    run(() => {
+      let img;
+      if (url) img = loadFromUrl(url);
+      else try {
+        img = fromImage(getImage());
+      } catch (e) {
+        log('unable to load image from clipboard');
+        if (settings.isDev) {
+          log(e.message);
+          log(e.stack);
+        }
+      }
+      if (!img) return;
+
+      try {
+        const h = ~~(img.getHeight() / img.getWidth() * settings.chatTilsImageArtWidth * 2 / 3);
+        if (settings.chatTilsImageArtEncoding === 'Braille') {
+          const w = settings.chatTilsImageArtWidth << 1;
+          img = resize(img, w, h << 1);
+          // if (img.getHeight() & 7) img = img.getSubimage(0, 0, w, img.getHeight() & ~7);
+        } else img = resize(img, settings.chatTilsImageArtWidth, h);
+        if (settings.chatTilsImageArtUseGaussian) img = guassian(img);
+        if (settings.chatTilsImageArtSharpen) img = sharpen(img);
+        if (settings.chatTilsImageArtDither) dither(img);
+        if (settings.chatTilsImageArtAlgorithm === 'Grayscale') img = grayscale(img);
+        else if (settings.chatTilsImageArtAlgorithm === 'Sobel') img = sobel(img);
+        if (imgArtLines.length) log(`&coverriding ${imgArtLines.length} previously existing line${imgArtLines === 1 ? '' : 's'}`);
+        imgArtId = 0;
+        if (settings.chatTilsImageArtEncoding === 'Braille') imgArtLines = encodeBraille(img);
+        else if (settings.chatTilsImageArtEncoding === 'ASCII') imgArtLines = encodeASCII(img);
+      } catch (e) {
+        log('unable to generate text from image');
+        if (settings.isDev) {
+          log(e.message);
+          log(e.stack);
+        }
+        return;
+      }
+      ChatLib.command('printimageline', true);
+    });
+  }, 'chattils').setName('printimage').setEnabled(settings._chatTilsImageArt);
+}());
+const nextArtLineMsg = new Message(new TextComponent('&a[NEXT]').setClick('run_command', '/printimageline'), ' ', new TextComponent('&4[CANCEL]').setClick('run_command', '/printimagecancel'));
+function printNextLine() {
+  let l = imgArtLines.shift();
+  if (!l) return log('&cno more lines left');
+  if (!l.trim()) {
+    l = blankLines.shift();
+    blankLines.push(l);
+  } else l += imgArtId++;
+  if (settings.chatTilsImageArtParty) l = '/pc ' + l;
+  ChatLib.say(l);
+  setTimeout(() => {
+    helper.deleteMessages([nextArtLineMsg.getFormattedText()]);
+    if (imgArtLines.length) {
+      if (settings.chatTilsImageArtAutoPrint) printNextLine();
+      else nextArtLineMsg.chat();
+    } else log('all lines printed!');
+  }, 500);
+}
+const nextArtLineReg = reg('command', () => printNextLine(), 'chattils').setName('printimageline').setEnabled(settings._chatTilsImageArt);
+const cancelArtLines = reg('command', () => {
+  if (imgArtLines.length) {
+    log(`cleared ${imgArtLines.length} remaining lines`);
+    imgArtLines = [];
+  } else log('&cno lines to clear');
+}, 'chattils').setName('printimagecancel').setEnabled(settings._chatTilsImageArt);
+
 export function init() {
   settings._chatTilsWaypointDuration.onBeforeChange(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
 }
@@ -180,6 +326,9 @@ export function load() {
   chatPingReg.register();
   followReg.register();
   clickChatReg.register();
+  genImgArtReg.register();
+  nextArtLineReg.register();
+  cancelArtLines.register();
 }
 export function unload() {
   blockNameCmd.unregister();
@@ -194,4 +343,7 @@ export function unload() {
   chatPingReg.unregister();
   followReg.unregister();
   clickChatReg.unregister();
+  genImgArtReg.unregister();
+  nextArtLineReg.unregister();
+  cancelArtLines.unregister();
 }
