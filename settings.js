@@ -719,6 +719,17 @@ export const props = {
   chatTilsClickAnywhereFollow: new Property('ChatTilsClickAnywhereFollow', page, ++sort, Property.Type.Toggle, false, { desc: 'click anywhere after opening chat to follow party member\n(mostly for diana/assfang/jumpy dt cube)' }),
   chatTilsClickAnywhereFollowOnlyLead: new Property('ChatTilsClickAnywhereFollowOnlyLead', page, ++sort, Property.Type.Toggle, true, { desc: 'only follow leader' }),
 
+  chatTilsImageArt: new Property('ChatTilsImageArt', page, ++sort, Property.Type.Toggle, false, { desc: 'generate ascii art from image\nusage: /printimage [image url]\n/printimage (will print image from clipboard)\n/printimage https://i.imgur.com/things.jpeg (will print image from url)' }),
+  chatTilsImageArtParty: new Property('ChatTilsImageArtPartyChat', page, ++sort, Property.Type.Toggle, true, { desc: 'always send in party chat' }),
+  chatTilsImageArtAutoPrint: new Property('ChatTilsImageArtAutoPrint', page, ++sort, Property.Type.Toggle, false, { desc: 'auto print all lines of the image' }),
+  chatTilsImageArtWidth: new Property('ChatTilsImageArtPartyWidth', page, ++sort, Property.Type.Integer, 40, { desc: 'width of the generated image (in characters)\nheight automatically scaled', min: 1, max: 128 }),
+  chatTilsImageArtEncoding: new Property('ChatTilsImageArtEncoding', page, ++sort, Property.Type.Option, 'Braille', { desc: 'encoding used', options: ['Braille', 'ASCII'] }),
+  chatTilsImageArtUseGaussian: new Property('ChatTilsImageArtSmooth', page, ++sort, Property.Type.Toggle, false, { desc: 'apply a gaussian blur to image before processing (best results when sobel is used)' }),
+  chatTilsImageArtSharpen: new Property('ChatTilsImageArtSharpen', page, ++sort, Property.Type.Toggle, true, { desc: 'sharpen source image' }),
+  chatTilsImageArtDither: new Property('ChatTilsImageArtDither', page, ++sort, Property.Type.Toggle, true, { desc: 'apply dithering' }),
+  chatTilsImageArtInvert: new Property('ChatTilsImageArtInvert', page, ++sort, Property.Type.Toggle, true, { desc: 'invert colors' }),
+  chatTilsImageArtAlgorithm: new Property('ChatTilsImageArtAlgorithm', page, ++sort, Property.Type.Option, 'Grayscale', { desc: 'transform algorithm used', options: ['Grayscale', 'Sobel'] }),
+
   // 13
   enablediana: new Property('EnableDiana', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'requires skytils to work (not the meow solver)' }),
   dianaArrowToBurrow: new Property('DianaArrowToBurrow', page, ++sort, Property.Type.Toggle, true, { desc: 'draw an arrow pointing to nearest burrow' }),
