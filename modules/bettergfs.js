@@ -13,24 +13,23 @@ let ids = [
 ];
 let names = [
   "Blobfish BRONZE", "Flyfish BRONZE", "Golden Fish BRONZE", "Gusher BRONZE", "Karate Fish BRONZE", "Lavahorse BRONZE", "Mana Ray BRONZE", "Moldin BRONZE", "Skeleton Fish BRONZE", "Slugfish BRONZE", "Soul Fish BRONZE", "Steaming-Hot Flounder BRONZE", "Sulphur Skitter BRONZE", "Vanille BRONZE", "Volcanic Stonefish BRONZE", "Blobfish SILVER", "Flyfish SILVER", "Golden Fish SILVER", "Gusher SILVER", "Karate Fish SILVER", "Lavahorse SILVER", "Mana Ray SILVER", "Moldin SILVER", "Skeleton Fish SILVER", "Slugfish SILVER", "Soul Fish SILVER", "Steaming-Hot Flounder SILVER", "Sulphur Skitter SILVER", "Vanille SILVER", "Volcanic Stonefish SILVER", "", "", "", "", "", "", "Rough Jade Gemstone", "Rough Amber Gemstone", "Rough Topaz Gemstone", "Rough Sapphire Gemstone", "Rough Amethyst Gemstone", "Rough Jasper Gemstone", "Rough Ruby Gemstone", "Rough Opal Gemstone", "Rough Onyx Gemstone", "Rough Aquamarine Gemstone", "Rough Citrine Gemstone", "Rough Peridot Gemstone", "Flawed Jade Gemstone", "Flawed Amber Gemstone", "Flawed Topaz Gemstone", "Flawed Sapphire Gemstone", "Flawed Amethyst Gemstone", "Flawed Jasper Gemstone", "Flawed Ruby Gemstone", "Flawed Opal Gemstone", "Flawed Onyx Gemstone", "Flawed Aquamarine Gemstone", "Flawed Citrine Gemstone", "Flawed Peridot Gemstone", "Fine Jade Gemstone", "Fine Amber Gemstone", "Fine Topaz Gemstone", "Fine Sapphire Gemstone", "Fine Amethyst Gemstone", "Fine Jasper Gemstone", "Fine Ruby Gemstone", "Fine Opal Gemstone", "Fine Onyx Gemstone", "Fine Aquamarine Gemstone", "Fine Citrine Gemstone", "Fine Peridot Gemstone", "Ascension Rope", "Bob-omb", "Control Switch", "Corleonite", "Electron Transmitter", "FTX 3070", "Jungle Key", "Oil Barrel", "Robotron Reflector", "Sludge Juice", "Superlite Motor", "Synthetic Heart", "Wishing Compass", "Yoggie", "Ancient Rose", "Architect's First Draft", "Bigfoot's Lasso", "Bonzo Fragment", "Decoy", "Dungeon Chest Key", "Fel Pearl", "Healing Tissue", "Inflatable Jerry", "Jolly Pink Rock", "Kismet Feather", "L.A.S.R.'s Eye", "Livid Fragment", "Mimic Fragment", "Scarf Fragment", "Spirit Leap", "Superboom TNT", "Thorn Fragment", "Trap", "Wither Catalyst", "Biofuel", "Glacite Jewel", "Goblin Egg", "Oil Barrel", "Plasma", "Sorrow", "Volta", "Blue Goblin Egg", "Green Goblin Egg", "Red Goblin Egg", "Yellow Goblin Egg", "Allium", "Azure Bluet", "Blue Orchid", "Dandelion", "Enchanted Dandelion", "Enchanted Poppy", "Endstone Rose", "Lilac", "Orange Tulip", "Oxeye Daisy", "Peony", "Pink Tulip", "Poppy", "Red Tulip", "Rose Bush", "Sunflower", "White Tulip", "Compost", "Cropie", "Dung", "Honey Jar", "Jacob's Ticket", "Plant Matter", "Squash", "Tasty Cheese", "Brown Mushroom", "Cactus", "Cactus Green", "Carrot", "Cocoa Beans", "Compost", "Cropie", "Golden Carrot", "Hay Bale", "Melon", "Nether Wart", "Poisonous Potato", "Potato", "Pumpkin", "Red Mushroom", "Seeds", "Squash", "Sugar Cane", "Wheat", "Blaze Rod", "Bone", "Chili Pepper", "Ender Pearl", "Ghast Tear", "Gunpowder", "Magma Cream", "Rotten Flesh", "Slimeball", "Spider Eye", "String", "Crystal Fragment", "Holy Dragon Fragment", "Mite Gel", "Old Dragon Fragment", "Protector Dragon Fragment", "Ritual Residue", "Strong Dragon Fragment", "Superior Dragon Fragment", "Unstable Dragon Fragment", "Wise Dragon Fragment", "Young Dragon Fragment", "Enchanted Brown Mushroom", "Enchanted Brown Mushroom Block", "Enchanted Cactus Green", "Enchanted Cactus", "Enchanted Carrot", "Enchanted Golden Carrot", "Enchanted Cocoa Beans", "Enchanted Cookie", "Enchanted Melon", "Enchanted Melon Block", "Enchanted Nether Wart", "Mutant Nether Wart", "Enchanted Potato", "Enchanted Baked Potato", "Enchanted Poisonous Potato", "Enchanted Pumpkin", "Polished Pumpkin", "Enchanted Red Mushroom", "Enchanted Red Mushroom Block", "Enchanted Seeds", "Box of Seeds", "Enchanted Sugar", "Enchanted Sugar Cane", "Enchanted Bread", "Enchanted Hay Bale", "Tightly-Tied Hay Bale", "Enchanted Blaze Powder", "Enchanted Blaze Rod", "Enchanted Bone", "Enchanted Bone Block", "Stuffed Chili Pepper", "Enchanted Ender Pearl", "Enchanted Eye of Ender", "Absolute Ender Pearl", "Enchanted Ghast Tear", "Enchanted Gunpowder", "Enchanted Magma Cream", "Whipped Magma Cream", "Enchanted Rotten Flesh", "Enchanted Slimeball", "Enchanted Slime Block", "Enchanted Spider Eye", "Enchanted String", "Enchanted Clay", "Enchanted Clownfish", "Enchanted Cooked Fish", "Enchanted Cooked Salmon", "Enchanted Ink Sac", "Enchanted Lily Pad", "Enchanted Prismarine Crystals", "Enchanted Prismarine Shard", "Enchanted Pufferfish", "Enchanted Raw Fish", "Enchanted Raw Salmon", "Enchanted Shark Fin", "Enchanted Sponge", "Enchanted Wet Sponge", "Enchanted Acacia Wood", "Enchanted Birch Wood", "Enchanted Dark Oak Wood", "Enchanted Jungle Wood", "Enchanted Oak Wood", "Enchanted Spruce Wood", "Enchanted Feather", "Enchanted Leather", "Enchanted Pork", "Enchanted Raw Chicken", "Enchanted Egg", "Enchanted Mutton", "Enchanted Raw Rabbit", "Enchanted Raw Beef", "Enchanted Rabbit Hide", "Enchanted Rabbit Foot", "Enchanted Coal", "Enchanted Coal Block", "Enchanted Cobblestone", "Enchanted Diamond", "Enchanted Diamond Block", "Enchanted Emerald", "Enchanted Emerald Block", "Enchanted End Stone", "Enchanted Flint", "Enchanted Glacite", "Enchanted Glowstone Dust", "Enchanted Glowstone", "Enchanted Gold", "Enchanted Gold Block", "Enchanted Coal", "Enchanted Coal Block", "Enchanted Hard Stone", "Concentrated Stone", "Enchanted Iron", "Enchanted Iron Block", "Enchanted Lapis Lazuli", "Enchanted Lapis Block", "Enchanted Mithril", "Enchanted Mycelium", "Enchanted Mycelium Cube", "Enchanted Quartz", "Enchanted Quartz Block", "Enchanted Netherrack", "Enchanted Obsidian", "Enchanted Red Sand", "Enchanted Red Sand Cube", "Enchanted Redstone", "Enchanted Redstone Block", "Enchanted Sand", "Enchanted Sulphur", "Enchanted Sulphur Cube", "Enchanted Titanium", "Enchanted Tungsten", "Enchanted Umber", "Agarimoo Tongue", "Blue Shark Tooth", "Chum", "Clay", "Clownfish", "Glowing Mushroom", "Ink Sac", "Lily Pad", "Nurse Shark Tooth", "Prismarine Crystals", "Prismarine Shard", "Pufferfish", "Raw Fish", "Raw Salmon", "Shark Fin", "Sponge", "Tiger Shark Tooth", "Acacia Sapling", "Acacia Wood", "Apple", "Birch Sapling", "Birch Wood", "Dark Oak Sapling", "Dark Oak Wood", "Jungle Sapling", "Jungle Wood", "Oak Sapling", "Oak Wood", "Spruce Sapling", "Spruce Wood", "Egg", "Feather", "Leather", "Mutton", "Rabbit Hide", "Rabbit's Foot", "Raw Beef", "Raw Chicken", "Raw Porkchop", "Raw Rabbit", "White Wool", "Blaze Powder", "Coal", "Cup of Blood", "Flaming Heart", "Gold Magmafish", "Horn of Taurus", "Lava Shell", "Lump of Magma", "Magma Cream", "Magmafish", "Moogma Pelt", "Netherrack", "Orb of Energy", "Pyroclastic Scale", "Silver Magmafish", "Thunder Shards", "Coal", "Cobblestone", "Diamond", "Emerald", "End Stone", "Flint", "Glacite", "Glowstone Dust", "Gold Ingot", "Gravel", "Hard Stone", "Iron Ingot", "Lapis Lazuli", "Mithril", "Mycelium", "Nether Quartz", "Netherrack", "Obsidian", "Oil Barrel", "Plasma", "Red Sand", "Redstone", "Refined Mineral", "Sand", "Starfall", "Stone", "Titanium", "Treasurite", "Tungsten", "Umber", "Volta", "Bezos", "Blaze Ashes", "Blaze Rod", "Burning Eye", "Compact Ooze", "Corrupted Fragment", "Digested Mushrooms", "Flames", "Gazing Pearl", "Ghast Tear", "Glowstone Dust", "Hallowed Skull", "Heavy Pearl", "Kada Lead", "Kuudra Teeth", "Leather Cloth", "Lumino Fiber", "Magma Chunk", "Magma Cream", "Magmag", "Millenia-Old Blaze Ashes", "Mutated Blaze Ashes", "Mycelium", "Nether Quartz", "Nether Star", "Nether Wart", "Netherrack", "Red Sand", "Rekindled Ember Fragment", "Spectre Dust", "Spell Powder", "Sulphur", "Tentacle Meat", "Wither Soul", "X", "Y", "Z", "Crude Gabagool", "Derelict Ashe", "Null Atom", "Null Sphere", "Raw Soulflow", "Revenant Catalyst", "Revenant Flesh", "Soulflow", "Spider Catalyst", "Tarantula Web", "Undead Catalyst", "Wolf Tooth", "Dark Candy", "Ectoplasm", "Green Candy", "Pumpkin Guts", "Purple Candy", "Spooky Shard", "Werewolf Skin", "Enchanted Ice", "Enchanted Packed Ice", "Enchanted Snow Block", "Glacial Fragment", "Green Gift", "Hunk of Blue Ice", "Hunk of Ice", "Ice", "Packed Ice", "Snow Block", "Snowball", "Walnut", "White Gift", "Winter Fragment", "Red Gift", "Volcanic Rock"
-].map(v => v.split(' '));
+].map(v => v.split(' ').map(v => sanitizeName(v)));
 const idMap = new Array(ids.length).fill(0).map((_, i) => i);
 const nameMap = new Array(ids.length).fill(0).map((_, i) => i);
 idMap.sort((a, b) => ids[a].localeCompare(ids[b], ['en-US']));
 nameMap.sort((a, b) => {
+  if (names[a].length !== names[b].length) return names[a].length - names[b].length;
   let i = 0;
-  while (i < names[a].length && i < names[b].length) {
+  while (i < names[a].length) {
     let c = names[a][i].localeCompare(ids[b][i], ['en-US']);
     if (c !== 0) return c;
     i++;
   }
-  return names[a].length - names[b].length;
 });
 ids = idMap.reduce((a, v, i) => ((a[i] = ids[v]), a), []);
 names = nameMap.reduce((a, v, i) => ((a[i] = names[v]), a), []);
 const idMapRev = idMap.reduce((a, v, i) => ((a[v] = i), a), []);
 const nameMapRev = nameMap.reduce((a, v, i) => ((a[v] = i), a), []);
-const santNames = names.map(v => v.map(v => sanitizeName(v)));
 
 // TODO: cache and invalidate once key typed in chat
 // forge smh
@@ -58,24 +57,22 @@ function fix(args, multiple = true) {
   }
   args = args.map(v => sanitizeName(v));
   const possNames = new Set();
-  santNames.forEach((v, k) => v.length >= args.length && args.every((a, i) => v[i].startsWith(a)) && possNames.add(k));
-  // santNames.forEach((v, k) => v.length >= args.length && args.every((a, i) => v[i][i === args.length - 1 ? 'startsWith' : 'includes'](a)) && possNames.add(k));
-  // santNames.forEach((v, k) => v.length >= args.length && args.every((a, i) => v[i].includes(a)) && possNames.add(k));
+  names.forEach((v, k) => v.length >= args.length && args.every((a, i) => v[i].startsWith(a)) && possNames.add(k));
+  // names.forEach((v, k) => v.length >= args.length && args.every((a, i) => v[i][i === args.length - 1 ? 'startsWith' : 'includes'](a)) && possNames.add(k));
+  // names.forEach((v, k) => v.length >= args.length && args.every((a, i) => v[i].includes(a)) && possNames.add(k));
   arr.push([]);
   function addNames() {
     if (args.length === 1) possNames.forEach(v => arr[1].push(names[v].join(' ')));
     else {
-      if (multiple) {
-        const n = [];
-        possNames.forEach(v => names[v].forEach((v, i) => {
-          if (i === n.length) n.push(new Set());
-          n[i].add(v);
-        }));
-        n.forEach((v, i) => {
-          if (i + 1 === arr.length) arr.push([]);
-          Array.prototype.push.apply(arr[i + 1], Array.from(v));
-        });
-      } else if (possNames.length > 0) names[possNames[0]].forEach((v, i) => arr[i + 1].push(v));
+      const n = [];
+      possNames.forEach(v => names[v].forEach((v, i) => {
+        if (i === n.length) n.push(new Set());
+        n[i].add(v);
+      }));
+      n.forEach((v, i) => {
+        if (i + 1 === arr.length) arr.push([]);
+        Array.prototype.push.apply(arr[i + 1], Array.from(v));
+      });
     }
   }
   switch (settings.betterGFSIDPref) {
@@ -85,15 +82,19 @@ function fix(args, multiple = true) {
       break;
     case 'Name':
       possIds.forEach(v => possNames.add(nameMapRev[idMap[v]]));
-      addNames();
+      if (multiple) addNames();
+      else if (possNames.size > 0) names[possNames.values().next().value].forEach((v, i) => {
+        if (i) arr[i + 1] = [v];
+        else arr[i + 1].push(v);
+      });
       break;
     case 'Dynamic': {
       const idPrio = possIds.size > 0;
       possIds.forEach(v => possNames.add(nameMapRev[idMap[v]]));
       possNames.forEach(v => possIds.add(idMapRev[nameMap[v]]));
       if (idPrio) possIds.forEach(v => arr[1].push(ids[v]));
-      addNames();
-      if (!idPrio) possIds.forEach(v => arr[1].push(ids[v]));
+      if (!idPrio || multiple) addNames();
+      if (!idPrio && multiple || possNames.size === 0) possIds.forEach(v => arr[1].push(ids[v]));
       break;
     }
   }
