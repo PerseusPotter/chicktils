@@ -1,77 +1,5 @@
 import reg from './registerer';
-
 const EventEmitter = require('./events');
-
-const editGui = new Gui();
-const editDisplay = new Display();
-editDisplay.hide();
-/**
- * @type {CustomTextGui}
- */
-let curr;
-const renderReg = reg('renderOverlay', () => {
-  Renderer.drawRect(0x80000000, 0, 0, 5000, 5000);
-
-  const { x, y, s, a } = curr.getLoc();
-
-  editDisplay.setAlign((a & 1) === 0 ? 'LEFT' : 'RIGHT');
-  editDisplay.setOrder((a & 2) === 0 ? 'DOWN' : 'UP');
-  editDisplay.setRenderX(x);
-  editDisplay.setRenderY(y);
-  editDisplay.clearLines();
-  const text = curr.getEditText();
-  if (a & 2) text.reverse();
-  editDisplay.addLines(text);
-  editDisplay.getLines().forEach(v => v.setScale(s));
-  editDisplay.setShouldRender(true);
-  editDisplay.render();
-  editDisplay.setShouldRender(false);
-
-  Renderer.drawStringWithShadow('&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str, 50, 20);
-  Renderer.drawCircle(0xFF0000FF, x, y, 5, 10);
-}, 'customtextgui');
-
-let lastX = -1;
-let lastY = -1;
-editGui.registerClosed(() => {
-  lastX = -1;
-  lastY = -1;
-  renderReg.unregister();
-  curr.isEdit = false;
-  curr.emit('editClose');
-});
-editGui.registerKeyTyped((c, n) => {
-  const l = curr.getLoc();
-  switch (n) {
-    case 2:
-      l.x = 50;
-      l.y = 50;
-      l.s = 1;
-      l.a = 0;
-      break;
-    case 3:
-      l.a = (l.a + 1) & 3;
-      break;
-    default:
-      curr.emit('editKey', n);
-  }
-});
-editGui.registerMouseDragged((x, y, b) => {
-  if (b !== 2) return;
-  if (lastX !== -1) {
-    curr.getLoc().x += (x - lastX);
-    curr.getLoc().y += (y - lastY);
-  }
-  lastX = x;
-  lastY = y;
-});
-editGui.registerMouseReleased(() => {
-  lastX = -1;
-  lastY = -1;
-});
-editGui.registerScrolled((x, y, d) => {
-  curr.getLoc().s = Math.max(0.1, curr.getLoc().s + d / 10);
-});
 
 /**
  * @type {DisplayLine[]}
@@ -123,7 +51,7 @@ displaysF.setAccessible(true);
  * @param {string?} customEditMsg
  * @returns {CustomTextGui}
  */
-export default function createTextGui(getLoc, getEditText, str = '') {
+function createTextGui(getLoc, getEditText, str = '') {
   /**
    * @type {CustomTextGui}
    */
@@ -214,3 +142,62 @@ export default function createTextGui(getLoc, getEditText, str = '') {
 
   return obj;
 }
+export default createTextGui;
+
+const editGui = new Gui();
+const editDisplay = createTextGui(() => curr.getLoc(), () => []);
+/**
+ * @type {CustomTextGui}
+ */
+let curr;
+const renderReg = reg('renderOverlay', () => {
+  Renderer.drawRect(0x80000000, 0, 0, 5000, 5000);
+
+  editDisplay.setLines(curr.getEditText());
+  editDisplay.render();
+
+  Renderer.drawStringWithShadow('&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str, 50, 20);
+  Renderer.drawCircle(0xFF0000FF, curr.getLoc().x, curr.getLoc().y, 5, 10);
+}, 'customtextgui');
+
+let lastX = -1;
+let lastY = -1;
+editGui.registerClosed(() => {
+  lastX = -1;
+  lastY = -1;
+  renderReg.unregister();
+  curr.isEdit = false;
+  curr.emit('editClose');
+});
+editGui.registerKeyTyped((c, n) => {
+  const l = curr.getLoc();
+  switch (n) {
+    case 2:
+      l.x = 50;
+      l.y = 50;
+      l.s = 1;
+      l.a = 0;
+      break;
+    case 3:
+      l.a = (l.a + 1) & 3;
+      break;
+    default:
+      curr.emit('editKey', n);
+  }
+});
+editGui.registerMouseDragged((x, y, b) => {
+  if (b !== 2) return;
+  if (lastX !== -1) {
+    curr.getLoc().x += (x - lastX);
+    curr.getLoc().y += (y - lastY);
+  }
+  lastX = x;
+  lastY = y;
+});
+editGui.registerMouseReleased(() => {
+  lastX = -1;
+  lastY = -1;
+});
+editGui.registerScrolled((x, y, d) => {
+  curr.getLoc().s = Math.max(0.1, curr.getLoc().s + d / 10);
+});
