@@ -371,3 +371,27 @@ export function calcMedian(arr) {
   arr.sort((a, b) => a - b);
   return (arr[(arr.length - 1) >> 1] + arr[arr.length >> 1]) / 2;
 }
+
+/**
+ *
+ * @param {number} dx
+ * @param {number} dy
+ * @returns number
+ * @link https://www.flipcode.com/archives/Fast_Approximate_Distance_Functions.shtml
+ */
+export function fastDistance(dx, dy) {
+  if (dx < 0) dx = -dx;
+  if (dy < 0) dy = -dy;
+
+  let min, max;
+  if (dx < dy) {
+    min = dx;
+    max = dy;
+  } else {
+    min = dy;
+    max = dx;
+  }
+
+  return (((max << 8) + (max << 3) - (max << 4) - (max << 1) +
+    (min << 7) - (min << 5) + (min << 3) - (min << 1)) >> 8);
+}
