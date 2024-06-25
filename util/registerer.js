@@ -57,6 +57,104 @@ if (trackPerformance) {
   }).setName('chicktilsdumpperformancedataregister');
 }
 
+const createRegister = (function() {
+  // doesn't add to com.chattriggers.ctjs.commands.Command.activeCommands so unload all commands on game unload (ct reload)
+  const cmds = {};
+  register('gameUnload', () => Object.values(cmds).forEach(v => v.unregister()));
+  const ClientCommandHandler = Java.type('net.minecraftforge.client.ClientCommandHandler').instance;
+  const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
+  const commandMapF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71562_a');
+  commandMapF.setAccessible(true);
+  const commandSetF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71561_b');
+  commandSetF.setAccessible(true);
+  class ChickTilsCommand {
+    cb = Function.prototype;
+    name = '';
+    tabCb = null;
+    tabArr = new ArrayList();
+    aliases = new ArrayList();
+    override = false;
+    jcmd;
+    _init = false;
+    constructor(cb) {
+      this.cb = cb;
+      this.jcmd = new JavaAdapter(Java.type('net.minecraft.command.CommandBase'), {
+        // getCommandName
+        func_71517_b: () => this.name,
+        // getCommandUsage
+        func_71518_a: () => ('/' + this.name).toString(),
+        // getCommandAliases
+        func_71514_a: () => this.aliases,
+        // processCommand
+        func_71515_b: (sender, args) => void this.cb.apply(null, args),
+        // addTabCompletionOptions
+        func_180525_a: (sender, args, pos) => this.tabCb ? new ArrayList(this.tabCb(args)) : this.tabArr,
+        // getRequiredPermissionLevel
+        func_82362_a: () => 0
+      });
+    }
+
+    _instantiate() {
+      if (this._init) return;
+      this._init = true;
+      if (!this.override && ClientCommandHandler.func_71555_a()[this.name]) return;
+      ClientCommandHandler.func_71560_a(this.jcmd);
+      cmds[this.name] = this;
+    }
+    _uninstantiate() {
+      if (!this._init) return;
+      this._init = false;
+      if (cmds[this.name] !== this) return;
+      helper.removeElementMap(commandMapF, ClientCommandHandler, this.name);
+      helper.removeElementSet(commandSetF, ClientCommandHandler, this.jcmd);
+    }
+    _reinstantiate() {
+      if (!this._init) return;
+      this._uninstantiate();
+      this._instantiate();
+    }
+
+    trigger(args) {
+      this.cb(args);
+    }
+    register() {
+      this._instantiate();
+      return this;
+    }
+    unregister() {
+      this._uninstantiate();
+      return this;
+    }
+    setTabCompletions(...args) {
+      if (!args) args = [];
+      else if (args.length === 1 && typeof args[0] === 'function') this.tabCb = args[0];
+      else args.forEach(v => this.tabArr.add(v.toString()));
+      return this;
+    }
+    setAliases(...args) {
+      args.forEach(v => this.aliases.add(v.toString()));
+      this._reinstantiate();
+      return this;
+    }
+    setCommandName(name, override = false) {
+      this.name = name.toString();
+      this.override = override;
+      this._reinstantiate();
+      return this;
+    }
+    setName(name, override) {
+      return this.setCommandName(name, override);
+    }
+
+    setPriority() { }
+    compareTo() { }
+  }
+  return function(type, shit) {
+    if (type === 'command') return new ChickTilsCommand(shit);
+    return register(type, shit).unregister();
+  };
+}());
+
 /**
  * isRegistered() => boolean;
  * setRegistered(v: boolean) => this;
@@ -88,13 +186,10 @@ reg = function reg(type, shit, modN) {
       }
     };
   }
-  const rr = register(type, shit).unregister();
+  const rr = createRegister(type, shit);
   let isReg = false;
   let isAReg = false;
   let regReq = new StateProp(true);
-  let cmdName = '';
-  let aliases = null;
-  let ov = false;
   const props = new Map();
   const prox = new Proxy({}, {
     get(t, p, r) {
@@ -106,9 +201,6 @@ reg = function reg(type, shit, modN) {
         case 'setEnabled': return _setEnabled;
         case 'update': return _update;
         case 'forceTrigger': return shit;
-        case 'setCommandName':
-        case 'setName': return _setName;
-        case 'setAliases': return _setAliases;
       }
       if (!rr[p]) return void 0;
       let w;
@@ -122,12 +214,7 @@ reg = function reg(type, shit, modN) {
   const _register = wrap(rr, prox, () => {
     if (!isAReg && regReq.get()) {
       isAReg = true;
-      if (cmdName) {
-        rr.setName(cmdName, ov);
-        if (aliases) rr.setAliases.apply(rr, aliases);
-      } else rr.register();
-      cmdName = '';
-      aliases = null;
+      rr.register();
     }
     isReg = true;
   });
@@ -149,15 +236,14 @@ reg = function reg(type, shit, modN) {
   });
   const _update = wrap({}, prox, () => {
     if (!isReg) return;
-    if (regReq.get()) _register();
-    else _unregister();
+    if (regReq.get()) {
+      if (!isAReg) rr.register();
+      isAReg = true;
+    } else {
+      if (isAReg) rr.unregister();
+      isAReg = false;
+    }
   });
-  const _setName = type === 'command' ? wrap(rr, prox, (n, o) => {
-    cmdName = n;
-    ov = o || false;
-  }) : void 0;
-  const _setAliases = type === 'command' ? wrap(rr, prox, ...a => aliases = a) : void 0;
-  allRegs.push({ type: typeof type === 'string' ? type : type.class.getName(), reg: prox, getIsReg: () => isReg, getIsAReg: () => isAReg });
   return prox;
 };
 export default reg;
