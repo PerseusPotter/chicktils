@@ -1,4 +1,5 @@
 import { fastDistance, rescale } from './math';
+import { streamToString } from './net';
 
 const Base64 = Java.type('java.util.Base64');
 const ByteArrayInputStream = Java.type('java.io.ByteArrayInputStream');
@@ -12,9 +13,43 @@ const Kernel = Java.type('java.awt.image.Kernel');
 /**
  * @param {string} url
  * @returns {typeof BufferedImage}
+ * @link https://github.com/Sk1erLLC/Patcher/blob/4ce6e196e5ad1339f8a0ab96eb5680c2f6464583/src/main/java/club/sk1er/patcher/screen/render/overlay/ImagePreview.java#L151
  */
 export function fromURL(url) {
-  return ImageIO.read(new URL(url).openConnection().inputStream);
+  if (url.includes('imgur.com/') && !url.includes('i.imgur')) url = `https://i.imgur.com/${url.slice(url.lastIndexOf('/') + 1)}.png`;
+  let conn;
+  try {
+    const u = new URL(url);
+    conn = u.openConnection();
+    conn.setRequestMethod('GET');
+    conn.setUseCaches(true);
+    conn.setInstanceFollowRedirects(true);
+    conn.addRequestProperty('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36');
+    if (url.includes('imgur')) conn.addRequestProperty('Referer', 'https://imgur.com/');
+    conn.setReadTimeout(1000);
+    conn.setConnectTimeout(1000);
+    conn.setDoOutput(true);
+    const stream = conn.getInputStream();
+    if (conn.getHeaderField('Content-Type').includes('text/html')) {
+      const body = streamToString(stream);
+      let imgURL = '';
+      let m;
+      if (m = body.match(/<meta property="(?:og:image|twitter:image)" content="(.+?)".*?\/?>/)) imgURL = m[1];
+      else if (m = body.match(/<img.*?src="(.+?)".*?>/)) imgURL = m[1];
+      if (imgURL.startsWith('/')) imgURL = `${u.getProtocol()}://${u.getHost()}${imgURL}`;
+      imgURL = imgURL.trim();
+      if (imgURL) {
+        conn.disconnect();
+        return fromURL(imgURL);
+      }
+    }
+    const img = ImageIO.read(stream);
+    conn.disconnect();
+    return img;
+  } catch (e) {
+    if (conn) conn.disconnect();
+    throw e;
+  }
 }
 /**
  * @param {string} b64
