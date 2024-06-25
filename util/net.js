@@ -23,6 +23,16 @@ export function urlToFile(url, dst, connecttimeout = 1000, readtimeout = 1000) {
   IS.close();
   FilePS.close();
 }
+export function streamToString(stream) {
+  const out = new ByteArrayOutputStream();
+  let buf = new Packages.java.lang.reflect.Array.newInstance(Byte.TYPE, 65536);
+  let len;
+  while ((len = stream.read(buf)) > 0) {
+    out.write(buf, 0, len);
+  }
+  stream.close();
+  return out.toString('UTF-8');
+}
 export function urlToString(url, connecttimeout = 1000, readtimeout = 1000) {
   try {
     const connection = new URL(url).openConnection();
@@ -30,15 +40,7 @@ export function urlToString(url, connecttimeout = 1000, readtimeout = 1000) {
     connection.setDoOutput(true);
     connection.setConnectTimeout(connecttimeout);
     connection.setReadTimeout(readtimeout);
-    const IS = connection.getInputStream();
-    const out = new ByteArrayOutputStream();
-    let buf = new Packages.java.lang.reflect.Array.newInstance(Byte.TYPE, 65536);
-    let len;
-    while ((len = IS.read(buf)) > 0) {
-      out.write(buf, 0, len);
-    }
-    IS.close();
-    return out.toString('UTF-8');
+    return streamToString(connection.getInputStream());
   } catch (e) {
     if (e.toString().includes('java.io.FileNotFoundException')) return null;
     throw e;
