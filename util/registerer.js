@@ -67,6 +67,8 @@ const createRegister = (function() {
   commandMapF.setAccessible(true);
   const commandSetF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71561_b');
   commandSetF.setAccessible(true);
+  // :(
+  // [gg.skytils.skytilsmod.features.impl.handlers.NamespacedCommands:registerCommandHelper:81]: WARNING! Command aaa has 0; owners: []
   class ChickTilsCommand {
     cb = Function.prototype;
     name = '';
@@ -86,7 +88,7 @@ const createRegister = (function() {
         // getCommandAliases
         func_71514_a: () => this.aliases,
         // processCommand
-        func_71515_b: (sender, args) => void this.cb.apply(null, args),
+        func_71515_b: (sender, args) => void this.cb.apply(this, args),
         // addTabCompletionOptions
         func_180525_a: (sender, args, pos) => this.tabCb ? new ArrayList(this.tabCb(args)) : this.tabArr,
         // getRequiredPermissionLevel
