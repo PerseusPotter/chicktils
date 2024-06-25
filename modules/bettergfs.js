@@ -75,26 +75,38 @@ function fix(args, multiple = true) {
       });
     }
   }
+  function trimMult() {
+    if (multiple) return;
+    if (possIds.size) {
+      const f = possIds.values().next().value;
+      possIds.clear();
+      possIds.add(f);
+    }
+    if (possNames.size) {
+      const f = possNames.values().next().value;
+      possNames.clear();
+      possNames.add(f);
+    }
+  }
   switch (settings.betterGFSIDPref) {
     case 'ID':
       possNames.forEach(v => possIds.add(idMapRev[nameMap[v]]));
+      trimMult();
       possIds.forEach(v => arr[1].push(ids[v]));
       break;
     case 'Name':
       possIds.forEach(v => possNames.add(nameMapRev[idMap[v]]));
-      if (multiple) addNames();
-      else if (possNames.size > 0) names[possNames.values().next().value].forEach((v, i) => {
-        if (i) arr[i + 1] = [v];
-        else arr[i + 1].push(v);
-      });
+      trimMult();
+      addNames();
       break;
     case 'Dynamic': {
       const idPrio = possIds.size > 0;
       possIds.forEach(v => possNames.add(nameMapRev[idMap[v]]));
       possNames.forEach(v => possIds.add(idMapRev[nameMap[v]]));
+      trimMult();
       if (idPrio) possIds.forEach(v => arr[1].push(ids[v]));
       if (!idPrio || multiple) addNames();
-      if (!idPrio && multiple || possNames.size === 0) possIds.forEach(v => arr[1].push(ids[v]));
+      if (!idPrio && (multiple || possNames.size === 0)) possIds.forEach(v => arr[1].push(ids[v]));
       break;
     }
   }
