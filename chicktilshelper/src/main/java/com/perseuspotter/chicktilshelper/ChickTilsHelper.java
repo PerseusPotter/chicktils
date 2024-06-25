@@ -3,6 +3,8 @@ package com.perseuspotter.chicktilshelper;
 import java.lang.reflect.Field;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -134,6 +136,26 @@ public class ChickTilsHelper {
     try {
       List<?> arr = (List<?>) f.get(o);
       arr.remove(arr.size() - 1);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public static boolean removeElementSet(Field f, Object o, Object r) {
+    try {
+      Set<?> set = (Set<?>) f.get(o);
+      set.remove(r);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public static boolean removeElementMap(Field f, Object o, Object r) {
+    try {
+      Map<?, ?> map = (Map<?, ?>) f.get(o);
+      map.remove(r);
       return true;
     } catch (Exception e) {
       return false;
