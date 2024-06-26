@@ -591,7 +591,8 @@ export const props = {
 
   dungeonTerminalsHelper: new Property('DungeonTerminalsHelper', page, ++sort, Property.Type.Toggle, false),
   dungeonTerminalsGuiSize: new Property('DungeonTerminalsGuiSize', page, ++sort, Property.Type.Option, 'Unchanged', { desc: 'change gui size while in terminals', options: ['Unchanged', 'Small', 'Normal', 'Large', '4x', '5x', 'Auto'] }),
-  dungeonTerminalsHideInv: new Property('DungeonTerminalsHideInventory', page, ++sort, Property.Type.Toggle, false, { desc: 'hide inventory in terminals' }),
+  dungeonTerminalsHideInv: new Property('DungeonTerminalsHideInventory', page, ++sort, Property.Type.Toggle, false, { desc: 'hide inventory in terminals\nplease do not use, it will 1) break all solvers, 2) look shit, 3) probably breaks other things like locking slots' }),
+  dungeonTerminalsHideInvScuffed: new Property('DungeonTerminalsHideInventoryScuffed', page, ++sort, Property.Type.Toggle, false, { desc: 'hide inventory in terminals, but scuffed (basically centers around the chest instead of hiding)' }),
 
   dungeonSpiritBearHelper: new Property('DungeonSpiritBearHelper', page, ++sort, Property.Type.Toggle, false, { desc: 'predict spirit bear spawn location' }),
   dungeonSpiritBearTimer: new Property('DungeonSpiritBearShowTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer above box' }),

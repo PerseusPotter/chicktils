@@ -4,6 +4,10 @@ import { StateProp, StateVar } from '../../util/state';
 import { createChestNoInv, getLowerContainer } from '../../util/mc';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
 
+const ySizeF = Java.type('net.minecraft.client.gui.inventory.GuiContainer').class.getDeclaredField('field_147000_g');
+ySizeF.setAccessible(true);
+const newYSizeInt = new (Java.type('java.lang.Integer'))(143);
+
 const origGuiSize = new StateVar(-1);
 
 const tickReg = reg('tick', () => {
@@ -41,6 +45,7 @@ const termOpenReg = reg('guiOpened', evn => {
     }());
   }
   if (settings.dungeonTerminalsHideInv) GuiHandler.openGui(createChestNoInv(gui));
+  if (settings.dungeonTerminalsHideInvScuffed) ySizeF.set(gui, newYSizeInt);
 }, 'dungeon/terminalsguisize').setEnabled(new StateProp(stateFloor).equalsmult('F7', 'M7').and(stateIsInBoss).and(settings._dungeonTerminalsHelper));
 
 export function init() { }
