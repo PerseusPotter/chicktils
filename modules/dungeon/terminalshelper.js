@@ -1,17 +1,17 @@
 import settings from '../../settings';
 import reg from '../../util/registerer';
 import { StateProp, StateVar } from '../../util/state';
-import { getLowerContainer } from '../../util/mc';
+import { createChestNoInv, getLowerContainer } from '../../util/mc';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
 
 const origGuiSize = new StateVar(-1);
 
 const tickReg = reg('tick', () => {
-  if (!Client.currentGui.get()) {
+  if (!Client.isInGui()) {
     Client.settings.video.setGuiScale(origGuiSize.get());
     origGuiSize.set(-1);
   }
-}, 'dungeon/terminalsguisize').setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).notequals(-1)).and(stateIsInBoss));
+}, 'dungeon/terminalsguisize').setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).notequals(-1)).and(settings._dungeonTerminalsHelper));
 const termOpenReg = reg('guiOpened', evn => {
   const gui = evn.gui;
   if (gui.getClass().getSimpleName() !== 'GuiChest') return;
@@ -27,18 +27,21 @@ const termOpenReg = reg('guiOpened', evn => {
     name.startsWith('What starts with:')
   )) return;
 
-  origGuiSize.set(Client.settings.video.getGuiScale());
-  Client.settings.video.setGuiScale(function() {
-    switch (settings.dungeonTerminalsGuiSize) {
-      case 'Small': return 1;
-      case 'Normal': return 2;
-      case 'Large': return 3;
-      case '4x': return 4;
-      case '5x': return 5;
-      case 'Auto': return 0;
-    }
-  }());
-}, 'dungeon/terminalsguisize').setEnabled(new StateProp(settings._dungeonTerminalsGuiSize).notequals('Unchanged').and(new StateProp(origGuiSize).equals(-1)).and(stateIsInBoss).and(new StateProp(stateFloor).equalsmult('F7', 'M7')));
+  if (settings.dungeonTerminalsGuiSize !== 'Unchanged' && origGuiSize.get() === -1) {
+    origGuiSize.set(Client.settings.video.getGuiScale());
+    Client.settings.video.setGuiScale(function() {
+      switch (settings.dungeonTerminalsGuiSize) {
+        case 'Small': return 1;
+        case 'Normal': return 2;
+        case 'Large': return 3;
+        case '4x': return 4;
+        case '5x': return 5;
+        case 'Auto': return 0;
+      }
+    }());
+  }
+  if (settings.dungeonTerminalsHideInv) GuiHandler.openGui(createChestNoInv(gui));
+}, 'dungeon/terminalsguisize').setEnabled(new StateProp(stateFloor).equalsmult('F7', 'M7').and(stateIsInBoss).and(settings._dungeonTerminalsHelper));
 
 export function init() { }
 export function start() {

@@ -589,7 +589,9 @@ export const props = {
   dungeonIceSprayAlertTime: new Property('DungeonIceSprayAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
   dungeonIceSprayAlertSound: new Property('DungeonIceSprayAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
 
-  dungeonTerminalsGuiSize: new Property('DungeonTerminalGuiSize', page, ++sort, Property.Type.Option, 'Unchanged', { desc: 'change gui size while in terminals', options: ['Unchanged', 'Small', 'Normal', 'Large', '4x', '5x', 'Auto'] }),
+  dungeonTerminalsHelper: new Property('DungeonTerminalsHelper', page, ++sort, Property.Type.Toggle, false),
+  dungeonTerminalsGuiSize: new Property('DungeonTerminalsGuiSize', page, ++sort, Property.Type.Option, 'Unchanged', { desc: 'change gui size while in terminals', options: ['Unchanged', 'Small', 'Normal', 'Large', '4x', '5x', 'Auto'] }),
+  dungeonTerminalsHideInv: new Property('DungeonTerminalsHideInventory', page, ++sort, Property.Type.Toggle, false, { desc: 'hide inventory in terminals' }),
 
   dungeonSpiritBearHelper: new Property('DungeonSpiritBearHelper', page, ++sort, Property.Type.Toggle, false, { desc: 'predict spirit bear spawn location' }),
   dungeonSpiritBearTimer: new Property('DungeonSpiritBearShowTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer above box' }),
