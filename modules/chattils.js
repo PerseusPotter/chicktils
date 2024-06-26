@@ -291,7 +291,8 @@ function printNextLine() {
   if (!l.trim()) {
     l = blankLines.shift();
     blankLines.push(l);
-  } else l += imgArtId++;
+  } else if (settings.chatTilsImageArtEncoding === 'Braille') l += String.fromCharCode(0x2800 | (imgArtId++));
+  else l += imgArtId++;
   if (settings.chatTilsImageArtParty) l = '/pc ' + l;
   ChatLib.say(l);
   setTimeout(() => {
