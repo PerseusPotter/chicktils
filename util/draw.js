@@ -4,10 +4,6 @@ import RenderLib2D from '../../RenderLib2D/index';
 import _drawBeaconBeam from '../../BeaconBeam/index';
 import settings from '../settings';
 import { getEyeHeight } from './mc';
-if (!GlStateManager) {
-  var GL11 = Java.type("org.lwjgl.opengl.GL11");
-  var GlStateManager = Java.type("net.minecraft.client.renderer.GlStateManager");
-}
 const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 const worldRen = tess.func_178180_c();
 
