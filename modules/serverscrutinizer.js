@@ -23,21 +23,24 @@ function getAverageTPS() {
 function getMinimumTPS() {
   if (ticks.length <= 1) return ticks.length;
   const t = ticks.slice();
-  let r = -1;
+  const n = Date.now();
+  let lt = n;
+  let l = 0, r = -1;
   let m = Number.POSITIVE_INFINITY;
-  for (let l = 0; l < t.length; l++) {
-    let lr = r;
-    while (r < t.length && t[l] - t[r + 1] <= 1_000) r++;
-    if (r === lr) continue;
+  while (l < t.length && r < t.length - 1) {
+    while (r < t.length - 1 && lt - t[r + 1] <= 1_000) r++;
     let d = r - l + 1;
     if (
       r === l &&
       (
         r < t.length - 1 && t[r] - t[r + 1] > 1_000 ||
-        r > 0 && t[r - 1] - t[r] > 1_000
+        r > 0 && t[r - 1] - t[r] > 1_000 ||
+        r === 0 && n - t[r] > 1_000
       )
     ) d = 0;
     m = Math.min(m, d);
+    l++;
+    lt = t[l];
   }
   return cap(m);
 }
