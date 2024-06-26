@@ -5,7 +5,7 @@ import reg from '../../util/registerer';
 import { logDebug } from '../../util/log';
 import { StateProp } from '../../util/state';
 import { registerTrackPlayers, roundRoomCoords, stateIsInBoss } from '../dungeon.js';
-import { run } from '../../util/threading.js';
+import { run } from '../../util/threading';
 
 let map;
 let mapId;

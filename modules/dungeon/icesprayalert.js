@@ -2,7 +2,7 @@ import settings from '../../settings';
 import createAlert from '../../util/alert';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
-import { run } from '../../util/threading.js';
+import { run } from '../../util/threading';
 import { stateIsInBoss } from '../dungeon.js';
 
 const iceSprayAlert = createAlert('ice spray :O', 10);
