@@ -136,7 +136,7 @@ export function init() {
     require('./dungeon/spiritbear'),
     require('./dungeon/stairstonkhelper'),
     require('./dungeon/terminalbreakdown'),
-    require('./dungeon/terminalsguisize')
+    require('./dungeon/terminalshelper')
   ];
   modules.forEach(v => v.init());
 
