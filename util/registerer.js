@@ -246,6 +246,7 @@ reg = function reg(type, shit, modN) {
       isAReg = false;
     }
   });
+  allRegs.push({ type: typeof type === 'string' ? type : type.class.getName(), reg: prox, getIsReg: () => isReg, getIsAReg: () => isAReg });
   return prox;
 };
 export default reg;
