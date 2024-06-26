@@ -102,3 +102,79 @@ export function getBlockPos(bPos) {
     z: bPos.func_177952_p()
   };
 }
+
+const ResourceLocation = Java.type('net.minecraft.util.ResourceLocation');
+const CHEST_GUI_TEXTURE = new ResourceLocation('textures/gui/container/generic_54.png');
+const Container = Java.type('net.minecraft.inventory.Container');
+const GuiContainer = Java.type('net.minecraft.client.gui.inventory.GuiContainer');
+const JSlot = Java.type('net.minecraft.inventory.Slot');
+const addSlotToContainerM = Container.class.getDeclaredMethod('func_75146_a', [JSlot.class]);
+addSlotToContainerM.setAccessible(true);
+/**
+ * @param {import ('../../@types/External').JavaClass<'net.minecraft.client.gui.inventory.GuiChest'>} chest
+ * @returns {typeof GuiContainer}
+ * @link https://github.com/Marcelektro/MCP-919/blob/main/temp/src/minecraft/net/minecraft/entity/boss/BossStatus.java
+ */
+export function createChestNoInv(chest) {
+  const p = Player.getPlayer();
+  if (!p) return chest;
+  const inv = getLowerContainer(chest);
+  const cont = new JavaAdapter(Container, {
+    // canInteractWith
+    func_75145_c(p) {
+      return inv.func_70300_a(p);
+    },
+    // transferStackInSlot
+    func_82846_b(p, i) {
+      let itemStack = null;
+      const slot = this.field_75151_b[p_82846_2_];
+      if (slot && slot.func_75216_d()) {
+        const itemStack1 = slot.func_75211_c();
+        itemStack = itemStack1.func_77946_l();
+        if (i < contNumRows * 9) {
+          if (!this.func_75135_a(itemStack1, contNumRows * 9, this.field_75151_b.size(), true)) return null;
+        } else if (!this.func_75135_a(itemStack1, 0, contNumRows * 9, false)) return null;
+
+        if (itemStack1.field_77994_a === 0) slot.func_75215_d(null);
+        else slot.func_75218_e();
+      }
+
+      return itemStack;
+    },
+    // onContainerClosed
+    func_75134_a(p) {
+      this.super$func_75134_a(p);
+      inv.func_174886_c(p);
+    }
+  });
+  const contNumRows = inv.func_70302_i_() / 9;
+  inv.func_174889_b(p);
+  Client.scheduleTask(() => cont.field_75152_c = chest.field_147002_h.field_75152_c);
+
+  for (let i = 0; i < contNumRows; i++) {
+    for (let j = 0; j < 9; j++) {
+      addSlotToContainerM.invoke(cont, new JSlot(inv, j + i * 9, 8 + j * 18, 18 + i * 18));
+    }
+  }
+  const gCont = new JavaAdapter(GuiContainer, {
+    // drawGuiContainerForegroundLayer
+    func_146979_b(mX, mY) {
+      this.field_146289_q.func_78276_b(inv.func_145748_c_().func_150260_c(), 8, 6, 4210752);
+    },
+    // drawGuiContainerBackgroundLayer
+    func_146976_a(pt, mX, mY) {
+      GlStateManager.func_179131_c(1, 1, 1, 1);
+      this.field_146297_k.func_110434_K().func_110577_a(CHEST_GUI_TEXTURE);
+      const i = (this.field_146294_l - this.field_146999_f) / 2;
+      const j = (this.field_146295_m - this.field_147000_g) / 2;
+      this.func_73729_b(i, j, 0, 0, this.field_146999_f, this.field_147018_x * 18 + 17);
+      this.func_73729_b(i, j + this.field_147018_x * 18 + 17, 0, 126 + 96 - 7, this.field_146999_f, 7);
+    }
+  }, cont);
+
+  gCont.field_146291_p = false;
+  gCont.field_147018_x = inv.func_70302_i_() / 9;
+  gCont.field_147000_g = gCont.field_147018_x * 18 + 36;
+
+  return gCont;
+}
