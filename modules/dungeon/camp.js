@@ -10,7 +10,7 @@ import { StateProp, StateVar } from '../../util/state';
 import { DelayTimer } from '../../util/timers';
 import { getItemId } from '../../util/mc';
 import { listenBossMessages, roundRoomCoords, stateIsInBoss } from '../dungeon.js';
-import { run } from '../../util/threading.js';
+import { run } from '../../util/threading';
 
 let bloodMobs = [];
 let possibleSkulls = [];

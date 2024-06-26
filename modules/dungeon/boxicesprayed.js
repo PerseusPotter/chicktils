@@ -6,7 +6,7 @@ import Grid from '../../util/grid';
 import { fromVec3, getItemId, toVec3 } from '../../util/mc';
 import { getSbId } from '../../util/skyblock';
 import { getPlayers, isMob, registerTrackPlayers } from '../dungeon.js';
-import { run } from '../../util/threading.js';
+import { run } from '../../util/threading';
 
 let allMobs = [];
 let newAllMobs = [];

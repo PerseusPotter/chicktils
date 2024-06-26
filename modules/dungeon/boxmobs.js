@@ -5,7 +5,7 @@ import { compareFloat, dist } from '../../util/math';
 import Grid from '../../util/grid';
 import { StateProp } from '../../util/state';
 import { isDungeonMob, stateIsInBoss } from '../dungeon.js';
-import { run } from '../../util/threading.js';
+import { run } from '../../util/threading';
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(stateIsInBoss).not()));
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
