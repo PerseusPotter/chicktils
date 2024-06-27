@@ -18,13 +18,13 @@ const actionBarReg = reg('actionBar', (curr, max) => {
   const hpph = max / maxHp;
   actualAbsorb = Math.min(Math.max(Math.ceil(curr / hpph) - hp, 0), settings.absorptionMaxHearts);
 }, 'absorption').setChatCriteria('${curr}/${max}❤${*}');
+
+const drawTexturedModalRect = Client.getMinecraft().field_71456_v.func_73729_b.bind(Client.getMinecraft().field_71456_v);
 const renderHeartReg = reg('renderHealth', evn => {
   const playerE = Player.getPlayer();
   if (!playerE) return;
   updateC++;
   cancel(evn);
-
-  const drawTexturedModalRect = Client.getMinecraft().field_71456_v.func_73729_b.bind(Client.getMinecraft().field_71456_v);
 
   // https://github.com/MinecraftForge/MinecraftForge/blob/d06e0ad71b8471923cc809dde58251de8299a143/src/main/java/net/minecraftforge/client/GuiIngameForge.java#L330
   const w = Renderer.screen.getWidth();
@@ -39,7 +39,7 @@ const renderHeartReg = reg('renderHealth', evn => {
     hpUpdateC = updateC + (hp < currHp ? 20 : 10);
   } else if (d - prevTime > 1000) {
     prevHp = hp;
-    prevTime = Date.now();
+    prevTime = d;
   }
 
   currHp = hp;
@@ -73,12 +73,6 @@ const renderHeartReg = reg('renderHealth', evn => {
     if (!pos[i]) return;
     drawTexturedModalRect(pos[i][0], pos[i][1], u, TOP, 9, 9);
   };
-  const inc = () => {
-    if (++x === 10) {
-      x = 0;
-      y++;
-    }
-  };
 
   let x = 0;
   let y = 0;
@@ -87,7 +81,10 @@ const renderHeartReg = reg('renderHealth', evn => {
     let _y = b - y * rowHeight + (hp <= 4) * (Math.random() < 0.5) + (pos.length === regen ? -2 : 0);
     pos.push([_x, _y]);
     drawTexturedModalRect(_x, _y, BACKGROUND, TOP, 9, 9);
-    inc();
+    if (++x === 10) {
+      x = 0;
+      y++;
+    }
     slots--;
   }
   x = (hp % 20) >> 1;
@@ -95,7 +92,10 @@ const renderHeartReg = reg('renderHealth', evn => {
   let s = 1 + !(hp & 1);
   while (absorb > 0) {
     drawText(x, y, (absorb === 1 ? 169 : 160));
-    inc();
+    if (++x === 10) {
+      x = 0;
+      y++;
+    }
     absorb -= s;
     s = 2;
   }
@@ -104,7 +104,10 @@ const renderHeartReg = reg('renderHealth', evn => {
   s = 1 + !(hp & 1);
   while (hpDiff > 0) {
     drawText(x, y, MARGIN + (hpDiff === 1 ? 63 : 54));
-    inc();
+    if (++x === 10) {
+      x = 0;
+      y++;
+    }
     hpDiff -= s;
     s = 2;
   }
@@ -112,7 +115,10 @@ const renderHeartReg = reg('renderHealth', evn => {
   y = 0;
   while (hp > 0) {
     drawText(x, y, MARGIN + (hp === 1 ? 45 : 36));
-    inc();
+    if (++x === 10) {
+      x = 0;
+      y++;
+    }
     hp -= 2;
   }
 
