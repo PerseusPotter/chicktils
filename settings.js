@@ -606,6 +606,10 @@ export const props = {
   dungeonSilverfishHasteTimer: new Property('DungeonSilverfishHasteTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render how much longer haste from silverfish will last' }),
   moveSilverfishHasteTimer: new Property('MoveSilverfishHasteTimer', page, ++sort, Property.Type.Action),
 
+  dungeonHideFallingBlocks: new Property('DungeonHideFallingBlocks', page, ++sort, Property.Type.Toggle, true, { desc: 'dont render falling blocks in boss' }),
+
+  dungeonHideWitherKing: new Property('DungeonHideWitherKing', page, ++sort, Property.Type.Toggle, true, { desc: 'dont render wither king tentacles' }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
