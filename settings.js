@@ -760,6 +760,7 @@ export const props = {
   serverScrutinizerTPSDisplayCurr: new Property('ServerScrutinizerDisplayCurrentTPS', page, ++sort, Property.Type.Toggle, false, { desc: 'show current tps' }),
   serverScrutinizerTPSDisplayAvg: new Property('ServerScrutinizerDisplayAverageTPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show average tps (last 5s)' }),
   serverScrutinizerTPSDisplayMin: new Property('ServerScrutinizerDisplayMinimumTPS', page, ++sort, Property.Type.Toggle, false, { desc: 'show minimum tps (last 5s)' }),
+  serverScrutinizerTPSMaxAge: new Property('ServerScrutinizerTPSMaxAge', page, ++sort, Property.Type.Integer, 5000, { desc: 'max age of ticks, affects min tps and avg tps', min: 1000 }),
   moveTPSDisplay: new Property('MoveTPSDisplay', page, ++sort, Property.Type.Action),
   serverScrutinizerLastTickDisplay: new Property('ServerScrutinizerLastPacketDisplay', page, ++sort, Property.Type.Toggle, true, { desc: 'tracks last packet sent time (lag spike)' }),
   serverScrutinizerLastTickThreshold: new Property('ServerScrutinizerLastPacketThreshold', page, ++sort, Property.Type.Integer, 200, { desc: 'only show when server has not responded for this amount of time\nin ms' }),
