@@ -57,13 +57,9 @@ const tickReg = reg('tick', () => {
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (id.toString() !== 'REDSTONE') return;
-  try {
-    // chattriggers :clown:
-    // org.mozilla.javascript.WrappedException: Wrapped java.lang.IllegalArgumentException: Color parameter outside of expected range: Green Blue
-    const b = part.getColor().getBlue();
-    if (b === 0 || b > 10) return;
-    if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
-  } catch (e) { }
+  const b = part.underlyingEntity.func_70535_g();
+  if (b === 0 || b > 10) return;
+  if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
 }, 'dungeon/hidehealerpowerups').triggerIfCanceled(false).setEnabled(settings._dungeonHideHealerPowerups);
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.contains(e.entity)) cancel(evn);
