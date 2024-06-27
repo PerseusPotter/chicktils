@@ -73,27 +73,35 @@ function createTextGui(getLoc, getEditText, str = '') {
   let cy = -0.696942;
   let cs = -0.696942;
   let ca = -0.696942;
+  const updateLoc = () => {
+    let x = cx;
+    let y = cy;
+    if (ca & 2 && cll > 0) y -= obj.display.getLine(0).getText().getHeight();
+    obj.display.setRenderX(x);
+    obj.display.setRenderY(y);
+  };
   const updateLocCache = () => {
     const l = obj.getLoc();
     if (!l) return;
     const { x, y, s, a } = l;
     if (x !== cx) {
       cx = x;
-      obj.display.setRenderX(x);
+      updateLoc();
     }
     if (y !== cy) {
       cy = y;
-      obj.display.setRenderY(y);
+      updateLoc();
     }
     if (s !== cs) {
       cs = s;
       obj.display.getLines().forEach(v => v.setScale(s));
+      updateLoc();
     }
     if (a !== ca) {
       ca = a;
-      obj.display.setAlign((a & 1) === 0 ? 'LEFT' : 'RIGHT');
-      obj.display.setOrder((a & 2) === 0 ? 'DOWN' : 'UP');
-      if (a === 4) obj.display.setAlign('CENTER');
+      obj.display.setAlign(a & 1 ? 'RIGHT' : 'LEFT');
+      obj.display.setOrder(a & 2 ? 'UP' : 'DOWN');
+      updateLoc();
     }
   };
   Client.scheduleTask(() => updateLocCache());
@@ -117,8 +125,24 @@ function createTextGui(getLoc, getEditText, str = '') {
     return this;
   };
   obj.setLines = function(strs) {
-    this.clearLines();
-    this.addLines(strs);
+    if (strs.length === 1) return this.setLine(strs[0]);
+    if (strs.length < cll) {
+      if (ca & 2) freeLines(this.display.getLines().slice(0, cll - strs.length));
+      else freeLines(this.display.getLines().slice(strs.length));
+      while (strs.length < cll) {
+        this.display.removeLine(ca & 2 ? 0 : cll - 1);
+        cll--;
+      }
+    }
+    while (strs.length > cll) {
+      this.display.addLine(ca & 2 ? 0 : cll, getLine().setScale(cs));
+      cll++;
+    }
+    strs.forEach((v, i) => {
+      const l = this.display.getLine(ca & 2 ? cll - i - 1 : i);
+      if (l.getText().getString() === v) return;
+      l.setText(v);
+    });
     return this;
   };
   obj.addLine = function(str) {
@@ -133,7 +157,7 @@ function createTextGui(getLoc, getEditText, str = '') {
     return this;
   };
   obj.clearLines = function() {
-    freeLines(obj.display.getLines());
+    freeLines(this.display.getLines());
     this.display.clearLines();
     cll = 0;
     cstr = 'googoogAA gaa';
