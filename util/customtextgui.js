@@ -26,6 +26,18 @@ function createNonShitDisplayLineFuckChatTriggers() {
   }
   return line;
 }
+const textWidthF = DisplayLine.class.getSuperclass().getDeclaredField('textWidth');
+textWidthF.setAccessible(true);
+/**
+ *
+ * @param {DisplayLine} line
+ * @param {string} text
+ */
+function setTextOfDisplayLineFuckChatTriggers(line, text) {
+  line.getText().setString(text);
+  textWidthF.set(line, new (Java.type('java.lang.Float'))(Renderer.getStringWidth(text) * line.getText().getScale()));
+  return line;
+}
 
 /**
  * @typedef {import('./events').EventEmitterImpl<'editClose' | 'editKey'> & {
@@ -76,7 +88,8 @@ function createTextGui(getLoc, getEditText, str = '') {
   const updateLoc = () => {
     let x = cx;
     let y = cy;
-    if (ca & 2 && cll > 0) y -= obj.display.getLine(0).getText().getHeight();
+    // if (ca & 2 && cll > 0) y -= obj.display.getLine(0).getText().getHeight();
+    if (ca & 2) y -= cs * 10;
     obj.display.setRenderX(x);
     obj.display.setRenderY(y);
   };
@@ -84,25 +97,27 @@ function createTextGui(getLoc, getEditText, str = '') {
     const l = obj.getLoc();
     if (!l) return;
     const { x, y, s, a } = l;
+    let update = false;
     if (x !== cx) {
       cx = x;
-      updateLoc();
+      update = true;
     }
     if (y !== cy) {
       cy = y;
-      updateLoc();
+      update = true;
     }
     if (s !== cs) {
       cs = s;
       obj.display.getLines().forEach(v => v.setScale(s));
-      updateLoc();
+      update = true;
     }
     if (a !== ca) {
       ca = a;
       obj.display.setAlign(a & 1 ? 'RIGHT' : 'LEFT');
       obj.display.setOrder(a & 2 ? 'UP' : 'DOWN');
-      updateLoc();
+      update = true;
     }
+    if (update) updateLoc();
   };
   Client.scheduleTask(() => updateLocCache());
   obj.render = function() {
@@ -113,18 +128,20 @@ function createTextGui(getLoc, getEditText, str = '') {
     this.display.render();
     if (!isRemoved) this.display.setShouldRender(false);
   };
-  let cstr = 'googoogAA gaa';
+  const BLANK_STRING = Math.random().toString();
+  let cstr = BLANK_STRING;
   let cll = 0;
   obj.setLine = function(str) {
     if (str !== cstr) {
       this.clearLines();
       cstr = str;
       cll = 1;
-      this.display.addLine(getLine().setText(cstr).setScale(cs));
+      this.display.addLine(setTextOfDisplayLineFuckChatTriggers(getLine(), cstr).setScale(cs));
     }
     return this;
   };
   obj.setLines = function(strs) {
+    if (strs.length === 0) return this.clearLines();
     if (strs.length === 1) return this.setLine(strs[0]);
     if (strs.length < cll) {
       if (ca & 2) freeLines(this.display.getLines().slice(0, cll - strs.length));
@@ -141,15 +158,16 @@ function createTextGui(getLoc, getEditText, str = '') {
     strs.forEach((v, i) => {
       const l = this.display.getLine(ca & 2 ? cll - i - 1 : i);
       if (l.getText().getString() === v) return;
-      l.setText(v);
+      setTextOfDisplayLineFuckChatTriggers(l, v);
     });
+    cstr = BLANK_STRING;
     return this;
   };
   obj.addLine = function(str) {
     const i = (ca & 2) ? 0 : cll;
-    this.display.addLine(i, getLine().setText(str).setScale(cs));
+    this.display.addLine(i, setTextOfDisplayLineFuckChatTriggers(getLine().setScale(cs), str));
     cll++;
-    cstr = 'googoogAA gaa';
+    cstr = BLANK_STRING;
     return this;
   };
   obj.addLines = function(strs) {
@@ -160,7 +178,7 @@ function createTextGui(getLoc, getEditText, str = '') {
     freeLines(this.display.getLines());
     this.display.clearLines();
     cll = 0;
-    cstr = 'googoogAA gaa';
+    cstr = BLANK_STRING;
     return this;
   };
 
