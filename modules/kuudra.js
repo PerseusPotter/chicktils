@@ -9,7 +9,7 @@ import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
 import { run } from '../util/threading';
-const { gsl_sf_lambert_W0: W, intersectPL } = require('../util/math');
+const { gsl_sf_lambert_W0: W, intersectPL, normalize, rotate } = require('../util/math');
 
 /**
  * t_{heta}=y_{aw}+90
@@ -174,29 +174,29 @@ const renderReg = reg('renderWorld', () => {
 }, 'kuudra').setEnabled(new StateProp(settings._kuudraRenderPearlTarget).or(settings._kuudraRenderEmptySupplySpot).or(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks).or(settings._kuudraShowCannonAim).or(settings._kuudraBoxKuudra));
 
 const tickReg = reg('tick', () => {
-  if (settings.kuudraRenderPearlTarget) {
-    pearlLocs = dropLocs.map(({ x, y, z }) => {
-      let { phi, theta, ticks } = solvePearl(
-        x - Player.getX(),
-        y - (Player.getY() + getEyeHeight() - 0.1),
-        z - Player.getZ()
-      );
-      if (Number.isNaN(phi)) return;
-      return {
-        ...intersectPL(
-          Math.sin(phi) * Math.cos(theta),
-          Math.cos(phi),
-          Math.sin(phi) * Math.sin(theta),
-          getRenderX(),
-          getRenderY() + getEyeHeight(),
-          getRenderZ(),
-          0, 1, 0,
-          0, 140, 0
-        ),
-        ticks
-      };
-    }).filter(Boolean);
-  }
+  let look = Player.getPlayer()?.func_70040_Z();
+  if (look) look = normalize(rotate(look.field_72450_a, 0, look.field_72449_c, Math.PI / 2, 0, 0), 0.25);
+  else look = { x: 0, y: 0, z: 0 };
+  const px = Player.getX() + look.x;
+  const py = Player.getY() + getEyeHeight() - 0.1;
+  const pz = Player.getZ() + look.z;
+  pearlLocs = dropLocs.map(({ x, y, z }) => {
+    let { phi, theta, ticks } = solvePearl(x - px, y - py, z - pz);
+    if (Number.isNaN(phi)) return;
+    return {
+      ...intersectPL(
+        Math.sin(phi) * Math.cos(theta),
+        Math.cos(phi),
+        Math.sin(phi) * Math.sin(theta),
+        getRenderX(),
+        getRenderY() + getEyeHeight(),
+        getRenderZ(),
+        0, 1, 0,
+        0, 140, 0
+      ),
+      ticks
+    };
+  }).filter(Boolean);
 }, 'kuudra').setEnabled(settings._kuudraRenderPearlTarget);
 const customBossBar = createBossBar('§6﴾ §c§lKuudra§6 ﴿', () => {
   if (!kuuder) return 100_000;
