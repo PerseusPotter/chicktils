@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const src = __dirname;
-const ignore = ['chicktilshelper', '.vscode', 'node_modules', 'package.json', 'package-lock.json', 'pnpm-lock.yaml', 'chicktils.zip', '.gitignore', '.git'];
+const ignore = ['chicktilshelper', '.vscode', 'node_modules', 'package.json', 'package-lock.json', 'pnpm-lock.yaml', 'chicktils.zip', '.gitignore', '.git', '_blank.js'];
 
 const files = [];
 const dirs = [];

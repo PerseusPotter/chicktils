@@ -19,11 +19,6 @@ function loadMod() {
   log('&7ChickTils Loaded!');
 }
 
-function crashGame(txt) {
-  const cr = new (Java.type('net.minecraft.crash.CrashReport'))('ChickTils', new (Java.type('java.lang.Throwable'))(txt));
-  Client.getMinecraft().func_71404_a(cr);
-}
-
 register('command', ...args => {
   if (!args) args = ['config'];
 

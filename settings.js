@@ -571,9 +571,9 @@ export const props = {
   dungeonStairStonkHelperColor: new Property('DungeonStairStonkHelperColor', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: 'draw line to align yourself to dig down a stair\nsame as soopy but does not cut fps in half' }),
   dungeonStairStonkHelperHighlightColor: new Property('DungeonStairStonkHelperHighlightColor', page, ++sort, Property.Type.Color, 0x7DF9FF80, { desc: 'highlight stairs this color if they need to be ghosted to stonk' }),
 
-  dungeonAutoRefillPearls: new Property('DungeonAutoRefillPearls', page, ++sort, Property.Type.Toggle, false, { desc: 'automatically run /gfs to replenish used pearls' }),
+  dungeonAutoRefillPearls: new Property('DungeonAutoRefillPearls', page, ++sort, Property.Type.Toggle, false, { desc: 'automatically run /gfs to replenish used pearls', immutable: true }),
   dungeonAutoRefillPearlsAmount: new Property('DungeonAutoRefillPearlsAmount', page, ++sort, Property.Type.Integer, 16, { desc: 'amount of pearls you want to have at a time', min: 0, max: 560 }),
-  dungeonAutoRefillPearlsThreshold: new Property('DungeonAutoRefillPearlsThreshold', page, ++sort, Property.Type.Integer, 0, { desc: 'automatically replenish pearls mid run when below this amount\n0 to disable', min: 0, max: 560 }),
+  dungeonAutoRefillPearlsThreshold: new Property('DungeonAutoRefillPearlsThreshold', page, ++sort, Property.Type.Integer, 0, { desc: 'automatically replenish pearls mid run when below this amount\n0 to disable', min: 0, max: 560, immutable: true }),
   dungeonAutoRefillPearlsGhostPickFix: new Property('DungeonAutoRefillPearlsGhostPickFix', page, ++sort, Property.Type.Toggle, false, { desc: 'dont replenish when ghost pick\n(turn on if you ghost using pearls)' }),
 
   dungeonM7LBWaypoints: new Property('DungeonDragonLBWaypoints', page, ++sort, Property.Type.Toggle, false),
