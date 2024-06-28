@@ -3,7 +3,6 @@ import settings, { Property, props, setIsMain as setIsMainS } from './settings';
 import { setIsMain as setIsMainD } from './data';
 import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
-import * as Updater from './updater';
 import { centerMessage, cleanNumber } from './util/format';
 import getPing from './util/ping';
 import { getRegs } from './util/registerer';
@@ -12,68 +11,6 @@ setIsMainS();
 setIsMainD();
 const VERSION = '0.4.13';
 
-let sev;
-function tryUpdate(delay = 0) {
-  if (!settings.autoUpdate) return;
-  try {
-    const m = Updater.loadMeta();
-    const v = Updater.getVersion(m);
-    if (v === VERSION) return -1;
-    if (delay > 0) Thread.sleep(delay);
-    const u = Updater.getAssetURL(m);
-    try {
-      Updater.downloadUpdate(u);
-    } catch (e) {
-      if (settings.isDev) log('failed to download update:', e, e.stack);
-      else log('failed to download update');
-      centerMessage(new Message(new TextComponent('&nClick to Manually Update').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
-      return 1;
-    }
-    const vv = Updater.getCurrVV();
-    const uvv = Updater.getUpdateVV();
-    sev = vv.findIndex((v, i) => v < uvv[i]);
-    if (sev < 0) { // if i fuck up idk
-      Updater.deleteDownload();
-      return -1;
-    }
-    ChatLib.chat(centerMessage('&9&lChickTils &r&5Update Found!'));
-    centerMessage(new Message(new TextComponent('&3&nClick To View').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
-    ChatLib.chat(centerMessage(`&4v${VERSION} &r-> &2v${v}`));
-    ChatLib.chat('')
-    if (sev === 0) ChatLib.chat(centerMessage('&l&cNote: Your game will be restarted.'));
-    else if (sev === 1 || (sev === 2 && !settings.isDev)) ChatLib.chat(centerMessage('&l&cNote: Your CT Modules will be reloaded.'));
-    else {
-      ChatLib.chat(centerMessage('&l&cNote: ChickTils will be reloaded.'));
-      ChatLib.chat(centerMessage('&l&c(but you already knew that)'));
-    }
-    centerMessage(new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'))).chat();
-    setTimeout(() => {
-      silentUpdate = true;
-      ChatLib.command('csmupdate deny', true);
-    }, 10_000);
-    return 0;
-  } catch (e) {
-    if (settings.isDev) log('failed to fetch update:', e, e.stack);
-    else log('failed to fetch update');
-  }
-}
-let silentUpdate = false;
-register('command', res => {
-  if (sev === undefined) {
-    if (!silentUpdate) log('there is not an update pending');
-  } else if (res === 'accept') {
-    Updater.applyUpdate();
-    if (sev === 0) crashGame('updating !');
-    if (sev === 1) Java.type('com.chattriggers.ctjs.Reference').reloadCT();
-    if (sev === 2) settings.isDev ? ChatLib.command('chicktils reload', true) : Java.type('com.chattriggers.ctjs.Reference').reloadCT();
-    sev = void 0;
-  } else {
-    sev = void 0;
-    Updater.deleteDownload();
-    loadMod();
-  }
-  silentUpdate = false;
-}).setName('csmupdate');
 function loadMod() {
   log('&7Loading ChickTils...');
   load();
@@ -100,7 +37,6 @@ register('command', ...args => {
           `&9&l-> ChickTils v${VERSION}`,
           ' &3/chicktils &7(Alias &f/cts, /csm&7)',
           ' &3/chicktils help &l-> &bshows this help menu &7(Alias &f/chicktils ?&7)',
-          ' &3/chicktils update &l-> &bchecks for updates',
           ' &3/chicktils ping &l-> &bcurrent ping (not refreshed maybe)',
           ' &3/chicktils reload &l-> &breloads modules',
           ' &3/chicktils unload &l-> &bunloads modules',
@@ -109,11 +45,6 @@ register('command', ...args => {
           ' &3/chicktils config search <search term> &l-> &bsearches the settings',
           ' &3/chicktils stats &l-> &bshows stats'
         ].forEach(v => ChatLib.chat(v));
-        break;
-      case 'update':
-        new Thread(() => {
-          if (tryUpdate() === -1) log('You are up to date!');
-        }).start();
         break;
       case 'ping':
         log(getPing());
@@ -199,8 +130,7 @@ const worldLoadOnce = register('worldLoad', () => {
     Thread.sleep(1000);
     // TODO: check for skyblock
     settings.load();
-    if (settings.autoUpdate && tryUpdate(1000) !== -1) { }
-    else loadMod();
+    loadMod();
 
     worldLoadOnce.unregister();
   }).start();
