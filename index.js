@@ -14,6 +14,7 @@ const VERSION = '0.4.13';
 
 let sev;
 function tryUpdate(delay = 0) {
+  if (!settings.autoUpdate) return;
   try {
     const m = Updater.loadMeta();
     const v = Updater.getVersion(m);
