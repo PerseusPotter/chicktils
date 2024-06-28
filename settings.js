@@ -26,9 +26,9 @@ export class Property {
    * @param {number} pageSort
    * @param {number} type
    * @param {any} defaultValue
-   * @param {{ desc: string, min: number, max: number, len: number, options: string[] }} opts
+   * @param {{ desc: string, min: number, max: number, len: number, options: string[], immutable: boolean }} opts
    */
-  constructor(name, page, pageSort, type, defaultValue, { desc = '', min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY, len = Number.POSITIVE_INFINITY, options = [] } = {}) {
+  constructor(name, page, pageSort, type, defaultValue, { desc = '', min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY, len = Number.POSITIVE_INFINITY, options = [], immutable = false } = {}) {
     if (name.includes(' ')) throw 'bad parser deal with it';
     this.name = name;
     this.desc = desc;
@@ -37,6 +37,7 @@ export class Property {
     this.type = type;
     this.value = defaultValue;
     this.defaultValue = defaultValue;
+    this.immutable = immutable;
     this.opts = { min, max, len, options };
     this.listeners0 = [];
     this.listeners1 = [];
@@ -45,6 +46,7 @@ export class Property {
   set(v, force) {
     if (this.type === Property.Type.Action) return;
     if (!force && v === this.value) return;
+    if (this.immutable) throw 'sorry, you arent allowed to change this! (download from github to change it)';
     this.validate(v);
     this.listeners0.forEach(cb => cb(v, old));
     const old = this.value;
@@ -457,7 +459,7 @@ let sort = 0;
 export const props = {
   // 1
   enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'toggles mod globally' }),
-  autoUpdate: new Property('CheckForUpdates', page, ++sort, Property.Type.Toggle, true, { desc: 'check for updates when loaded' }),
+  autoUpdate: new Property('CheckForUpdates', page, ++sort, Property.Type.Toggle, false, { desc: 'check for updates when loaded', immutable: true }),
   isDev: new Property('IsDev', page, ++sort, Property.Type.Toggle, false, { desc: 'negatively impacts loading performance and may spam your chat' }),
   pingRefreshDelay: new Property('PingRefreshDelay', page, ++sort, Property.Type.Number, 10, { desc: 'how often (in seconds) to refresh ping. set to 0 to disable ping. requires skytils' }),
   preferUseTracer: new Property('PreferUseTracer', page, ++sort, Property.Type.Toggle, false, { desc: 'when available, prefer to use a tracer rather than an arrow (is jittery, looks bad, and sometimes doesnt show because renderlib2d reasons)' }),
@@ -473,11 +475,11 @@ export const props = {
 
   kuudraBoxSupplies: new Property('KuudraBoxSupplies', page, ++sort, Property.Type.Toggle, true),
   kuudraBoxSuppliesColor: new Property('KuudraBoxSuppliesColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
-  kuudraBoxSuppliesEsp: new Property('KuudraBoxSuppliesEsp', page, ++sort, Property.Type.Toggle, true),
+  kuudraBoxSuppliesEsp: new Property('KuudraBoxSuppliesEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
 
   kuudraBoxChunks: new Property('KuudraBoxChunks', page, ++sort, Property.Type.Toggle, true),
   kuudraBoxChunksColor: new Property('KuudraBoxChunksColor', page, ++sort, Property.Type.Color, 0xFF00FFFF),
-  kuudraBoxChunksEsp: new Property('KuudraBoxChunksEsp', page, ++sort, Property.Type.Toggle, true),
+  kuudraBoxChunksEsp: new Property('KuudraBoxChunksEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
 
   kuudraShowCannonAim: new Property('KuudraShowCannonAim', page, ++sort, Property.Type.Toggle, true, { desc: 'render location to aim at for cannon, (useful for when client desyncs)' }),
   kuudraCannonAimColor: new Property('KuudraCannonAimColor', page, ++sort, Property.Type.Color, 0xFFFF00FF),
@@ -486,7 +488,7 @@ export const props = {
 
   kuudraBoxKuudra: new Property('KuudraBoxKuudra', page, ++sort, Property.Type.Toggle, true, { desc: 'draws box around kuudra' }),
   kuudraBoxKuudraColor: new Property('KuudraBoxKuudraColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
-  kuudraBoxKuudraEsp: new Property('KuudraBoxKuudraEsp', page, ++sort, Property.Type.Toggle, true),
+  kuudraBoxKuudraEsp: new Property('KuudraBoxKuudraEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
 
   kuudraDrawArrowToKuudra: new Property('KuudraDrawArrowToKuudra', page, ++sort, Property.Type.Toggle, true, { desc: 'draw arrow pointing to kuudra in p5' }),
   kuudraArrowToKuudraColor: new Property('KuudraArrowToKuudraColor', page, ++sort, Property.Type.Color, 0x00FFFFFF),
@@ -502,7 +504,7 @@ export const props = {
   enabledungeon: new Property('EnableDungeon', ++page, sort = 0, Property.Type.Toggle, true),
 
   dungeonBoxMobs: new Property('DungeonBoxMobs', page, ++sort, Property.Type.Toggle, true, { desc: 'draws boxes around starred mobs\nonly mobs with both nametag and corresponding entity (no ghost nametags!)' }),
-  dungeonBoxMobEsp: new Property('DungeonBoxMobEsp', page, ++sort, Property.Type.Toggle, false),
+  dungeonBoxMobEsp: new Property('DungeonBoxMobEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   dungeonBoxMobColor: new Property('DungeonBoxMobColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color for basic mobs' }),
   dungeonBoxKeyColor: new Property('DungeonBoxKeyColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color for wither/blood keys' }),
   dungeonBoxSAColor: new Property('DungeonBoxSAColor', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: 'color for SAs' }),
@@ -512,11 +514,11 @@ export const props = {
   dungeonBoxMobDisableInBoss: new Property('DungeonBoxMobDisableInBoss', page, ++sort, Property.Type.Toggle, false),
 
   dungeonBoxWither: new Property('DungeonBoxWither', page, ++sort, Property.Type.Toggle, false, { desc: 'independent from box mobs' }),
-  dungeonBoxWitherEsp: new Property('DungeonBoxWitherEsp', page, ++sort, Property.Type.Toggle, true),
+  dungeonBoxWitherEsp: new Property('DungeonBoxWitherEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   dungeonBoxWitherColor: new Property('DungeonBoxWitherColor', page, ++sort, Property.Type.Color, 0x515A0BFF),
 
   dungeonBoxIceSprayed: new Property('DungeonBoxIceSprayedMobs', page, ++sort, Property.Type.Toggle, false, { desc: 'independent from box mobs' }),
-  dungeonBoxIceSprayedEsp: new Property('DungeonBoxIceSprayedEsp', page, ++sort, Property.Type.Toggle, false),
+  dungeonBoxIceSprayedEsp: new Property('DungeonBoxIceSprayedEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   dungeonBoxIceSprayedOutlineColor: new Property('DungeonBoxIceSprayedOutlineColor', page, ++sort, Property.Type.Color, 0XADD8E6FF),
   dungeonBoxIceSprayedFillColor: new Property('DungeonBoxIceSprayedFillColor', page, ++sort, Property.Type.Color, 0XADBCE650),
 
@@ -533,7 +535,7 @@ export const props = {
   dungeonCampTimer: new Property('DungeonCampShowTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer underneath boxes' }),
   dungeonCampWireColor: new Property('DungeonCampWireColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color of wireframe' }),
   dungeonCampBoxColor: new Property('DungeonCampBoxColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color of shaded box' }),
-  dungeonCampBoxEsp: new Property('DungeonCampBoxEsp', page, ++sort, Property.Type.Toggle, false),
+  dungeonCampBoxEsp: new Property('DungeonCampBoxEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   dungeonCampSmoothTime: new Property('DungeonCampSmoothTime', page, ++sort, Property.Type.Integer, 500, { desc: 'amount of time in ms spent lerping between different guesses\n(and how often to make guesses)', min: 1 }),
   dungeonCampSkipTimer: new Property('DungeonCampDialogueSkipTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'timer until last of first 4 blood mobs spawn' }),
   moveDungeonCampSkipTimer: new Property('MoveDungeonCampSkipTimer', page, ++sort, Property.Type.Action),
@@ -598,7 +600,7 @@ export const props = {
   dungeonSpiritBearTimer: new Property('DungeonSpiritBearShowTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer above box' }),
   dungeonSpiritBearWireColor: new Property('DungeonSpiritBearWireColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color of wireframe' }),
   dungeonSpiritBearBoxColor: new Property('DungeonSpiritBearBoxColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color of shaded box' }),
-  dungeonSpiritBearBoxEsp: new Property('DungeonSpiritBearBoxEsp', page, ++sort, Property.Type.Toggle, false),
+  dungeonSpiritBearBoxEsp: new Property('DungeonSpiritBearBoxEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   dungeonSpiritBearSmoothTime: new Property('DungeonSpiritBearSmoothTime', page, ++sort, Property.Type.Integer, 500, { desc: 'amount of time in ms spent lerping between different guesses\n(and how often to make guesses)', min: 1 }),
   dungeonSpiritBearTimerHud: new Property('DungeonSpiritBearTimerHud', page, ++sort, Property.Type.Toggle, true, { desc: 'show spirit bear timer on hud' }),
   moveSpiritBearTimerHud: new Property('MoveSpiritBearTimerHud', page, ++sort, Property.Type.Action),
@@ -655,7 +657,7 @@ export const props = {
   // 6
   enablerattils: new Property('EnableRatTils', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'boxes cheese and other stuff' }),
   ratTilsBoxColor: new Property('RatTilsBoxColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
-  ratTilsBoxEsp: new Property('RatTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
+  ratTilsBoxEsp: new Property('RatTilsBoxEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   ratTilsAlertTime: new Property('RatTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
   ratTilsAlertSound: new Property('RatTilsAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   ratTilsMessage: new Property('RatTilsMessage', page, ++sort, Property.Type.Text, 'i.imgur.com/8da4IiM.png', { desc: 'empty to disable' }),
@@ -664,7 +666,7 @@ export const props = {
   // 7
   enablepowderalert: new Property('EnablePowderAlert', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'alerts when powder chest spawns' }),
   powderBoxColor: new Property('PowderBoxColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
-  powderBoxEsp: new Property('PowderBoxEsp', page, ++sort, Property.Type.Toggle, true),
+  powderBoxEsp: new Property('PowderBoxEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   powderAlertTime: new Property('PowderAlertTime', page, ++sort, Property.Type.Integer, 1000, { desc: 'in ms', min: 0 }),
   powderAlertSound: new Property('PowderAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   powderScanRange: new Property('PowderScanRange', page, ++sort, Property.Type.Integer, 10, { min: 0 }),
@@ -672,7 +674,7 @@ export const props = {
   // 8
   enablecrystalalert: new Property('EnableCrystalAlert', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'alerts when end crystals spawn' }),
   crystalBoxColor: new Property('CrystalBoxColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
-  crystalBoxEsp: new Property('CrystalBoxEsp', page, ++sort, Property.Type.Toggle, true),
+  crystalBoxEsp: new Property('CrystalBoxEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   crystalAlertTime: new Property('CrystalAlertTime', page, ++sort, Property.Type.Integer, 1000, { desc: 'in ms', min: 0 }),
   crystalAlertSound: new Property('CrystalAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
 
@@ -692,9 +694,9 @@ export const props = {
 
   // 11
   enablerabbit: new Property('EnableRabbitTils', ++page, sort = 0, Property.Type.Toggle, false),
-  rabbitSniffer: new Property('RabbitTilsSniffEggs', page, ++sort, Property.Type.Toggle, false),
+  rabbitSniffer: new Property('RabbitTilsSniffEggs', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   rabbitBoxColor: new Property('RabbitTilsBoxColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
-  rabbitBoxEsp: new Property('RabbitTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
+  rabbitBoxEsp: new Property('RabbitTilsBoxEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
   rabbitAlertEggSpawn: new Property('RabbitTilsAlertEggSpawn', page, ++sort, Property.Type.Toggle, true),
   rabbitAlertEggFound: new Property('RabbitTilsAlertEggFound', page, ++sort, Property.Type.Toggle, true),
   rabbitAlertSpawnTime: new Property('RabbitTilsAlertSpawnTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
@@ -770,7 +772,7 @@ export const props = {
 
   enableboxallentities: new Property('EnableBoxAllEntities', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
   boxAllEntitiesColor: new Property('BoxAllEntitiesColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
-  boxAllEntitiesEsp: new Property('BoxAllEntitiesEsp', page, ++sort, Property.Type.Toggle, true),
+  boxAllEntitiesEsp: new Property('BoxAllEntitiesEsp', page, ++sort, Property.Type.Toggle, false, { immutable: true }),
 
   enableexcavatorsolver: new Property('EnableExcavatorSolver', page, ++sort, Property.Type.Toggle, false, { desc: 'find fossils' }),
   excavatorSolverOnlyShowBest: new Property('ExcavatorSolverOnlyHighlightBest', page, ++sort, Property.Type.Toggle, true, { desc: 'only highlight the best move' }),
