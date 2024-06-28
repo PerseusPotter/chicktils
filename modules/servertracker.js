@@ -31,6 +31,7 @@ const warpLocs = {
   'castle': 2,
   'crypts': 2,
   'crypt': 2,
+  'wizard': 2,
   'dungeon_hub': 3,
   'dungeons': 3,
   'dhub': 3,
