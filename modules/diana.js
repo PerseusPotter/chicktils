@@ -241,6 +241,8 @@ const unloadReg = reg('worldUnload', () => {
   renderWrldReg.unregister();
   tickReg.unregister();
   fixStReg.unregister();
+  soundPlayReg.unregister();
+  spawnPartReg.unregister();
   targetLoc = null;
   guessLoc = null;
 }, 'diana');
