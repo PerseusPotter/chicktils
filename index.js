@@ -259,7 +259,7 @@ register('command', () => {
   const tickerTicksS = new (Java.type('java.util.concurrent.ConcurrentLinkedQueue'))();
   const ActualThread = Java.type('java.lang.Thread');
   const System = Java.type('java.lang.System');
-  const freezeDur = 1000 * 1e6;
+  const freezeDur = 100 * 1e6;
   let tickData = { c: 0 };
   let tickFreezes = [];
   function filterTickData(data) {
@@ -279,7 +279,7 @@ register('command', () => {
     tickerThreads.push(new ActualThread(() => {
       let startT = 0;
       while (!ActualThread.interrupted()) {
-        ActualThread.sleep(0, 1e5);
+        // ActualThread.sleep(0, 2e4);
         let t = System.nanoTime();
         if (!startT) startT = t;
         t -= startT;
