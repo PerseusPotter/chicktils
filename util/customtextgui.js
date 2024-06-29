@@ -115,6 +115,7 @@ function createTextGui(getLoc, getEditText, str = '') {
       ca = a;
       obj.display.setAlign(a & 1 ? 'RIGHT' : 'LEFT');
       obj.display.setOrder(a & 2 ? 'UP' : 'DOWN');
+      if (a === 4) obj.display.setAlign('CENTER');
       update = true;
     }
     if (update) updateLoc();
