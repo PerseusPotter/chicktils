@@ -339,7 +339,8 @@ register('command', () => {
     new Thread(() => {
       ActualThread.sleep(100);
       tickData = filterTickData(tickData);
-      FileLib.write('chicktils', 'tickerreport.json', JSON.stringify({ total: tickData, freezes: tickFreezes.sort((a, b) => (b.fp - b.ap) - (a.fp - a.ap)) }, null, 2));
+      // FileLib.write('chicktils', 'tickerreport.json', JSON.stringify({ total: tickData, freezes: tickFreezes.sort((a, b) => (b.fp - b.ap) - (a.fp - a.ap)) }, null, 2));
+      FileLib.write('chicktils', 'tickerreport.json', JSON.stringify({ total: tickData, freezes: tickFreezes }, null, 2));
       tickerTicksT.clear();
       tickerTicksS.clear();
       log('ticker report generated');
