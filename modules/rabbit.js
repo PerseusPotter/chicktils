@@ -76,8 +76,12 @@ const eggRenWrldReg = reg('renderWorld', () => {
 }, 'rabbit').setEnabled(stateIsSpring);
 const eggRendOvReg = reg('renderOverlay', () => {
   if (eggs.length === 0) return;
-  eggs.sort((a, b) => Player.asPlayerMP().distanceTo(a) - Player.asPlayerMP().distanceTo(b));
-  pointTo3D(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
+  let closest = eggs.reduce((a, v) => {
+    const d = Player.asPlayerMP().distanceTo(v);
+    if (d < a[0]) return [d, v];
+    return a;
+  }, [Number.POSITIVE_INFINITY, null])[1];
+  pointTo3D(settings.rabbitBoxColor, closest.getX(), closest.getY() + 1.75, closest.getZ(), false);
 }, 'rabbit').setEnabled(stateIsSpring);
 
 const guiReg = reg('guiOpened', evn => {
