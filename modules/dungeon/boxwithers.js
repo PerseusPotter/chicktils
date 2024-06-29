@@ -8,8 +8,9 @@ let withers = [];
 
 const stateBoxWithers = new StateProp(stateFloor).equalsmult('F7', 'M7').and(settings._dungeonBoxWither).and(stateIsInBoss);
 
+const EntityWither = Java.type('net.minecraft.entity.boss.EntityWither');
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
-  if (evn.entity.getClass().getSimpleName() === 'EntityWither') withers.push(new EntityLivingBase(evn.entity));
+  if (evn.entity instanceof EntityWither) withers.push(new EntityLivingBase(evn.entity));
 }, 'dungeon/boxwithers').setEnabled(stateBoxWithers);
 const tickReg = reg('tick', () => withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither' && v.getMaxHP() !== 300), 'dungeon/boxwithers').setEnabled(stateBoxWithers);
 const renderWorldReg = reg('renderWorld', () => {

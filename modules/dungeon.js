@@ -41,18 +41,26 @@ export const stateFloor = new StateVar('');
 export function listenBossMessages(cb) {
   bossCbs.push(cb);
 }
-export function isMob(name) {
-  return isDungeonMob(name) ||
-    name === 'EntityWither' ||
-    name === 'EntityGiantZombie' ||
-    name === 'EntityIronGolem' ||
-    name === 'EntityDragon';
+const EntityWither = Java.type('net.minecraft.entity.boss.EntityWither');
+const EntityGiantZombie = Java.type('net.minecraft.entity.monster.EntityGiantZombie');
+const EntityIronGolem = Java.type('net.minecraft.entity.monster.EntityIronGolem');
+const EntityDragon = Java.type('net.minecraft.entity.boss.EntityDragon');
+const EntityZombie = Java.type('net.minecraft.entity.monster.EntityZombie');
+const EntitySkeleton = Java.type('net.minecraft.entity.monster.EntitySkeleton');
+const EntityOtherPlayerMP = Java.type('net.minecraft.client.entity.EntityOtherPlayerMP');
+const EntityEnderman = Java.type('net.minecraft.entity.monster.EntityEnderman');
+export function isMob(ent) {
+  return isDungeonMob(ent) ||
+    ent instanceof EntityWither ||
+    ent instanceof EntityGiantZombie ||
+    ent instanceof EntityIronGolem ||
+    ent instanceof EntityDragon;
 }
-export function isDungeonMob(name) {
-  return name === 'EntityZombie' ||
-    name === 'EntitySkeleton' ||
-    name === 'EntityOtherPlayerMP' ||
-    name === 'EntityEnderman';
+export function isDungeonMob(ent) {
+  return ent instanceof EntityZombie ||
+    ent instanceof EntitySkeleton ||
+    ent instanceof EntityOtherPlayerMP ||
+    ent instanceof EntityEnderman;
 }
 export function roundRoomCoords(c) {
   return ((c + 8) & 0b11111111111111111111111111100000) - 8;
@@ -60,7 +68,7 @@ export function roundRoomCoords(c) {
 
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
-  if (e.getClass().getSimpleName() === 'EntityOtherPlayerMP' && e.func_110124_au().version() === 4) {
+  if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) {
     const p = players.find(v => v.ign === e.func_70005_c_());
     if (p) p.e = new EntityLivingBase(e);
   }
@@ -87,8 +95,7 @@ const getPlayersStep2Reg = reg('step', () => {
       players.push({ ign: getPlayerName(s), class: m[1], e: null });
     }
     if (players.length) {
-      World.getAllEntities().forEach(v => {
-        if (v.getClassName() !== 'EntityOtherPlayerMP') return;
+      World.getAllEntitiesOfType(EntityOtherPlayerMP).forEach(v => {
         const player = players.find(p => p.ign === v.getName());
         if (player) player.e = new EntityLivingBase(v.entity);
       });

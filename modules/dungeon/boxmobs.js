@@ -31,25 +31,28 @@ function getBoxMobType(n) {
 
   return 4;
 }
+const EntityZombie = Java.type('net.minecraft.entity.monster.EntityZombie');
+const EntitySkeleton = Java.type('net.minecraft.entity.monster.EntitySkeleton');
+const EntityOtherPlayerMP = Java.type('net.minecraft.client.entity.EntityOtherPlayerMP');
+const EntityEnderman = Java.type('net.minecraft.entity.monster.EntityEnderman');
 function matchesMobType(n, e) {
-  const c = e.getClass().getSimpleName();
-  if (n.includes('Zombie Commander', 6)) return c === 'EntityOtherPlayerMP';
-  if (n.includes('Zombie', 6)) return c === 'EntityZombie';
-  if (n.includes('Skele', 6)) return c === 'EntitySkeleton';
-  if (n.includes('Fels', 6)) return c === 'EntityEnderman';
-  if (n.includes('Withermancer', 6)) return c === 'EntitySkeleton' && e.func_82202_m() === 1;
-  if (n.includes('Crypt Lurker', 6)) return c === 'EntityZombie';
-  if (n.includes('Super Archer', 6)) return c === 'EntitySkeleton';
-  if (n.includes('Sniper', 6)) return c === 'EntitySkeleton';
-  return c === 'EntityOtherPlayerMP';
+  if (n.includes('Zombie Commander', 6)) return e instanceof EntityOtherPlayerMP;
+  if (n.includes('Zombie', 6)) return e instanceof EntityZombie;
+  if (n.includes('Skele', 6)) return e instanceof EntitySkeleton;
+  if (n.includes('Fels', 6)) return e instanceof EntityEnderman;
+  if (n.includes('Withermancer', 6)) return e instanceof EntitySkeleton && e.func_82202_m() === 1;
+  if (n.includes('Crypt Lurker', 6)) return e instanceof EntityZombie;
+  if (n.includes('Super Archer', 6)) return e instanceof EntitySkeleton;
+  if (n.includes('Sniper', 6)) return e instanceof EntitySkeleton;
+  return e instanceof EntityOtherPlayerMP;
 }
 
+const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
-  const c = e.getClass().getSimpleName();
-  if (c === 'EntityArmorStand') {
+  if (e instanceof EntityArmorStand) {
     if (settings.dungeonBoxMobs && !stateIsInBoss.get()) nameCand.push(e);
-  } else if (isDungeonMob(c)) newMobCands.push(e);
+  } else if (isDungeonMob(e)) newMobCands.push(e);
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const step2Reg = reg('step', () => {
   run(() => {

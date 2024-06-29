@@ -38,9 +38,10 @@ function addSkull(skull) {
   bloodMobs.push(skull);
 }
 
+const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
-  if (e.getClass().getSimpleName() === 'EntityArmorStand') possibleSkulls.push(e);
+  if (e instanceof EntityArmorStand) possibleSkulls.push(e);
 }, 'dungeon/camp').setEnabled(stateCamp);
 const tickReg = reg('tick', () => {
   run(() => {
@@ -53,7 +54,7 @@ const tickReg = reg('tick', () => {
           const ent = new Entity(e);
           bloodX = roundRoomCoords(ent.getX());
           bloodZ = roundRoomCoords(ent.getZ());
-          World.getAllEntitiesOfType(net.minecraft.entity.item.EntityArmorStand).forEach(e => isSkull(e.entity) && addSkull(e));
+          World.getAllEntitiesOfType(EntityArmorStand).forEach(e => isSkull(e.entity) && addSkull(e));
         }
       } else addSkull(new Entity(e));
     });

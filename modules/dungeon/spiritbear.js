@@ -38,12 +38,13 @@ function resetFM4Vars() {
   lastY = bearParticleHeightCap;
 }
 
+const EntityGhast = Java.type('net.minecraft.entity.monster.EntityGhast');
 const tickReg = reg('tick', () => {
   if (World.getBlockAt(7, 77, 34).type.getID() !== 169) return justSpawned = false;
   if (justSpawned) return;
   prevTime = Date.now();
   ticks.set(bearSpawnTicks);
-  const thorn = World.getAllEntities().find(v => v.getClassName() === 'EntityGhast');
+  const thorn = World.getAllEntitiesOfType(EntityGhast)[0];
   if (!thorn) {
     log('cannot find thorn');
     est = estPrev = fm4Center;
@@ -57,8 +58,9 @@ const tickReg = reg('tick', () => {
   }
 }, 'dungeon/spiritbear').setEnabled(new StateProp(ticks).equals(0).and(stateInFM4));
 const serverTickReg = reg('packetReceived', () => ticks.set(ticks.get() - 1), 'dungeon/spiritbear').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBearSpawning);
+const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
-  if (id.toString() !== 'SPELL_MOB') return;
+  if (id !== EnumParticleTypes.SPELL_MOB) return;
   const pos = { x: part.getX(), y: part.getY(), z: part.getZ(), t: ticks.get() };
   if (pos.y < fm4Center.y || pos.y > lastY || Math.hypot(pos.x - fm4Center.x, pos.z - fm4Center.z) > 10) return;
 

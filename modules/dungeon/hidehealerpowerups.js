@@ -18,9 +18,10 @@ let powerupCand = [];
 const hiddenPowerups = new (Java.type('java.util.HashSet'))();
 const hiddenPowerupsBucket = new Grid({ size: 0, addNeighbors: 1 });
 
+const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
-  if (e.getClass().getSimpleName() === 'EntityArmorStand') powerupCand.push([Date.now(), e]);
+  if (e instanceof EntityArmorStand) powerupCand.push([Date.now(), e]);
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const tickReg = reg('tick', () => {
   run(() => {
@@ -55,8 +56,9 @@ const tickReg = reg('tick', () => {
     });
   });
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
+const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
-  if (id.toString() !== 'REDSTONE') return;
+  if (id !== EnumParticleTypes.REDSTONE) return;
   const b = part.underlyingEntity.func_70535_g();
   if (b === 0 || b > 10) return;
   if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
