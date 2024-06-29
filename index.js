@@ -251,3 +251,98 @@ register('command', () => {
     isTesting = false;
   }).start();
 }).setName('ChickTilsRunTest');
+
+(function() {
+  let isTicking = false;
+  let tickerThreads = [];
+  const tickerTicksT = new (Java.type('java.util.concurrent.ConcurrentLinkedQueue'))();
+  const tickerTicksS = new (Java.type('java.util.concurrent.ConcurrentLinkedQueue'))();
+  const ActualThread = Java.type('java.lang.Thread');
+  const System = Java.type('java.lang.System');
+  const freezeDur = 1000 * 1e6;
+  let tickData = { c: 0 };
+  let tickFreezes = [];
+  function filterTickData(data) {
+    // const filtered = Object.entries(data).filter(v => v[0] !== 'c' && v[1].t > 0).sort((a, b) => b[1].c - a[1].c);
+    const filtered = Object.entries(data).filter(v => v[0] !== 'c').sort((a, b) => b[1].c - a[1].c);
+    filtered.forEach(v => v[1] = Object.entries(v[1]).sort((a, b) => (b[0].length === 1 ? Number.MAX_SAFE_INTEGER : b[1]) - (a[0].length === 1 ? Number.MAX_SAFE_INTEGER : a[1])).reduce((a, v) => ((a[v[0]] = v[1]), a), {}));
+    return filtered.reduce((a, v) => ((a[v[0]] = v[1]), a), { c: data.c });
+  }
+  register('command', () => {
+    if (isTicking) return log('already running ticker');
+    isTicking = true;
+
+    tickData = { c: 0 };
+    tickFreezes = [];
+    const mainThread = Thread.currentThread();
+
+    tickerThreads.push(new ActualThread(() => {
+      let startT = 0;
+      while (!ActualThread.interrupted()) {
+        ActualThread.sleep(0, 1e5);
+        let t = System.nanoTime();
+        if (!startT) startT = t;
+        t -= startT;
+        tickerTicksT.add(t);
+        tickerTicksS.add(mainThread.getStackTrace());
+      }
+    }));
+
+    tickerThreads.push(new ActualThread(() => {
+      let freezeData = { c: 0 };
+      let ptb = 0;
+
+      while (!ActualThread.interrupted()) {
+        // ActualThread.sleep(0, 1e5);
+        ActualThread.sleep(1);
+
+        while (!tickerTicksT.isEmpty() && !tickerTicksS.isEmpty()) {
+          let t = tickerTicksT.poll();
+          let stack = tickerTicksS.poll();
+          let prev = stack[0].toString();
+          for (let i = 1; i < stack.length; i++) {
+            let dataT = tickData[prev] || (tickData[prev] = { c: 0, t: 0 });
+            let dataF = freezeData[prev] || (freezeData[prev] = { c: 0, t: 0 });
+            dataT[stack[i]] = (dataT[stack[i]] || 0) + 1;
+            dataF[stack[i]] = (dataF[stack[i]] || 0) + 1;
+            dataT.c++;
+            dataF.c++;
+            if (i === 1) dataT.t++;
+            if (i === 1) dataF.t++;
+            prev = stack[i].toString();
+          }
+          tickData.c++;
+          freezeData.c++;
+
+          const tb = ~~(t / freezeDur);
+          if (tb !== ptb) {
+            ptb = tb;
+            const data = filterTickData(freezeData);
+            freezeData = { c: 0 };
+            Object.entries(data).forEach(([k, v]) => {
+              const fp = v.c / data.c;
+              const ap = tickData[k].c / tickData.c;
+              if (fp - ap > 0.2 && fp / ap > 1.3) tickFreezes.push({ t: t / 1e9, fp, ap, k, vc: v.c, dc: data.c });
+            });
+          }
+        }
+      }
+    }));
+    tickerThreads.forEach(v => v.start());
+  }).setName('ChickTilsRunTicker');
+
+  register('command', () => {
+    if (!isTicking) return log('ticker not running');
+    isTicking = false;
+    tickerThreads.forEach(v => v.interrupt());
+    tickerThreads = [];
+    new Thread(() => {
+      ActualThread.sleep(100);
+      tickData = filterTickData(tickData);
+      FileLib.write('chicktils', 'tickerreport.json', JSON.stringify({ total: tickData, freezes: tickFreezes.sort((a, b) => (b.fp - b.ap) - (a.fp - a.ap)) }, null, 2));
+      tickerTicksT.clear();
+      tickerTicksS.clear();
+      log('ticker report generated');
+    }).start();
+  }).setName('ChickTilsStopTicker');
+}());
