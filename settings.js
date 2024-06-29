@@ -815,6 +815,6 @@ const pageNames = [
  *
  * @type {Settings & Record<keyof typeof props, string | number | boolean> & { [K: string]: Property }}
  */
-const inst = new Settings('ChickTils', 'settings.json', props, pageNames);
+const settings = new Settings('ChickTils', 'settings.json', props, pageNames);
 
-export default inst;
+export default settings;
