@@ -198,17 +198,19 @@ const customBossBar = createBossBar('§6﴾ §c§lKuudra§6 ﴿', () => {
   if (h <= 25_000) return h * 4;
   return (h - 25_000) / 3 * 4;
 }, 100_000);
+const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
+const EntityMagmaCube = Java.type('net.minecraft.entity.monster.EntityMagmaCube');
 const updateReg1 = reg('step', () => {
   if (settings.kuudraBoxSupplies) supplies = supplies.filter(v => !v.isDead());
   if (settings.kuudraBoxChunks) chunks = chunks.filter(v => !v.isDead());
   run(() => {
     World.getAllEntities().forEach(e => {
-      if (e.getName() === '§a§l✓ SUPPLIES RECEIVED ✓') {
+      if (e instanceof EntityArmorStand && e.getName() === '§a§l✓ SUPPLIES RECEIVED ✓') {
         dropLocs.forEach(v => v.d = (v.x - e.getX()) ** 2 + (v.z - e.getZ()) ** 2);
         dropLocs.sort((a, b) => a.d - b.d);
         if (dropLocs.length > 0 && dropLocs[0].d < 4) dropLocs.shift();
       }
-      if (e.getClassName() === 'EntityMagmaCube' && e.entity.func_70809_q() === 30 && e.entity.func_110143_aJ() <= 100_000) kuuder = new EntityLivingBase(e.entity);
+      if (e instanceof EntityMagmaCube && e.entity.func_70809_q() === 30 && e.entity.func_110143_aJ() <= 100_000) kuuder = new EntityLivingBase(e.entity);
     });
   });
 }, 'kuudra').setFps(1);
@@ -255,14 +257,14 @@ const dirOverlayReg = reg('renderOverlay', () => {
   drawArrow2D(settings.kuudraArrowToKuudraColor, kt * Math.PI, 20, Player.getY() > 60 ? 0 : undefined);
 }, 'kuudra').setEnabled(settings._kuudraDrawArrowToKuudra);
 
+const EntityGiantZombie = Java.type('net.minecraft.entity.monster.EntityGiantZombie');
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
-  if (evn.entity.getClass().getSimpleName() === 'EntityGiantZombie') {
-    const e = new Entity(evn.entity);
-    const y = e.getY();
-    if (y < 60) chunks.push(e);
-    else if (y < 67) supplies.push(e);
-    else if (y < 80) chunks.push(e);
-  }
+  if (!(evn.entity instanceof EntityGiantZombie));
+  const e = new Entity(evn.entity);
+  const y = e.getY();
+  if (y < 60) chunks.push(e);
+  else if (y < 67) supplies.push(e);
+  else if (y < 80) chunks.push(e);
 }, 'kuudra').setEnabled(new StateProp(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks));
 
 const cannonReg = reg('chat', () => {

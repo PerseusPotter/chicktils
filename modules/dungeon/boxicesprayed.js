@@ -13,24 +13,23 @@ let newAllMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
 let itemCand = [];
 let frozenMobs = [];
+const EntityItem = Java.type('net.minecraft.entity.item.EntityItem');
+const EntityOtherPlayerMP = Java.type('net.minecraft.entity.client.EntityOtherPlayerMP');
+const EntityWither = Java.type('net.minecraft.entity.boss.EntityWither');
 
 const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
   const e = evn.entity;
-  const c = e.getClass().getSimpleName();
-  if (isMob(c)) newAllMobs.push(e);
-  else if (c === 'EntityItem') itemCand.push(e);
+  if (isMob(e)) {
+    if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) return;
+    if (e instanceof EntityWither && e.func_110138_aP() === 300) return;
+    newAllMobs.push(e);
+  } else if (e instanceof EntityItem) itemCand.push(e);
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
   run(() => {
     allMobsBucket.clear();
     allMobs = allMobs.filter(e => {
       if (e.field_70128_L) return false;
-      const c = e.getClass().getSimpleName();
-      if (c === 'EntityOtherPlayerMP') {
-        if (e.func_110124_au().version() === 4) return false;
-      } else if (c === 'EntityWither') {
-        if (e.func_110138_aP() === 300) return false;
-      }
       allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
       return true;
     });

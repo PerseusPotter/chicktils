@@ -5,10 +5,11 @@ import reg from '../util/registerer';
 
 const crystalAlert = createAlert('crystals respawned', 2);
 let crystals = [];
+const EntityEnderCrystal = Java.type('net.minecraft.entity.item.EntityEnderCrystal');
 function updateCrystals() {
   Client.scheduleTask(5, () => {
     const oldCount = crystals.length;
-    crystals = World.getAllEntities().filter(v => v.getClassName() === 'EntityEnderCrystal').map(v => ({ x: v.getX(), y: v.getY(), z: v.getZ(), w: 2, h: 2 }));
+    crystals = World.getAllEntitiesOfType(EntityEnderCrystal).map(v => ({ x: v.getX(), y: v.getY(), z: v.getZ(), w: 2, h: 2 }));
     if (oldCount === crystals.length) return;
     crystalAlert.text = 'Crystal x' + crystals.length;
     crystalAlert.show(settings.crystalAlertTime);

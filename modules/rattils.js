@@ -18,9 +18,9 @@ function reset() {
   unloadReg.unregister();
 }
 const unloadReg = reg('worldUnload', () => reset(), 'rattils');
+const EntityItem = Java.type('net.minecraft.entity.item.EntityItem');
 function scanCheese() {
-  cheese = World.getAllEntities().filter(v => {
-    if (v.getClassName() !== 'EntityItem') return false;
+  cheese = World.getAllEntitiesOfType(EntityItem).filter(v => {
     /*
     {
       SkullOwner: {

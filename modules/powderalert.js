@@ -5,8 +5,9 @@ import reg from '../util/registerer';
 
 let chests = [];
 const chestAlert = createAlert('chest');
+const PlayerInteractEventAction = Java.type('net.minecraftforge.event.entity.player.PlayerInteractEvent').Action;
 const rcReg = reg('playerInteract', (action, pos) => {
-  if (action.toString() !== 'RIGHT_CLICK_BLOCK') return;
+  if (action !== PlayerInteractEventAction.RIGHT_CLICK_BLOCK) return;
   let i = chests.findIndex(v => v.x === pos.x && v.y === pos.y && v.z === pos.z);
   if (i >= 0) chests.splice(i, 1);
 }, 'powderalert');

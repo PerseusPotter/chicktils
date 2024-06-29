@@ -7,9 +7,10 @@ import { stateIsInBoss } from '../dungeon.js';
 
 const iceSprayAlert = createAlert('ice spray :O', 10);
 
+const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const step2Reg = reg('step', () => {
   run(() => {
-    if (World.getAllEntities().some(e => e.getClassName() === 'EntityArmorStand' && e.getName().includes('Ice Spray Wand'))) iceSprayAlert.show(settings.dungeonIceSprayAlertTime);
+    if (World.getAllEntitiesOfType(EntityArmorStand).some(e => e.getName().includes('Ice Spray Wand'))) iceSprayAlert.show(settings.dungeonIceSprayAlertTime);
   });
 }, 'dungeon/icesprayalert').setFps(2).setEnabled(new StateProp(stateIsInBoss).not().and(settings._dungeonIceSprayAlert));
 
