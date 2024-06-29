@@ -97,9 +97,19 @@ const renderReg = reg('renderWorld', () => {
     const c = settings.kuudraPearlTargetColor;
     const timeLeft = ticksUntilPickup - (Date.now() - pickupStart) - getPing();
     pearlLocs.forEach(v => {
-      drawLine3D(c, v.x - 1, v.y, v.z - 1, v.x + 1, v.y, v.z + 1, 5);
-      drawLine3D(c, v.x - 1, v.y, v.z + 1, v.x + 1, v.y, v.z - 1, 5);
-      drawString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', v.x, v.y + 1, v.z, rgbaToARGB(c));
+      const { x, y, z } = intersectPL(
+        Math.sin(v.phi) * Math.cos(v.theta),
+        Math.cos(v.phi),
+        Math.sin(v.phi) * Math.sin(v.theta),
+        getRenderX(),
+        getRenderY() + getEyeHeight(),
+        getRenderZ(),
+        0, 1, 0,
+        0, 140, 0
+      );
+      drawLine3D(c, x - 1, y, z - 1, x + 1, y, z + 1, 5);
+      drawLine3D(c, x - 1, y, z + 1, x + 1, y, z - 1, 5);
+      drawString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x, y + 1, z, rgbaToARGB(c));
     });
   }
   if (settings.kuudraRenderEmptySupplySpot && dropLocs.length > 0) {
@@ -180,23 +190,7 @@ const tickReg = reg('tick', () => {
   const px = Player.getX() + look.x;
   const py = Player.getY() + getEyeHeight() - 0.1;
   const pz = Player.getZ() + look.z;
-  pearlLocs = dropLocs.map(({ x, y, z }) => {
-    let { phi, theta, ticks } = solvePearl(x - px, y - py, z - pz);
-    if (Number.isNaN(phi)) return;
-    return {
-      ...intersectPL(
-        Math.sin(phi) * Math.cos(theta),
-        Math.cos(phi),
-        Math.sin(phi) * Math.sin(theta),
-        getRenderX(),
-        getRenderY() + getEyeHeight(),
-        getRenderZ(),
-        0, 1, 0,
-        0, 140, 0
-      ),
-      ticks
-    };
-  }).filter(Boolean);
+  pearlLocs = dropLocs.map(({ x, y, z }) => solvePearl(x - px, y - py, z - pz)).filter(v => !Number.isNaN(v.phi));
 }, 'kuudra').setEnabled(settings._kuudraRenderPearlTarget);
 const customBossBar = createBossBar('§6﴾ §c§lKuudra§6 ﴿', () => {
   if (!kuuder) return 100_000;
