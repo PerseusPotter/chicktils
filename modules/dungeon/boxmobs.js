@@ -10,7 +10,6 @@ import { run } from '../../util/threading';
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(stateIsInBoss).not()));
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
 let mobCand = [];
-let newMobCands = [];
 let nameCand = [];
 const mobCandBucket = new Grid();
 
@@ -51,7 +50,10 @@ const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand')
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) {
     if (settings.dungeonBoxMobs && !stateIsInBoss.get()) nameCand.push(e);
-  } else if (isDungeonMob(e)) newMobCands.push(e);
+  } else if (isDungeonMob(e)) {
+    mobCand.push(e);
+    mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
+  }
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const step2Reg = reg('step', () => {
   run(() => {
@@ -72,12 +74,6 @@ const step2Reg = reg('step', () => {
 }, 'dungeon/boxmobs').setFps(2).setEnabled(stateBoxMob);
 const tickReg = reg('tick', () => {
   run(() => {
-    newMobCands.forEach(e => {
-      mobCand.push(e);
-      mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
-    });
-    newMobCands = [];
-
     nameCand = nameCand.filter(e => {
       if (e.field_70128_L) return;
       const n = e.func_70005_c_();
@@ -120,7 +116,6 @@ const renderEntPostReg = reg('postRenderEntity', (e, pos, partial) => {
 export function init() { }
 export function start() {
   mobCand = [];
-  newMobCands = [];
   nameCand = [];
   mobCandBucket.clear();
 

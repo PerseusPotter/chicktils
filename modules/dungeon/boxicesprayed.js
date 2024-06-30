@@ -9,7 +9,6 @@ import { getPlayers, isMob, registerTrackPlayers } from '../dungeon.js';
 import { run } from '../../util/threading';
 
 let allMobs = [];
-let newAllMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
 let itemCand = [];
 let frozenMobs = [];
@@ -21,7 +20,8 @@ const entSpawnReg = reg('spawnEntity', e => {
   if (isMob(e)) {
     if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) return;
     if (e instanceof EntityWither && e.func_110138_aP() === 300) return;
-    newAllMobs.push(e);
+    allMobs.push(e);
+    allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
   } else if (e instanceof EntityItem) itemCand.push(e);
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
@@ -38,12 +38,6 @@ const step2Reg = reg('step', () => {
 }, 'dungeon/boxicesprayed').setFps(2).setEnabled(settings._dungeonBoxIceSprayed);
 const tickReg = reg('tick', () => {
   run(() => {
-    newAllMobs.forEach(e => {
-      allMobs.push(e);
-      allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
-    });
-    newAllMobs = [];
-
     const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');
     itemCand = [];
     if (hasIce) {
@@ -149,7 +143,6 @@ export function init() {
 }
 export function start() {
   allMobs = [];
-  newAllMobs = [];
   allMobsBucket.clear();
   itemCand = [];
   frozenMobs = [];
