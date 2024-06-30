@@ -8,6 +8,7 @@ import { centerMessage, cleanNumber } from './util/format';
 import getPing from './util/ping';
 import { getRegs } from './util/registerer';
 import { calcMedian } from './util/math';
+import { _setTimeout } from './util/timers';
 setIsMainS();
 setIsMainD();
 const VERSION = '0.5.0';
@@ -46,7 +47,7 @@ function tryUpdate(delay = 0) {
       ChatLib.chat(centerMessage('&l&c(but you already knew that)'));
     }
     centerMessage(new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'))).chat();
-    setTimeout(() => {
+    _setTimeout(() => {
       silentUpdate = true;
       ChatLib.command('csmupdate deny', true);
     }, 10_000);

@@ -8,6 +8,7 @@ import { StateProp, StateVar } from '../util/state';
 import { run } from '../util/threading';
 import { dither, fromImage, fromURL, grayscale, guassian, resize, sharpen, sobel } from '../util/image';
 import { getImage } from '../util/clipboard';
+import { _setTimeout } from '../util/timers';
 
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
@@ -295,7 +296,7 @@ function printNextLine() {
   else l += imgArtId++;
   if (settings.chatTilsImageArtParty) l = '/pc ' + l;
   ChatLib.say(l);
-  setTimeout(() => {
+  _setTimeout(() => {
     helper.deleteMessages([nextArtLineMsg.getFormattedText()]);
     if (imgArtLines.length) {
       if (settings.chatTilsImageArtAutoPrint) printNextLine();

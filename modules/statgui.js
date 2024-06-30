@@ -2,6 +2,7 @@ import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
 import reg from '../util/registerer';
+import { _setTimeout } from '../util/timers';
 
 const locs = [
   'Private Island',
@@ -48,14 +49,14 @@ function loadListeners(tries = 0) {
     // npe at com.chattriggers.ctjs.minecraft.wrappers.TabList.getNames(TabList.kt:37) whenever player gets kicked
     return;
   }
-  if (!loc) return (tries > 0) && setTimeout(() => loadListeners(tries - 1), 1000);
+  if (!loc) return (tries > 0) && _setTimeout(() => loadListeners(tries - 1), 1000);
   currLoc = locs.indexOf(loc);
   if (currLoc >= 0 && settings['loc' + currLoc]) {
     updateReg.register();
     renderReg.register();
   } else unloadListeners();
 }
-const loadReg = reg('worldLoad', () => setTimeout(() => loadListeners(10), 1000), 'statgui');
+const loadReg = reg('worldLoad', () => _setTimeout(() => loadListeners(10), 1000), 'statgui');
 
 function unloadListeners() {
   // currLoc = -1;
