@@ -3,6 +3,7 @@ import tabCompletion from '../util/tabcompletion';
 import settings from '../settings';
 import { log } from '../util/log';
 import reg from '../util/registerer';
+import { _setTimeout } from '../util/timers';
 
 const servers = {};
 let lastWarp = 0;
@@ -83,7 +84,7 @@ const regs = [
     if (t < settings.serverTrackerTransferCd) {
       // yes warping in same server has cd (just no cd message appears)
       if (settings.serverTrackerCdMessage) log(settings.serverTrackerCdMessage);
-      setTimeout(() => ChatLib.command('warp ' + loc), settings.serverTrackerTransferCd - t);
+      _setTimeout(() => ChatLib.command('warp ' + loc), settings.serverTrackerTransferCd - t);
     } else ChatLib.command('warp ' + loc);
     lastLoc = loc;
   }, 'servertracker').setTabCompletions(tabComplete).setName('warp', true),

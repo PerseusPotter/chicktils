@@ -1,16 +1,14 @@
-// ????
-const origSet = setTimeout;
+const Threading = Java.type('gg.essential.api.utils.Multithreading');
+const MILLISECONDS = Java.type('java.util.concurrent.TimeUnit').MILLISECONDS;
 const timers = [];
 // index will always be truthy
 let i = 1;
 export const _setTimeout = function(cb, t, thisCtx, ...args) {
-  const index = i;
-  timers[index] = true;
-  origSet(() => timers[index] && cb.apply(thisCtx || {}, args), t);
+  timers[i] = Threading.schedule(() => cb.apply(thisCtx, args), t, MILLISECONDS);
   return i++;
 };
 export const _clearTimeout = function(index) {
-  timers[index] = false;
+  timers[index].cancel(false);
 };
 
 export class FrameTimer {
