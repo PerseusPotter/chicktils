@@ -66,8 +66,7 @@ export function roundRoomCoords(c) {
   return ((c + 8) & 0b11111111111111111111111111100000) - 8;
 }
 
-const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
-  const e = evn.entity;
+const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) {
     const p = players.find(v => v.ign === e.func_70005_c_());
     if (p) p.e = new EntityLivingBase(e);

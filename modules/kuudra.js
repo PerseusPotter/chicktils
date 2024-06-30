@@ -258,9 +258,9 @@ const dirOverlayReg = reg('renderOverlay', () => {
 }, 'kuudra').setEnabled(settings._kuudraDrawArrowToKuudra);
 
 const EntityGiantZombie = Java.type('net.minecraft.entity.monster.EntityGiantZombie');
-const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
-  if (!(evn.entity instanceof EntityGiantZombie));
-  const e = new Entity(evn.entity);
+const entSpawnReg = reg('spawnEntity', ent => {
+  if (!(ent instanceof EntityGiantZombie));
+  const e = new Entity(ent);
   const y = e.getY();
   if (y < 60) chunks.push(e);
   else if (y < 67) supplies.push(e);

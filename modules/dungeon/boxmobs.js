@@ -48,8 +48,7 @@ function matchesMobType(n, e) {
 }
 
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
-const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
-  const e = evn.entity;
+const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) {
     if (settings.dungeonBoxMobs && !stateIsInBoss.get()) nameCand.push(e);
   } else if (isDungeonMob(e)) newMobCands.push(e);

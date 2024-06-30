@@ -17,8 +17,7 @@ const EntityItem = Java.type('net.minecraft.entity.item.EntityItem');
 const EntityOtherPlayerMP = Java.type('net.minecraft.entity.client.EntityOtherPlayerMP');
 const EntityWither = Java.type('net.minecraft.entity.boss.EntityWither');
 
-const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
-  const e = evn.entity;
+const entSpawnReg = reg('spawnEntity', e => {
   if (isMob(e)) {
     if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) return;
     if (e instanceof EntityWither && e.func_110138_aP() === 300) return;

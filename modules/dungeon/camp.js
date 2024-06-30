@@ -39,8 +39,7 @@ function addSkull(skull) {
 }
 
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
-const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
-  const e = evn.entity;
+const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) possibleSkulls.push(e);
 }, 'dungeon/camp').setEnabled(stateCamp);
 const tickReg = reg('tick', () => {
