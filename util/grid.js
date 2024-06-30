@@ -2,8 +2,11 @@ export default class Grid {
   size = 0;
   key = 0;
   addNeighbors = 0;
-  hm = new (Java.type('java.util.concurrent.ConcurrentHashMap'))();
+  hm = new (Java.type('java.util.HashMap'))();
   arrs = [];
+  oldHm;
+  oldArrs;
+  locked = false;
   constructor({ size = 1, key = 631, addNeighbors = 0 } = {}) {
     this.size = size;
     this.key = key;
@@ -21,9 +24,9 @@ export default class Grid {
     this.arrs[key].push(item);
   }
   _getById(id) {
-    const i = this.hm.get(id);
+    const i = (this.locked ? this.oldHm : this.hm).get(id);
     if (i === null) return [];
-    return this.arrs[i];
+    return (this.locked ? this.oldArrs : this.arrs)[i];
   }
 
   add(x, z, item) {
@@ -46,7 +49,21 @@ export default class Grid {
     return this._getById(this._getId(x, z));
   }
   clear() {
-    this.hm.clear();
+    if (this.locked) this.hm = new (Java.type('java.util.HashMap'))();
+    else this.hm.clear();
     this.arrs = [];
+  }
+  // stfu ok
+  lock() {
+    if (this.locked) return;
+    this.locked = true;
+    this.oldHm = this.hm;
+    this.oldArrs = this.arrs;
+  }
+  unlock() {
+    if (!this.locked) return;
+    this.oldHm = null;
+    this.oldArrs = null;
+    this.locked = false;
   }
 }

@@ -26,12 +26,14 @@ const entSpawnReg = reg('spawnEntity', e => {
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
   run(() => {
+    allMobsBucket.lock();
     allMobsBucket.clear();
     allMobs = allMobs.filter(e => {
       if (e.field_70128_L) return false;
       allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
       return true;
     });
+    allMobsBucket.unlock();
   });
 }, 'dungeon/boxicesprayed').setFps(2).setEnabled(settings._dungeonBoxIceSprayed);
 const tickReg = reg('tick', () => {
