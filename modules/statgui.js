@@ -3,6 +3,7 @@ import data from '../data';
 import createTextGui from '../util/customtextgui';
 import reg from '../util/registerer';
 import { _setTimeout } from '../util/timers';
+import { unrun } from '../util/threading';
 
 const locs = [
   'Private Island',
@@ -74,7 +75,7 @@ const updateReg = reg('step', () => {
   let endI = lines.findIndex((v, i) => i > startI && (v === '§r' || !v.startsWith('§r ')));
   if (endI < 0) endI = lines.length;
 
-  display.setLines(lines.slice(startI + 1, endI));
+  unrun(() => display.setLines(lines.slice(startI + 1, endI)));
 }, 'statgui').setFps(2);
 
 export function init() {
