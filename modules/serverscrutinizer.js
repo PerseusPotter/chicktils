@@ -11,7 +11,8 @@ let lastTickTime = Date.now();
 const cap = n => settings.serverScrutinizerTPSDisplayCap20 ? Math.min(20, n) : n;
 function trimTicks() {
   const t = Date.now();
-  while (t - ticks[ticks.length - 1] > settings.serverScrutinizerTPSMaxAge) ticks.pop();
+  // sometimes undefined is added to array???
+  while (ticks.length > 0 && (t - ticks[ticks.length - 1] > settings.serverScrutinizerTPSMaxAge || !ticks[ticks.length - 1])) ticks.pop();
 }
 let lTps = 0;
 let rTps = 0;
