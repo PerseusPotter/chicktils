@@ -55,6 +55,7 @@ const entSpawnReg = reg('spawnEntity', e => {
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const step2Reg = reg('step', () => {
   run(() => {
+    mobCandBucket.lock();
     mobCandBucket.clear();
     mobCand = mobCand.filter(e => {
       if (e.field_70128_L) return false;
@@ -66,6 +67,7 @@ const step2Reg = reg('step', () => {
       mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
       return true;
     });
+    mobCandBucket.unlock();
   });
 }, 'dungeon/boxmobs').setFps(2).setEnabled(stateBoxMob);
 const tickReg = reg('tick', () => {
