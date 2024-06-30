@@ -302,8 +302,49 @@ reg = function reg(type, shit, modN) {
   }, 'ChickTilsSpawnEntity');
   ChickTilsSpawnEntity.spawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => newMobs.push(evn.entity), 'ChickTilsSpawnEntity');
 
+  const Threading = Java.type('gg.essential.api.utils.Multithreading');
+  const MILLISECONDS = Java.type('java.util.concurrent.TimeUnit').MILLISECONDS;
+  class ChickTilsStep extends ChickTilsRegister {
+    constructor(cb) {
+      super(cb);
+
+      this.offset = 0;
+      this.delay = 0;
+      this.future = null;
+    }
+
+    register() {
+      if (this.delay === 0) throw 'set delay before registering';
+      if (this.future) return;
+      this.future = Threading.getScheduledPool().scheduleAtFixedRate(this.cb, this.offset, this.delay, MILLISECONDS);
+    }
+    unregister() {
+      if (this.future) this.future.cancel(false);
+      this.future = null;
+    }
+
+    setFps(fps) {
+      this.delay = Math.ceil(1000 / fps);
+      if (this.future) {
+        this.unregister();
+        this.register();
+      }
+    }
+    setDelay(delay) {
+      this.delay = ~~(delay * 1000);
+      if (this.future) {
+        this.unregister();
+        this.register();
+      }
+    }
+    setOffset(offset) {
+      this.offset = ~~offset;
+    }
+  }
+
   customRegs['command'] = ChickTilsCommand;
   customRegs['spawnEntity'] = ChickTilsSpawnEntity;
+  customRegs['step'] = ChickTilsStep;
 }
 
 export default reg;

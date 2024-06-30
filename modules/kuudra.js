@@ -8,7 +8,7 @@ import getPing from '../util/ping';
 import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
-import { run } from '../util/threading';
+import { unrun } from '../util/threading';
 const { gsl_sf_lambert_W0: W, intersectPL, normalize, rotate } = require('../util/math');
 
 /**
@@ -201,17 +201,21 @@ const customBossBar = createBossBar('§6﴾ §c§lKuudra§6 ﴿', () => {
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const EntityMagmaCube = Java.type('net.minecraft.entity.monster.EntityMagmaCube');
 const updateReg1 = reg('step', () => {
-  if (settings.kuudraBoxSupplies) supplies = supplies.filter(v => !v.isDead());
-  if (settings.kuudraBoxChunks) chunks = chunks.filter(v => !v.isDead());
-  run(() => {
-    World.getAllEntities().forEach(e => {
-      if (e instanceof EntityArmorStand && e.getName() === '§a§l✓ SUPPLIES RECEIVED ✓') {
-        dropLocs.forEach(v => v.d = (v.x - e.getX()) ** 2 + (v.z - e.getZ()) ** 2);
-        dropLocs.sort((a, b) => a.d - b.d);
-        if (dropLocs.length > 0 && dropLocs[0].d < 4) dropLocs.shift();
-      }
-      if (e instanceof EntityMagmaCube && e.entity.func_70809_q() === 30 && e.entity.func_110143_aJ() <= 100_000) kuuder = new EntityLivingBase(e.entity);
-    });
+  if (settings.kuudraBoxSupplies) {
+    const s = supplies.filter(v => !v.isDead());
+    unrun(() => supplies = s);
+  }
+  if (settings.kuudraBoxChunks) {
+    const c = chunks.filter(v => !v.isDead());
+    unrun(() => chunks = c);
+  }
+  World.getAllEntities().forEach(e => {
+    if (e instanceof EntityArmorStand && e.getName() === '§a§l✓ SUPPLIES RECEIVED ✓') {
+      dropLocs.forEach(v => v.d = (v.x - e.getX()) ** 2 + (v.z - e.getZ()) ** 2);
+      dropLocs.sort((a, b) => a.d - b.d);
+      if (dropLocs.length > 0 && dropLocs[0].d < 4) dropLocs.shift();
+    }
+    if (e instanceof EntityMagmaCube && e.entity.func_70809_q() === 30 && e.entity.func_110143_aJ() <= 100_000) kuuder = new EntityLivingBase(e.entity);
   });
 }, 'kuudra').setFps(1);
 const bossBarReg = reg('renderBossHealth', () => {

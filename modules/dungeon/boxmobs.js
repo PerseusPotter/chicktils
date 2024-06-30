@@ -56,22 +56,20 @@ const entSpawnReg = reg('spawnEntity', e => {
   }
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const step2Reg = reg('step', () => {
-  run(() => {
-    mobCandBucket.lock();
-    mobCandBucket.clear();
-    mobCand = mobCand.filter(e => {
-      if (e.field_70128_L) return false;
-      const n = e.func_70005_c_();
-      if (n === 'Shadow Assassin') {
-        boxMobs.put(e, { yO: 0, h: 2, c: rgbaToJavaColor(settings.dungeonBoxSAColor) });
-        return false;
-      }
-      mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
-      return true;
-    });
-    mobCandBucket.unlock();
+  mobCandBucket.lock();
+  mobCandBucket.clear();
+  mobCand = mobCand.filter(e => {
+    if (e.field_70128_L) return false;
+    const n = e.func_70005_c_();
+    if (n === 'Shadow Assassin') {
+      boxMobs.put(e, { yO: 0, h: 2, c: rgbaToJavaColor(settings.dungeonBoxSAColor) });
+      return false;
+    }
+    mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
+    return true;
   });
-}, 'dungeon/boxmobs').setFps(2).setEnabled(stateBoxMob);
+  mobCandBucket.unlock();
+}, 'dungeon/boxmobs').setFps(2).setOffset(500 / 3).setEnabled(stateBoxMob);
 const tickReg = reg('tick', () => {
   run(() => {
     nameCand = nameCand.filter(e => {
@@ -120,7 +118,7 @@ export function start() {
   mobCandBucket.clear();
 
   entSpawnReg.register();
-  Client.scheduleTask(3, () => step2Reg.register());
+  step2Reg.register();
   tickReg.register();
   renderEntPostReg.register();
 }

@@ -25,17 +25,15 @@ const entSpawnReg = reg('spawnEntity', e => {
   } else if (e instanceof EntityItem) itemCand.push(e);
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
-  run(() => {
-    allMobsBucket.lock();
-    allMobsBucket.clear();
-    allMobs = allMobs.filter(e => {
-      if (e.field_70128_L) return false;
-      allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
-      return true;
-    });
-    allMobsBucket.unlock();
+  allMobsBucket.lock();
+  allMobsBucket.clear();
+  allMobs = allMobs.filter(e => {
+    if (e.field_70128_L) return false;
+    allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
+    return true;
   });
-}, 'dungeon/boxicesprayed').setFps(2).setEnabled(settings._dungeonBoxIceSprayed);
+  allMobsBucket.unlock();
+}, 'dungeon/boxicesprayed').setFps(2).setOffset(0).setEnabled(settings._dungeonBoxIceSprayed);
 const tickReg = reg('tick', () => {
   run(() => {
     const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');
@@ -148,7 +146,7 @@ export function start() {
   frozenMobs = [];
 
   entSpawnReg.register();
-  Client.scheduleTask(0, () => step2Reg.register());
+  step2Reg.register();
   tickReg.register();
   serverTickReg.register();
   renderWorldReg.register();
