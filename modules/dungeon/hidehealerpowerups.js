@@ -19,8 +19,7 @@ const hiddenPowerups = new (Java.type('java.util.HashSet'))();
 const hiddenPowerupsBucket = new Grid({ size: 0, addNeighbors: 1 });
 
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
-const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
-  const e = evn.entity;
+const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) powerupCand.push([Date.now(), e]);
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const tickReg = reg('tick', () => {

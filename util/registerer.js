@@ -1,4 +1,5 @@
 import { StateProp, StateVar } from './state';
+import { run } from './threading';
 
 function wrap(orig, wrap, prop) {
   return function(...args) {
@@ -58,6 +59,33 @@ if (trackPerformance) {
 }
 
 const createRegister = (function() {
+  class ChickTilsRegister {
+    static list = [];
+    cb = Function.prototype;
+    constructor(cb) {
+      this.cb = cb;
+    }
+    register() {
+      list.push(this);
+      this.update();
+    }
+    unregister() {
+      const i = list.indexOf(this);
+      if (i >= 0) {
+        list.splice(i, 1);
+        this.update();
+      }
+    }
+    setPriority() { }
+    trigger() { }
+
+    static register() { }
+    static unregister() { }
+    static update() {
+      if (this.list.length) this.register();
+      else this.unregister();
+    }
+  }
   // doesn't add to com.chattriggers.ctjs.commands.Command.activeCommands so unload all commands on game unload (ct reload)
   const cmds = {};
   register('gameUnload', () => Object.values(cmds).forEach(v => v.unregister()));
@@ -69,8 +97,7 @@ const createRegister = (function() {
   commandSetF.setAccessible(true);
   // :(
   // [gg.skytils.skytilsmod.features.impl.handlers.NamespacedCommands:registerCommandHelper:81]: WARNING! Command aaa has 0; owners: []
-  class ChickTilsCommand {
-    cb = Function.prototype;
+  class ChickTilsCommand extends ChickTilsRegister {
     name = '';
     tabCb = null;
     tabArr = new ArrayList();
@@ -79,7 +106,7 @@ const createRegister = (function() {
     jcmd;
     _init = false;
     constructor(cb) {
-      this.cb = cb;
+      super(cb);
       this.jcmd = new JavaAdapter(Java.type('net.minecraft.command.CommandBase'), {
         // getCommandName
         func_71517_b: () => this.name,
@@ -148,11 +175,34 @@ const createRegister = (function() {
       return this.setCommandName(name, override);
     }
 
-    setPriority() { }
     compareTo() { }
+  }
+  class ChickTilsSpawnEntity extends ChickTilsRegister {
+    constructor(cb) {
+      super(cb);
+    }
+
+    static newMobs = [];
+    static tickReg = reg('tick', () => {
+      if (this.newMobs.length === 0) return;
+      run(() => {
+        this.newMobs.forEach(v => this.list.forEach(c => c(v)));
+        this.newMobs = [];
+      });
+    });
+    static spawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => this.newMobs.push(evn.entity));
+    static register() {
+      this.tickReg.register();
+      this.spawnReg.register();
+    }
+    static unregister() {
+      this.tickReg.unregister();
+      this.spawnReg.unregister();
+    }
   }
   return function(type, shit) {
     if (type === 'command') return new ChickTilsCommand(shit);
+    if (type === 'spawnEntity') return new ChickTilsSpawnEntity(shit);
     return register(type, shit).unregister();
   };
 }());
