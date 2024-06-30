@@ -58,154 +58,11 @@ if (trackPerformance) {
   }).setName('chicktilsdumpperformancedataregister');
 }
 
-const createRegister = (function() {
-  class ChickTilsRegister {
-    static list = [];
-    cb = Function.prototype;
-    constructor(cb) {
-      this.cb = cb;
-    }
-    register() {
-      list.push(this);
-      this.update();
-    }
-    unregister() {
-      const i = list.indexOf(this);
-      if (i >= 0) {
-        list.splice(i, 1);
-        this.update();
-      }
-    }
-    setPriority() { }
-    trigger() { }
-
-    static register() { }
-    static unregister() { }
-    static update() {
-      if (this.list.length) this.register();
-      else this.unregister();
-    }
-  }
-  // doesn't add to com.chattriggers.ctjs.commands.Command.activeCommands so unload all commands on game unload (ct reload)
-  const cmds = {};
-  register('gameUnload', () => Object.values(cmds).forEach(v => v.unregister()));
-  const ClientCommandHandler = Java.type('net.minecraftforge.client.ClientCommandHandler').instance;
-  const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
-  const commandMapF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71562_a');
-  commandMapF.setAccessible(true);
-  const commandSetF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71561_b');
-  commandSetF.setAccessible(true);
-  // :(
-  // [gg.skytils.skytilsmod.features.impl.handlers.NamespacedCommands:registerCommandHelper:81]: WARNING! Command aaa has 0; owners: []
-  class ChickTilsCommand extends ChickTilsRegister {
-    name = '';
-    tabCb = null;
-    tabArr = new ArrayList();
-    aliases = new ArrayList();
-    override = false;
-    jcmd;
-    _init = false;
-    constructor(cb) {
-      super(cb);
-      this.jcmd = new JavaAdapter(Java.type('net.minecraft.command.CommandBase'), {
-        // getCommandName
-        func_71517_b: () => this.name,
-        // getCommandUsage
-        func_71518_a: () => ('/' + this.name).toString(),
-        // getCommandAliases
-        func_71514_a: () => this.aliases,
-        // processCommand
-        func_71515_b: (sender, args) => void this.cb.apply(this, args),
-        // addTabCompletionOptions
-        func_180525_a: (sender, args, pos) => this.tabCb ? new ArrayList(this.tabCb(args)) : this.tabArr,
-        // getRequiredPermissionLevel
-        func_82362_a: () => 0
-      });
-    }
-
-    _instantiate() {
-      if (this._init) return;
-      this._init = true;
-      if (!this.override && ClientCommandHandler.func_71555_a()[this.name]) return;
-      ClientCommandHandler.func_71560_a(this.jcmd);
-      cmds[this.name] = this;
-    }
-    _uninstantiate() {
-      if (!this._init) return;
-      this._init = false;
-      if (cmds[this.name] !== this) return;
-      helper.removeElementMap(commandMapF, ClientCommandHandler, this.name);
-      helper.removeElementSet(commandSetF, ClientCommandHandler, this.jcmd);
-    }
-    _reinstantiate() {
-      if (!this._init) return;
-      this._uninstantiate();
-      this._instantiate();
-    }
-
-    trigger(args) {
-      this.cb(args);
-    }
-    register() {
-      this._instantiate();
-      return this;
-    }
-    unregister() {
-      this._uninstantiate();
-      return this;
-    }
-    setTabCompletions(...args) {
-      if (!args) args = [];
-      else if (args.length === 1 && typeof args[0] === 'function') this.tabCb = args[0];
-      else args.forEach(v => this.tabArr.add(v.toString()));
-      return this;
-    }
-    setAliases(...args) {
-      args.forEach(v => this.aliases.add(v.toString()));
-      this._reinstantiate();
-      return this;
-    }
-    setCommandName(name, override = false) {
-      this.name = name.toString();
-      this.override = override;
-      this._reinstantiate();
-      return this;
-    }
-    setName(name, override) {
-      return this.setCommandName(name, override);
-    }
-
-    compareTo() { }
-  }
-  class ChickTilsSpawnEntity extends ChickTilsRegister {
-    constructor(cb) {
-      super(cb);
-    }
-
-    static newMobs = [];
-    static tickReg = reg('tick', () => {
-      if (this.newMobs.length === 0) return;
-      run(() => {
-        this.newMobs.forEach(v => this.list.forEach(c => c(v)));
-        this.newMobs = [];
-      });
-    });
-    static spawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => this.newMobs.push(evn.entity));
-    static register() {
-      this.tickReg.register();
-      this.spawnReg.register();
-    }
-    static unregister() {
-      this.tickReg.unregister();
-      this.spawnReg.unregister();
-    }
-  }
-  return function(type, shit) {
-    if (type === 'command') return new ChickTilsCommand(shit);
-    if (type === 'spawnEntity') return new ChickTilsSpawnEntity(shit);
-    return register(type, shit).unregister();
-  };
-}());
+const customRegs = {};
+const createRegister = function(type, shit) {
+  if (type in customRegs) return new (customRegs[type])(shit);
+  return register(type, shit).unregister();
+};
 
 /**
  * isRegistered() => boolean;
@@ -299,4 +156,154 @@ reg = function reg(type, shit, modN) {
   allRegs.push({ type: typeof type === 'string' ? type : type.class.getName(), reg: prox, getIsReg: () => isReg, getIsAReg: () => isAReg });
   return prox;
 };
+
+{
+  class ChickTilsRegister {
+    static list = [];
+    cb = Function.prototype;
+    constructor(cb) {
+      this.cb = cb;
+    }
+    register() {
+      this.constructor.list.push(this);
+      this.constructor.update();
+    }
+    unregister() {
+      const i = this.constructor.list.indexOf(this);
+      if (i >= 0) {
+        this.constructor.list.splice(i, 1);
+        this.constructor.update();
+      }
+    }
+    setPriority() { }
+    trigger() { }
+
+    static register() { }
+    static unregister() { }
+    static update() {
+      if (this.list.length) this.register();
+      else this.unregister();
+    }
+  }
+
+  // doesn't add to com.chattriggers.ctjs.commands.Command.activeCommands so unload all commands on game unload (ct reload)
+  const cmds = {};
+  register('gameUnload', () => Object.values(cmds).forEach(v => v.unregister()));
+  const ClientCommandHandler = Java.type('net.minecraftforge.client.ClientCommandHandler').instance;
+  const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
+  const commandMapF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71562_a');
+  commandMapF.setAccessible(true);
+  const commandSetF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71561_b');
+  commandSetF.setAccessible(true);
+  // :(
+  // [gg.skytils.skytilsmod.features.impl.handlers.NamespacedCommands:registerCommandHelper:81]: WARNING! Command aaa has 0; owners: []
+  class ChickTilsCommand extends ChickTilsRegister {
+    // rhino doesn't initialize properties if they're defined here if it's a subclass ??????
+    constructor(cb) {
+      super(cb);
+      this.name = '';
+      this.tabCb = null;
+      this.tabArr = new ArrayList();
+      this.aliases = new ArrayList();
+      this.override = false;
+      this.jcmd;
+      this._init = false;
+      this.jcmd = new JavaAdapter(Java.type('net.minecraft.command.CommandBase'), {
+        // getCommandName
+        func_71517_b: () => this.name,
+        // getCommandUsage
+        func_71518_a: () => ('/' + this.name).toString(),
+        // getCommandAliases
+        func_71514_a: () => this.aliases,
+        // processCommand
+        func_71515_b: (sender, args) => void this.cb.apply(this, args),
+        // addTabCompletionOptions
+        func_180525_a: (sender, args, pos) => this.tabCb ? new ArrayList(this.tabCb(args)) : this.tabArr,
+        // getRequiredPermissionLevel
+        func_82362_a: () => 0
+      });
+    }
+
+    _instantiate() {
+      if (this._init) return;
+      this._init = true;
+      if (!this.override && ClientCommandHandler.func_71555_a()[this.name]) return;
+      ClientCommandHandler.func_71560_a(this.jcmd);
+      cmds[this.name] = this;
+    }
+    _uninstantiate() {
+      if (!this._init) return;
+      this._init = false;
+      if (cmds[this.name] !== this) return;
+      helper.removeElementMap(commandMapF, ClientCommandHandler, this.name);
+      helper.removeElementSet(commandSetF, ClientCommandHandler, this.jcmd);
+    }
+    _reinstantiate() {
+      if (!this._init) return;
+      this._uninstantiate();
+      this._instantiate();
+    }
+
+    trigger(args) {
+      this.cb(args);
+    }
+    register() {
+      this._instantiate();
+      return this;
+    }
+    unregister() {
+      this._uninstantiate();
+      return this;
+    }
+    setTabCompletions(...args) {
+      if (!args) args = [];
+      else if (args.length === 1 && typeof args[0] === 'function') this.tabCb = args[0];
+      else args.forEach(v => this.tabArr.add(v.toString()));
+      return this;
+    }
+    setAliases(...args) {
+      args.forEach(v => this.aliases.add(v.toString()));
+      this._reinstantiate();
+      return this;
+    }
+    setCommandName(name, override = false) {
+      this.name = name.toString();
+      this.override = override;
+      this._reinstantiate();
+      return this;
+    }
+    setName(name, override) {
+      return this.setCommandName(name, override);
+    }
+
+    compareTo() { }
+  }
+  class ChickTilsSpawnEntity extends ChickTilsRegister {
+    constructor(cb) {
+      super(cb);
+    }
+
+    static register() {
+      this.tickReg.register();
+      this.spawnReg.register();
+    }
+    static unregister() {
+      this.tickReg.unregister();
+      this.spawnReg.unregister();
+    }
+  }
+  let newMobs = [];
+  ChickTilsSpawnEntity.tickReg = reg('tick', () => {
+    if (newMobs.length === 0) return;
+    run(() => {
+      newMobs.forEach(v => ChickTilsSpawnEntity.list.forEach(c => c.cb(v)));
+      newMobs = [];
+    });
+  }, 'ChickTilsSpawnEntity');
+  ChickTilsSpawnEntity.spawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => newMobs.push(evn.entity), 'ChickTilsSpawnEntity');
+
+  customRegs['command'] = ChickTilsCommand;
+  customRegs['spawnEntity'] = ChickTilsSpawnEntity;
+}
+
 export default reg;
