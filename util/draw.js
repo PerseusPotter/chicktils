@@ -587,3 +587,21 @@ function rescaleRender(x, y, z) {
   }
   return { x, y, z, s: 1 };
 }
+
+export function rgbaToJavaColor(c) {
+  return new (Java.type('java.awt.Color'))(rgbaToARGB(c), true);
+}
+
+export class JavaColorWrapper {
+  cache;
+  /**
+   * @param {import ('../settings').Property} prop
+   */
+  constructor(prop) {
+    this.cache = rgbaToJavaColor(prop.valueOf());
+    prop.onAfterChange(v => this.cache = rgbaToJavaColor(v));
+  }
+  get() {
+    return this.cache;
+  }
+}
