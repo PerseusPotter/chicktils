@@ -1,7 +1,7 @@
 import settings from '../../settings';
 import data from '../../data';
 import createGui from '../../util/customgui';
-import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawBoxPos, drawFilledBox, drawLine3D, rgbaToJavaColor, drawString, drawBeaconBeam } from '../../util/draw';
+import { drawOutline, drawFilledBox, drawLine3D, drawString, drawBeaconBeam } from '../../util/draw';
 import createAlert from '../../util/alert';
 import reg from '../../util/registerer';
 import { colorForNumber, execCmd, getPlayerName } from '../../util/format';

@@ -1,5 +1,5 @@
 import settings from '../../settings';
-import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawFilledBox } from '../../util/draw';
+import { drawOutline, drawFilledBox } from '../../util/draw';
 import reg from '../../util/registerer';
 import { cross, lerp, normalize, rotate } from '../../util/math';
 import Grid from '../../util/grid';
@@ -114,14 +114,6 @@ const serverTickReg = reg('packetReceived', () => {
   frozenMobs = frozenMobs.filter(v => --v[1] > 0);
 }, 'dungeon/boxicesprayed').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(settings._dungeonBoxIceSprayed);
 const renderWorldReg = reg('renderWorld', partial => {
-  const or = ((settings.dungeonBoxIceSprayedOutlineColor >> 24) & 0xFF) / 256;
-  const og = ((settings.dungeonBoxIceSprayedOutlineColor >> 16) & 0xFF) / 256;
-  const ob = ((settings.dungeonBoxIceSprayedOutlineColor >> 8) & 0xFF) / 256;
-  const oa = ((settings.dungeonBoxIceSprayedOutlineColor >> 0) & 0xFF) / 256;
-  const fr = ((settings.dungeonBoxIceSprayedFillColor >> 24) & 0xFF) / 256;
-  const fg = ((settings.dungeonBoxIceSprayedFillColor >> 16) & 0xFF) / 256;
-  const fb = ((settings.dungeonBoxIceSprayedFillColor >> 8) & 0xFF) / 256;
-  const fa = ((settings.dungeonBoxIceSprayedFillColor >> 0) & 0xFF) / 256;
   frozenMobs.forEach(([e]) => {
     if (e.field_70128_L) return;
     const x = lerp(e.field_70169_q, e.field_70165_t, partial);
@@ -129,10 +121,8 @@ const renderWorldReg = reg('renderWorld', partial => {
     const z = lerp(e.field_70166_s, e.field_70161_v, partial);
     const w = e.field_70130_N + 0.2;
     const h = e.field_70131_O + 0.2;
-    if (settings.dungeonBoxIceSprayedEsp) drawBoxAtBlock(x - w / 2, y, z - w / 2, or, og, ob, w, h, oa, 5);
-    else drawBoxAtBlockNotVisThruWalls(x - w / 2, y, z - w / 2, or, og, ob, w, h, oa, 5);
-
-    drawFilledBox(x, y, z, w, h, fr, fg, fb, fa, settings.dungeonBoxIceSprayedEsp);
+    drawOutline(x, y, z, w, h, settings.dungeonBoxIceSprayedOutlineColor, settings.dungeonBoxIceSprayedEsp, true, 5);
+    drawFilledBox(x, y, z, w, h, settings.dungeonBoxIceSprayedFillColor, settings.dungeonBoxIceSprayedEsp);
   });
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 

@@ -1,5 +1,5 @@
 import settings from '../settings';
-import { drawBeaconBeam, drawBoxAtBlock, drawString, renderWaypoints } from '../util/draw';
+import { drawBeaconBeam, drawOutline, drawString, drawWaypoint } from '../util/draw';
 import { execCmd, getPlayerName } from '../util/format';
 import { getLeader } from '../util/party';
 import { log, logMessage } from '../util/log';
@@ -17,16 +17,13 @@ const blockNameCmd = reg('command', ign => {
 
 const coords = [];
 const removeOldestCmd = reg('command', () => coords.shift(), 'chattils').setName('ctsremoveoldestwaypoint').setEnabled(settings._chatTilsWaypoint);
-const worldRenderReg = reg('renderWorld', partial => {
-  const c = settings.chatTilsWaypointColor;
-  const r = ((c >> 24) & 0xFF) / 256;
-  const g = ((c >> 16) & 0xFF) / 256;
-  const b = ((c >> 8) & 0xFF) / 256;
-  const a = ((c >> 0) & 0xFF) / 256;
-  if (settings.chatTilsWaypointType === 'Box') renderWaypoints(coords, r, g, b, true, false);
-  if (settings.chatTilsWaypointType === 'Wireframe') coords.forEach(v => drawBoxAtBlock(v.x, v.y, v.z, r, g, b, 1, 1, a));
-  if (settings.chatTilsWaypointBeacon) coords.forEach(v => drawBeaconBeam(v.x, v.y + 1, v.z, r, g, b, a, false));
-  if (settings.chatTilsWaypointName) coords.forEach(v => drawString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(c)*/));
+const worldRenderReg = reg('renderWorld', () => {
+  if (settings.chatTilsWaypointType !== 'None') coords.forEach(v => {
+    if (settings.chatTilsWaypointType === 'Box') drawWaypoint(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
+    else drawOutline(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
+  });
+  if (settings.chatTilsWaypointBeacon) coords.forEach(v => drawBeaconBeam(v.x, v.y + 1, v.z, settings.chatTilsWaypointColor, true, false));
+  if (settings.chatTilsWaypointName) coords.forEach(v => drawString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(settings.chatTilsWaypointColor)*/));
 }, 'chattils');
 let waypointReloadNum = 0;
 const worldUnloadReg = reg('worldUnload', () => {

@@ -1,5 +1,5 @@
 import createAlert from '../util/alert';
-import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls } from '../util/draw';
+import { drawOutline } from '../util/draw';
 import settings from '../settings';
 import { _clearTimeout, _setTimeout } from '../util/timers';
 import { log } from '../util/log';
@@ -62,17 +62,11 @@ const cheesePickReg = reg('chat', (name, t) => {
   players[name] = _setTimeout(() => log(`Rat Buff to ${name} has expired.`), t * 1000);
 }, 'rattils').setCriteria('CHEESE! You buffed ${name} giving them +${*}✯ Magic Find for ${t} seconds!');
 const cheeseRenderReg = reg('renderWorld', () => {
-  const c = settings.ratTilsBoxColor;
-  const r = ((c >> 24) & 0xFF) / 256;
-  const g = ((c >> 16) & 0xFF) / 256;
-  const b = ((c >> 8) & 0xFF) / 256;
-  const a = ((c >> 0) & 0xFF) / 256;
   cheese.forEach(v => {
     const x = v.getRenderX();
     const y = v.getRenderY();
     const z = v.getRenderZ();
-    if (settings.ratTilsBoxEsp) drawBoxAtBlock(x - 0.25, y, z - 0.25, r, g, b, 0.5, 0.5, a);
-    else drawBoxAtBlockNotVisThruWalls(x - 0.25, y, z - 0.25, r, g, b, 0.5, 0.5, a);
+    drawOutline(x, y, z, 0.5, 0.5, settings.ratTilsBoxColor, settings.ratTilsBoxEsp);
   });
 }, 'rattils');
 const muteReg = reg('soundPlay', (pos, name, vol, pitch, category, evn) => vol === 1 && (Math.abs(pitch - 1.19047) < 0.0001) && cancel(evn), 'rattils').setCriteria('mob.bat.idle').setEnabled(settings._ratTilsMuteSound);

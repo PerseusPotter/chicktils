@@ -1,195 +1,27 @@
-import RenderLib from '../../RenderLib/index';
 import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
 import RenderLib2D from '../../RenderLib2D/index';
 import _drawBeaconBeam from '../../BeaconBeam/index';
 import settings from '../settings';
 import { getEyeHeight } from './mc';
+
 const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 const worldRen = tess.func_178180_c();
-
-// soopy !
-export function drawBoxAtBlockNotVisThruWalls(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1, lw = 5) {
-  ({ x, y, z } = rescaleRender(x, y, z));
-  GL11.glBlendFunc(770, 771);
-  GL11.glEnable(GL11.GL_BLEND);
-  GL11.glLineWidth(lw);
-  GL11.glDisable(GL11.GL_TEXTURE_2D);
-  GlStateManager.func_179094_E();
-
-  x -= 0.005;
-  y -= 0.005;
-  z -= 0.005;
-  w += 0.01;
-  h += 0.01;
-
-  Tessellator.begin(GL11.GL_LINE_STRIP).colorize(colorR, colorG, colorB, a);
-
-  Tessellator.pos(x + w, y + h, z + w);
-  Tessellator.pos(x + w, y + h, z);
-  Tessellator.pos(x, y + h, z);
-  Tessellator.pos(x, y + h, z + w);
-  Tessellator.pos(x + w, y + h, z + w);
-  Tessellator.pos(x + w, y, z + w);
-  Tessellator.pos(x + w, y, z);
-  Tessellator.pos(x, y, z);
-  Tessellator.pos(x, y, z + w);
-  Tessellator.pos(x, y, z);
-  Tessellator.pos(x, y + h, z);
-  Tessellator.pos(x, y, z);
-  Tessellator.pos(x + w, y, z);
-  Tessellator.pos(x + w, y + h, z);
-  Tessellator.pos(x + w, y, z);
-  Tessellator.pos(x + w, y, z + w);
-  Tessellator.pos(x, y, z + w);
-  Tessellator.pos(x, y + h, z + w);
-  Tessellator.pos(x + w, y + h, z + w);
-
-  Tessellator.draw();
-
-  GlStateManager.func_179121_F();
-  GL11.glEnable(GL11.GL_TEXTURE_2D);
-  GL11.glDisable(GL11.GL_BLEND);
-  GL11.glLineWidth(3);
-};
-export function drawBoxAtBlock(x, y, z, colorR, colorG, colorB, w = 1, h = 1, a = 1, lw = 5) {
-  ({ x, y, z } = rescaleRender(x, y, z));
-  GL11.glBlendFunc(770, 771);
-  GL11.glEnable(GL11.GL_BLEND);
-  GL11.glLineWidth(lw);
-  GL11.glDisable(GL11.GL_TEXTURE_2D);
-  GL11.glDisable(GL11.GL_DEPTH_TEST);
-  GL11.glDepthMask(false);
-  GlStateManager["func_179094_E"]();
-
-  Tessellator.begin(GL11.GL_LINE_STRIP).colorize(colorR, colorG, colorB, a);
-
-  Tessellator.pos(x + w, y + h, z + w);
-  Tessellator.pos(x + w, y + h, z);
-  Tessellator.pos(x, y + h, z);
-  Tessellator.pos(x, y + h, z + w);
-  Tessellator.pos(x + w, y + h, z + w);
-  Tessellator.pos(x + w, y, z + w);
-  Tessellator.pos(x + w, y, z);
-  Tessellator.pos(x, y, z);
-  Tessellator.pos(x, y, z + w);
-  Tessellator.pos(x, y, z);
-  Tessellator.pos(x, y + h, z);
-  Tessellator.pos(x, y, z);
-  Tessellator.pos(x + w, y, z);
-  Tessellator.pos(x + w, y + h, z);
-  Tessellator.pos(x + w, y, z);
-  Tessellator.pos(x + w, y, z + w);
-  Tessellator.pos(x, y, z + w);
-  Tessellator.pos(x, y + h, z + w);
-  Tessellator.pos(x + w, y + h, z + w);
-
-  Tessellator.draw();
-
-  GlStateManager["func_179121_F"]();
-  GL11.glEnable(GL11.GL_TEXTURE_2D);
-  GL11.glEnable(GL11.GL_DEPTH_TEST);
-  GL11.glDepthMask(true);
-  GL11.glDisable(GL11.GL_BLEND);
-  GL11.glLineWidth(3);
-};
-// soopy, the most consistent coder. wtf is he on
-export function drawFilledBox(x, y, z, w, h, red, green, blue, alpha, phase) {
-  ({ x, y, z } = rescaleRender(x, y, z));
-  GL11.glDisable(GL11.GL_CULL_FACE);
-  if (phase) {
-    GL11.glBlendFunc(770, 771);
-    GL11.glEnable(GL11.GL_BLEND);
-    GL11.glLineWidth(2);
-    GL11.glDisable(GL11.GL_TEXTURE_2D);
-    GL11.glDisable(GL11.GL_DEPTH_TEST);
-    GL11.glDepthMask(false);
-    GlStateManager.func_179094_E();
-  } else {
-    GL11.glDisable(GL11.GL_TEXTURE_2D);
-    GL11.glBlendFunc(770, 771);
-    GL11.glEnable(GL11.GL_BLEND);
-    GL11.glLineWidth(2);
-    GL11.glDepthMask(false);
-    GlStateManager.func_179094_E();
-  }
-
-  w /= 2;
-
-  Tessellator.begin(GL11.GL_QUADS, false);
-  Tessellator.colorize(red, green, blue, alpha);
-
-  Tessellator.translate(x, y, z).
-    pos(w, 0, w).
-    pos(w, 0, -w).
-    pos(-w, 0, -w).
-    pos(-w, 0, w).
-
-    pos(w, h, w).
-    pos(w, h, -w).
-    pos(-w, h, -w).
-    pos(-w, h, w).
-
-    pos(-w, h, w).
-    pos(-w, h, -w).
-    pos(-w, 0, -w).
-    pos(-w, 0, w).
-
-    pos(w, h, w).
-    pos(w, h, -w).
-    pos(w, 0, -w).
-    pos(w, 0, w).
-
-    pos(w, h, -w).
-    pos(-w, h, -w).
-    pos(-w, 0, -w).
-    pos(w, 0, -w).
-
-    pos(-w, h, w).
-    pos(w, h, w).
-    pos(w, 0, w).
-    pos(-w, 0, w).
-    draw();
-
-  GL11.glEnable(GL11.GL_CULL_FACE);
-  if (phase) {
-    GlStateManager.func_179121_F();
-    GL11.glEnable(GL11.GL_TEXTURE_2D);
-    GL11.glEnable(GL11.GL_DEPTH_TEST);
-    GL11.glDepthMask(true);
-    GL11.glDisable(GL11.GL_BLEND);
-  } else {
-    GL11.glEnable(GL11.GL_TEXTURE_2D);
-    GlStateManager.func_179121_F();
-    GL11.glDepthMask(true);
-    GL11.glDisable(GL11.GL_BLEND);
-  }
-};
-
+const rm = Renderer.getRenderManager();
+const xa = rm.class.getDeclaredField('field_78725_b'); xa.setAccessible(true);
+const ya = rm.class.getDeclaredField('field_78726_c'); ya.setAccessible(true);
+const za = rm.class.getDeclaredField('field_78723_d'); za.setAccessible(true);
 /**
- * @param {{x: number, y: number, z: number, w?: number, h?: number, text?: string}[]} waypoints
- * @param {number} r
- * @param {number} g
- * @param {number} b
- * @param {boolean?} phase
- * @param {boolean?} isCentered
+ * @type {() => number}
  */
-export function renderWaypoints(waypoints, r, g, b, phase = true, isCentered = true) {
-  if (waypoints.length === 0) return;
-
-  waypoints.forEach((waypoint) => {
-    const w = waypoint.w || 1;
-    const h = waypoint.h || 1;
-    let x = waypoint.x + (isCentered ? 0 : w / 2);
-    let y = waypoint.y;
-    let z = waypoint.z + (isCentered ? 0 : w / 2);
-    ({ x, y, z } = rescaleRender(x, y, z));
-
-    RenderLib.drawEspBox(x, y, z, w, h, r, g, b, 1, phase)
-    RenderLib.drawInnerEspBox(x, y, z, w, h, r, g, b, 0.25, phase);
-    if (waypoint.text) Tessellator.drawString(waypoint.text, x, y + 1.5, z, 0xFFFFFF, true);
-  });
-}
-
+export function getRenderX() { return xa.get(rm); };
+/**
+ * @type {() => number}
+ */
+export function getRenderY() { return ya.get(rm); };
+/**
+ * @type {() => number}
+ */
+export function getRenderZ() { return za.get(rm); };
 function getXMult() {
   return Client.settings.getSettings().field_74320_O === 2 ? -1 : 1;
 }
@@ -208,7 +40,7 @@ function getPitch() {
  * in radians
  * @param {number} color rgba
  * @param {number} theta radians
- * @param {number?} length
+ * @param {number?} length (20)
  * @param {number?} yaw degrees
  */
 export function drawArrow2D(color, theta, length = 20, yaw) {
@@ -229,7 +61,7 @@ export function drawArrow2D(color, theta, length = 20, yaw) {
  * @param {number} color rgba
  * @param {number} theta radians
  * @param {number} phi radians
- * @param {number?} scale
+ * @param {number?} scale (3)
  * @param {number?} yaw degrees
  * @param {number?} pitch degrees
  */
@@ -345,18 +177,24 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
  * @param {number} dx
  * @param {number} dy
  * @param {number} dz
- * @param {boolean?} rel
- * @param {number?} scale
+ * @param {boolean?} rel (true)
+ * @param {number?} scale (3)
  */
 export function pointTo3D(color, dx, dy, dz, rel = true, scale) {
   if (rel) {
-    if (settings.preferUseTracer) return renderTracer(color, dx + _getRenderX(), dy + _getRenderY(), dz + _getRenderZ());
+    if (settings.preferUseTracer) return renderTracer(color, dx + getRenderX(), dy + getRenderY(), dz + getRenderZ());
     return drawArrow3D(color, Math.atan2(dz, dx), Math.acos(dy / Math.hypot(dx, dy, dz)), scale);
   }
   if (settings.preferUseTracer) return renderTracer(color, dx, dy, dz);
-  return pointTo3D(color, dx - _getRenderX(), dy - _getRenderY(), dz - _getRenderZ(), true, scale);
+  return pointTo3D(color, dx - getRenderX(), dy - getRenderY(), dz - getRenderZ(), true, scale);
 }
 
+/**
+ * @param {number} color rgba
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ */
 export function renderTracer(color, x, y, z) {
   ({ x, y, z } = rescaleRender(x, y, z));
   // renderWorld
@@ -402,61 +240,37 @@ export function renderTracer(color, x, y, z) {
   GlStateManager.func_179089_o();
 }
 
-const RenderUtil = Java.type('gg.skytils.skytilsmod.utils.RenderUtil');
-let _getRenderX = () => 0;
-let _getRenderY = () => 0;
-let _getRenderZ = () => 0;
+// Java.type('net.minecraft.client.renderer.RenderGlobal').func_181563_a(bb, c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
 /**
- * @type {() => number}
- */
-export function getRenderX() {
-  return _getRenderX();
-}
-/**
- * @type {() => number}
- */
-export function getRenderY() {
-  return _getRenderY();
-}
-/**
- * @type {() => number}
- */
-export function getRenderZ() {
-  return _getRenderZ();
-}
-if (RenderUtil) {
-  _getRenderX = RenderUtil.INSTANCE.getRenderX.bind(RenderUtil.INSTANCE);
-  _getRenderY = RenderUtil.INSTANCE.getRenderY.bind(RenderUtil.INSTANCE);
-  _getRenderZ = RenderUtil.INSTANCE.getRenderZ.bind(RenderUtil.INSTANCE);
-} else {
-  const rm = Renderer.getRenderManager();
-  const xa = rm.class.getDeclaredField('field_78725_b');
-  xa.setAccessible(true);
-  const ya = rm.class.getDeclaredField('field_78726_c');
-  ya.setAccessible(true);
-  const za = rm.class.getDeclaredField('field_78723_d');
-  za.setAccessible(true);
-  _getRenderX = function() { return xa.get(rm); };
-  _getRenderY = function() { return ya.get(rm); };
-  _getRenderZ = function() { return za.get(rm); };
-}
-const AABB = Java.type('net.minecraft.util.AxisAlignedBB');
-/**
- * @param {import('ctjs/External').JavaClass<'net.minecraft.util.AxisAlignedBB'>} bb
- * @param {import('ctjs/External').JavaClass<'java.awt.Color'>} c
- * @param {number} f partial tick
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {number} w
+ * @param {number} h
+ * @param {number} color rgba
  * @param {boolean?} esp is visible through walls (false)
+ * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} lw line width (5)
- * @link https://github.com/Skytils/SkytilsMod/blob/facd8686633c5c9bb9fd239026c9a03563d228bf/src/main/kotlin/gg/skytils/skytilsmod/utils/RenderUtil.kt#L237
+ * @param {boolean?} nt use if postrenderentity (false)
  */
-export function drawBoxBB(bb, c, f, esp = false, lw = 5) {
-  if (!esp && RenderUtil) return RenderUtil.drawOutlinedBoundingBox(bb, c, lw, f);
+export function drawOutline(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false) {
+  if (center) {
+    x -= w / 2;
+    z -= w / 2;
+  }
+  if (!nt) {
+    let s;
+    ({ x, y, z, s } = rescaleRender(x, y, z));
+    w *= s;
+    h *= s;
+  }
+
   const render = Client.getMinecraft().func_175606_aa();
-  const realX = lerp(render.field_70142_S, render.field_70165_t, f);
-  const realY = lerp(render.field_70137_T, render.field_70163_u, f);
-  const realZ = lerp(render.field_70136_U, render.field_70161_v, f);
+  const realX = lerp(render.field_70142_S, render.field_70165_t, Tessellator.partialTicks);
+  const realY = lerp(render.field_70137_T, render.field_70163_u, Tessellator.partialTicks);
+  const realZ = lerp(render.field_70136_U, render.field_70161_v, Tessellator.partialTicks);
   GlStateManager.func_179094_E();
-  GlStateManager.func_179137_b(-realX, -realY, -realZ);
+  if (!nt) GlStateManager.func_179137_b(-realX, -realY, -realZ);
   GlStateManager.func_179090_x();
   GlStateManager.func_179147_l();
   GlStateManager.func_179140_f();
@@ -467,62 +281,146 @@ export function drawBoxBB(bb, c, f, esp = false, lw = 5) {
     GL11.glDisable(GL11.GL_DEPTH_TEST);
     GL11.glDepthMask(false);
   }
-  Java.type('net.minecraft.client.renderer.RenderGlobal').func_181563_a(bb, c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
-  GlStateManager.func_179137_b(realX, realY, realZ);
+  // Java.type('net.minecraft.client.renderer.RenderGlobal').func_181563_a(bb, c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
+
+  const r = ((color >> 24) & 0xFF) / 256;
+  const g = ((color >> 16) & 0xFF) / 256;
+  const b = ((color >> 8) & 0xFF) / 256;
+  const a = ((color >> 0) & 0xFF) / 256;
+  GlStateManager.func_179131_c(r, g, b, a);
+
+  worldRen.func_181668_a(2, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181662_b(x, y, z).func_181675_d();
+  worldRen.func_181662_b(x, y, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y, z).func_181675_d();
+  tess.func_78381_a();
+  worldRen.func_181668_a(2, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181662_b(x, y + h, z).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
+  tess.func_78381_a();
+  worldRen.func_181668_a(1, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181662_b(x, y, z).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z).func_181675_d();
+  worldRen.func_181662_b(x, y, z + w).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y, z).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
+  tess.func_78381_a();
+
+  if (!nt) GlStateManager.func_179137_b(realX, realY, realZ);
   GlStateManager.func_179084_k();
   GlStateManager.func_179141_d();
   GlStateManager.func_179098_w();
   GlStateManager.func_179131_c(1, 1, 1, 1);
   GlStateManager.func_179121_F();
-  GL11.glLineWidth(3);
+  GL11.glLineWidth(2);
   if (esp) {
     GL11.glEnable(GL11.GL_DEPTH_TEST);
     GL11.glDepthMask(true);
   }
 }
+
 /**
  * @param {number} x
  * @param {number} y
  * @param {number} z
  * @param {number} w
  * @param {number} h
- * @param {import('ctjs/External').JavaClass<'java.awt.Color'>} c
- * @param {number} f partial tick
+ * @param {number} color rgba
+ * @param {boolean?} esp is visible through walls (false)
+ * @param {boolean?} center are coordinates already centered (true)
+ * @param {boolean?} nt use if postrenderentity (false)
+ */
+export function drawFilledBox(x, y, z, w, h, color, esp = false, center = true, nt = false) {
+  if (center) {
+    x -= w / 2;
+    z -= w / 2;
+  }
+  let s;
+  ({ x, y, z, s } = rescaleRender(x, y, z));
+  w *= s;
+  h *= s;
+
+  const render = Client.getMinecraft().func_175606_aa();
+  const realX = lerp(render.field_70142_S, render.field_70165_t, Tessellator.partialTicks);
+  const realY = lerp(render.field_70137_T, render.field_70163_u, Tessellator.partialTicks);
+  const realZ = lerp(render.field_70136_U, render.field_70161_v, Tessellator.partialTicks);
+
+  GL11.glDisable(GL11.GL_CULL_FACE);
+  GlStateManager.func_179094_E();
+  if (!nt) GlStateManager.func_179137_b(-realX, -realY, -realZ);
+  GlStateManager.func_179090_x();
+  GlStateManager.func_179147_l();
+  GlStateManager.func_179140_f();
+  GlStateManager.func_179118_c();
+  GlStateManager.func_179120_a(770, 771, 1, 0);
+  if (esp) {
+    GL11.glDisable(GL11.GL_DEPTH_TEST);
+    GL11.glDepthMask(false);
+  }
+
+  const r = ((color >> 24) & 0xFF) / 256;
+  const g = ((color >> 16) & 0xFF) / 256;
+  const b = ((color >> 8) & 0xFF) / 256;
+  const a = ((color >> 0) & 0xFF) / 256;
+  GlStateManager.func_179131_c(r, g, b, a);
+
+  worldRen.func_181668_a(5, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181662_b(x, y, z).func_181675_d();
+  worldRen.func_181662_b(x + w, y, z).func_181675_d();
+  worldRen.func_181662_b(x, y, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y, z + w).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
+  worldRen.func_181662_b(x, y, z).func_181675_d();
+  worldRen.func_181662_b(x + w, y, z).func_181675_d();
+  tess.func_78381_a();
+  worldRen.func_181668_a(7, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181662_b(x, y, z).func_181675_d();
+  worldRen.func_181662_b(x, y, z + w).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z).func_181675_d();
+  worldRen.func_181662_b(x + w, y, z).func_181675_d();
+  worldRen.func_181662_b(x + w, y, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
+  tess.func_78381_a();
+
+  if (!nt) GlStateManager.func_179137_b(realX, realY, realZ);
+  GlStateManager.func_179084_k();
+  GlStateManager.func_179141_d();
+  GlStateManager.func_179098_w();
+  GlStateManager.func_179131_c(1, 1, 1, 1);
+  GlStateManager.func_179121_F();
+  GL11.glEnable(GL11.GL_CULL_FACE);
+  if (esp) {
+    GL11.glEnable(GL11.GL_DEPTH_TEST);
+    GL11.glDepthMask(true);
+  }
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {number} w
+ * @param {number} h
+ * @param {number} color rgba
  * @param {boolean?} esp is visible through walls (false)
  * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} lw line width (5)
  */
-export function drawBoxPos(x, y, z, w, h, c, f, esp = false, center = true, lw = 5) {
-  x += _getRenderX();
-  y += _getRenderY();
-  z += _getRenderZ();
-  if (!center) {
-    x -= w / 2;
-    z -= w / 2;
-  }
-  ({ x, y, z } = rescaleRender(x, y, z));
-  const bb = new AABB(x, y, z, x + w, y + h, z + w);
-  drawBoxBB(bb, c, f, esp, lw);
-}
-
-/**
- * @param {number} size `InventoryBasic::func_70302_i_();`
- * @param {number} xSlotPos `Slot::field_75223_e;`
- * @param {number} ySlotPos `Slot::field_75221_f;`
- * @param {number} color argb
- * @link https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/utils/RenderUtils.java#L47
- */
-export function highlightSlot(size, xSlotPos, ySlotPos, color) {
-  const guiLeft = (Renderer.screen.getWidth() - 176) / 2;
-  const guiTop = (Renderer.screen.getHeight() - 222) / 2;
-  const x = guiLeft + xSlotPos;
-  let y = guiTop + ySlotPos;
-  // Move down when chest isn't 6 rows
-  if (size !== 90) y += (6 - (size - 36) / 9) * 9;
-
-  GL11.glTranslated(0, 0, 1);
-  Gui.func_73734_a(x, y, x + 16, y + 16, color | 0); // integer, e.g. 4278255360 (0xFF00FF00) -> -16711936
-  GL11.glTranslated(0, 0, -1);
+export function drawWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5) {
+  const c = (color & ~0xFF) | ((color & 0xFF) >> 2);
+  drawFilledBox(x, yu, z, w, h, c, esp, center, lw);
+  drawOutline(x, yu, z, w, h, color, esp, center, lw);
 }
 
 /**
@@ -578,7 +476,7 @@ function applyTint(c, a) {
  * @param {number} x2
  * @param {number} y2
  * @param {number} z2
- * @param {number} lw
+ * @param {number?} lw (2)
  */
 export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
@@ -613,7 +511,7 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   GlStateManager.func_179098_w();
   GlStateManager.func_179131_c(1, 1, 1, 1);
   GlStateManager.func_179121_F();
-  GL11.glLineWidth(3);
+  GL11.glLineWidth(2);
 }
 
 /**
@@ -621,64 +519,60 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
  * @param {number} x
  * @param {number} y
  * @param {number} z
- * @param {number?} color msb ARGB lsb (0xFFFFFFFF)
+ * @param {number?} color rgba (0xFFFFFFFF)
  * @param {boolean?} renderBlackBox (true)
  * @param {number?} scale (1)
  * @param {boolean?} increase (true)
  */
 export function drawString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = true, scale = 1, increase = true) {
-  ({ x, y, z } = rescaleRender(x, y, z));
-  Tessellator.drawString(text, x, y, z, color | 0, renderBlackBox, scale, increase);
+  let s;
+  ({ x, y, z, s } = rescaleRender(x, y, z));
+  scale *= s;
+  Tessellator.drawString(text, x, y, z, rgbaToARGB(color), renderBlackBox, scale, increase);
 }
 
 /**
  * @param {number} x
  * @param {number} y
  * @param {number} z
- * @param {number} r
- * @param {number} g
- * @param {number} b
- * @param {number} alpha
- * @param {boolean} depthCheck
+ * @param {number} color rgba
+ * @param {boolean?} esp is visible through walls (false)
+ * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} height (300)
  */
-export function drawBeaconBeam(x, y, z, r, g, b, alpha, depthCheck, height = 300) {
+export function drawBeaconBeam(x, y, z, color, esp = false, center = true, height = 300) {
+  if (center) {
+    x -= 0.5;
+    z -= 0.5;
+  }
   ({ x, y, z } = rescaleRender(x, y, z));
-  _drawBeaconBeam(x, y, z, r, g, b, alpha, depthCheck, height);
+  _drawBeaconBeam(x, y, z,
+    ((color >> 24) & 0xFF) / 256,
+    ((color >> 16) & 0xFF) / 256,
+    ((color >> 8) & 0xFF) / 256,
+    ((color >> 0) & 0xFF) / 256,
+    !esp, height
+  );
 }
 
+/**
+ * @param {number} c rgba
+ * @returns argb
+ */
 export function rgbaToARGB(c) {
   return ((c & 0xFF) << 24) | c >> 8;
 }
 
-export function rgbaToJavaColor(c) {
-  return new (Java.type('java.awt.Color'))(rgbaToARGB(c), true);
-}
-
-export class JavaColorWrapper {
-  cache;
-  /**
-   * @param {import ('../settings').Property} prop
-   */
-  constructor(prop) {
-    this.cache = rgbaToJavaColor(prop.valueOf());
-    prop.onAfterChange(v => this.cache = rgbaToJavaColor(v));
-  }
-  get() {
-    return this.cache;
-  }
-}
-
 /**
  * @param {number} x
  * @param {number} y
  * @param {number} z
- * @returns {{x: number, y: number, z: number}}
+ * @returns {{x: number, y: number, z: number, s: number}}
  */
 function rescaleRender(x, y, z) {
-  const rx = _getRenderX();
-  const ry = _getRenderY() + getEyeHeight();
-  const rz = _getRenderZ();
+  const rx = getRenderX();
+  const ry = getRenderY() + getEyeHeight();
+  const rz = getRenderZ();
   let d = (rx - x) ** 2 + (ry - y) ** 2 + (rz - z) ** 2;
 
   const rd = Client.settings.video.getRenderDistance() << 4;
@@ -687,8 +581,9 @@ function rescaleRender(x, y, z) {
     return {
       x: lerp(rx, x, d),
       y: lerp(ry, y, d),
-      z: lerp(rz, z, d)
+      z: lerp(rz, z, d),
+      s: d
     };
   }
-  return { x, y, z };
+  return { x, y, z, s: 1 };
 }
