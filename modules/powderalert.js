@@ -1,5 +1,5 @@
 import createAlert from '../util/alert';
-import { renderWaypoints } from '../util/draw';
+import { drawWaypoint } from '../util/draw';
 import settings from '../settings';
 import reg from '../util/registerer';
 
@@ -31,12 +31,7 @@ const startReg = reg('chat', () => {
 }, 'powderalert').setCriteria('&r&aYou uncovered a treasure chest!&r');
 
 const renderReg = reg('renderWorld', () => {
-  const c = settings.powderBoxColor;
-  const r = ((c >> 24) & 0xFF) / 256;
-  const g = ((c >> 16) & 0xFF) / 256;
-  const b = ((c >> 8) & 0xFF) / 256;
-  // const a = ((c >> 0) & 0xFF) / 256;
-  renderWaypoints(chests, r, g, b, settings.powderBoxEsp, false);
+  chests.forEach(v => drawWaypoint(v.x, v.y, v.z, 1, 1, settings.powderBoxColor, settings.powderBoxEsp, false));
 }, 'powderalert');
 
 export function init() {

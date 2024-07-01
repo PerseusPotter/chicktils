@@ -74,13 +74,7 @@ const renderWorldReg = reg('renderWorld', () => {
     );
   });
 
-  if (lookPos) {
-    const r = ((settings.dungeonStairStonkHelperHighlightColor >> 24) & 0xFF) / 256;
-    const g = ((settings.dungeonStairStonkHelperHighlightColor >> 16) & 0xFF) / 256;
-    const b = ((settings.dungeonStairStonkHelperHighlightColor >> 8) & 0xFF) / 256;
-    const a = ((settings.dungeonStairStonkHelperHighlightColor >> 0) & 0xFF) / 256;
-    drawFilledBox(lookPos.x + 0.4995, lookPos.y - 0.005, lookPos.z + 0.4995, 1.01, 1.01, r, g, b, a, false);
-  }
+  if (lookPos) drawFilledBox(lookPos.x - 0.005, lookPos.y - 0.005, lookPos.z - 0.005, 1.01, 1.01, settings.dungeonStairStonkHelperHighlightColor, false, false);
 }, 'dungeon/stairstonkhelper').setEnabled(settings._dungeonStairStonkHelper);
 
 export function init() { }

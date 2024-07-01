@@ -3,7 +3,7 @@ import data from '../data';
 import reg from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { drawBeaconBeam, drawString, pointTo3D, renderWaypoints } from '../util/draw';
+import { drawBeaconBeam, drawString, drawWaypoint, pointTo3D } from '../util/draw';
 import { dist, linReg, lineRectColl } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateVar } from '../util/state';
@@ -69,13 +69,8 @@ const renderOvReg = reg('renderOverlay', () => {
 }, 'diana').setEnabled(settings._dianaArrowToBurrow);
 const renderWrldReg = reg('renderWorld', () => {
   if (guessLoc) {
-    const c = settings.dianaGuessFromParticlesColor;
-    const r = ((c >> 24) & 0xFF) / 256;
-    const g = ((c >> 16) & 0xFF) / 256;
-    const b = ((c >> 8) & 0xFF) / 256;
-    const a = ((c >> 0) & 0xFF) / 256;
-    renderWaypoints([{ x: guessLoc[0], y: guessLoc[1], z: guessLoc[2] }], r, g, b, true, true);
-    drawBeaconBeam(guessLoc[0] - 0.5, guessLoc[1] + 1, guessLoc[2] - 0.5, r, g, b, a, false);
+    drawWaypoint(guessLoc[0], guessLoc[1], guessLoc[2], 1, 1, settings.dianaGuessFromParticlesColor, true, false);
+    drawBeaconBeam(guessLoc[0], guessLoc[1] + 1, guessLoc[2], settings.dianaGuessFromParticlesColor, true, false);
     // drawString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
   }
 }, 'diana').setEnabled(settings._dianaGuessFromParticles);

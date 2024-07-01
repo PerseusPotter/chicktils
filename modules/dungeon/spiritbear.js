@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import data from '../../data';
-import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawFilledBox, drawString } from '../../util/draw';
+import { drawOutline, drawFilledBox, drawString } from '../../util/draw';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import getPing from '../../util/ping';
@@ -103,18 +103,9 @@ const renderWorldReg = reg('renderWorld', () => {
     y = lerp(estPrev.y, est.y, smoothFactor);
     z = lerp(estPrev.z, est.z, smoothFactor);
   }
-  const br = ((settings.dungeonSpiritBearBoxColor >> 24) & 0xFF) / 256;
-  const bg = ((settings.dungeonSpiritBearBoxColor >> 16) & 0xFF) / 256;
-  const bb = ((settings.dungeonSpiritBearBoxColor >> 8) & 0xFF) / 256;
-  const ba = ((settings.dungeonSpiritBearBoxColor >> 0) & 0xFF) / 256;
-  const wr = ((settings.dungeonSpiritBearWireColor >> 24) & 0xFF) / 256;
-  const wg = ((settings.dungeonSpiritBearWireColor >> 16) & 0xFF) / 256;
-  const wb = ((settings.dungeonSpiritBearWireColor >> 8) & 0xFF) / 256;
-  const wa = ((settings.dungeonSpiritBearWireColor >> 0) & 0xFF) / 256;
   const m = (bearSpawnTicks - ticks.get() - Tessellator.partialTicks + getPing() / 50) / bearSpawnTicks;
-  drawFilledBox(x, y + 1 - m, z, m, 2 * m, br, bg, bb, ba, settings.dungeonSpiritBearBoxEsp);
-  if (settings.dungeonSpiritBearBoxEsp) drawBoxAtBlock(x - 0.5, y, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
-  else drawBoxAtBlockNotVisThruWalls(x - 0.5, y, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
+  drawOutline(x, y, z, 1, 2, settings.dungeonSpiritBearWireColor, settings.dungeonSpiritBearBoxEsp, true, 3);
+  drawFilledBox(x, y + 2.5 - m, z, m, 2 * m, settings.dungeonSpiritBearBoxColor, settings.dungeonSpiritBearBoxEsp);
 
   if (settings.dungeonSpiritBearTimer) drawString(((ticks.get() - Tessellator.partialTicks) / 20).toFixed(2), x, y + 2.5, z);
 }, 'dungeon/spiritbear').setEnabled(stateBearSpawning);

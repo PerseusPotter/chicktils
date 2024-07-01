@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import data from '../../data';
-import { drawBoxAtBlockNotVisThruWalls, drawBoxAtBlock, drawFilledBox, drawString } from '../../util/draw';
+import { drawOutline, drawFilledBox, drawString } from '../../util/draw';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import getPing from '../../util/ping';
@@ -120,9 +120,6 @@ const serverTickReg = reg('packetReceived', () => {
   });
 }, 'dungeon/camp').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateCampFinal);
 const renderWorldReg = reg('renderWorld', () => {
-  // bloodMobs.forEach(e => motionData.has(e.getUUID().toString()) || drawBoxAtBlock(e.getX() - 0.5, e.getY() + 1.5, e.getZ() - 0.5, 1, +(!e.isDead()), +(e.getX() === e.getLastX()), 1, 1));
-  // drawBoxAtBlock(bloodX, 69, bloodZ, 1, 0, 0, 32, 16);
-
   const t = Date.now();
   motionData.forEach(({ estX, estY, estZ, lastEstX, lastEstY, lastEstZ, ttl, maxTtl, lastUpdate }) => {
     const dt = t - lastUpdate;
@@ -139,18 +136,9 @@ const renderWorldReg = reg('renderWorld', () => {
       y = lerp(lastEstY, estY, smoothFactor);
       z = lerp(lastEstZ, estZ, smoothFactor);
     }
-    const br = ((settings.dungeonCampBoxColor >> 24) & 0xFF) / 256;
-    const bg = ((settings.dungeonCampBoxColor >> 16) & 0xFF) / 256;
-    const bb = ((settings.dungeonCampBoxColor >> 8) & 0xFF) / 256;
-    const ba = ((settings.dungeonCampBoxColor >> 0) & 0xFF) / 256;
-    const wr = ((settings.dungeonCampWireColor >> 24) & 0xFF) / 256;
-    const wg = ((settings.dungeonCampWireColor >> 16) & 0xFF) / 256;
-    const wb = ((settings.dungeonCampWireColor >> 8) & 0xFF) / 256;
-    const wa = ((settings.dungeonCampWireColor >> 0) & 0xFF) / 256;
     const m = (maxTtl - ttl - Tessellator.partialTicks + getPing() / 50) / maxTtl;
-    drawFilledBox(x, y + 2.5 - m, z, m, 2 * m, br, bg, bb, ba, settings.dungeonCampBoxEsp);
-    if (settings.dungeonCampBoxEsp) drawBoxAtBlock(x - 0.5, y + 1.5, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
-    else drawBoxAtBlockNotVisThruWalls(x - 0.5, y + 1.5, z - 0.5, wr, wg, wb, 1, 2, wa, 3);
+    drawOutline(x, y + 1.5, z, 1, 2, settings.dungeonCampWireColor, settings.dungeonCampBoxEsp, true, 3);
+    drawFilledBox(x, y + 2.5 - m, z, m, 2 * m, settings.dungeonCampBoxColor, settings.dungeonCampBoxEsp);
 
     if (settings.dungeonCampTimer) drawString(((ttl - Tessellator.partialTicks) / 20).toFixed(2), x, y + 1, z);
   });

@@ -1,5 +1,5 @@
 import settings from '../../settings';
-import { drawBoxPos, rgbaToJavaColor } from '../../util/draw';
+import { drawOutline } from '../../util/draw';
 import reg from '../../util/registerer';
 import { compareFloat, dist } from '../../util/math';
 import Grid from '../../util/grid';
@@ -62,7 +62,7 @@ const step2Reg = reg('step', () => {
     if (e.field_70128_L) return false;
     const n = e.func_70005_c_();
     if (n === 'Shadow Assassin') {
-      boxMobs.put(e, { yO: 0, h: 2, c: rgbaToJavaColor(settings.dungeonBoxSAColor) });
+      boxMobs.put(e, { yO: 0, h: 2, c: settings.dungeonBoxSAColor });
       return false;
     }
     mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
@@ -76,7 +76,7 @@ const tickReg = reg('tick', () => {
       if (e.field_70128_L) return;
       const n = e.func_70005_c_();
       if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
-        boxMobs.put(e, { yO: -1, h: 1, c: rgbaToJavaColor(settings.dungeonBoxKeyColor) });
+        boxMobs.put(e, { yO: -1, h: 1, c: settings.dungeonBoxKeyColor });
         return;
       }
       if (!n.startsWith('§6✯ ')) return;
@@ -102,13 +102,13 @@ const tickReg = reg('tick', () => {
       } else if (t === 3) {
         c = settings.dungeonBoxMiniColor;
       }
-      boxMobs.put(ent, { yO: 0, h, c: rgbaToJavaColor(c) });
+      boxMobs.put(ent, { yO: 0, h, c });
     });
   });
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
-const renderEntPostReg = reg('postRenderEntity', (e, pos, partial) => {
+const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity);
-  if (data) drawBoxPos(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, partial, settings.dungeonBoxMobEsp, false);
+  if (data) drawOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, settings.dungeonBoxMobEsp, true, undefined, true);
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 
 export function init() { }

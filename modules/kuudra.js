@@ -1,4 +1,4 @@
-import { drawBoxAtBlock, drawBoxAtBlockNotVisThruWalls, drawArrow2D, renderWaypoints, getRenderX, getRenderY, getRenderZ, drawBeaconBeam, drawLine3D, drawString, rgbaToARGB } from '../util/draw';
+import { drawOutline, drawArrow2D, getRenderX, getRenderY, getRenderZ, drawBeaconBeam, drawLine3D, drawString, rgbaToARGB, drawWaypoint } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
@@ -112,75 +112,34 @@ const renderReg = reg('renderWorld', () => {
       drawString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x, y + 1, z, rgbaToARGB(c));
     });
   }
-  if (settings.kuudraRenderEmptySupplySpot && dropLocs.length > 0) {
-    const c = settings.kuudraEmptySupplySpotColor;
-    const r = ((c >> 24) & 0xFF) / 256;
-    const g = ((c >> 16) & 0xFF) / 256;
-    const b = ((c >> 8) & 0xFF) / 256;
-    // const a = ((c >> 0) & 0xFF) / 256;
-    renderWaypoints(dropLocs, r, g, b);
-  }
-  if (settings.kuudraBoxSupplies && supplies.length > 0) {
-    const c = settings.kuudraBoxSuppliesColor;
-    const r = ((c >> 24) & 0xFF) / 256;
-    const g = ((c >> 16) & 0xFF) / 256;
-    const b = ((c >> 8) & 0xFF) / 256;
-    const a = ((c >> 0) & 0xFF) / 256;
-
-    supplies.forEach(v => {
-      const x = v.getRenderX();
-      const y = v.getRenderY();
-      const z = v.getRenderZ();
-      if (settings.kuudraBoxSuppliesEsp) drawBoxAtBlock(x - 3.25, y + 8, z + 2, r, g, b, 2.5, 2.5, a);
-      else drawBoxAtBlockNotVisThruWalls(x - 3.25, y + 8, z + 2, r, g, b, 2.5, 2.5, a);
-      drawBeaconBeam(x - 2.5, y + 11, z + 2.75, r, g, b, a, !settings.kuudraBoxSuppliesEsp);
-    });
-  }
-  if (settings.kuudraBoxChunks && chunks.length > 0) {
-    const c = settings.kuudraBoxChunksColor;
-    const r = ((c >> 24) & 0xFF) / 256;
-    const g = ((c >> 16) & 0xFF) / 256;
-    const b = ((c >> 8) & 0xFF) / 256;
-    const a = ((c >> 0) & 0xFF) / 256;
-
-    chunks.forEach(v => {
-      const x = v.getRenderX();
-      const y = v.getRenderY();
-      const z = v.getRenderZ();
-      if (settings.kuudraBoxSuppliesEsp) drawBoxAtBlock(x - 3.25, y + 8, z + 2, r, g, b, 2.5, 2.5, a);
-      else drawBoxAtBlockNotVisThruWalls(x - 3.25, y + 8, z + 2, r, g, b, 2.5, 2.5, a);
-    });
-  }
+  if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => drawWaypoint(v.x, v.y, v.z, 1, 1, settings.kuudraEmptySupplySpotColor, true));
+  if (settings.kuudraBoxSupplies && supplies.length > 0) supplies.forEach(v => {
+    const x = v.getRenderX();
+    const y = v.getRenderY();
+    const z = v.getRenderZ();
+    drawOutline(x - 3.25, y + 8, z + 2, 2.5, 2.5, settings.kuudraBoxSuppliesColor, settings.kuudraBoxSuppliesEsp, false);
+    drawBeaconBeam(x - 2.5, y + 11, z + 2.75, settings.kuudraBoxSuppliesColor, settings.kuudraBoxSuppliesEsp, false);
+  });
+  if (settings.kuudraBoxChunks && chunks.length > 0) chunks.forEach(v => {
+    const x = v.getRenderX();
+    const y = v.getRenderY();
+    const z = v.getRenderZ();
+    drawOutline(x - 3.25, y + 8, z + 2, 2.5, 2.5, settings.kuudraBoxChunksColor, settings.kuudraBoxChunksEsp, false);
+  });
   if (settings.kuudraShowCannonAim && isOnCannon && Player.getY() > 60) {
     const theta = (Player.getX() > -100 ? 130 : 50) / 180 * Math.PI;
     const phi = 80 / 180 * Math.PI;
-    const c = settings.kuudraCannonAimColor;
-    const r = ((c >> 24) & 0xFF) / 256;
-    const g = ((c >> 16) & 0xFF) / 256;
-    const b = ((c >> 8) & 0xFF) / 256;
-    // const a = ((c >> 0) & 0xFF) / 256;
-    renderWaypoints([{
-      ...intersectPL(
-        Math.sin(phi) * Math.cos(theta),
-        Math.cos(phi),
-        Math.sin(phi) * Math.sin(theta),
-        getRenderX(), getRenderY() + getEyeHeight(), getRenderZ(),
-        0, 0, 1,
-        0, 0, -80
-      ),
-      w: 1,
-      h: 1
-    }], r, g, b);
+    const { x, y, z } = intersectPL(
+      Math.sin(phi) * Math.cos(theta),
+      Math.cos(phi),
+      Math.sin(phi) * Math.sin(theta),
+      getRenderX(), getRenderY() + getEyeHeight(), getRenderZ(),
+      0, 0, 1,
+      0, 0, -80
+    );
+    drawWaypoint(x, y, z, 1, 1, settings.kuudraCannonAimColor, true);
   }
-  if (settings.kuudraBoxKuudra && kuuder) {
-    const c = settings.kuudraBoxKuudraColor;
-    const r = ((c >> 24) & 0xFF) / 256;
-    const g = ((c >> 16) & 0xFF) / 256;
-    const b = ((c >> 8) & 0xFF) / 256;
-    const a = ((c >> 0) & 0xFF) / 256;
-    if (settings.kuudraBoxKuudraEsp) drawBoxAtBlock(kuuder.getX() - 7.5, kuuder.getY(), kuuder.getZ() - 7.5, r, g, b, 15, 15, a);
-    else drawBoxAtBlockNotVisThruWalls(kuuder.getX() - 7.5, kuuder.getY(), kuuder.getZ() - 7.5, r, g, b, 15, 15, a);
-  }
+  if (settings.kuudraBoxKuudra && kuuder) drawOutline(kuuder.getX(), kuuder.getY(), kuuder.getZ(), 15, 15, settings.kuudraBoxKuudraColor, settings.kuudraBoxKuudraEsp);
 }, 'kuudra').setEnabled(new StateProp(settings._kuudraRenderPearlTarget).or(settings._kuudraRenderEmptySupplySpot).or(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks).or(settings._kuudraShowCannonAim).or(settings._kuudraBoxKuudra));
 
 const tickReg = reg('tick', () => {
