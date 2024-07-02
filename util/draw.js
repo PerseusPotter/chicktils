@@ -44,6 +44,7 @@ function getPitch() {
  * @param {number?} yaw degrees
  */
 export function drawArrow2D(color, theta, length = 20, yaw) {
+  if ((color & 0xFF) === 0) return;
   if (yaw === undefined) yaw = getYaw();
   const dt = theta - yaw / 180 * Math.PI - Math.PI/* + (getXMult() === 1 ? -Math.PI : 0)*/;
   const x1 = Renderer.screen.getWidth() / 2;
@@ -66,6 +67,7 @@ export function drawArrow2D(color, theta, length = 20, yaw) {
  * @param {number?} pitch degrees
  */
 export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
+  if ((color & 0xFF) === 0) return;
   if (yaw === undefined) yaw = getYaw();
   if (pitch === undefined) pitch = getPitch();
   const dt = theta - yaw / 180 * Math.PI - Math.PI / 2 + (getXMult() === 1 ? 0 : Math.PI);
@@ -181,6 +183,7 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
  * @param {number?} scale (3)
  */
 export function pointTo3D(color, dx, dy, dz, rel = true, scale) {
+  if ((color & 0xFF) === 0) return;
   if (rel) {
     if (settings.preferUseTracer) return renderTracer(color, dx + getRenderX(), dy + getRenderY(), dz + getRenderZ());
     return drawArrow3D(color, Math.atan2(dz, dx), Math.acos(dy / Math.hypot(dx, dy, dz)), scale);
@@ -196,6 +199,7 @@ export function pointTo3D(color, dx, dy, dz, rel = true, scale) {
  * @param {number} z
  */
 export function renderTracer(color, x, y, z) {
+  if ((color & 0xFF) === 0) return;
   ({ x, y, z } = rescaleRender(x, y, z));
   // renderWorld
   // const p = Player.getPlayer();
@@ -254,6 +258,7 @@ export function renderTracer(color, x, y, z) {
  * @param {boolean?} nt use if postrenderentity (false)
  */
 export function drawOutline(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false) {
+  if ((color & 0xFF) === 0) return;
   if (center) {
     x -= w / 2;
     z -= w / 2;
@@ -337,6 +342,7 @@ export function drawOutline(x, y, z, w, h, color, esp = false, center = true, lw
  * @param {boolean?} nt use if postrenderentity (false)
  */
 export function drawFilledBox(x, y, z, w, h, color, esp = false, center = true, nt = false) {
+  if ((color & 0xFF) === 0) return;
   if (center) {
     x -= w / 2;
     z -= w / 2;
@@ -418,9 +424,10 @@ export function drawFilledBox(x, y, z, w, h, color, esp = false, center = true, 
  * @param {number?} lw line width (5)
  */
 export function drawWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5) {
+  if ((color & 0xFF) === 0) return;
   const c = (color & ~0xFF) | ((color & 0xFF) >> 2);
-  drawFilledBox(x, yu, z, w, h, c, esp, center, lw);
-  drawOutline(x, yu, z, w, h, color, esp, center, lw);
+  drawFilledBox(x, y, z, w, h, c, esp, center, lw);
+  drawOutline(x, y, z, w, h, color, esp, center, lw);
 }
 
 /**
@@ -429,6 +436,7 @@ export function drawWaypoint(x, y, z, w, h, color, esp = false, center = true, l
  * @link https://github.com/ChatTriggers/ChatTriggers/blob/3aac68d7aa6c3276ae79000306895130c291d85b/src/main/kotlin/com/chattriggers/ctjs/minecraft/libs/renderer/Renderer.kt#L225
  */
 export function drawPolygon(color, vertexes) {
+  if ((color & 0xFF) === 0) return;
   GlStateManager.func_179147_l();
   GlStateManager.func_179090_x();
   GlStateManager.func_179120_a(770, 771, 1, 0);
@@ -479,6 +487,7 @@ function applyTint(c, a) {
  * @param {number?} lw (2)
  */
 export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
+  if ((color & 0xFF) === 0) return;
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
   ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));
   const render = Client.getMinecraft().func_175606_aa();
@@ -525,6 +534,7 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
  * @param {boolean?} increase (true)
  */
 export function drawString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = true, scale = 1, increase = true) {
+  if ((color & 0xFF) === 0) return;
   let s;
   ({ x, y, z, s } = rescaleRender(x, y, z));
   scale *= s;
@@ -541,6 +551,7 @@ export function drawString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = t
  * @param {number?} height (300)
  */
 export function drawBeaconBeam(x, y, z, color, esp = false, center = true, height = 300) {
+  if ((color & 0xFF) === 0) return;
   if (center) {
     x -= 0.5;
     z -= 0.5;
