@@ -244,7 +244,6 @@ export function renderTracer(color, x, y, z) {
   GlStateManager.func_179089_o();
 }
 
-// Java.type('net.minecraft.client.renderer.RenderGlobal').func_181563_a(bb, c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
 /**
  * @param {number} x
  * @param {number} y
@@ -539,6 +538,21 @@ export function drawString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = t
   ({ x, y, z, s } = rescaleRender(x, y, z));
   scale *= s;
   Tessellator.drawString(text, x, y, z, rgbaToARGB(color), renderBlackBox, scale, increase);
+}
+
+/**
+ * @param {string} text
+ * @param {number} x
+ * @param {number} y
+ */
+export function drawOutlinedString(text, x, y) {
+  GlStateManager.func_179131_c(0, 0, 0, 1);
+  Renderer.drawString(text, x + 1, y + 0);
+  Renderer.drawString(text, x - 1, y + 0);
+  Renderer.drawString(text, x + 0, y + 1);
+  Renderer.drawString(text, x + 0, y - 1);
+  GlStateManager.func_179131_c(1, 1, 1, 1);
+  Renderer.drawString(text, x, y);
 }
 
 /**
