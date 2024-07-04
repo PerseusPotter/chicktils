@@ -3,9 +3,11 @@ import RenderLib2D from '../../RenderLib2D/index';
 import _drawBeaconBeam from '../../BeaconBeam/index';
 import settings from '../settings';
 import { getEyeHeight } from './mc';
+import { log } from './log';
 
 const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 const worldRen = tess.func_178180_c();
+const DefaultVertexFormats = Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats');
 const rm = Renderer.getRenderManager();
 const xa = rm.class.getDeclaredField('field_78725_b'); xa.setAccessible(true);
 const ya = rm.class.getDeclaredField('field_78726_c'); ya.setAccessible(true);
@@ -217,7 +219,7 @@ export function renderTracer(color, x, y, z) {
   const b = ((color >> 8) & 0xFF) / 256;
   const a = ((color >> 0) & 0xFF) / 256;
   GlStateManager.func_179131_c(r, g, b, a);
-  worldRen.func_181668_a(1, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
 
   // renderWorld
   // worldRen.func_181662_b(dx - getRenderX(), dy - getRenderY(), dz - getRenderZ()).func_181675_d();
@@ -285,7 +287,6 @@ export function drawOutline(x, y, z, w, h, color, esp = false, center = true, lw
     GL11.glDisable(GL11.GL_DEPTH_TEST);
     GL11.glDepthMask(false);
   }
-  // Java.type('net.minecraft.client.renderer.RenderGlobal').func_181563_a(bb, c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
 
   const r = ((color >> 24) & 0xFF) / 256;
   const g = ((color >> 16) & 0xFF) / 256;
@@ -293,19 +294,19 @@ export function drawOutline(x, y, z, w, h, color, esp = false, center = true, lw
   const a = ((color >> 0) & 0xFF) / 256;
   GlStateManager.func_179131_c(r, g, b, a);
 
-  worldRen.func_181668_a(2, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
   worldRen.func_181662_b(x, y, z + w).func_181675_d();
   worldRen.func_181662_b(x + w, y, z + w).func_181675_d();
   worldRen.func_181662_b(x + w, y, z).func_181675_d();
   tess.func_78381_a();
-  worldRen.func_181668_a(2, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y + h, z).func_181675_d();
   worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
   worldRen.func_181662_b(x + w, y + h, z + w).func_181675_d();
   worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
   tess.func_78381_a();
-  worldRen.func_181668_a(1, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
   worldRen.func_181662_b(x, y + h, z).func_181675_d();
   worldRen.func_181662_b(x, y, z + w).func_181675_d();
@@ -375,7 +376,7 @@ export function drawFilledBox(x, y, z, w, h, color, esp = false, center = true, 
   const a = ((color >> 0) & 0xFF) / 256;
   GlStateManager.func_179131_c(r, g, b, a);
 
-  worldRen.func_181668_a(5, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
   worldRen.func_181662_b(x + w, y, z).func_181675_d();
   worldRen.func_181662_b(x, y, z + w).func_181675_d();
@@ -387,7 +388,7 @@ export function drawFilledBox(x, y, z, w, h, color, esp = false, center = true, 
   worldRen.func_181662_b(x, y, z).func_181675_d();
   worldRen.func_181662_b(x + w, y, z).func_181675_d();
   tess.func_78381_a();
-  worldRen.func_181668_a(7, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(7, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
   worldRen.func_181662_b(x, y, z + w).func_181675_d();
   worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
@@ -449,7 +450,7 @@ export function drawPolygon(color, vertexes) {
   const b = ((color >> 8) & 0xFF) / 256;
   const a = ((color >> 0) & 0xFF) / 256;
   GlStateManager.func_179131_c(r, g, b, a);
-  worldRen.func_181668_a(5, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
 
   vertexes.forEach(v => worldRen.func_181662_b(v[0], v[1], v[2] || 0).func_181675_d());
   tess.func_78381_a();
@@ -507,7 +508,7 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   const b = ((color >> 8) & 0xFF) / 256;
   const a = ((color >> 0) & 0xFF) / 256;
   GlStateManager.func_179131_c(r, g, b, a);
-  worldRen.func_181668_a(3, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(3, DefaultVertexFormats.field_181705_e);
 
   worldRen.func_181662_b(x1, y1, z1).func_181675_d();
   worldRen.func_181662_b(x2, y2, z2).func_181675_d();
@@ -572,6 +573,36 @@ export function drawOutlinedString(text, x, y) {
 /**
  * @param {number} x
  * @param {number} y
+ * @param {number} u
+ * @param {number} v
+ * @param {number} w
+ * @param {number} h
+ * @param {number} tw
+ * @param {number} th
+ * @param {number?} uw
+ * @param {number?} vh
+ * @param {number?} z
+ */
+export function drawTexturedRect(x, y, u, v, w, h, tw, th, uw, vh) {
+  if (!uw) uw = w;
+  if (!vh) vh = h;
+  const f = 1 / tw;
+  const g = 1 / th;
+  u *= f;
+  v *= g;
+  uw *= f;
+  vh *= g;
+  worldRen.func_181668_a(7, DefaultVertexFormats.field_181707_g);
+  worldRen.func_181662_b(x, y + h, 0).func_181673_a(u, v + vh).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, 0).func_181673_a(u + uw, v + vh).func_181675_d();
+  worldRen.func_181662_b(x + w, y, 0).func_181673_a(u + uw, v).func_181675_d();
+  worldRen.func_181662_b(x, y, 0).func_181673_a(u, v).func_181675_d();
+  tess.func_78381_a();
+}
+
+/**
+ * @param {number} x
+ * @param {number} y
  * @param {number} z
  * @param {number} color rgba
  * @param {boolean?} esp is visible through walls (false)
@@ -627,8 +658,9 @@ function rescaleRender(x, y, z) {
   return { x, y, z, s: 1 };
 }
 
+const JColor = Java.type('java.awt.Color');
 export function rgbaToJavaColor(c) {
-  return new (Java.type('java.awt.Color'))(rgbaToARGB(c), true);
+  return new JColor(rgbaToARGB(c), true);
 }
 
 export class JavaColorWrapper {
