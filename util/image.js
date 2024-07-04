@@ -9,6 +9,7 @@ const BufferedImage = Java.type('java.awt.image.BufferedImage');
 const JImage = Java.type('java.awt.Image');
 const ConvolveOp = Java.type('java.awt.image.ConvolveOp');
 const Kernel = Java.type('java.awt.image.Kernel');
+const File = Java.type('java.io.File');
 
 /**
  * @param {string} url
@@ -58,6 +59,13 @@ export function fromURL(url) {
 export function fromBase64(b64) {
   const o = b64.indexOf(';base64,');
   return ImageIO.read(new ByteArrayInputStream(Base64.getDecoder().decode(o >= 0 ? b64.slice(o + ';base64,'.length) : b64)));
+}
+/**
+ * @param {string} path
+ * @returns {typeof BufferedImage}
+ */
+export function fromFile(path) {
+  return ImageIO.read(new File('./config/ChatTriggers/images', path));
 }
 
 /**
