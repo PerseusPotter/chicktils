@@ -104,8 +104,8 @@ const allChatReg = reg('chat', (ign, msg) => {
 const partyChatReg = reg('chat', (ign, msg, evn) => {
   processMessageWaypoint(ign, msg);
 
-  if (settings.chatTilsHideBonzo !== 'False' && msg === 'Bonzo Procced (3s)') return hideMessage(settings.chatTilsHideBonzo, evn);
-  if (settings.chatTilsHidePhoenix !== 'False' && msg === 'Phoenix Procced (3s)') return hideMessage(settings.chatTilsHidePhoenix, evn);
+  if (settings.chatTilsHideBonzo !== 'False' && msg.startsWith('Bonzo Procced')) return hideMessage(settings.chatTilsHideBonzo, evn);
+  if (settings.chatTilsHidePhoenix !== 'False' && msg.startsWith('Phoenix Procced')) return hideMessage(settings.chatTilsHidePhoenix, evn);
   if (settings.chatTilsHideLeap !== 'False' && (msg.startsWith('Leaped to ') || msg.startsWith('Leaping to ') || msg.startsWith('I\'m leaping to '))) return hideMessage(settings.chatTilsHideLeap, evn);
   if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
     const lIgn = ign.toLowerCase();
