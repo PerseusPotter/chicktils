@@ -43,6 +43,7 @@ const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) possibleSkulls.push(e);
 }, 'dungeon/camp').setEnabled(stateCamp);
 const tickReg = reg('tick', () => {
+  if (possibleSkulls.length === 0) return;
   run(() => {
     possibleSkulls.forEach(e => {
       if (!isSkull(e)) return;
