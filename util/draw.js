@@ -544,15 +544,29 @@ export function drawString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = t
  * @param {string} text
  * @param {number} x
  * @param {number} y
+ * @param {boolean?} shadow (false)
+ */
+export function drawString2D(text, x, y, shadow = false) {
+  text = ChatLib.addColor(text);
+  const fr = Renderer.getFontRenderer();
+  text.split('\n').forEach(v => {
+    fr.func_175065_a(v, x, y, 0xFFFFFFFF | 0, shadow);
+    y += fr.field_78288_b;
+  });
+}
+
+/**
+ * @param {string} text
+ * @param {number} x
+ * @param {number} y
  */
 export function drawOutlinedString(text, x, y) {
-  GlStateManager.func_179131_c(0, 0, 0, 1);
-  Renderer.drawString(text, x + 1, y + 0);
-  Renderer.drawString(text, x - 1, y + 0);
-  Renderer.drawString(text, x + 0, y + 1);
-  Renderer.drawString(text, x + 0, y - 1);
-  GlStateManager.func_179131_c(1, 1, 1, 1);
-  Renderer.drawString(text, x, y);
+  const bt = '&0' + text;
+  drawString2D(bt, x + 1, y + 0);
+  drawString2D(bt, x - 1, y + 0);
+  drawString2D(bt, x + 0, y + 1);
+  drawString2D(bt, x + 0, y - 1);
+  drawString2D(text, x, y);
 }
 
 /**
