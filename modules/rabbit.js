@@ -6,7 +6,7 @@ import { getSbDate } from '../util/skyblock';
 import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
 import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
-import { run } from '../util/threading';
+import { run, unrun } from '../util/threading';
 
 const stateIsSpring = new StateVar(false);
 
@@ -27,25 +27,27 @@ function scanEgg() {
       const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
       return ['015adc61-0aba-3d4d-b3d1-ca47a68a154b', '55ae5624-c86b-359f-be54-e0ec7c175403', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].find((v, i) => activeEggs[i] === 2 && v === id);
     });
-    if (settings.rabbitAlertEggFound && eggs.length > l) Client.scheduleTask(() => eggFoundAlert.show(settings.rabbitAlertFoundTime));
+    if (settings.rabbitAlertEggFound && eggs.length > l) unrun(() => eggFoundAlert.show(settings.rabbitAlertFoundTime));
   });
 }
 const eggSpawnReg = reg('step', () => {
-  const { year, month, day, hour } = getSbDate();
-  stateIsSpring.set(month <= 3);
-  if (month > 3) return;
-  const dayHash = year * 631 * 631 + month * 631 + day;
-  let type;
-  if (hour === 7) type = 0;
-  else if (hour === 14) type = 1;
-  else if (hour === 21) type = 2;
-  else return;
+  unrun(() => {
+    const { year, month, day, hour } = getSbDate();
+    stateIsSpring.set(month <= 3);
+    if (month > 3) return;
+    const dayHash = year * 631 * 631 + month * 631 + day;
+    let type;
+    if (hour === 7) type = 0;
+    else if (hour === 14) type = 1;
+    else if (hour === 21) type = 2;
+    else return;
 
-  if (lastSpawnDays[type] === dayHash) return;
-  lastSpawnDays[type] = dayHash;
-  activeEggs[type] = 2;
+    if (lastSpawnDays[type] === dayHash) return;
+    lastSpawnDays[type] = dayHash;
+    activeEggs[type] = 2;
 
-  if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertFoundTime);
+    if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertFoundTime);
+  });
 }, 'rabbit').setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
 const eggStepReg = reg('step', () => scanEgg(), 'rabbit').setDelay(2).setEnabled(new StateProp(stateIsSpring).and(settings._rabbitSniffer));
 const types = {
