@@ -60,16 +60,11 @@ function onCollect(type) {
 const eggCollectReg = reg('chat', onCollect, 'rabbit').setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').setEnabled(stateIsSpring);
 const eggAlrCollectReg = reg('chat', onCollect, 'rabbit').setCriteria('&r&cYou have already collected this Chocolate ${type} Egg&r&c! Try again when it respawns!&r').setEnabled(stateIsSpring);
 const eggRenWrldReg = reg('renderWorld', () => {
-  const c = settings.rabbitBoxColor;
-  const r = ((c >> 24) & 0xFF) / 256;
-  const g = ((c >> 16) & 0xFF) / 256;
-  const b = ((c >> 8) & 0xFF) / 256;
-  const a = ((c >> 0) & 0xFF) / 256;
   eggs.forEach(v => {
     const x = v.getRenderX();
     const y = v.getRenderY();
     const z = v.getRenderZ();
-    drawOutline(x, y, z, 0.5, 0.5, settings.rabbitBoxColor, settings.rabbitBoxEsp);
+    drawOutline(x, y + 1.5, z, 0.5, 0.5, settings.rabbitBoxColor, settings.rabbitBoxEsp);
     drawBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.rabbitBoxEsp);
   });
 }, 'rabbit').setEnabled(stateIsSpring);
