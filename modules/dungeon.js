@@ -25,7 +25,7 @@ function start() {
 }
 
 /**
- * @type {{ ign: string, class: 'Archer' | 'Bers' | 'Healer' | 'Mage' | 'Tank', e: Entity | null }[]}
+ * @type {{ ign: string, class: 'Archer' | 'Bers' | 'Healer' | 'Mage' | 'Tank', e: EntityLivingBase | null, me: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'> | null }[]}
  */
 let players = [];
 let modules = [];
@@ -71,7 +71,10 @@ export function roundRoomCoords(c) {
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) {
     const p = players.find(v => v.ign === e.func_70005_c_());
-    if (p) p.e = new EntityLivingBase(e);
+    if (p) {
+      p.e = new EntityLivingBase(e);
+      p.me = e;
+    }
   }
 }, 'dungeon');
 const getPlayersStep2Reg = reg('step', () => {
@@ -97,10 +100,16 @@ const getPlayersStep2Reg = reg('step', () => {
   if (players.length) {
     World.getAllEntitiesOfType(EntityOtherPlayerMP).forEach(v => {
       const player = players.find(p => p.ign === v.getName());
-      if (player) player.e = new EntityLivingBase(v.entity);
+      if (player) {
+        player.e = new EntityLivingBase(v.entity);
+        player.me = v.entity;
+      }
     });
     const player = players.find(p => p.ign === Player.getName());
-    if (player) player.e = Player;
+    if (player) {
+      player.e = Player;
+      player.me = Player.getPlayer();
+    }
     getPlayersStep2Reg.unregister();
   }
 }, 'dungeon').setFps(2);
