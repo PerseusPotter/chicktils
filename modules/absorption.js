@@ -1,4 +1,5 @@
 import settings from '../settings';
+import { drawTexturedRect } from '../util/draw';
 import { dist } from '../util/math';
 import reg from '../util/registerer';
 
@@ -19,7 +20,6 @@ const actionBarReg = reg('actionBar', (curr, max) => {
   actualAbsorb = Math.min(Math.max(Math.ceil(curr / hpph) - hp, 0), settings.absorptionMaxHearts);
 }, 'absorption').setChatCriteria('${curr}/${max}❤${*}');
 
-const drawTexturedModalRect = Client.getMinecraft().field_71456_v.func_73729_b.bind(Client.getMinecraft().field_71456_v);
 const renderHeartReg = reg('renderHealth', evn => {
   const playerE = Player.getPlayer();
   if (!playerE) return;
@@ -29,7 +29,6 @@ const renderHeartReg = reg('renderHealth', evn => {
   // https://github.com/MinecraftForge/MinecraftForge/blob/d06e0ad71b8471923cc809dde58251de8299a143/src/main/java/net/minecraftforge/client/GuiIngameForge.java#L330
   const w = Renderer.screen.getWidth();
   const h = Renderer.screen.getHeight();
-  GL11.glEnable(GL11.GL_BLEND);
   let hp = Math.ceil(Player.getHP());
   const doHighlight = hpUpdateC > updateC && (((hpUpdateC - updateC) / 3) & 1) === 1;
 
@@ -71,7 +70,7 @@ const renderHeartReg = reg('renderHealth', evn => {
   const drawText = (x, y, u) => {
     const i = y * 10 + x;
     if (!pos[i]) return;
-    drawTexturedModalRect(pos[i][0], pos[i][1], u, TOP, 9, 9);
+    drawTexturedRect(pos[i][0], pos[i][1], u, TOP, 9, 9, 256, 256);
   };
 
   let x = 0;
@@ -80,7 +79,7 @@ const renderHeartReg = reg('renderHealth', evn => {
     let _x = l + x * 8;
     let _y = b - y * rowHeight + (hp <= 4) * (Math.random() < 0.5) + (pos.length === regen ? -2 : 0);
     pos.push([_x, _y]);
-    drawTexturedModalRect(_x, _y, BACKGROUND, TOP, 9, 9);
+    drawTexturedRect(_x, _y, BACKGROUND, TOP, 9, 9, 256, 256);
     if (++x === 10) {
       x = 0;
       y++;
@@ -121,8 +120,6 @@ const renderHeartReg = reg('renderHealth', evn => {
     }
     hp -= 2;
   }
-
-  GL11.glDisable(GL11.GL_BLEND);
 }, 'absorption');
 
 export function init() { }
