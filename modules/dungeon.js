@@ -24,6 +24,9 @@ function start() {
   modules.forEach(v => v.start());
 }
 
+/**
+ * @type {{ ign: string, class: 'Archer' | 'Bers' | 'Healer' | 'Mage' | 'Tank', e: Entity | null }[]}
+ */
 let players = [];
 let modules = [];
 const bossCbs = [];
