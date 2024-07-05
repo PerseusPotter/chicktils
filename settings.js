@@ -312,17 +312,18 @@ export class Property {
     this.actionListeners.push(cb);
   }
 
-  getMessage(module, name = this.name) {
-    const comps = [this.desc ? new TextComponent(` &f${name}`).setHover('show_text', this.desc) : ` &f${name}`];
-    if (this.type === Property.Type.Action) comps.unshift(new TextComponent('&7[&dRUN&7]&r').setClick('run_command', `/${module} config edit ${this.name}`));
+  getMessage(parity, module, name = this.name) {
+    const c = parity ? ['&7', '&6', '&5', '&4', '&3', '&2', '&8'] : ['&f', '&e', '&d', '&c', '&b', '&a', '&7'];
+    const comps = [this.desc ? new TextComponent(`${c[0]}${name}`).setHover('show_text', this.desc) : `${c[0]}${name}`];
+    if (this.type === Property.Type.Action) comps.unshift(new TextComponent(`${c[6]}[  ${c[2]}RUN${c[6]}   ]&r `).setClick('run_command', `/${module} config edit ${this.name}`));
     else {
       comps.unshift(
-        new TextComponent('&7[&4RESET&7]&r').setClick('run_command', `/${module} config edit ${this.name}`),
-        new TextComponent('&7[&aEDIT&7]&r').setClick('suggest_command', `/${module} config edit ${this.name} ${this.toString()}`)
+        new TextComponent(`${c[6]}[ ${c[3]}RESET${c[6]} ]&r `).setClick('run_command', `/${module} config edit ${this.name}`),
+        new TextComponent(`${c[6]}[  ${c[5]}EDIT${c[6]}  ]&r `).setClick('suggest_command', `/${module} config edit ${this.name} ${this.toString()}`)
       );
-      comps.push(`&7:&6 ${this.toString()}`);
+      comps.push(`${c[6]}:${c[1]} ${this.toString()}`);
     }
-    if (this.type === Property.Type.Toggle) comps[1] = new TextComponent('&7[&bTOGGLE&7]&r').setClick('run_command', `/${module} config edit ${this.name} TOGGLE`);
+    if (this.type === Property.Type.Toggle) comps[1] = new TextComponent(`${c[6]}[${c[4]}TOGGLE${c[6]}]&r `).setClick('run_command', `/${module} config edit ${this.name} TOGGLE`);
     return new Message(...comps);
   }
 }
@@ -401,7 +402,7 @@ class Settings {
   display(page) {
     const props = this.props.filter(v => v.page === page);
     props.sort((a, b) => a.sort - b.sort);
-    const msgs = props.map(p => p.getMessage(this.module));
+    const msgs = props.map((p, i) => p.getMessage(i & 1, this.module));
     const pageNav = new Message(page === this.minPage ? '   ' : new TextComponent('&a<- ').setClick('run_command', `/${this.module} config view ${page - 1}`), `&fPage &6${page} &fof &6${this.maxPage}`, page === this.maxPage ? '   ' : new TextComponent('&a ->').setClick('run_command', `/${this.module} config view ${page + 1}`));
     centerMessage(pageNav);
     // msgs.unshift(pageNav.clone());
@@ -427,7 +428,7 @@ class Settings {
         if (i !== 0) return i;
         return a.p.name.toLowerCase().localeCompare(b.p.name.toLowerCase(), ['en-US']);
       });
-    const msgs = props.map(({ s, p }) => p.getMessage(this.module, s));
+    const msgs = props.map(({ s, p }, i) => p.getMessage(i & 1, this.module, s));
     msgs.unshift(new Message(centerMessage(`&d&l${this.module} &b&l"${str}" &d&lSettings`)));
     // this.prevMsgs.forEach(v => ChatLib.deleteChat(v));
     deleteMessages(this.prevMsgs);
