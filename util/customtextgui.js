@@ -199,7 +199,10 @@ const renderReg = reg('renderOverlay', () => {
   editDisplay.setLines(curr.getEditText());
   editDisplay.render();
 
-  Renderer.drawStringWithShadow('&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str, 50, 20);
+  const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str;
+  const w = Renderer.getStringWidth(editStr);
+  Renderer.drawRect(0xB0000000, 40, 15, w + 20, 20);
+  Renderer.drawStringWithShadow(editStr, 50, 20);
   Renderer.drawCircle(0xFF0000FF, curr.getLoc().x, curr.getLoc().y, 5, 10);
 }, 'customtextgui');
 
