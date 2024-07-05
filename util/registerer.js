@@ -1,3 +1,4 @@
+import { inherits } from './polyfill';
 import { StateProp, StateVar } from './state';
 import { run } from './threading';
 
@@ -158,37 +159,37 @@ reg = function reg(type, shit, modN) {
 };
 
 {
-  class ChickTilsRegister {
-    static list = [];
-    cb = Function.prototype;
-    constructor(cb) {
-      this.cb = cb;
-    }
-    register() {
-      this.constructor.list.push(this);
-      this.constructor.update();
-    }
-    unregister() {
-      const i = this.constructor.list.indexOf(this);
-      if (i >= 0) {
-        this.constructor.list.splice(i, 1);
-        this.constructor.update();
-      }
-    }
-    setPriority() { }
-    trigger() { }
-
-    static register() { }
-    static unregister() { }
-    static update() {
-      if (this.list.length) this.register();
-      else this.unregister();
-    }
+  function ChickTilsRegister(cb) {
+    this.cb = cb;
+    this.id = '' + Date.now() + Math.random();
   }
+  ChickTilsRegister.prototype.getList = function getList() {
+    throw 'override getList';
+  };
+  ChickTilsRegister.prototype.update = function update() { };
+  ChickTilsRegister.prototype.register = function register() {
+    this.getList().set(this.id, this);
+    this.update();
+    return this;
+  };
+  ChickTilsRegister.prototype.unregister = function unregister() {
+    this.getList().delete(this.id);
+    this.update();
+    return this;
+  };
+  ChickTilsRegister.prototype.setPriority = function setPriority() {
+    return this;
+  };
+  ChickTilsRegister.prototype.trigger = function trigger() { };
 
-  // doesn't add to com.chattriggers.ctjs.commands.Command.activeCommands so unload all commands on game unload (ct reload)
-  const cmds = {};
-  register('gameUnload', () => Object.values(cmds).forEach(v => v.unregister()));
+  const listenList = (function() {
+    const lists = [];
+    const gameUnloadReg = register('gameUnload', () => lists.forEach(v => v.forEach(v => v.unregister())));
+    return function(list) {
+      lists.push(list);
+    };
+  }());
+
   const ClientCommandHandler = Java.type('net.minecraftforge.client.ClientCommandHandler').instance;
   const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
   const commandMapF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71562_a');
@@ -197,150 +198,162 @@ reg = function reg(type, shit, modN) {
   commandSetF.setAccessible(true);
   // :(
   // [gg.skytils.skytilsmod.features.impl.handlers.NamespacedCommands:registerCommandHelper:81]: WARNING! Command aaa has 0; owners: []
-  class ChickTilsCommand extends ChickTilsRegister {
-    // rhino doesn't initialize properties if they're defined here if it's a subclass ??????
-    constructor(cb) {
-      super(cb);
-      this.name = '';
-      this.tabCb = null;
-      this.tabArr = new ArrayList();
-      this.aliases = new ArrayList();
-      this.override = false;
-      this.jcmd;
-      this._init = false;
-      this.jcmd = new JavaAdapter(Java.type('net.minecraft.command.CommandBase'), {
-        // getCommandName
-        func_71517_b: () => this.name,
-        // getCommandUsage
-        func_71518_a: () => ('/' + this.name).toString(),
-        // getCommandAliases
-        func_71514_a: () => this.aliases,
-        // processCommand
-        func_71515_b: (sender, args) => void this.cb.apply(this, args),
-        // addTabCompletionOptions
-        func_180525_a: (sender, args, pos) => this.tabCb ? new ArrayList(this.tabCb(args)) : this.tabArr,
-        // getRequiredPermissionLevel
-        func_82362_a: () => 0
-      });
-    }
-
-    _instantiate() {
-      if (this._init) return;
-      this._init = true;
-      if (!this.override && ClientCommandHandler.func_71555_a()[this.name]) return;
-      ClientCommandHandler.func_71560_a(this.jcmd);
-      cmds[this.name] = this;
-    }
-    _uninstantiate() {
-      if (!this._init) return;
-      this._init = false;
-      if (cmds[this.name] !== this) return;
-      helper.removeElementMap(commandMapF, ClientCommandHandler, this.name);
-      helper.removeElementSet(commandSetF, ClientCommandHandler, this.jcmd);
-    }
-    _reinstantiate() {
-      if (!this._init) return;
-      this._uninstantiate();
-      this._instantiate();
-    }
-
-    trigger(args) {
-      this.cb(args);
-    }
-    register() {
-      this._instantiate();
-      return this;
-    }
-    unregister() {
-      this._uninstantiate();
-      return this;
-    }
-    setTabCompletions(...args) {
-      if (!args) args = [];
-      else if (args.length === 1 && typeof args[0] === 'function') this.tabCb = args[0];
-      else args.forEach(v => this.tabArr.add(v.toString()));
-      return this;
-    }
-    setAliases(...args) {
-      args.forEach(v => this.aliases.add(v.toString()));
-      this._reinstantiate();
-      return this;
-    }
-    setCommandName(name, override = false) {
-      this.name = name.toString();
-      this.override = override;
-      this._reinstantiate();
-      return this;
-    }
-    setName(name, override) {
-      return this.setCommandName(name, override);
-    }
-
-    compareTo() { }
+  function ChickTilsCommand(cb) {
+    ChickTilsRegister.call(this, cb);
+    this.id = '';
+    this.tabCb = null;
+    this.tabArr = new ArrayList();
+    this.aliases = new ArrayList();
+    this.override = false;
+    this.jcmd;
+    this._init = false;
+    this.jcmd = new JavaAdapter(Java.type('net.minecraft.command.CommandBase'), {
+      // getCommandName
+      func_71517_b: () => this.id,
+      // getCommandUsage
+      func_71518_a: () => ('/' + this.id).toString(),
+      // getCommandAliases
+      func_71514_a: () => this.aliases,
+      // processCommand
+      func_71515_b: (sender, args) => void this.cb.apply(this, args),
+      // addTabCompletionOptions
+      func_180525_a: (sender, args, pos) => this.tabCb ? new ArrayList(this.tabCb(args)) : this.tabArr,
+      // getRequiredPermissionLevel
+      func_82362_a: () => 0
+    });
   }
-  class ChickTilsSpawnEntity extends ChickTilsRegister {
-    constructor(cb) {
-      super(cb);
-    }
+  inherits(ChickTilsCommand, ChickTilsRegister);
+  ChickTilsCommand.list = new Map();
+  listenList(ChickTilsCommand.list);
+  ChickTilsCommand.prototype.getList = function getList() {
+    return ChickTilsCommand.list;
+  };
+  ChickTilsCommand.prototype._instantiate = function _instantiate() {
+    if (this._init) return false;
+    this._init = true;
+    if (!this.override && ClientCommandHandler.func_71555_a()[this.id]) return false;
+    ClientCommandHandler.func_71560_a(this.jcmd);
+    return true;
+  };
+  ChickTilsCommand.prototype._uninstantiate = function _uninstantiate() {
+    if (!this._init) return false;
+    this._init = false;
+    if (this.getList().get(this.id) !== this) return false;
+    helper.removeElementMap(commandMapF, ClientCommandHandler, this.id);
+    helper.removeElementSet(commandSetF, ClientCommandHandler, this.jcmd);
+    return true;
+  };
+  ChickTilsCommand.prototype._reinstantiate = function _reinstantiate() {
+    if (!this._init) return;
+    this._uninstantiate();
+    this._instantiate();
+  };
+  ChickTilsCommand.prototype.register = function register() {
+    if (this._instantiate()) ChickTilsRegister.prototype.register.call(this);
+    return this;
+  };
+  ChickTilsCommand.prototype.unregister = function unregister() {
+    if (this._uninstantiate()) ChickTilsRegister.prototype.unregister.call(this);
+    return this;
+  };
+  ChickTilsCommand.prototype.setTabCompletions = function setTabCompletions(...args) {
+    if (!args) args = [];
+    else if (args.length === 1 && typeof args[0] === 'function') this.tabCb = args[0];
+    else args.forEach(v => this.tabArr.add(v.toString()));
+    return this;
+  };
+  ChickTilsCommand.prototype.setAliases = function setAliases(...args) {
+    args.forEach(v => this.aliases.add(v.toString()));
+    this._reinstantiate();
+    return this;
+  };
+  ChickTilsCommand.prototype.setCommandName = function setCommandName(name, override = false) {
+    this.id = name.toString();
+    this.override = override;
+    this._reinstantiate();
+    return this;
+  };
+  ChickTilsCommand.prototype.setName = function setName(name, override) {
+    return this.setCommandName(name, override);
+  };
+  ChickTilsCommand.prototype.compareTo = function compareTo() { };
 
-    static register() {
-      this.tickReg.register();
-      this.spawnReg.register();
-    }
-    static unregister() {
-      this.tickReg.unregister();
-      this.spawnReg.unregister();
-    }
+  function ChickTilsSpawnEntity(cb) {
+    ChickTilsRegister.call(this, cb);
   }
-  let newMobs = [];
+  inherits(ChickTilsSpawnEntity, ChickTilsRegister);
+  ChickTilsSpawnEntity.list = new Map();
+  listenList(ChickTilsSpawnEntity.list);
+  ChickTilsSpawnEntity.prototype.getList = function getList() {
+    return ChickTilsSpawnEntity.list;
+  };
+  ChickTilsSpawnEntity.newMobs = [];
   ChickTilsSpawnEntity.tickReg = reg('tick', () => {
-    if (newMobs.length === 0) return;
+    if (ChickTilsSpawnEntity.newMobs.length === 0) return;
     run(() => {
-      newMobs.forEach(v => ChickTilsSpawnEntity.list.forEach(c => c.cb(v)));
-      newMobs = [];
+      ChickTilsSpawnEntity.newMobs.forEach(v => ChickTilsSpawnEntity.list.forEach(c => c.cb(v)));
+      ChickTilsSpawnEntity.newMobs = [];
     });
   }, 'ChickTilsSpawnEntity');
-  ChickTilsSpawnEntity.spawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => newMobs.push(evn.entity), 'ChickTilsSpawnEntity');
+  ChickTilsSpawnEntity.spawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => ChickTilsSpawnEntity.newMobs.push(evn.entity), 'ChickTilsSpawnEntity');
+  ChickTilsSpawnEntity.prototype.update = function update() {
+    if (ChickTilsSpawnEntity.list.size) {
+      ChickTilsSpawnEntity.tickReg.register();
+      ChickTilsSpawnEntity.spawnReg.register();
+    } else {
+      ChickTilsSpawnEntity.tickReg.unregister();
+      ChickTilsSpawnEntity.spawnReg.unregister();
+    }
+  };
 
   const Threading = Java.type('gg.essential.api.utils.Multithreading');
   const MILLISECONDS = Java.type('java.util.concurrent.TimeUnit').MILLISECONDS;
-  class ChickTilsStep extends ChickTilsRegister {
-    constructor(cb) {
-      super(cb);
-
-      this.offset = 0;
-      this.delay = 0;
-      this.future = null;
-    }
-
-    register() {
-      if (this.delay === 0) throw 'set delay before registering';
-      if (this.future) return;
-      this.future = Threading.getScheduledPool().scheduleAtFixedRate(this.cb, this.offset, this.delay, MILLISECONDS);
-    }
-    unregister() {
-      if (this.future) this.future.cancel(false);
-      this.future = null;
-    }
-
-    setFps(fps) {
-      this.delay = Math.ceil(1000 / fps);
-      if (this.future) {
-        this.unregister();
-        this.register();
-      }
-    }
-    setDelay(delay) {
-      this.delay = ~~(delay * 1000);
-      if (this.future) {
-        this.unregister();
-        this.register();
-      }
-    }
-    setOffset(offset) {
-      this.offset = ~~offset;
-    }
+  function ChickTilsStep(cb) {
+    ChickTilsRegister.call(this, cb);
+    this.offset = 0;
+    this.delay = 0;
+    this.future = null;
   }
+  inherits(ChickTilsStep, ChickTilsRegister);
+  ChickTilsStep.list = new Map();
+  listenList(ChickTilsStep.list);
+  ChickTilsStep.prototype.getList = function getList() {
+    return ChickTilsStep.list;
+  };
+  ChickTilsStep.prototype.register = function register() {
+    if (this.delay === 0) throw 'set delay before registering';
+    if (this.future) return this;
+    this.future = Threading.getScheduledPool().scheduleAtFixedRate(this.cb, this.offset, this.delay, MILLISECONDS);
+    return ChickTilsRegister.prototype.register.call(this);
+  };
+  ChickTilsStep.prototype.unregister = function unregister() {
+    if (this.future) {
+      this.future.cancel(false);
+      ChickTilsRegister.prototype.unregister.call(this);
+    }
+    this.future = null;
+    return this;
+  };
+  ChickTilsStep.prototype.setFps = function setFps(fps) {
+    this.delay = Math.ceil(1000 / fps);
+    if (this.future) {
+      this.unregister();
+      this.register();
+    }
+    return this;
+  };
+  ChickTilsStep.prototype.setDelay = function setDelay(delay) {
+    this.delay = ~~(delay * 1000);
+    if (this.future) {
+      this.unregister();
+      this.register();
+    }
+    return this;
+  };
+  ChickTilsStep.prototype.setOffset = function setOffset(offset) {
+    this.offset = ~~offset;
+    return this;
+  };
 
   customRegs['command'] = ChickTilsCommand;
   customRegs['spawnEntity'] = ChickTilsSpawnEntity;
