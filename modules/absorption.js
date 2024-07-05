@@ -29,6 +29,7 @@ const renderHeartReg = reg('renderHealth', evn => {
   // https://github.com/MinecraftForge/MinecraftForge/blob/d06e0ad71b8471923cc809dde58251de8299a143/src/main/java/net/minecraftforge/client/GuiIngameForge.java#L330
   const w = Renderer.screen.getWidth();
   const h = Renderer.screen.getHeight();
+  GL11.glEnable(GL11.GL_BLEND);
   let hp = Math.ceil(Player.getHP());
   const doHighlight = hpUpdateC > updateC && (((hpUpdateC - updateC) / 3) & 1) === 1;
 
@@ -120,6 +121,8 @@ const renderHeartReg = reg('renderHealth', evn => {
     }
     hp -= 2;
   }
+
+  GL11.glDisable(GL11.GL_BLEND);
 }, 'absorption');
 
 export function init() { }
