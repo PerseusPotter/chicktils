@@ -98,10 +98,10 @@ const getPlayersStep2Reg = reg('step', () => {
     players.push({ ign: getPlayerName(s), class: m[1], e: null });
   }
   if (players.length) {
-    World.getAllEntitiesOfType(EntityOtherPlayerMP).forEach(v => {
+    World.getAllPlayers().forEach(v => {
       const player = players.find(p => p.ign === v.getName());
       if (player) {
-        player.e = new EntityLivingBase(v.entity);
+        player.e = v;
         player.me = v.entity;
       }
     });
