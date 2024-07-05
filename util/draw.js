@@ -256,7 +256,7 @@ export function renderTracer(color, x, y, z) {
  * @param {boolean?} esp is visible through walls (false)
  * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} lw line width (5)
- * @param {boolean?} nt use if postrenderentity (false)
+ * @param {boolean?} nt use if renderentity.pos (false)
  */
 export function drawOutline(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false) {
   if ((color & 0xFF) === 0) return;
