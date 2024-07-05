@@ -2,7 +2,7 @@ import settings from '../settings';
 import { drawOutline } from '../util/draw';
 import reg from '../util/registerer';
 
-const renderReg = reg('renderEntity', (ent, pos, part) => {
+const renderReg = reg('postRenderEntity', (ent, pos, part) => {
   drawOutline(pos.getX(), pos.getY(), pos.getZ(), ent.getWidth(), ent.getHeight(), settings.boxAllEntitiesColor, settings.boxAllEntitiesEsp, true, undefined, true);
 }, 'boxallentities');
 
