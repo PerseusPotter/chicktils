@@ -105,7 +105,7 @@ const renderWorldReg = reg('renderWorld', () => {
   }
   const m = (bearSpawnTicks - ticks.get() - Tessellator.partialTicks + getPing() / 50) / bearSpawnTicks;
   drawOutline(x, y, z, 1, 2, settings.dungeonSpiritBearWireColor, settings.dungeonSpiritBearBoxEsp, true, 3);
-  drawFilledBox(x, y + 2.5 - m, z, m, 2 * m, settings.dungeonSpiritBearBoxColor, settings.dungeonSpiritBearBoxEsp);
+  drawFilledBox(x, y + 1 - m, z, m, 2 * m, settings.dungeonSpiritBearBoxColor, settings.dungeonSpiritBearBoxEsp);
 
   if (settings.dungeonSpiritBearTimer) drawString(((ticks.get() - Tessellator.partialTicks) / 20).toFixed(2), x, y + 2.5, z);
 }, 'dungeon/spiritbear').setEnabled(stateBearSpawning);
