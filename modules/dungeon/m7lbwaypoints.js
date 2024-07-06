@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import { drawBeaconBeam } from '../../util/draw';
-import { fastDistance } from '../../util/math.js';
+import { fastDistance } from '../../util/math';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
