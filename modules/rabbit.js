@@ -1,5 +1,5 @@
 import createAlert from '../util/alert';
-import { pointTo3D, drawOutline, drawBeaconBeam } from '../util/draw';
+import { pointTo3D, renderOutline, renderBeaconBeam } from '../util/draw';
 import settings from '../settings';
 import reg from '../util/registerer';
 import { getSbDate } from '../util/skyblock';
@@ -66,8 +66,8 @@ const eggRenWrldReg = reg('renderWorld', () => {
     const x = v.getRenderX();
     const y = v.getRenderY();
     const z = v.getRenderZ();
-    drawOutline(x, y + 1.5, z, 0.5, 0.5, settings.rabbitBoxColor, settings.rabbitBoxEsp);
-    drawBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.rabbitBoxEsp);
+    renderOutline(x, y + 1.5, z, 0.5, 0.5, settings.rabbitBoxColor, settings.rabbitBoxEsp);
+    renderBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.rabbitBoxEsp);
   });
 }, 'rabbit').setEnabled(stateIsSpring);
 const eggRendOvReg = reg('renderOverlay', () => {

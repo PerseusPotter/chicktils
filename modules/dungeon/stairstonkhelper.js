@@ -1,5 +1,5 @@
 import settings from '../../settings';
-import { drawFilledBox, drawLine3D } from '../../util/draw';
+import { renderFilledBox, renderLine3D } from '../../util/draw';
 import reg from '../../util/registerer';
 import Grid from '../../util/grid';
 import { getBlockPos } from '../../util/mc';
@@ -66,7 +66,7 @@ const renderWorldReg = reg('renderWorld', () => {
     // average rhino L
     // java.lang.ClassCastException: java.lang.Boolean cannot be cast to [Ljava.lang.Object;
     // drawLine(settings.dungeonStairStonkHelperColor, ...v[1], ...v[2], 2);
-    drawLine3D(
+    renderLine3D(
       settings.dungeonStairStonkHelperColor,
       v[1][0], v[1][1], v[1][2],
       v[2][0], v[2][1], v[2][2],
@@ -74,7 +74,7 @@ const renderWorldReg = reg('renderWorld', () => {
     );
   });
 
-  if (lookPos) drawFilledBox(lookPos.x - 0.005, lookPos.y - 0.005, lookPos.z - 0.005, 1.01, 1.01, settings.dungeonStairStonkHelperHighlightColor, false, false);
+  if (lookPos) renderFilledBox(lookPos.x - 0.005, lookPos.y - 0.005, lookPos.z - 0.005, 1.01, 1.01, settings.dungeonStairStonkHelperHighlightColor, false, false);
 }, 'dungeon/stairstonkhelper').setEnabled(settings._dungeonStairStonkHelper);
 
 export function init() { }

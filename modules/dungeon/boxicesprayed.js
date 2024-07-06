@@ -1,5 +1,5 @@
 import settings from '../../settings';
-import { drawOutline, drawFilledBox } from '../../util/draw';
+import { renderOutline, renderFilledBox } from '../../util/draw';
 import reg from '../../util/registerer';
 import { cross, lerp, normalize, rotate } from '../../util/math';
 import Grid from '../../util/grid';
@@ -123,8 +123,8 @@ const renderWorldReg = reg('renderWorld', partial => {
     const z = lerp(e.field_70166_s, e.field_70161_v, partial);
     const w = e.field_70130_N + 0.2;
     const h = e.field_70131_O + 0.2;
-    drawOutline(x, y, z, w, h, settings.dungeonBoxIceSprayedOutlineColor, settings.dungeonBoxIceSprayedEsp, true, 5);
-    drawFilledBox(x, y, z, w, h, settings.dungeonBoxIceSprayedFillColor, settings.dungeonBoxIceSprayedEsp);
+    renderOutline(x, y, z, w, h, settings.dungeonBoxIceSprayedOutlineColor, settings.dungeonBoxIceSprayedEsp, true, 5);
+    renderFilledBox(x, y, z, w, h, settings.dungeonBoxIceSprayedFillColor, settings.dungeonBoxIceSprayedEsp);
   });
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 

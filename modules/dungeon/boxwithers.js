@@ -1,5 +1,5 @@
 import settings from '../../settings';
-import { drawOutline } from '../../util/draw';
+import { renderOutline } from '../../util/draw';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
@@ -18,7 +18,7 @@ const renderWorldReg = reg('renderWorld', () => {
     const x = e.getRenderX();
     const y = e.getRenderY();
     const z = e.getRenderZ();
-    drawOutline(x, y - 0.25, z, 1.5, 4, settings.dungeonBoxWitherColor, settings.dungeonBoxWitherEsp);
+    renderOutline(x, y - 0.25, z, 1.5, 4, settings.dungeonBoxWitherColor, settings.dungeonBoxWitherEsp);
   });
 }, 'dungeon/boxwithers').setEnabled(stateBoxWithers);
 

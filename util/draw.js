@@ -174,8 +174,9 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
   // const c2 = (color >> 8) | ((color & 0xFF) << 24);
   // edges.forEach(([w, i, j]) => Renderer.drawLine(c2, points[i][0], points[i][1], points[j][0], points[j][1], 1));
   // points.forEach(([x, y]) => Renderer.drawCircle(c2, x, y, 2, 10));
-  // points.forEach(([x, y], i) => Renderer.drawString(i.toString(), x, y));
+  // points.forEach(([x, y], i) => Renderer.renderString(i.toString(), x, y));
 }
+
 /**
  * @param {number} color rgba
  * @param {number} dx
@@ -258,7 +259,7 @@ export function renderTracer(color, x, y, z) {
  * @param {number?} lw line width (5)
  * @param {boolean?} nt use if renderentity.pos (false)
  */
-export function drawOutline(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false) {
+export function renderOutline(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false) {
   if ((color & 0xFF) === 0) return;
   if (center) {
     x -= w / 2;
@@ -341,7 +342,7 @@ export function drawOutline(x, y, z, w, h, color, esp = false, center = true, lw
  * @param {boolean?} center are coordinates already centered (true)
  * @param {boolean?} nt use if renderentity.pos (false)
  */
-export function drawFilledBox(x, y, z, w, h, color, esp = false, center = true, nt = false) {
+export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true, nt = false) {
   if ((color & 0xFF) === 0) return;
   if (center) {
     x -= w / 2;
@@ -423,11 +424,11 @@ export function drawFilledBox(x, y, z, w, h, color, esp = false, center = true, 
  * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} lw line width (5)
  */
-export function drawWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5) {
+export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5) {
   if ((color & 0xFF) === 0) return;
   const c = (color & ~0xFF) | ((color & 0xFF) >> 2);
-  drawFilledBox(x, y, z, w, h, c, esp, center, lw);
-  drawOutline(x, y, z, w, h, color, esp, center, lw);
+  renderFilledBox(x, y, z, w, h, c, esp, center, lw);
+  renderOutline(x, y, z, w, h, color, esp, center, lw);
 }
 
 /**
@@ -486,7 +487,7 @@ function applyTint(c, a) {
  * @param {number} z2
  * @param {number?} lw (2)
  */
-export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
+export function renderLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   if ((color & 0xFF) === 0) return;
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
   ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));
@@ -533,12 +534,12 @@ export function drawLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
  * @param {number?} scale (1)
  * @param {boolean?} increase (true)
  */
-export function drawString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = true, scale = 1, increase = true) {
+export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = true, scale = 1, increase = true) {
   if ((color & 0xFF) === 0) return;
   let s;
   ({ x, y, z, s } = rescaleRender(x, y, z));
   scale *= s;
-  Tessellator.drawString(text, x, y, z, rgbaToARGB(color), renderBlackBox, scale, increase);
+  Tessellator.renderString(text, x, y, z, rgbaToARGB(color), renderBlackBox, scale, increase);
 }
 
 /**
@@ -547,7 +548,7 @@ export function drawString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = t
  * @param {number} y
  * @param {boolean?} shadow (false)
  */
-export function drawString2D(text, x, y, shadow = false) {
+export function drawString(text, x, y, shadow = false) {
   text = ChatLib.addColor(text);
   const fr = Renderer.getFontRenderer();
   text.split('\n').forEach(v => {
@@ -563,11 +564,11 @@ export function drawString2D(text, x, y, shadow = false) {
  */
 export function drawOutlinedString(text, x, y) {
   const bt = '&0' + text;
-  drawString2D(bt, x + 1, y + 0);
-  drawString2D(bt, x - 1, y + 0);
-  drawString2D(bt, x + 0, y + 1);
-  drawString2D(bt, x + 0, y - 1);
-  drawString2D(text, x, y);
+  drawString(bt, x + 1, y + 0);
+  drawString(bt, x - 1, y + 0);
+  drawString(bt, x + 0, y + 1);
+  drawString(bt, x + 0, y - 1);
+  drawString(text, x, y);
 }
 
 /**
@@ -609,7 +610,7 @@ export function drawTexturedRect(x, y, u, v, w, h, tw, th, uw, vh) {
  * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} height (300)
  */
-export function drawBeaconBeam(x, y, z, color, esp = false, center = true, height = 300) {
+export function renderBeaconBeam(x, y, z, color, esp = false, center = true, height = 300) {
   if ((color & 0xFF) === 0) return;
   if (center) {
     x -= 0.5;

@@ -1,5 +1,5 @@
 import settings from '../../settings';
-import { drawOutline } from '../../util/draw';
+import { renderOutline } from '../../util/draw';
 import reg from '../../util/registerer';
 import { compareFloat, dist } from '../../util/math';
 import Grid from '../../util/grid';
@@ -110,7 +110,7 @@ const serverTickReg = reg('packetReceived', () => {
 }, 'dungeon/boxmobs').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity);
-  if (data) drawOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, settings.dungeonBoxMobEsp, true, undefined, true);
+  if (data) renderOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, settings.dungeonBoxMobEsp, true, undefined, true);
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 
 export function init() { }

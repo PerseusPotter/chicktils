@@ -1,5 +1,5 @@
 import createAlert from '../util/alert';
-import { drawWaypoint } from '../util/draw';
+import { renderWaypoint } from '../util/draw';
 import settings from '../settings';
 import reg from '../util/registerer';
 
@@ -18,7 +18,7 @@ function updateCrystals() {
 const destroyReg = reg('chat', () => updateCrystals(), 'crystalalert').setCriteria('${*}destroyed an Ender Crystal!');
 const stepReg = reg('step', () => updateCrystals(), 'crystalalert').setFps(1);
 const renderReg = reg('renderWorld', () => {
-  crystals.forEach(v => drawWaypoint(v.x, v.y, v.z, 2, 2, settings.crystalBoxColor, settings.crystalBoxEsp, false));
+  crystals.forEach(v => renderWaypoint(v.x, v.y, v.z, 2, 2, settings.crystalBoxColor, settings.crystalBoxEsp, false));
 }, 'crystalalert');
 function reset() {
   crystals = [];
