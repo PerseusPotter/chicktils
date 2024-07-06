@@ -23,5 +23,5 @@ export function start() {
   renderWorldReg.register();
 }
 export function reset() {
-  renderWorldReg.register();
+  renderWorldReg.unregister();
 }
