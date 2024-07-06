@@ -70,7 +70,7 @@ const step2Reg = reg('step', () => {
   });
   mobCandBucket.unlock();
 }, 'dungeon/boxmobs').setFps(2).setOffset(500 / 3).setEnabled(stateBoxMob);
-const tickReg = reg('tick', () => {
+const serverTickReg = reg('packetReceived', () => {
   run(() => {
     nameCand = nameCand.filter(e => {
       if (e.field_70128_L) return;
@@ -105,7 +105,7 @@ const tickReg = reg('tick', () => {
       boxMobs.put(ent, { yO: 0, h, c });
     });
   });
-}, 'dungeon/boxmobs').setEnabled(stateBoxMob);
+}, 'dungeon/boxmobs').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity);
   if (data) drawOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, settings.dungeonBoxMobEsp, true, undefined, true);
@@ -119,12 +119,12 @@ export function start() {
 
   entSpawnReg.register();
   step2Reg.register();
-  tickReg.register();
+  serverTickReg.register();
   renderEntPostReg.register();
 }
 export function reset() {
   entSpawnReg.unregister();
   step2Reg.unregister();
-  tickReg.unregister();
+  serverTickReg.unregister();
   renderEntPostReg.unregister();
 }

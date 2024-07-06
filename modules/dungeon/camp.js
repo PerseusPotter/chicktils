@@ -42,8 +42,8 @@ const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand')
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) possibleSkulls.push(e);
 }, 'dungeon/camp').setEnabled(stateCamp);
-const tickReg = reg('tick', () => {
-  if (possibleSkulls.length === 0) return;
+const serverTickReg = reg('packetReceived', () => {
+  if (bloodOpenTime === 0) return;
   run(() => {
     possibleSkulls.forEach(e => {
       if (!isSkull(e)) return;
@@ -59,11 +59,7 @@ const tickReg = reg('tick', () => {
       } else addSkull(new Entity(e));
     });
     possibleSkulls = [];
-  });
-}, 'dungeon/camp').setEnabled(stateCamp);
-const serverTickReg = reg('packetReceived', () => {
-  if (bloodOpenTime === 0) return;
-  run(() => {
+
     const t = Date.now();
     bloodMobs = bloodMobs.filter(e => {
       const uuid = e.getUUID().toString();
@@ -175,7 +171,6 @@ export function start() {
   stateBloodClosed.set(false);
 
   entSpawnReg.register();
-  tickReg.register();
   serverTickReg.register();
   renderWorldReg.register();
   renderOverlayReg.register();
@@ -183,7 +178,6 @@ export function start() {
 }
 export function reset() {
   entSpawnReg.unregister();
-  tickReg.unregister();
   serverTickReg.unregister();
   renderWorldReg.unregister();
   renderOverlayReg.unregister();

@@ -34,7 +34,8 @@ const step2Reg = reg('step', () => {
   });
   allMobsBucket.unlock();
 }, 'dungeon/boxicesprayed').setFps(2).setOffset(0).setEnabled(settings._dungeonBoxIceSprayed);
-const tickReg = reg('tick', () => {
+const serverTickReg = reg('packetReceived', () => {
+  frozenMobs = frozenMobs.filter(v => --v[1] > 0);
   run(() => {
     const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');
     itemCand = [];
@@ -108,9 +109,6 @@ const tickReg = reg('tick', () => {
       });
     });
   });
-}, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
-const serverTickReg = reg('packetReceived', () => {
-  frozenMobs = frozenMobs.filter(v => --v[1] > 0);
 }, 'dungeon/boxicesprayed').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(settings._dungeonBoxIceSprayed);
 const renderWorldReg = reg('renderWorld', partial => {
   frozenMobs.forEach(([e]) => {
@@ -136,14 +134,12 @@ export function start() {
 
   entSpawnReg.register();
   step2Reg.register();
-  tickReg.register();
   serverTickReg.register();
   renderWorldReg.register();
 }
 export function reset() {
   entSpawnReg.unregister();
   step2Reg.unregister();
-  tickReg.unregister();
   serverTickReg.unregister();
   renderWorldReg.unregister();
 }
