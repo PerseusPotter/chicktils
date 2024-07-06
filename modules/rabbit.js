@@ -1,5 +1,5 @@
 import createAlert from '../util/alert';
-import { pointTo3D, renderOutline, renderBeaconBeam } from '../util/draw';
+import { renderOutline, renderBeaconBeam, drawArrow3DPos, renderTracer } from '../util/draw';
 import settings from '../settings';
 import reg from '../util/registerer';
 import { getSbDate } from '../util/skyblock';
@@ -26,7 +26,7 @@ function scanEgg() {
       if (!nbt) return false;
       const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
       return ['015adc61-0aba-3d4d-b3d1-ca47a68a154b', '55ae5624-c86b-359f-be54-e0ec7c175403', 'e67f7c89-3a19-3f30-ada2-43a3856e5028'].find((v, i) => activeEggs[i] === 2 && v === id);
-    });
+    }).sort((a, b) => Player.asPlayerMP().distanceTo(a) - Player.asPlayerMP().distanceTo(b));
     if (settings.rabbitAlertEggFound && eggs.length > l) unrun(() => eggFoundAlert.show(settings.rabbitAlertFoundTime));
   });
 }
@@ -69,16 +69,12 @@ const eggRenWrldReg = reg('renderWorld', () => {
     renderOutline(x, y + 1.5, z, 0.5, 0.5, settings.rabbitBoxColor, settings.rabbitBoxEsp);
     renderBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.rabbitBoxEsp);
   });
+  if (settings.preferUseTracer) renderTracer(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
 }, 'rabbit').setEnabled(stateIsSpring);
 const eggRendOvReg = reg('renderOverlay', () => {
   if (eggs.length === 0) return;
-  let closest = eggs.reduce((a, v) => {
-    const d = Player.asPlayerMP().distanceTo(v);
-    if (d < a[0]) return [d, v];
-    return a;
-  }, [Number.POSITIVE_INFINITY, null])[1];
-  pointTo3D(settings.rabbitBoxColor, closest.getX(), closest.getY() + 1.75, closest.getZ(), false);
-}, 'rabbit').setEnabled(stateIsSpring);
+  drawArrow3DPos(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
+}, 'rabbit').setEnabled(new StateProp(settings._preferUseTracer).not().and(stateIsSpring));
 
 const guiReg = reg('guiOpened', evn => {
   if (!settings.rabbitShowBestUpgrade) return;
