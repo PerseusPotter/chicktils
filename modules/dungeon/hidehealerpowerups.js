@@ -57,7 +57,7 @@ const tickReg = reg('tick', () => {
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
-  if (id !== EnumParticleTypes.REDSTONE) return;
+  if (!id.equals(EnumParticleTypes.REDSTONE)) return;
   const b = part.underlyingEntity.func_70535_g();
   if (b === 0 || b > 10) return;
   if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);

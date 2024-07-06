@@ -12,7 +12,7 @@ const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, ev
 }, 'dungeon/hidewitherking').setEnabled(new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonHideWitherKing));
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const partSpawnReg = reg('spawnParticle', (p, i, evn) => {
-  if (p.getY() >= 9 && p.getY() <= 25 && p.getZ() <= 45 && i === EnumParticleTypes.SPELL_WITCH) cancel(evn);
+  if (p.getY() >= 9 && p.getY() <= 25 && p.getZ() <= 45 && i.equals(EnumParticleTypes.SPELL_WITCH)) cancel(evn);
 }, 'dungeon/hidewitherking').setEnabled(new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonHideWitherKing));
 
 export function init() { }

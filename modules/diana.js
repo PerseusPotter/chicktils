@@ -196,7 +196,7 @@ const soundPlayReg = reg('soundPlay', (pos, name, vol, pit, cat, evn) => {
 }, 'diana').setEnabled(settings._dianaGuessFromParticles);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const spawnPartReg = reg('spawnParticle', (part, id, evn) => {
-  if (id !== EnumParticleTypes.DRIP_LAVA) return;
+  if (!id.equals(EnumParticleTypes.DRIP_LAVA)) return;
   const t = Date.now();
   if (t - lastGuessTime > 3_000) {
     prevSounds = [];
