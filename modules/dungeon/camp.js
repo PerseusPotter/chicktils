@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import data from '../../data';
-import { drawOutline, drawFilledBox, drawString } from '../../util/draw';
+import { renderOutline, renderFilledBox, renderString } from '../../util/draw';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import getPing from '../../util/ping';
@@ -143,10 +143,10 @@ const renderWorldReg = reg('renderWorld', () => {
       z = lerp(lastEstZ, estZ, smoothFactor);
     }
     const m = (maxTtl - ttl - Tessellator.partialTicks + getPing() / 50) / maxTtl;
-    drawOutline(x, y + 1.5, z, 1, 2, settings.dungeonCampWireColor, settings.dungeonCampBoxEsp, true, 3);
-    drawFilledBox(x, y + 2.5 - m, z, m, 2 * m, settings.dungeonCampBoxColor, settings.dungeonCampBoxEsp);
+    renderOutline(x, y + 1.5, z, 1, 2, settings.dungeonCampWireColor, settings.dungeonCampBoxEsp, true, 3);
+    renderFilledBox(x, y + 2.5 - m, z, m, 2 * m, settings.dungeonCampBoxColor, settings.dungeonCampBoxEsp);
 
-    if (settings.dungeonCampTimer) drawString(((ttl - Tessellator.partialTicks) / 20).toFixed(2), x, y + 1, z);
+    if (settings.dungeonCampTimer) renderString(((ttl - Tessellator.partialTicks) / 20).toFixed(2), x, y + 1, z);
   });
 }, 'dungeon/camp').setEnabled(stateCampFinal);
 const renderOverlayReg = reg('renderOverlay', () => {

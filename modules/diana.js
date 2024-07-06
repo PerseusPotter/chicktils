@@ -3,7 +3,7 @@ import data from '../data';
 import reg from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { drawBeaconBeam, drawString, drawWaypoint, pointTo3D } from '../util/draw';
+import { renderBeaconBeam, renderString, renderWaypoint, pointTo3D } from '../util/draw';
 import { dist, linReg, lineRectColl } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateVar } from '../util/state';
@@ -69,9 +69,9 @@ const renderOvReg = reg('renderOverlay', () => {
 }, 'diana').setEnabled(settings._dianaArrowToBurrow);
 const renderWrldReg = reg('renderWorld', () => {
   if (guessLoc) {
-    drawWaypoint(guessLoc[0], guessLoc[1], guessLoc[2], 1, 1, settings.dianaGuessFromParticlesColor, true, false);
-    drawBeaconBeam(guessLoc[0], guessLoc[1] + 1, guessLoc[2], settings.dianaGuessFromParticlesColor, true, false);
-    // drawString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
+    renderWaypoint(guessLoc[0], guessLoc[1], guessLoc[2], 1, 1, settings.dianaGuessFromParticlesColor, true, false);
+    renderBeaconBeam(guessLoc[0], guessLoc[1] + 1, guessLoc[2], settings.dianaGuessFromParticlesColor, true, false);
+    // renderString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
   }
 }, 'diana').setEnabled(settings._dianaGuessFromParticles);
 const GriffinBurrows = Java.type('gg.skytils.skytilsmod.features.impl.events.GriffinBurrows');

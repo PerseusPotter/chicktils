@@ -1,4 +1,4 @@
-import { drawOutline, drawArrow2D, getRenderX, getRenderY, getRenderZ, drawBeaconBeam, drawLine3D, drawString, rgbaToARGB, drawWaypoint } from '../util/draw';
+import { renderOutline, drawArrow2D, getRenderX, getRenderY, getRenderZ, renderBeaconBeam, renderLine3D, renderString, rgbaToARGB, renderWaypoint } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
@@ -107,24 +107,24 @@ const renderReg = reg('renderWorld', () => {
         0, 1, 0,
         0, 140, 0
       );
-      drawLine3D(c, x - 1, y, z - 1, x + 1, y, z + 1, 5);
-      drawLine3D(c, x - 1, y, z + 1, x + 1, y, z - 1, 5);
-      drawString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x, y + 1, z, rgbaToARGB(c));
+      renderLine3D(c, x - 1, y, z - 1, x + 1, y, z + 1, 5);
+      renderLine3D(c, x - 1, y, z + 1, x + 1, y, z - 1, 5);
+      renderString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x, y + 1, z, rgbaToARGB(c));
     });
   }
-  if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => drawWaypoint(v.x, v.y, v.z, 1, 1, settings.kuudraEmptySupplySpotColor, true));
+  if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => renderWaypoint(v.x, v.y, v.z, 1, 1, settings.kuudraEmptySupplySpotColor, true));
   if (settings.kuudraBoxSupplies && supplies.length > 0) supplies.forEach(v => {
     const x = v.getRenderX();
     const y = v.getRenderY();
     const z = v.getRenderZ();
-    drawOutline(x - 3.25, y + 8, z + 2, 2.5, 2.5, settings.kuudraBoxSuppliesColor, settings.kuudraBoxSuppliesEsp, false);
-    drawBeaconBeam(x - 2.5, y + 11, z + 2.75, settings.kuudraBoxSuppliesColor, settings.kuudraBoxSuppliesEsp, false);
+    renderOutline(x - 3.25, y + 8, z + 2, 2.5, 2.5, settings.kuudraBoxSuppliesColor, settings.kuudraBoxSuppliesEsp, false);
+    renderBeaconBeam(x - 2.5, y + 11, z + 2.75, settings.kuudraBoxSuppliesColor, settings.kuudraBoxSuppliesEsp, false);
   });
   if (settings.kuudraBoxChunks && chunks.length > 0) chunks.forEach(v => {
     const x = v.getRenderX();
     const y = v.getRenderY();
     const z = v.getRenderZ();
-    drawOutline(x - 3.25, y + 8, z + 2, 2.5, 2.5, settings.kuudraBoxChunksColor, settings.kuudraBoxChunksEsp, false);
+    renderOutline(x - 3.25, y + 8, z + 2, 2.5, 2.5, settings.kuudraBoxChunksColor, settings.kuudraBoxChunksEsp, false);
   });
   if (settings.kuudraShowCannonAim && isOnCannon && Player.getY() > 60) {
     const theta = (Player.getX() > -100 ? 130 : 50) / 180 * Math.PI;
@@ -137,9 +137,9 @@ const renderReg = reg('renderWorld', () => {
       0, 0, 1,
       0, 0, -80
     );
-    drawWaypoint(x, y, z, 1, 1, settings.kuudraCannonAimColor, true);
+    renderWaypoint(x, y, z, 1, 1, settings.kuudraCannonAimColor, true);
   }
-  if (settings.kuudraBoxKuudra && kuuder) drawOutline(kuuder.getX(), kuuder.getY(), kuuder.getZ(), 15, 15, settings.kuudraBoxKuudraColor, settings.kuudraBoxKuudraEsp);
+  if (settings.kuudraBoxKuudra && kuuder) renderOutline(kuuder.getX(), kuuder.getY(), kuuder.getZ(), 15, 15, settings.kuudraBoxKuudraColor, settings.kuudraBoxKuudraEsp);
 }, 'kuudra').setEnabled(new StateProp(settings._kuudraRenderPearlTarget).or(settings._kuudraRenderEmptySupplySpot).or(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks).or(settings._kuudraShowCannonAim).or(settings._kuudraBoxKuudra));
 
 const tickReg = reg('tick', () => {

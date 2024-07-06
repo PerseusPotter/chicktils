@@ -1,5 +1,5 @@
 import settings from '../settings';
-import { drawBeaconBeam, drawOutline, drawString, drawWaypoint } from '../util/draw';
+import { renderBeaconBeam, renderOutline, renderString, renderWaypoint } from '../util/draw';
 import { execCmd, getPlayerName } from '../util/format';
 import { getLeader } from '../util/party';
 import { log, logMessage } from '../util/log';
@@ -19,11 +19,11 @@ const coords = [];
 const removeOldestCmd = reg('command', () => coords.shift(), 'chattils').setName('ctsremoveoldestwaypoint').setEnabled(settings._chatTilsWaypoint);
 const worldRenderReg = reg('renderWorld', () => {
   if (settings.chatTilsWaypointType !== 'None') coords.forEach(v => {
-    if (settings.chatTilsWaypointType === 'Box') drawWaypoint(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
-    else drawOutline(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
+    if (settings.chatTilsWaypointType === 'Box') renderWaypoint(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
+    else renderOutline(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
   });
-  if (settings.chatTilsWaypointBeacon) coords.forEach(v => drawBeaconBeam(v.x, v.y + 1, v.z, settings.chatTilsWaypointColor, true, false));
-  if (settings.chatTilsWaypointName) coords.forEach(v => drawString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(settings.chatTilsWaypointColor)*/));
+  if (settings.chatTilsWaypointBeacon) coords.forEach(v => renderBeaconBeam(v.x, v.y + 1, v.z, settings.chatTilsWaypointColor, true, false));
+  if (settings.chatTilsWaypointName) coords.forEach(v => renderString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(settings.chatTilsWaypointColor)*/));
 }, 'chattils');
 let waypointReloadNum = 0;
 const worldUnloadReg = reg('worldUnload', () => {
