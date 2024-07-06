@@ -500,7 +500,7 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
   let s;
   ({ x, y, z, s } = rescaleRender(x, y, z));
   scale *= s;
-  Tessellator.renderString(text, x, y, z, rgbaToARGB(color), renderBlackBox, scale, increase);
+  Tessellator.drawString(text, x, y, z, rgbaToARGB(color), renderBlackBox, scale, increase);
 }
 
 /**
