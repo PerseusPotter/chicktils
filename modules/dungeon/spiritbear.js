@@ -60,7 +60,7 @@ const tickReg = reg('tick', () => {
 const serverTickReg = reg('packetReceived', () => ticks.set(ticks.get() - 1), 'dungeon/spiritbear').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBearSpawning);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
-  if (id !== EnumParticleTypes.SPELL_MOB) return;
+  if (!id.equals(EnumParticleTypes.SPELL_MOB)) return;
   const pos = { x: part.getX(), y: part.getY(), z: part.getZ(), t: ticks.get() };
   if (pos.y < fm4Center.y || pos.y > lastY || Math.hypot(pos.x - fm4Center.x, pos.z - fm4Center.z) > 10) return;
 
