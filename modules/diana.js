@@ -3,10 +3,10 @@ import data from '../data';
 import reg from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { renderBeaconBeam, renderString, renderWaypoint, pointTo3D } from '../util/draw';
+import { drawArrow3DPos, renderBeaconBeam, renderString, renderTracer, renderWaypoint } from '../util/draw';
 import { dist, linReg, lineRectColl } from '../util/math';
 import { execCmd } from '../util/format';
-import { StateVar } from '../util/state';
+import { StateProp, StateVar } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
 
 const warps = [
@@ -63,10 +63,14 @@ let numNotStartBurrows = 0;
 let numStartBurrows = 0;
 let targetLoc = null;
 let guessLoc = null;
-const renderOvReg = reg('renderOverlay', () => {
+const renderArrowOvReg = reg('renderOverlay', () => {
   const l = targetLoc || guessLoc;
-  if (l) pointTo3D(settings.dianaArrowToBurrowColor, l[0], l[1] + 1, l[2], false);
-}, 'diana').setEnabled(settings._dianaArrowToBurrow);
+  if (l) drawArrow3DPos(settings.dianaArrowToBurrowColor, l[0], l[1] + 1, l[2], false);
+}, 'diana').setEnabled(new StateProp(settings._preferUseTracer).not().and(settings._dianaArrowToBurrow));
+const renderArrowWrldReg = reg('renderWorld', () => {
+  const l = targetLoc || guessLoc;
+  if (l) renderTracer(settings.dianaArrowToBurrowColor, l[0], l[1] + 1, l[2], false);
+}, 'diana').setEnabled(new StateProp(settings._preferUseTracer).and(settings._dianaArrowToBurrow));
 const renderWrldReg = reg('renderWorld', () => {
   if (guessLoc) {
     renderWaypoint(guessLoc[0], guessLoc[1], guessLoc[2], 1, 1, settings.dianaGuessFromParticlesColor, true, false);
@@ -224,7 +228,8 @@ const startBurrowReg = reg('chat', () => {
   guessLoc = null;
   prevSounds = [];
   prevParticles = [];
-  renderOvReg.register();
+  renderArrowOvReg.register();
+  renderArrowWrldReg.register();
   renderWrldReg.register();
   tickReg.register();
   fixStReg.register();
@@ -233,7 +238,8 @@ const startBurrowReg = reg('chat', () => {
   unloadReg.register();
 }, 'diana').setCriteria('&r&eYou dug out a Griffin Burrow! &r&7(1/4)&r');
 const unloadReg = reg('worldUnload', () => {
-  renderOvReg.unregister();
+  renderArrowOvReg.unregister();
+  renderArrowWrldReg.unregister();
   renderWrldReg.unregister();
   tickReg.unregister();
   fixStReg.unregister();

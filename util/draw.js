@@ -185,14 +185,9 @@ export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
  * @param {boolean?} rel (true)
  * @param {number?} scale (3)
  */
-export function pointTo3D(color, dx, dy, dz, rel = true, scale) {
-  if ((color & 0xFF) === 0) return;
-  if (rel) {
-    if (settings.preferUseTracer) return renderTracer(color, dx + getRenderX(), dy + getRenderY(), dz + getRenderZ());
-    return drawArrow3D(color, Math.atan2(dz, dx), Math.acos(dy / Math.hypot(dx, dy, dz)), scale);
-  }
-  if (settings.preferUseTracer) return renderTracer(color, dx, dy, dz);
-  return pointTo3D(color, dx - getRenderX(), dy - getRenderY(), dz - getRenderZ(), true, scale);
+export function drawArrow3DPos(color, dx, dy, dz, rel = true, scale = 3) {
+  if (rel) return drawArrow3D(color, Math.atan2(dz, dx), Math.acos(dy / Math.hypot(dx, dy, dz)), scale);
+  return drawArrow3DPos(color, dx - getRenderX(), dy - getRenderY(), dz - getRenderZ(), true, scale);
 }
 
 /**
@@ -200,51 +195,20 @@ export function pointTo3D(color, dx, dy, dz, rel = true, scale) {
  * @param {number} x
  * @param {number} y
  * @param {number} z
+ * @param {boolean?} rel (true)
+ * @param {number?} lw (3)
  */
-export function renderTracer(color, x, y, z) {
+export function renderTracer(color, x, y, z, rel = true, lw = 3) {
   if ((color & 0xFF) === 0) return;
-  ({ x, y, z } = rescaleRender(x, y, z));
-  // renderWorld
-  // const p = Player.getPlayer();
-  // if (!p) return;
-  GlStateManager.func_179147_l();
-  GlStateManager.func_179090_x();
-  GlStateManager.func_179120_a(770, 771, 1, 0);
-  GlStateManager.func_179097_i();
-  GlStateManager.func_179129_p();
-
-  GlStateManager.func_179094_E();
-
-  const r = ((color >> 24) & 0xFF) / 256;
-  const g = ((color >> 16) & 0xFF) / 256;
-  const b = ((color >> 8) & 0xFF) / 256;
-  const a = ((color >> 0) & 0xFF) / 256;
-  GlStateManager.func_179131_c(r, g, b, a);
-  worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
-
-  // renderWorld
-  // worldRen.func_181662_b(dx - getRenderX(), dy - getRenderY(), dz - getRenderZ()).func_181675_d();
-  // const look = p.func_70676_i(Tessellator.partialTicks);
-  // worldRen.func_181662_b(look.field_72450_a, p.func_70047_e() + look.field_72448_b, look.field_72449_c).func_181675_d();
-
-  // renderOverlay
-  const point = RenderLib2D.projectPoint(x, y, z);
-  if (point) {
-    worldRen.func_181662_b(Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2, 0).func_181675_d();
-    worldRen.func_181662_b(point.x, point.y, 0).func_181675_d();
+  const p = Player.getPlayer();
+  if (!p) return;
+  if (rel) {
+    x += getRenderX();
+    y += getRenderY();
+    z += getRenderZ();
   }
-  // Tessellator.rotate(getPitch(), 0, 1, 0);
-  // Tessellator.rotate(getYaw() * getXMult(), 1, 0, 0);
-  // look.field_72450_a, look.field_72448_b, look.field_72449_c
-  // worldRen.func_181662_b(Renderer.screen.getWidth() / 2 + look.field_72450_a, Renderer.screen.getHeight() / 2 + look.field_72448_b, look.field_72449_c).func_181675_d();
-
-  tess.func_78381_a();
-  GlStateManager.func_179121_F();
-
-  GlStateManager.func_179084_k();
-  GlStateManager.func_179098_w();
-  GlStateManager.func_179126_j();
-  GlStateManager.func_179089_o();
+  const look = p.func_70676_i(Tessellator.partialTicks);
+  renderLine3D(color, x, y, z, look.field_72450_a, look.field_72448_b + getEyeHeight(p), look.field_72449_c, lw);
 }
 
 /**
