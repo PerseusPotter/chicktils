@@ -18,8 +18,6 @@ const EntityWither = Java.type('net.minecraft.entity.boss.EntityWither');
 
 const entSpawnReg = reg('spawnEntity', e => {
   if (isMob(e)) {
-    if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) return;
-    if (e instanceof EntityWither && e.func_110138_aP() === 300) return;
     allMobs.push(e);
     allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
   } else if (e instanceof EntityItem) itemCand.push(e);
@@ -29,6 +27,8 @@ const step2Reg = reg('step', () => {
   allMobsBucket.clear();
   allMobs = allMobs.filter(e => {
     if (e.field_70128_L) return false;
+    if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) return false;
+    if (e instanceof EntityWither && e.func_110138_aP() === 300) return false;
     allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
     return true;
   });
