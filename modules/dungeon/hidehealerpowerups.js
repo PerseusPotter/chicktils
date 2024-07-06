@@ -15,7 +15,7 @@ const orbIds = [
   'DUNGEON_GREEN_SUPPORT_ORB'
 ];
 let powerupCand = [];
-const hiddenPowerups = new (Java.type('java.util.HashSet'))();
+const hiddenPowerups = new (Java.type('java.util.WeakHashMap'))();
 const hiddenPowerupsBucket = new Grid({ size: 0, addNeighbors: 1 });
 
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
@@ -33,8 +33,8 @@ const serverTickReg = reg('packetReceived', () => {
         let b = i && i.func_77978_p();
         if (b) {
           const d = b.func_74775_l('ExtraAttributes').func_74779_i('id');
-          if (orbIds.some(v => d === v)) {
-            hiddenPowerups.add(e);
+          if (d && orbIds.some(v => d === v)) {
+            hiddenPowerups.put(e, 0);
             hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
             return false;
           }
@@ -42,13 +42,13 @@ const serverTickReg = reg('packetReceived', () => {
         i = e.func_71124_b(0);
         b = i && i.func_77978_p();
         if (b && b.func_74775_l('SkullOwner').func_74775_l('Properties').func_150295_c('textures', 10).func_150305_b(0).func_74775_l('Value').func_74775_l('textures').func_74775_l('SKIN').func_74779_i('url') === 'http://textures.minecraft.net/texture/96c3e31cfc66733275c42fcfb5d9a44342d643b55cd14c9c77d273a2352') {
-          hiddenPowerups.add(e);
+          hiddenPowerups.put(e, 0);
           hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
           return false;
         }
-        return t - v[0] < 500;
+        return t - v[0] < 1_000;
       } else if (orbNames.some(v => n.startsWith(v))) {
-        hiddenPowerups.add(e);
+        hiddenPowerups.put(e, 0);
         hiddenPowerupsBucket.add(e.field_70165_t, e.field_70161_v, e);
       }
       return false;
@@ -60,16 +60,15 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (!id.equals(EnumParticleTypes.REDSTONE)) return;
   const b = part.underlyingEntity.func_70535_g();
   if (b === 0 || b > 10) return;
-  if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 2))) cancel(evn);
+  if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 5))) cancel(evn);
 }, 'dungeon/hidehealerpowerups').triggerIfCanceled(false).setEnabled(settings._dungeonHideHealerPowerups);
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
-  if (hiddenPowerups.contains(e.entity)) cancel(evn);
+  if (hiddenPowerups.containsKey(e.entity)) cancel(evn);
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 
 export function init() { }
 export function start() {
   powerupCand = [];
-  hiddenPowerups.clear();
   hiddenPowerupsBucket.clear();
 
   entSpawnReg.register();
