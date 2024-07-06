@@ -1,9 +1,6 @@
 import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
-import RenderLib2D from '../../RenderLib2D/index';
 import _drawBeaconBeam from '../../BeaconBeam/index';
-import settings from '../settings';
 import { getEyeHeight } from './mc';
-import { log } from './log';
 
 const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 const worldRen = tess.func_178180_c();
