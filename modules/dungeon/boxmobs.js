@@ -5,7 +5,7 @@ import { compareFloat, dist } from '../../util/math';
 import Grid from '../../util/grid';
 import { StateProp } from '../../util/state';
 import { isDungeonMob, stateIsInBoss } from '../dungeon.js';
-import { run } from '../../util/threading';
+import { run, unrun } from '../../util/threading';
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(stateIsInBoss).not()));
 const boxMobs = new (Java.type('java.util.WeakHashMap'))();
@@ -72,11 +72,12 @@ const step2Reg = reg('step', () => {
 }, 'dungeon/boxmobs').setFps(2).setOffset(500 / 3).setEnabled(stateBoxMob);
 const serverTickReg = reg('packetReceived', () => {
   run(() => {
+    const boxMobsBuff = [];
     nameCand = nameCand.filter(e => {
       if (e.field_70128_L) return;
       const n = e.func_70005_c_();
       if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
-        boxMobs.put(e, { yO: -1, h: 1, c: settings.dungeonBoxKeyColor });
+        boxMobsBuff.push([e, { yO: -1, h: 1, c: settings.dungeonBoxKeyColor }]);
         return;
       }
       if (!n.startsWith('§6✯ ')) return;
@@ -102,8 +103,9 @@ const serverTickReg = reg('packetReceived', () => {
       } else if (t === 3) {
         c = settings.dungeonBoxMiniColor;
       }
-      boxMobs.put(ent, { yO: 0, h, c });
+      boxMobsBuff.push([ent, { yO: 0, h, c }]);
     });
+    if (boxMobsBuff.length) unrun(() => boxMobsBuff.forEach(v => boxMobs.put(v[0], v[1])));
   });
 }, 'dungeon/boxmobs').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
@@ -113,6 +115,7 @@ const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
 
 export function init() { }
 export function start() {
+  boxMobs.clear();
   mobCand = [];
   nameCand = [];
   mobCandBucket.clear();

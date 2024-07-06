@@ -6,7 +6,7 @@ import Grid from '../../util/grid';
 import { fromVec3, getItemId, toVec3 } from '../../util/mc';
 import { getSbId } from '../../util/skyblock';
 import { getPlayers, isMob, registerTrackPlayers } from '../dungeon.js';
-import { run } from '../../util/threading';
+import { run, unrun } from '../../util/threading';
 
 let allMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
@@ -50,6 +50,7 @@ const serverTickReg = reg('packetReceived', () => {
     const ls = l * l;
     const wE = 3.4;
     const n = 5;
+    const frozenBuff = [];
     icers.forEach(({ e: p }) => {
       const ent = (p === Player ? p.getPlayer() : p.entity);
       if (!ent) return;
@@ -105,9 +106,10 @@ const serverTickReg = reg('packetReceived', () => {
           (ent.field_70161_v - e.field_70161_v) ** 2 > ls
         ) return;
         const aabb = e.func_174813_aQ();
-        if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) frozenMobs.push([e, 5 * 20]);
+        if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) frozenBuff.push([e, 5 * 20]);
       });
     });
+    if (frozenBuff.length) unrun(() => frozenMobs = frozenMobs.concat(frozenBuff));
   });
 }, 'dungeon/boxicesprayed').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(settings._dungeonBoxIceSprayed);
 const renderWorldReg = reg('renderWorld', partial => {
