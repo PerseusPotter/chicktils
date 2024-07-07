@@ -48,11 +48,12 @@ const serverTickReg = reg('packetReceived', () => {
   const arr = possibleSkulls;
   possibleSkulls = [];
   if (motionBuff.length) {
-    motionBuff.forEach(v => {
+    const a = motionBuff;
+    motionBuff = [];
+    a.forEach(v => {
       if (v.length === 1) motionData.delete(v[0]);
       else motionData.set(v[0], v[1]);
     });
-    motionBuff = [];
   }
   run(() => {
     arr.forEach(e => {
