@@ -56,14 +56,14 @@ export default class Grid {
   // stfu ok
   lock() {
     if (this.locked) return;
-    this.locked = true;
     this.oldHm = this.hm;
     this.oldArrs = this.arrs;
+    this.locked = true;
   }
   unlock() {
     if (!this.locked) return;
+    this.locked = false;
     this.oldHm = null;
     this.oldArrs = null;
-    this.locked = false;
   }
 }
