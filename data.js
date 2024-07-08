@@ -1,5 +1,5 @@
 import PogObject from '../PogData';
-import { log, logDebug } from './util/log';
+import { log } from './util/log';
 
 // if reloading modules without cache it resets data :(
 let isMainData = false;
@@ -11,7 +11,7 @@ export function setIsMain() {
  * @typedef {{ x: number, y: number, s: number }} Location
  */
 /**
- * @typedef {Location & { a: number }} TextLocation
+ * @typedef {Location & { a: number, b: boolean }} TextLocation
  */
 /**
  * @type {{
@@ -43,10 +43,11 @@ function verifyLocation(value) {
 }
 function resetTextLocation(key, mute) {
   data[key].a = 0;
+  data[key].b = false;
   reset(key, mute);
 }
 function verifyTextLocation(value) {
-  return typeof value.a === 'number';
+  return typeof value.a === 'number' && typeof value.b === 'boolean';
 }
 
 [
@@ -68,16 +69,17 @@ function verifyTextLocation(value) {
 });
 
 if (!data.statLocs || !Array.isArray(data.statLocs)) {
-  data.statLocs = new Array(17).fill(0).map(() => ({ x: 50, y: 50, s: 1, a: 0 }));
+  data.statLocs = new Array(17).fill(0).map(() => ({ x: 50, y: 50, s: 1, a: 0, b: false }));
   reset('statLocs');
 }
 data.statLocs.forEach((_, i) => {
   if (!verifyLocation(data.statLocs[i])) {
-    data.statLocs[i] = { x: 50, y: 50, s: 1, a: 0 };
+    data.statLocs[i] = { x: 50, y: 50, s: 1, a: 0, b: false };
     reset(`statLocs[${i}]`);
   }
   if (!verifyTextLocation(data.statLocs[i])) {
     data.statLocs[i].a = 0;
+    data.statLocs[i].b = false;
     reset(`statLocs[${i}]`);
   }
 });

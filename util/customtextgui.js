@@ -1,3 +1,4 @@
+import { drawOutlinedString } from './draw';
 import reg from './registerer';
 const EventEmitter = require('./events');
 
@@ -81,10 +82,11 @@ function createTextGui(getLoc, getEditText, str = '') {
     renderReg.register();
     editGui.open();
   };
-  let cx = -0.696942;
-  let cy = -0.696942;
-  let cs = -0.696942;
-  let ca = -0.696942;
+  let cx = 0;
+  let cy = 0;
+  let cs = 0;
+  let ca = 0;
+  let cb = false;
   const updateLoc = () => {
     let x = cx;
     let y = cy;
@@ -96,7 +98,7 @@ function createTextGui(getLoc, getEditText, str = '') {
   const updateLocCache = () => {
     const l = obj.getLoc();
     if (!l) return;
-    const { x, y, s, a } = l;
+    const { x, y, s, a, b } = l;
     let update = false;
     if (x !== cx) {
       cx = x;
@@ -118,6 +120,10 @@ function createTextGui(getLoc, getEditText, str = '') {
       if (a === 4) obj.display.setAlign('CENTER');
       update = true;
     }
+    if (b !== cb) {
+      cb = b;
+      obj.display.getLines().forEach(v => v.setShadow(b));
+    }
     if (update) updateLoc();
   };
   Client.scheduleTask(() => updateLocCache());
@@ -137,7 +143,7 @@ function createTextGui(getLoc, getEditText, str = '') {
       this.clearLines();
       cstr = str;
       cll = 1;
-      this.display.addLine(setTextOfDisplayLineFuckChatTriggers(getLine(), cstr).setScale(cs));
+      this.display.addLine(setTextOfDisplayLineFuckChatTriggers(getLine(), cstr).setScale(cs).setShadow(cb));
     }
     return this;
   };
@@ -153,7 +159,7 @@ function createTextGui(getLoc, getEditText, str = '') {
       }
     }
     while (strs.length > cll) {
-      this.display.addLine(ca & 2 ? 0 : cll, getLine().setScale(cs));
+      this.display.addLine(ca & 2 ? 0 : cll, getLine().setScale(cs).setShadow(cb));
       cll++;
     }
     strs.forEach((v, i) => {
@@ -166,7 +172,7 @@ function createTextGui(getLoc, getEditText, str = '') {
   };
   obj.addLine = function(str) {
     const i = (ca & 2) ? 0 : cll;
-    this.display.addLine(i, setTextOfDisplayLineFuckChatTriggers(getLine().setScale(cs), str));
+    this.display.addLine(i, setTextOfDisplayLineFuckChatTriggers(getLine().setScale(cs).setShadow(cb), str));
     cll++;
     cstr = BLANK_STRING;
     return this;
@@ -199,10 +205,10 @@ const renderReg = reg('renderOverlay', () => {
   editDisplay.setLines(curr.getEditText());
   editDisplay.render();
 
-  const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str;
-  const w = Renderer.getStringWidth(editStr);
-  Renderer.drawRect(0xB0000000, 40, 15, w + 20, 20);
-  Renderer.drawStringWithShadow(editStr, 50, 20);
+  const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&23&7] &fToggle Shadow &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str;
+  // const w = Renderer.getStringWidth(editStr);
+  // Renderer.drawRect(0xB0000000, 40, 15, w + 20, 20);
+  drawOutlinedString(editStr, 50, 20);
   Renderer.drawCircle(0xFF0000FF, curr.getLoc().x, curr.getLoc().y, 5, 10);
 }, 'customtextgui');
 
@@ -223,9 +229,13 @@ editGui.registerKeyTyped((c, n) => {
       l.y = 50;
       l.s = 1;
       l.a = 0;
+      l.b = false;
       break;
     case 3:
       l.a = (l.a + 1) & 3;
+      break;
+    case 4:
+      l.b = !l.b;
       break;
     default:
       curr.emit('editKey', n);

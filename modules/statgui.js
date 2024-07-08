@@ -27,11 +27,11 @@ const locs = [
 
 let currLoc = -1;
 let editLoc = -1;
-const display = createTextGui(() => display.isEdit ? data.statLocs[editLoc] : data.statLocs[currLoc], () => [' §r Speed: §r§f✦400§r', ' §r Strength: §r§c❁9999§r', ' §r Crit Chance: §r§9☣100§r', ' §r Crit Damage: §r§9☠9999§r', ' §r Attack Speed: §r§e⚔100§r'], ' &8| &7[&23&7] &fApply to All Locations');
+const display = createTextGui(() => display.isEdit ? data.statLocs[editLoc] : data.statLocs[currLoc], () => [' §r Speed: §r§f✦400§r', ' §r Strength: §r§c❁9999§r', ' §r Crit Chance: §r§9☣100§r', ' §r Crit Damage: §r§9☠9999§r', ' §r Attack Speed: §r§e⚔100§r'], '\n&7[&24&7] &fApply to All Locations');
 function editLocation(index) {
   editLoc = index;
   display.on('editKey', n => {
-    if (n !== 4) return;
+    if (n !== 5) return;
     data.statLocs = locs.map(() => Object.assign({}, data.statLocs[editLoc]));
   });
 
