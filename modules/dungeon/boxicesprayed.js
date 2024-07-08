@@ -12,7 +12,6 @@ let allMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
 let itemCand = [];
 let frozenMobs = [];
-let frozenBuff = [];
 const EntityItem = Java.type('net.minecraft.entity.item.EntityItem');
 const EntityOtherPlayerMP = Java.type('net.minecraft.entity.client.EntityOtherPlayerMP');
 const EntityWither = Java.type('net.minecraft.entity.boss.EntityWither');
@@ -36,10 +35,6 @@ const step2Reg = reg('step', () => {
   allMobsBucket.unlock();
 }, 'dungeon/boxicesprayed').setFps(2).setOffset(0).setEnabled(settings._dungeonBoxIceSprayed);
 const serverTickReg = reg('packetReceived', () => {
-  if (frozenBuff.length) {
-    frozenMobs = frozenMobs.concat(frozenBuff);
-    frozenBuff = [];
-  }
   frozenMobs = frozenMobs.filter(v => --v[1] > 0);
   run(() => {
     const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');
@@ -55,6 +50,7 @@ const serverTickReg = reg('packetReceived', () => {
     const ls = l * l;
     const wE = 3.4;
     const n = 5;
+    const frozenBuff = [];
     icers.forEach(({ e: p }) => {
       const ent = (p === Player ? p.getPlayer() : p.entity);
       if (!ent) return;
@@ -113,6 +109,7 @@ const serverTickReg = reg('packetReceived', () => {
         if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) frozenBuff.push([e, 5 * 20]);
       });
     });
+    if (frozenBuff.length) unrun(() => frozenMobs = frozenMobs.concat(frozenBuff));
   });
 }, 'dungeon/boxicesprayed').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(settings._dungeonBoxIceSprayed);
 const renderWorldReg = reg('renderWorld', partial => {
@@ -136,7 +133,6 @@ export function start() {
   allMobsBucket.clear();
   itemCand = [];
   frozenMobs = [];
-  frozenBuff = [];
 
   entSpawnReg.register();
   step2Reg.register();

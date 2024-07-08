@@ -10,7 +10,7 @@ import { StateProp, StateVar } from '../../util/state';
 import { DelayTimer } from '../../util/timers';
 import { getItemId } from '../../util/mc';
 import { listenBossMessages, roundRoomCoords, stateIsInBoss } from '../dungeon.js';
-import { run } from '../../util/threading';
+import { run, unrun } from '../../util/threading';
 
 let bloodMobs = [];
 let possibleSkulls = [];
@@ -18,7 +18,6 @@ let bloodX = -1;
 let bloodZ = -1;
 let bloodMobCount = 0;
 const motionData = new Map();
-let motionBuff = [];
 const dialogueSkipTimer = createTextGui(() => data.dungeonCampSkipTimerLoc, () => ['§l§23.69s']);
 let lastSpawnedBloodMob;
 let bloodOpenTime = 0;
@@ -47,14 +46,6 @@ const serverTickReg = reg('packetReceived', () => {
   if (bloodOpenTime === 0) return;
   const arr = possibleSkulls;
   possibleSkulls = [];
-  if (motionBuff.length) {
-    const a = motionBuff;
-    motionBuff = [];
-    a.forEach(v => {
-      if (v.length === 1) motionData.delete(v[0]);
-      else motionData.set(v[0], v[1]);
-    });
-  }
   run(() => {
     arr.forEach(e => {
       if (!isSkull(e)) return;
@@ -71,6 +62,7 @@ const serverTickReg = reg('packetReceived', () => {
     });
 
     const t = Date.now();
+    const motionBuff = [];
     bloodMobs = bloodMobs.filter(e => {
       const uuid = e.getUUID().toString();
       let data = motionData.get(uuid);
@@ -124,6 +116,10 @@ const serverTickReg = reg('packetReceived', () => {
       }
       return true;
     });
+    if (motionBuff.length) unrun(() => motionBuff.forEach(v => {
+      if (v.length === 1) motionData.delete(v[0]);
+      else motionData.set(v[0], v[1]);
+    }));
   });
 }, 'dungeon/camp').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateCampFinal);
 const renderWorldReg = reg('renderWorld', () => {
@@ -176,7 +172,6 @@ export function start() {
   bloodZ = -1;
   bloodMobCount = 0;
   motionData.clear();
-  motionBuff = [];
   lastSpawnedBloodMob = null;
   bloodOpenTime = 0;
   stateBloodClosed.set(false);
