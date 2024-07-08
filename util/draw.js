@@ -524,7 +524,7 @@ export function drawString(text, x, y, shadow = false) {
  * @param {number} y
  */
 export function drawOutlinedString(text, x, y) {
-  const bt = '&0' + text;
+  const bt = '&0' + text.removeFormatting().split('\n').join('\n&0');
   drawString(bt, x + 1, y + 0);
   drawString(bt, x - 1, y + 0);
   drawString(bt, x + 0, y + 1);
