@@ -70,44 +70,47 @@ const step2Reg = reg('step', () => {
   });
   mobCandBucket.unlock();
 }, 'dungeon/boxmobs').setFps(2).setOffset(500 / 3).setEnabled(stateBoxMob);
-const serverTickReg = reg('packetReceived', () => {
-  run(() => {
-    const boxMobsBuff = [];
-    nameCand = nameCand.filter(e => {
-      if (e.field_70128_L) return;
-      const n = e.func_70005_c_();
-      if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
-        boxMobsBuff.push([e, { yO: -1, h: 1, c: settings.dungeonBoxKeyColor }]);
-        return;
-      }
-      if (!n.startsWith('§6✯ ')) return;
-      const x = e.field_70165_t;
-      const y = e.field_70163_u;
-      const z = e.field_70161_v;
+function boxMobsTick() {
+  const boxMobsBuff = [];
+  nameCand = nameCand.filter(e => {
+    if (e.field_70128_L) return;
+    const n = e.func_70005_c_();
+    if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
+      boxMobsBuff.push([e, { yO: -1, h: 1, c: settings.dungeonBoxKeyColor }]);
+      return;
+    }
+    if (!n.startsWith('§6✯ ')) return;
+    const x = e.field_70165_t;
+    const y = e.field_70163_u;
+    const z = e.field_70161_v;
 
-      let ents = mobCandBucket.get(e.field_70165_t, e.field_70161_v);
-      if (!ents) return true;
-      ents = ents.filter(v => compareFloat(v.field_70165_t, x, 1) === 0 && compareFloat(v.field_70161_v, z, 1) === 0 && v.field_70163_u < y && y - v.field_70163_u < 5).filter(v => matchesMobType(n, v));
-      if (ents.length === 0) return true;
-      const ent = ents.reduce((a, v) => dist(a.field_70165_t, x) + dist(a.field_70161_v, z) > dist(v.field_70165_t, x) - dist(v.field_70161_v, z) ? v : a, ents[0]);
+    let ents = mobCandBucket.get(e.field_70165_t, e.field_70161_v);
+    if (!ents) return true;
+    ents = ents.filter(v => compareFloat(v.field_70165_t, x, 1) === 0 && compareFloat(v.field_70161_v, z, 1) === 0 && v.field_70163_u < y && y - v.field_70163_u < 5).filter(v => matchesMobType(n, v));
+    if (ents.length === 0) return true;
+    const ent = ents.reduce((a, v) => dist(a.field_70165_t, x) + dist(a.field_70161_v, z) > dist(v.field_70165_t, x) - dist(v.field_70161_v, z) ? v : a, ents[0]);
 
-      let h = 2;
-      const t = getBoxMobType(n);
-      let c = settings.dungeonBoxMobColor;
-      if (t === 1) {
-        h = 3;
-        c = settings.dungeonBoxFelColor;
-      } else if (t === 2) {
-        c = settings.dungeonBoxChonkColor;
-        if (n.includes('Withermancer', 6)) h = 3;
-      } else if (t === 3) {
-        c = settings.dungeonBoxMiniColor;
-      }
-      boxMobsBuff.push([ent, { yO: 0, h, c }]);
-    });
-    if (boxMobsBuff.length) unrun(() => boxMobsBuff.forEach(v => boxMobs.put(v[0], v[1])));
+    let h = 2;
+    const t = getBoxMobType(n);
+    let c = settings.dungeonBoxMobColor;
+    if (t === 1) {
+      h = 3;
+      c = settings.dungeonBoxFelColor;
+    } else if (t === 2) {
+      c = settings.dungeonBoxChonkColor;
+      if (n.includes('Withermancer', 6)) h = 3;
+    } else if (t === 3) {
+      c = settings.dungeonBoxMiniColor;
+    }
+    boxMobsBuff.push([ent, { yO: 0, h, c }]);
   });
+  if (boxMobsBuff.length) unrun(() => boxMobsBuff.forEach(v => boxMobs.put(v[0], v[1])));
+}
+const serverTickReg = reg('packetReceived', () => {
+  clientTickReg.unregister();
+  run(boxMobsTick);
 }, 'dungeon/boxmobs').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBoxMob);
+const clientTickReg = reg('tick', () => run(boxMobsTick), 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity);
   if (data) renderOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, settings.dungeonBoxMobEsp, true, undefined, true);
@@ -123,11 +126,13 @@ export function start() {
   entSpawnReg.register();
   step2Reg.register();
   serverTickReg.register();
+  clientTickReg.register();
   renderEntPostReg.register();
 }
 export function reset() {
   entSpawnReg.unregister();
   step2Reg.unregister();
   serverTickReg.unregister();
+  clientTickReg.register();
   renderEntPostReg.unregister();
 }
