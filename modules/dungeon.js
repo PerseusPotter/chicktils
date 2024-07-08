@@ -13,8 +13,11 @@ function reset() {
 function start() {
   players = [];
   stateIsInBoss.set(false);
-  const floor = Scoreboard.getLines(false)[4].getName().match(/^ §7⏣ §cThe Catac..§combs §7\(([MF][1-7]|E)\)$/);
-  stateFloor.set(floor ? floor[1] : '');
+  if (!Scoreboard.getLines(false).some(v => {
+    const m = v.getName().match(/^ §7⏣ §cThe Catac..§combs §7\(([MF][1-7]|E)\)$/);
+    if (m) stateFloor.set(m[1]);
+    return Boolean(m);
+  })) stateFloor.set('');
 
   dungeonLeaveReg.register();
   bossMessageReg.register();
