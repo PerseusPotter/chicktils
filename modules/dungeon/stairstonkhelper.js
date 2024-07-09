@@ -70,6 +70,7 @@ const renderWorldReg = reg('renderWorld', () => {
       settings.dungeonStairStonkHelperColor,
       v[1][0], v[1][1], v[1][2],
       v[2][0], v[2][1], v[2][2],
+      false,
       2
     );
   });
