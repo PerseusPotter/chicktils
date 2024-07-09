@@ -69,11 +69,10 @@ const eggRenWrldReg = reg('renderWorld', () => {
     renderOutline(x, y + 1.5, z, 0.5, 0.5, settings.rabbitBoxColor, settings.rabbitBoxEsp);
     renderBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.rabbitBoxEsp);
   });
-  if (settings.preferUseTracer) renderTracer(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
+  if (settings.preferUseTracer && eggs.length > 0) renderTracer(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
 }, 'rabbit').setEnabled(stateIsSpring);
 const eggRendOvReg = reg('renderOverlay', () => {
-  if (eggs.length === 0) return;
-  drawArrow3DPos(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
+  if (eggs.length > 0) drawArrow3DPos(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
 }, 'rabbit').setEnabled(new StateProp(settings._preferUseTracer).not().and(stateIsSpring));
 
 const guiReg = reg('guiOpened', evn => {
