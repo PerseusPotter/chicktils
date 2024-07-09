@@ -222,7 +222,7 @@ const dirOverlayReg = reg('renderOverlay', () => {
 
 const EntityGiantZombie = Java.type('net.minecraft.entity.monster.EntityGiantZombie');
 const entSpawnReg = reg('spawnEntity', ent => {
-  if (!(ent instanceof EntityGiantZombie));
+  if (!(ent instanceof EntityGiantZombie)) return;
   const e = new Entity(ent);
   const y = e.getY();
   if (y < 60) chunks.push(e);
