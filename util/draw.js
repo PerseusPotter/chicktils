@@ -388,7 +388,7 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
 export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5) {
   if ((color & 0xFF) === 0) return;
   const c = (color & ~0xFF) | ((color & 0xFF) >> 2);
-  renderFilledBox(x, y, z, w, h, c, esp, center, lw);
+  renderFilledBox(x, y, z, w, h, c, esp, center);
   renderOutline(x, y, z, w, h, color, esp, center, lw);
 }
 
