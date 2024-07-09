@@ -205,7 +205,7 @@ export function renderTracer(color, x, y, z, rel = true, lw = 3) {
     z += getRenderZ();
   }
   const look = p.func_70676_i(Tessellator.partialTicks);
-  renderLine3D(color, x, y, z, look.field_72450_a, look.field_72448_b + getEyeHeight(p), look.field_72449_c, lw);
+  renderLine3D(color, x, y, z, getRenderX() + look.field_72450_a, getRenderY() + look.field_72448_b + getEyeHeight(p), getRenderZ() + look.field_72449_c, true, lw);
 }
 
 /**
