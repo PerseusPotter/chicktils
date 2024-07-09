@@ -474,6 +474,7 @@ export const props = {
 
   kuudraBoxSupplies: new Property('KuudraBoxSupplies', page, ++sort, Property.Type.Toggle, true),
   kuudraBoxSuppliesColor: new Property('KuudraBoxSuppliesColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
+  kuudraBoxSuppliesGiantColor: new Property('KuudraBoxSuppliesGiantColor', page, ++sort, Property.Type.Color, 0x01322040),
   kuudraBoxSuppliesEsp: new Property('KuudraBoxSuppliesEsp', page, ++sort, Property.Type.Toggle, true),
 
   kuudraBoxChunks: new Property('KuudraBoxChunks', page, ++sort, Property.Type.Toggle, true),
