@@ -107,8 +107,8 @@ const renderReg = reg('renderWorld', () => {
         0, 1, 0,
         0, 140, 0
       );
-      renderLine3D(c, x - 1, y, z - 1, x + 1, y, z + 1, 5);
-      renderLine3D(c, x - 1, y, z + 1, x + 1, y, z - 1, 5);
+      renderLine3D(c, x - 1, y, z - 1, x + 1, y, z + 1, true, 5);
+      renderLine3D(c, x - 1, y, z + 1, x + 1, y, z - 1, true, 5);
       renderString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x, y + 1, z, rgbaToARGB(c));
     });
   }

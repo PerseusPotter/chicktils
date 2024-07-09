@@ -446,9 +446,10 @@ function applyTint(c, a) {
  * @param {number} x2
  * @param {number} y2
  * @param {number} z2
+ * @param {number} esp (false)
  * @param {number?} lw (2)
  */
-export function renderLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
+export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
   if ((color & 0xFF) === 0) return;
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
   ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));
@@ -456,6 +457,7 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   const realX = lerp(render.field_70142_S, render.field_70165_t, Tessellator.partialTicks);
   const realY = lerp(render.field_70137_T, render.field_70163_u, Tessellator.partialTicks);
   const realZ = lerp(render.field_70136_U, render.field_70161_v, Tessellator.partialTicks);
+
   GlStateManager.func_179094_E();
   GlStateManager.func_179137_b(-realX, -realY, -realZ);
   GlStateManager.func_179090_x();
@@ -464,6 +466,10 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   GlStateManager.func_179118_c();
   GlStateManager.func_179120_a(770, 771, 1, 0);
   GL11.glLineWidth(lw);
+  if (esp) {
+    GL11.glDisable(GL11.GL_DEPTH_TEST);
+    GL11.glDepthMask(false);
+  }
 
   const r = ((color >> 24) & 0xFF) / 256;
   const g = ((color >> 16) & 0xFF) / 256;
@@ -483,6 +489,10 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, lw = 2) {
   GlStateManager.func_179131_c(1, 1, 1, 1);
   GlStateManager.func_179121_F();
   GL11.glLineWidth(2);
+  if (esp) {
+    GL11.glEnable(GL11.GL_DEPTH_TEST);
+    GL11.glDepthMask(true);
+  }
 }
 
 /**
