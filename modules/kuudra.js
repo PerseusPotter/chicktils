@@ -9,7 +9,7 @@ import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
 import { unrun } from '../util/threading';
-const { gsl_sf_lambert_W0: W, intersectPL, normalize, rotate } = require('../util/math');
+const { gsl_sf_lambert_W0: W, intersectPL, normalize, rotate, fastDistance } = require('../util/math');
 
 /**
  * t_{heta}=y_{aw}+90
@@ -170,12 +170,12 @@ const updateReg1 = reg('step', () => {
     unrun(() => chunks = c);
   }
   World.getAllEntities().forEach(e => {
-    if (e instanceof EntityArmorStand && e.getName() === '§a§l✓ SUPPLIES RECEIVED ✓') {
-      dropLocs.forEach(v => v.d = (v.x - e.getX()) ** 2 + (v.z - e.getZ()) ** 2);
+    if (e.entity instanceof EntityArmorStand && e.getName() === '§a§l✓ SUPPLIES RECEIVED ✓') unrun(() => {
+      dropLocs.forEach(v => v.d = fastDistance(v.x - e.getX(), v.z - e.getZ()));
       dropLocs.sort((a, b) => a.d - b.d);
       if (dropLocs.length > 0 && dropLocs[0].d < 4) dropLocs.shift();
-    }
-    if (e instanceof EntityMagmaCube && e.entity.func_70809_q() === 30 && e.entity.func_110143_aJ() <= 100_000) kuuder = new EntityLivingBase(e.entity);
+    });
+    if (e.entity instanceof EntityMagmaCube && e.entity.func_70809_q() === 30 && e.entity.func_110143_aJ() <= 100_000) kuuder = new EntityLivingBase(e.entity);
   });
 }, 'kuudra').setFps(1);
 const bossBarReg = reg('renderBossHealth', () => {
