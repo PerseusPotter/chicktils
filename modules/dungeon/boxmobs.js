@@ -133,6 +133,6 @@ export function reset() {
   entSpawnReg.unregister();
   step2Reg.unregister();
   serverTickReg.unregister();
-  clientTickReg.register();
+  clientTickReg.unregister();
   renderEntPostReg.unregister();
 }
