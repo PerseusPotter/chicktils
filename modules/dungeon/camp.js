@@ -13,6 +13,7 @@ import { listenBossMessages, roundRoomCoords, stateIsInBoss } from '../dungeon.j
 import { run, unrun } from '../../util/threading';
 
 let bloodMobs = [];
+let bloodMobsSet = new Set();
 let possibleSkulls = [];
 let bloodX = -1;
 let bloodZ = -1;
@@ -35,7 +36,10 @@ function addSkull(skull) {
   const x = roundRoomCoords(skull.getX());
   const z = roundRoomCoords(skull.getZ());
   if (x !== bloodX || z !== bloodZ) return;
+  const uuid = skull.getUUID().toString();
+  if (bloodMobsSet.has(uuid)) return;
   bloodMobs.push(skull);
+  bloodMobsSet.add(uuid);
 }
 
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
@@ -167,6 +171,7 @@ export function init() {
 }
 export function start() {
   bloodMobs = [];
+  bloodMobsSet.clear();
   possibleSkulls = [];
   bloodX = -1;
   bloodZ = -1;
