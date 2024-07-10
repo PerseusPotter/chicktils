@@ -24,8 +24,8 @@ export default class Grid {
     this.arrs[key].push(item);
   }
   _getById(id) {
-    const i = (this.locked ? this.oldHm : this.hm).get(id);
-    if (i === null) return [];
+    const i = (this.locked ? this.oldHm : this.hm)?.get(id);
+    if (i === null || i === undefined) return [];
     return (this.locked ? this.oldArrs : this.arrs)[i];
   }
 
