@@ -4,7 +4,6 @@ import data from '../data';
 import createTextGui from '../util/customtextgui';
 import { colorForNumber, execCmd } from '../util/format';
 import reg from '../util/registerer';
-import getPing from '../util/ping';
 import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
@@ -95,7 +94,7 @@ const hpDisplay = createTextGui(() => data.kuudraHpLoc, () => ['&d300M']);
 const renderReg = reg('renderWorld', () => {
   if (settings.kuudraRenderPearlTarget && pearlLocs.length > 0) {
     const c = settings.kuudraPearlTargetColor;
-    const timeLeft = ticksUntilPickup - (Date.now() - pickupStart) - getPing();
+    const timeLeft = ticksUntilPickup - (Date.now() - pickupStart);
     pearlLocs.forEach(v => {
       const { x, y, z } = intersectPL(
         Math.sin(v.phi) * Math.cos(v.theta),
