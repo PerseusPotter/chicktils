@@ -176,7 +176,9 @@ const soundPlayReg = reg('soundPlay', (pos, name, vol, pit, cat, evn) => {
   let pY;
   let pZ;
   if (prevSounds.length === 0) {
-    ({ x: pX, y: pY, z: pY } = getBlockPos(GriffinBurrows.INSTANCE.getLastDugParticleBurrow()));
+    const lastBurrow = GriffinBurrows.INSTANCE.getLastDugParticleBurrow();
+    if (lastBurrow) ({ x: pX, y: pY, z: pY } = getBlockPos(lastBurrow));
+
     if (pX === undefined || ((Player.getX() - pX) ** 2 + (Player.getY() - pY) ** 2 + (Player.getZ() - pZ) ** 2) > 25) {
       pX = Player.getX();
       pY = Player.getY();
