@@ -73,8 +73,8 @@ const renderArrowWrldReg = reg('renderWorld', () => {
 }, 'diana').setEnabled(new StateProp(settings._preferUseTracer).and(settings._dianaArrowToBurrow));
 const renderWrldReg = reg('renderWorld', () => {
   if (guessLoc) {
-    renderWaypoint(guessLoc[0], guessLoc[1], guessLoc[2], 1, 1, settings.dianaGuessFromParticlesColor, true, false);
-    renderBeaconBeam(guessLoc[0], guessLoc[1] + 1, guessLoc[2], settings.dianaGuessFromParticlesColor, true, false);
+    renderWaypoint(guessLoc[0], guessLoc[1], guessLoc[2], 1, 1, settings.dianaGuessFromParticlesColor, true, true);
+    renderBeaconBeam(guessLoc[0], guessLoc[1] + 1, guessLoc[2], settings.dianaGuessFromParticlesColor, true, true);
     // renderString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
   }
 }, 'diana').setEnabled(settings._dianaGuessFromParticles);
@@ -162,7 +162,7 @@ function updateGuess() {
     if (i === 2) break;
     gy--;
   }
-  guessLoc = [gx, gy < 60 ? (topBlock || 70) : gy, gz];
+  guessLoc = [gx + 0.5, (gy < 60 ? (topBlock || 70) : gy), gz + 0.5];
 }
 const soundPlayReg = reg('soundPlay', (pos, name, vol, pit, cat, evn) => {
   if (vol !== 1 || name !== 'note.harp') return;
