@@ -748,7 +748,7 @@ export const props = {
   dianaAlertFoundBurrowNoStart: new Property('DianaAlertFoundBurrowNoStart', page, ++sort, Property.Type.Toggle, false, { desc: 'do not alert when found burrow is a start burrow' }),
   dianaAlertFoundBurrowTime: new Property('DianaAlertFoundBurrowTime', page, ++sort, Property.Type.Integer, 500, { desc: 'in ms' }),
   dianaAlertFoundBurrowSound: new Property('DianaAlertFoundBurrowSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
-  dianaFixSkytils: new Property('DianaFixSkytils', page, ++sort, Property.Type.Toggle, false, { desc: 'only keep 1 guess waypoint at a time\nalternatively use /ctsmanualfixstdiana to remove oldest guess' }),
+  dianaFixSkytils: new Property('DianaFixSkytils', page, ++sort, Property.Type.Toggle, false, { desc: 'fixes some quirks\nif prefer finish -> only keep the newest guess waypoint\notherwise -> delete any obviously wrong guesses\nalternatively use /ctsmanualfixstdiana to remove the guess closest to you' }),
   dianaGuessFromParticles: new Property('DianaGuessFromParticles', page, ++sort, Property.Type.Toggle, false, { desc: '/togglesound must be on, from soopy (but not fps tax)\ndoes not require skytils but a lot more consistent with it' }),
   dianaGuessFromParticlesColor: new Property('DianaGuessFromParticlesColor', page, ++sort, Property.Type.Color, 0x00FFFFFF),
 

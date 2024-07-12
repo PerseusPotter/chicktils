@@ -4,7 +4,7 @@ import reg from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
 import { drawArrow3DPos, renderBeaconBeam, renderString, renderTracer, renderWaypoint } from '../util/draw';
-import { dist, linReg, lineRectColl } from '../util/math';
+import { dist, fastDistance, linReg, lineRectColl } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
@@ -83,17 +83,34 @@ const GriffinBurrows = Java.type('gg.skytils.skytilsmod.features.impl.events.Gri
 const tickReg = reg('tick', () => {
   if (settings.dianaFixSkytils) {
     const guess = GriffinBurrows.BurrowEstimation.INSTANCE.getGuesses();
-    if (guess.size() > 1) {
-      let latest;
-      let latestK;
-      guess.forEach((k, v) => {
-        if (!latest || v.compareTo(latest) > 0) {
-          latest = v;
-          latestK = k;
-        }
+    if (settings.dianaPreferFinish) {
+      if (guess.size() > 1) {
+        let latest;
+        let latestK;
+        guess.forEach((k, v) => {
+          if (!latest || v.compareTo(latest) > 0) {
+            latest = v;
+            latestK = k;
+          }
+        });
+        guess.clear();
+        guess.put(latestK, latest);
+      }
+    } else {
+      let remove = [];
+      guess.forEach(k => {
+        if (
+          (
+            k.getZ() < -30 ?
+              k.getX() < -230 :
+              k.getX() < -300
+          ) ||
+          k.getX() > 210 ||
+          k.getZ() < -240 ||
+          k.getZ() > 210
+        ) remove.push(k);
       });
-      guess.clear();
-      guess.put(latestK, latest);
+      remove.forEach(v => guess.remove(v));
     }
   }
 
@@ -275,15 +292,16 @@ warpKey.registerKeyRelease(() => {
 const fixStReg = reg('command', () => {
   const guess = GriffinBurrows.BurrowEstimation.INSTANCE.getGuesses();
   if (guess.size() > 0) {
-    let oldest;
-    let oldestK;
-    guess.forEach((k, v) => {
-      if (!oldest || v.compareTo(oldest) < 0) {
-        oldest = v;
-        oldestK = k;
+    let nearest;
+    let nd = 0;
+    guess.forEach(k => {
+      const d = fastDistance(Player.getX() - k.getX(), Player.getZ() - k.getZ());
+      if (!nearest || d < nd) {
+        nd = d;
+        nearest = k;
       }
     });
-    guess.remove(oldestK);
+    guess.remove(nearest);
   }
 }, 'diana').setName('ctsmanualfixstdiana').setEnabled(new StateVar(Boolean(GriffinBurrows)));
 
