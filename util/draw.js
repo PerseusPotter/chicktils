@@ -250,10 +250,10 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
     GL11.glDepthMask(false);
   }
 
-  const r = ((color >> 24) & 0xFF) / 256;
-  const g = ((color >> 16) & 0xFF) / 256;
-  const b = ((color >> 8) & 0xFF) / 256;
-  const a = ((color >> 0) & 0xFF) / 256;
+  const r = ((color >> 24) & 0xFF) / 255;
+  const g = ((color >> 16) & 0xFF) / 255;
+  const b = ((color >> 8) & 0xFF) / 255;
+  const a = ((color >> 0) & 0xFF) / 255;
   GlStateManager.func_179131_c(r, g, b, a);
 
   worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
@@ -332,10 +332,10 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
     GL11.glDepthMask(false);
   }
 
-  const r = ((color >> 24) & 0xFF) / 256;
-  const g = ((color >> 16) & 0xFF) / 256;
-  const b = ((color >> 8) & 0xFF) / 256;
-  const a = ((color >> 0) & 0xFF) / 256;
+  const r = ((color >> 24) & 0xFF) / 255;
+  const g = ((color >> 16) & 0xFF) / 255;
+  const b = ((color >> 8) & 0xFF) / 255;
+  const a = ((color >> 0) & 0xFF) / 255;
   GlStateManager.func_179131_c(r, g, b, a);
 
   worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
@@ -407,10 +407,10 @@ export function drawPolygon(color, vertexes) {
 
   GlStateManager.func_179094_E();
 
-  const r = ((color >> 24) & 0xFF) / 256;
-  const g = ((color >> 16) & 0xFF) / 256;
-  const b = ((color >> 8) & 0xFF) / 256;
-  const a = ((color >> 0) & 0xFF) / 256;
+  const r = ((color >> 24) & 0xFF) / 255;
+  const g = ((color >> 16) & 0xFF) / 255;
+  const b = ((color >> 8) & 0xFF) / 255;
+  const a = ((color >> 0) & 0xFF) / 255;
   GlStateManager.func_179131_c(r, g, b, a);
   worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
 
@@ -471,10 +471,10 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
     GL11.glDepthMask(false);
   }
 
-  const r = ((color >> 24) & 0xFF) / 256;
-  const g = ((color >> 16) & 0xFF) / 256;
-  const b = ((color >> 8) & 0xFF) / 256;
-  const a = ((color >> 0) & 0xFF) / 256;
+  const r = ((color >> 24) & 0xFF) / 255;
+  const g = ((color >> 16) & 0xFF) / 255;
+  const b = ((color >> 8) & 0xFF) / 255;
+  const a = ((color >> 0) & 0xFF) / 255;
   GlStateManager.func_179131_c(r, g, b, a);
   worldRen.func_181668_a(3, DefaultVertexFormats.field_181705_e);
 
@@ -589,10 +589,10 @@ export function renderBeaconBeam(x, y, z, color, esp = false, center = true, hei
   }
   ({ x, y, z } = rescaleRender(x, y, z));
   _drawBeaconBeam(x, y, z,
-    ((color >> 24) & 0xFF) / 256,
-    ((color >> 16) & 0xFF) / 256,
-    ((color >> 8) & 0xFF) / 256,
-    ((color >> 0) & 0xFF) / 256,
+    ((color >> 24) & 0xFF) / 255,
+    ((color >> 16) & 0xFF) / 255,
+    ((color >> 8) & 0xFF) / 255,
+    ((color >> 0) & 0xFF) / 255,
     !esp, height
   );
 }
