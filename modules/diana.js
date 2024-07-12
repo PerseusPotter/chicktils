@@ -152,8 +152,8 @@ let lastGuessTime = 0;
 let guessD = 0;
 function updateGuess() {
   if (prevParticles.length === 0) return;
-  let gx = prevParticles[prevParticles.length - 1].getX() + guessDir[0] * guessD;
-  let gz = prevParticles[prevParticles.length - 1].getZ() + guessDir[1] * guessD;
+  let gx = prevParticles[0].getX() + guessDir[0] * guessD;
+  let gz = prevParticles[0].getZ() + guessDir[1] * guessD;
   let gy = 100;
   let topBlock;
   while (gy >= 60) {
