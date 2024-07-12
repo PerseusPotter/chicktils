@@ -572,6 +572,8 @@ export function drawTexturedRect(x, y, u, v, w, h, tw, th, uw, vh) {
   tess.func_78381_a();
 }
 
+const ResourceLocation = Java.type('net.minecraft.util.ResourceLocation');
+const beaconBeamText = new ResourceLocation('textures/entity/beacon_beam.png');
 /**
  * @param {number} x
  * @param {number} y
@@ -580,21 +582,99 @@ export function drawTexturedRect(x, y, u, v, w, h, tw, th, uw, vh) {
  * @param {boolean?} esp is visible through walls (false)
  * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} height (300)
+ * @link https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/98f4f6140ab8371f1fd18846f5489318af2b2252/src/main/java/io/github/moulberry/notenoughupdates/core/util/render/RenderUtils.java#L220
  */
 export function renderBeaconBeam(x, y, z, color, esp = false, center = true, height = 300) {
   if ((color & 0xFF) === 0) return;
-  if (center) {
-    x -= 0.5;
-    z -= 0.5;
+  if (!center) {
+    x += 0.5;
+    z += 0.5;
   }
-  ({ x, y, z } = rescaleRender(x, y, z));
-  _drawBeaconBeam(x, y, z,
-    ((color >> 24) & 0xFF) / 255,
-    ((color >> 16) & 0xFF) / 255,
-    ((color >> 8) & 0xFF) / 255,
-    ((color >> 0) & 0xFF) / 255,
-    !esp, height
-  );
+  ({ x, y, z, s } = rescaleRender(x, y, z));
+
+  const render = Client.getMinecraft().func_175606_aa();
+  const realX = lerp(render.field_70142_S, render.field_70165_t, Tessellator.partialTicks);
+  const realY = lerp(render.field_70137_T, render.field_70163_u, Tessellator.partialTicks);
+  const realZ = lerp(render.field_70136_U, render.field_70161_v, Tessellator.partialTicks);
+
+  GlStateManager.func_179094_E();
+  GlStateManager.func_179137_b(-realX, -realY, -realZ);
+
+  const bottomOffset = 0;
+  const topOffset = bottomOffset + height;
+  if (esp) GlStateManager.func_179097_i();
+  Client.getMinecraft().func_110434_K().func_110577_a(beaconBeamText);
+  GL11.glTexParameterf(3553, 10242, 10497);
+  GL11.glTexParameterf(3553, 10243, 10497);
+  GlStateManager.func_179140_f();
+  GlStateManager.func_179089_o();
+  GlStateManager.func_179098_w();
+  GlStateManager.func_179120_a(770, 1, 1, 0);
+  GlStateManager.func_179147_l();
+  GlStateManager.func_179120_a(770, 771, 1, 0);
+  const time = 0.2 * (World.getWorld().func_82737_E() + Tessellator.partialTicks);
+  const d1 = Math.ceil(time) - time;
+  const r = ((color >> 24) & 0xFF) / 255;
+  const g = ((color >> 16) & 0xFF) / 255;
+  const b = ((color >> 8) & 0xFF) / 255;
+  const a = ((color >> 0) & 0xFF) / 255;
+  const d2 = time * -0.1875;
+  const d4 = Math.cos(d2 + 2.356194490192345) * 0.2 * s;
+  const d5 = Math.sin(d2 + 2.356194490192345) * 0.2 * s;
+  const d6 = Math.cos(d2 + 0.7853981633974483) * 0.2 * s;
+  const d7 = Math.sin(d2 + 0.7853981633974483) * 0.2 * s;
+  const d8 = Math.cos(d2 + 3.9269908169872414) * 0.2 * s;
+  const d9 = Math.sin(d2 + 3.9269908169872414) * 0.2 * s;
+  const d10 = Math.cos(d2 + 5.497787143782138) * 0.2 * s;
+  const d11 = Math.sin(d2 + 5.497787143782138) * 0.2 * s;
+  const d14 = d1 - 1;
+  const d15 = height * 2.5 + d14;
+  worldRen.func_181668_a(7, DefaultVertexFormats.field_181709_i);
+  worldRen.func_181662_b(x + d4, y + topOffset, z + d5).func_181673_a(1, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
+  worldRen.func_181662_b(x + d4, y + bottomOffset, z + d5).func_181673_a(1, d14).func_181666_a(r, g, b, 1).func_181675_d();
+  worldRen.func_181662_b(x + d6, y + bottomOffset, z + d7).func_181673_a(0, d14).func_181666_a(r, g, b, 1).func_181675_d();
+  worldRen.func_181662_b(x + d6, y + topOffset, z + d7).func_181673_a(0, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
+  worldRen.func_181662_b(x + d10, y + topOffset, z + d11).func_181673_a(1, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
+  worldRen.func_181662_b(x + d10, y + bottomOffset, z + d11).func_181673_a(1, d14).func_181666_a(r, g, b, 1).func_181675_d();
+  worldRen.func_181662_b(x + d8, y + bottomOffset, z + d9).func_181673_a(0, d14).func_181666_a(r, g, b, 1).func_181675_d();
+  worldRen.func_181662_b(x + d8, y + topOffset, z + d9).func_181673_a(0, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
+  worldRen.func_181662_b(x + d6, y + topOffset, z + d7).func_181673_a(1, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
+  worldRen.func_181662_b(x + d6, y + bottomOffset, z + d7).func_181673_a(1, d14).func_181666_a(r, g, b, 1).func_181675_d();
+  worldRen.func_181662_b(x + d10, y + bottomOffset, z + d11).func_181673_a(0, d14).func_181666_a(r, g, b, 1).func_181675_d();
+  worldRen.func_181662_b(x + d10, y + topOffset, z + d11).func_181673_a(0, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
+  worldRen.func_181662_b(x + d8, y + topOffset, z + d9).func_181673_a(1, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
+  worldRen.func_181662_b(x + d8, y + bottomOffset, z + d9).func_181673_a(1, d14).func_181666_a(r, g, b, 1).func_181675_d();
+  worldRen.func_181662_b(x + d4, y + bottomOffset, z + d5).func_181673_a(0, d14).func_181666_a(r, g, b, 1).func_181675_d();
+  worldRen.func_181662_b(x + d4, y + topOffset, z + d5).func_181673_a(0, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
+  tess.func_78381_a();
+  GlStateManager.func_179129_p();
+  const d12 = d1 - 1;
+  const d13 = height + d12;
+  worldRen.func_181668_a(7, DefaultVertexFormats.field_181709_i);
+  const w = 0.3 * s;
+  worldRen.func_181662_b(x - w, y + topOffset, z - w).func_181673_a(1, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
+  worldRen.func_181662_b(x - w, y + bottomOffset, z - w).func_181673_a(1, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
+  worldRen.func_181662_b(x + w, y + bottomOffset, z - w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
+  worldRen.func_181662_b(x + w, y + topOffset, z - w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
+  worldRen.func_181662_b(x + w, y + topOffset, z + w).func_181673_a(1, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
+  worldRen.func_181662_b(x + w, y + bottomOffset, z + w).func_181673_a(1, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
+  worldRen.func_181662_b(x - w, y + bottomOffset, z + w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
+  worldRen.func_181662_b(x - w, y + topOffset, z + w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
+  worldRen.func_181662_b(x + w, y + topOffset, z - w).func_181673_a(1, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
+  worldRen.func_181662_b(x + w, y + bottomOffset, z - w).func_181673_a(1, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
+  worldRen.func_181662_b(x + w, y + bottomOffset, z + w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
+  worldRen.func_181662_b(x + w, y + topOffset, z + w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
+  worldRen.func_181662_b(x - w, y + topOffset, z + w).func_181673_a(1, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
+  worldRen.func_181662_b(x - w, y + bottomOffset, z + w).func_181673_a(1, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
+  worldRen.func_181662_b(x - w, y + bottomOffset, z - w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
+  worldRen.func_181662_b(x - w, y + topOffset, z - w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
+  tess.func_78381_a();
+  GlStateManager.func_179140_f();
+  GlStateManager.func_179098_w();
+  if (esp) GlStateManager.func_179126_j();
+
+  GlStateManager.func_179137_b(realX, realY, realZ);
+  GlStateManager.func_179121_F();
 }
 
 /**
