@@ -188,10 +188,10 @@ export function grayscale(img) {
   const h = img.getHeight();
   const res = new BufferedImage(w, h, BufferedImage.TYPE_BYTE_GRAY);
   const pixels = res.getRaster().getDataBuffer().getData();
-  const k1 = 1 / 256;
+  const k1 = 1 / 255;
   const k2 = 1.0 / 2.2;
   let maxG = 0;
-  let minG = 256;
+  let minG = 255;
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
       let c = img.getRGB(x, y);
@@ -199,7 +199,7 @@ export function grayscale(img) {
       let g = (c >> 8) & 0xFF;
       let b = c & 0xFF;
 
-      let v = 256 * ((
+      let v = 255 * ((
         0.2126 * ((r * k1) ** 2.2) +
         0.7152 * ((g * k1) ** 2.2) +
         0.0722 * ((b * k1) ** 2.2)
