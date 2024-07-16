@@ -517,6 +517,11 @@ export const props = {
   dungeonBoxWitherEsp: new Property('DungeonBoxWitherEsp', page, ++sort, Property.Type.Toggle, true),
   dungeonBoxWitherColor: new Property('DungeonBoxWitherColor', page, ++sort, Property.Type.Color, 0x515A0BFF),
 
+  dungeonBoxLivid: new Property('DungeonBoxLivid', page, ++sort, Property.Type.Toggle, false, { desc: 'independent from box mobs' }),
+  dungeonBoxLividEsp: new Property('DungeonBoxLividEsp', page, ++sort, Property.Type.Toggle, true),
+  dungeonBoxLividColor: new Property('DungeonBoxLividColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
+  dungeonBoxLividDrawArrow: new Property('DungeonBoxLividDrawArrow', page, ++sort, Property.Type.Toggle, true),
+
   dungeonBoxIceSprayed: new Property('DungeonBoxIceSprayedMobs', page, ++sort, Property.Type.Toggle, false, { desc: 'independent from box mobs' }),
   dungeonBoxIceSprayedEsp: new Property('DungeonBoxIceSprayedEsp', page, ++sort, Property.Type.Toggle, false),
   dungeonBoxIceSprayedOutlineColor: new Property('DungeonBoxIceSprayedOutlineColor', page, ++sort, Property.Type.Color, 0XADD8E6FF),
