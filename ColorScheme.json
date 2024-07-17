@@ -37,5 +37,25 @@
         180
       ]
     }
+  },
+  "DropDown": {
+    "background": {
+      "color": [
+        0,
+        0,
+        0,
+        180
+      ],
+      "roundness": 10
+    },
+    "optionsbackground": {
+      "color": [
+        0,
+        0,
+        0,
+        180
+      ],
+      "roundness": 10
+    }
   }
 }
