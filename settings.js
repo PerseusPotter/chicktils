@@ -355,12 +355,6 @@ class Settings {
 
     // this.load();
     Client.scheduleTask(20, () => this.load(true));
-
-    this.amaterasu = convertToAmaterasu(this);
-    this.amaterasu
-      .setSize(70, 80)
-      .setPos(15, 10)
-      .apply();
   }
 
   load(isAutoLoad = false) {
@@ -376,7 +370,14 @@ class Settings {
         log(e);
       }
     });
-    if (isMainSettings) register('gameUnload', () => this.save());
+    if (isMainSettings) {
+      register('gameUnload', () => this.save());
+      this.amaterasu = convertToAmaterasu(this);
+      this.amaterasu
+        .setSize(70, 80)
+        .setPos(15, 10)
+        .apply();
+    }
   }
 
   save() {

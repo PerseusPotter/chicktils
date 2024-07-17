@@ -25,6 +25,7 @@ const typesToAmat = [
 ];
 
 export default function convert(settings) {
+  FileLib.delete('ChickTils', 'settings_amaterasu.json');
   const defaultConf = new DefaultConfig('ChickTils', 'settings_amaterasu.json');
   settings.props.forEach((v, i) => propertyToAmaterasu(defaultConf, v, settings.propIds[i], settings.pageNames[v.page]));
   return new Settings('ChickTils', defaultConf, 'ColorScheme.json');
