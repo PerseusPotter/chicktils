@@ -61,7 +61,7 @@ export class Property {
         if (v > this.opts.max) throw 'value must not be above ' + this.opts.max;
         break;
       case Property.Type.Text:
-        if (v.length > this.opts.len) throw 'length of string must exceed ' + this.opts.len;
+        if (v.length > this.opts.len) throw 'length of string must not exceed ' + this.opts.len;
         break;
       case Property.Type.Option: break;
       case Property.Type.Color: break;
