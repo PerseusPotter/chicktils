@@ -119,7 +119,7 @@ register('command', ...args => {
         log(getPing());
         break;
       case 'config':
-        if (args.length === 0) args = ['view'];
+        if (args.length === 0) return settings.amaterasu.openGui();
         if (args[0] === 'view') {
           if (args.length === 1) args[1] = settings.minPage.toString();
           // how scuffed do you want it: yes
