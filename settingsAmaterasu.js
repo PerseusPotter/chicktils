@@ -120,7 +120,7 @@ function propertyToAmaterasu(defaultConf, instance, key, pageName) {
           options: options,
           value: options.indexOf(value),
           registerListener(oldV, newV) {
-            instance.set(newV);
+            instance.set(options[newV]);
           }
         });
       break;
