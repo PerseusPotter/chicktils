@@ -3,6 +3,7 @@
 import convertToAmaterasu from './settingsAmaterasu';
 import { centerMessage } from './util/format';
 import { log } from './util/log';
+import { run } from './util/threading';
 
 // if reloading modules without cache it resets settings :(
 let isMainSettings = false;
@@ -372,11 +373,13 @@ class Settings {
     });
     if (isMainSettings) {
       register('gameUnload', () => this.save());
-      this.amaterasu = convertToAmaterasu(this);
-      this.amaterasu
-        .setSize(70, 80)
-        .setPos(15, 10)
-        .apply();
+      run(() => {
+        this.amaterasu = convertToAmaterasu(this);
+        this.amaterasu
+          .setSize(70, 80)
+          .setPos(15, 10)
+          .apply();
+      });
     }
   }
 
