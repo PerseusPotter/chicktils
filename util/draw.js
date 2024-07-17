@@ -572,6 +572,121 @@ export function drawTexturedRect(x, y, u, v, w, h, tw, th, uw, vh) {
   tess.func_78381_a();
 }
 
+/**
+ * @param {number} x center
+ * @param {number} y center
+ * @param {number} r
+ * @param {number} a1 start (radians)
+ * @param {number} a2 end (radians)
+ * @param {number} segments
+ */
+function _drawArc(x, y, r, a1, a2, segments) {
+  if (a2 < a1) return _drawArc(x, y, r, a2, a1, segments);
+  const ia = a2 - a1;
+  const da = ia / segments;
+  worldRen.func_181668_a(3, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181662_b(x + Math.cos(a1) * r, y - Math.sin(a1) * r, 0).func_181675_d();
+  for (let i = 1; i <= segments; i++) {
+    let aa = a1 + da * i;
+    worldRen.func_181662_b(x + Math.cos(aa) * r, y - Math.sin(aa) * r, 0).func_181675_d();
+  }
+  tess.func_78381_a();
+}
+
+/**
+ * @param {number} color rgba
+ * @param {number} x center
+ * @param {number} y center
+ * @param {number} r
+ * @param {number} a1 start (radians)
+ * @param {number} a2 end (radians)
+ * @param {number} segments
+ * @param {number?} lw (2)
+ */
+export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
+
+  GL11.glLineWidth(lw);
+  GL11.glEnable(GL11.GL_LINE_SMOOTH);
+  GlStateManager.func_179147_l();
+  GlStateManager.func_179090_x();
+  GlStateManager.func_179120_a(770, 771, 1, 0);
+  GlStateManager.func_179097_i();
+  GlStateManager.func_179129_p();
+
+  GlStateManager.func_179094_E();
+
+  GlStateManager.func_179131_c(
+    (color >> 24) & 0xFF,
+    (color >> 16) & 0xFF,
+    (color >> 8) & 0xFF,
+    (color >> 0) & 0xFF
+  );
+  _drawArc(x, y, r, a1, a2, segments);
+  GlStateManager.func_179121_F();
+
+  GlStateManager.func_179084_k();
+  GlStateManager.func_179098_w();
+  GlStateManager.func_179126_j();
+  GlStateManager.func_179089_o();
+  GL11.glLineWidth(2);
+  GL11.glDisable(GL11.GL_LINE_SMOOTH);
+}
+
+/**
+ * @param {number} color rgba
+ * @param {number} x top left
+ * @param {number} y top left
+ * @param {number} w
+ * @param {number} h
+ * @param {number?} r (5)
+ * @param {number?} lw (2)
+ */
+export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
+  r = Math.min(w / 2, h / 2, r);
+
+  GL11.glLineWidth(lw);
+  GlStateManager.func_179147_l();
+  GlStateManager.func_179090_x();
+  GlStateManager.func_179120_a(770, 771, 1, 0);
+  GlStateManager.func_179097_i();
+  GlStateManager.func_179129_p();
+
+  GlStateManager.func_179094_E();
+
+  GlStateManager.func_179131_c(
+    (color >> 24) & 0xFF,
+    (color >> 16) & 0xFF,
+    (color >> 8) & 0xFF,
+    (color >> 0) & 0xFF
+  );
+  worldRen.func_181668_a(1, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181662_b(x + r, y, 0).func_181675_d();
+  worldRen.func_181662_b(x + w - r, y, 0).func_181675_d();
+  worldRen.func_181662_b(x, y + r, 0).func_181675_d();
+  worldRen.func_181662_b(x, y + h - r, 0).func_181675_d();
+  worldRen.func_181662_b(x + r, y + h, 0).func_181675_d();
+  worldRen.func_181662_b(x + w - r, y + h, 0).func_181675_d();
+  worldRen.func_181662_b(x + w, y + r, 0).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h - r, 0).func_181675_d();
+  tess.func_78381_a();
+
+  GL11.glEnable(GL11.GL_LINE_SMOOTH);
+  _drawArc(x + r, y + r, r, Math.PI / 2, Math.PI, 10);
+  _drawArc(x + w - r, y + r, r, 0, Math.PI / 2, 10);
+  _drawArc(x + r, y + h - r, r, Math.PI, Math.PI * 3 / 2, 10);
+  _drawArc(x + w - r, y + h - r, r, Math.PI * 3 / 2, 2 * Math.PI, 10);
+  GL11.glDisable(GL11.GL_LINE_SMOOTH);
+
+  GlStateManager.func_179121_F();
+
+  GlStateManager.func_179084_k();
+  GlStateManager.func_179098_w();
+  GlStateManager.func_179126_j();
+  GlStateManager.func_179089_o();
+  GL11.glLineWidth(2);
+
+}
+
 const ResourceLocation = Java.type('net.minecraft.util.ResourceLocation');
 const beaconBeamText = new ResourceLocation('textures/entity/beacon_beam.png');
 /**
