@@ -131,6 +131,7 @@ const wisperToReg = reg('chat', msg => {
   processMessageWaypoint(Player.getName(), msg);
 }, 'chattils').setCriteria('&dTo ${*}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const wisperFromReg = reg('chat', (ign, msg) => {
+  lastDMIGN = ign;
   processMessageWaypoint(ign, msg);
 }, 'chattils').setCriteria('&dFrom ${ign}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const guildChatReg = reg('chat', (ign, msg) => {
@@ -138,6 +139,9 @@ const guildChatReg = reg('chat', (ign, msg) => {
   if (ign.endsWith(']')) ign = ign.split(0, ign.lastIndexOf('['));
   processMessageWaypoint(ign, msg);
 }, 'chattils').setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
+function essentialChatCb(ign, msg) {
+  processMessageWaypoint(ign, msg);
+}
 
 const stateCancelNextPing = new StateVar(false);
 const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
@@ -309,6 +313,121 @@ const cancelArtLines = reg('command', () => {
   } else log('&cno lines to clear');
 }, 'chattils').setName('printimagecancel').setEnabled(settings._chatTilsImageArt);
 
+const ConnectionManager = Java.type('gg.essential.Essential').getInstance().getConnectionManager();
+const ChatManager = ConnectionManager.getChatManager();
+const EssentialFriendArgumentParser = Java.type('gg.essential.commands.engine.EssentialFriendArgumentParser');
+const ServerChatChannelMessagePacketHandler = Java.type('gg.essential.network.connectionmanager.handler.chat.ServerChatChannelMessagePacketHandler');
+const ExtensionsKt = Java.type('gg.essential.util.ExtensionsKt');
+const EssentialConfig = Java.type('gg.essential.config.EssentialConfig');
+const UUIDUtil = Java.type('gg.essential.util.UUIDUtil');
+const HttpUrl = Java.type('gg.essential.lib.okhttp3.HttpUrl');
+const Model = Java.type('gg.essential.mod.Model');
+const Skin = Java.type('gg.essential.mod.Skin');
+const SkinUtilsKt = Java.type('gg.essential.gui.skin.SkinUtilsKt');
+const SocialMenu = Java.type('gg.essential.gui.friends.SocialMenu');
+const ChannelType = Java.type('com.sparkuniverse.toolbox.chat.enums.ChannelType');
+const NotificationHandlerConstructor = ServerChatChannelMessagePacketHandler.NotificationHandler.class.getDeclaredConstructor([Java.type('com.sparkuniverse.toolbox.chat.model.Channel').class, Java.type('com.sparkuniverse.toolbox.chat.model.Message').class]);
+NotificationHandlerConstructor.setAccessible(true);
+ConnectionManager.registerPacketHandler(Java.type('gg.essential.connectionmanager.common.packet.chat.ServerChatChannelMessagePacket').class, new JavaAdapter(Java.type('gg.essential.network.connectionmanager.handler.PacketHandler'), {
+  onHandle(connectionManager, packet) {
+    const chatManager = connectionManager.getChatManager();
+    packet.getMessages().sort((a, b) => ExtensionsKt.getSentTimestamp(a) - ExtensionsKt.getSentTimestamp(b)).some(message => {
+      const channelOptional = chatManager.getChannel(message.getChannelId());
+      if (!channelOptional.isPresent()) return true;
+      const channel = channelOptional.get();
+      if (chatManager.upsertMessageToChannel(channel.getId(), message));
+      if (
+        message.isRead() ||
+        message.getSender().equals(UUIDUtil.getClientUUID()) ||
+        channel.isMuted() ||
+        ServerChatChannelMessagePacketHandler.prefetching.get() !== 0 ||
+        !EssentialConfig.INSTANCE.getEssentialFull()
+      ) return;
+
+      UUIDUtil.getName(message.getSender()).thenAcceptAsync(name => onEssentialMessage(name, message.getContents())).exceptionally(err => log('&cfailed to get name of sender'));
+      if (!settings.chatTilsEssentialNotif) return;
+      const url = HttpUrl.parse(message.getContents());
+      if (url && url.host() === 'essential.gg') {
+        const pathSegments = url.pathSegments();
+        if (pathSegments.size() > 2 && pathSegments.get(0) === 'skin') {
+          const skin = new Skin(pathSegments.get(2), Model.byVariantOrDefault(pathSegments.get(1)));
+          const uuid = message.getSender();
+          UUIDUtil.getName(uuid).thenAcceptAsync(name => SkinUtilsKt.showSkinReceivedToast(skin, uuid, name, channel), ExtensionsKt.getExecutor(Client.getMinecraft()));
+          return;
+        }
+        if (pathSegments.size() > 1 && pathSegments.get(0) === 'gift') return;
+      }
+      if (!(Client.currentGui.get() instanceof SocialMenu)) {
+        const uuid = channel.getType() === ChannelType.DIRECT_MESSAGE ? ExtensionsKt.getOtherUser(channel) : message.getSender();
+        UUIDUtil.getName(uuid).thenAcceptAsync(NotificationHandlerConstructor.newInstance(channel, message), ExtensionsKt.getExecutor(Client.getMinecraft()));
+      }
+    });
+  }
+}));
+function onEssentialMessage(ign, msg) {
+  essentialChatCb(ign, msg);
+  lastEssentialDMIGN = ign;
+  if (settings.chatTilsEssentialPing) World.playSound('random.orb', 1, 1);
+  // the &r&7 is different than hypixel, but quick fix for links turning into r7link
+  ChatLib.chat(`&dFrom &b[ESSENTIAL] ${ign}&7:&r&7 ${msg}&r`);
+}
+const stateEssentialDM = new StateVar('');
+let lastEssentialDMIGN = '';
+let lastDMIGN = '';
+function sendEssentialMessage(ign, msg) {
+  const lign = ign.toLowerCase();
+  const friend = (new EssentialFriendArgumentParser()).getFriends().find(v => v.getIgn().toLowerCase() === lign);
+  if (!friend) return log(`&ccannot find channel with ${ign}. is their dm open?`);
+  ChatManager.sendMessage(friend.getChannel().getId(), msg, () => {
+    essentialChatCb(Player.getName(), msg);
+    // the &r&7 is different than hypixel, but quick fix for links turning into r7link
+    ChatLib.chat(`&dTo &b[ESSENTIAL] ${ign}&7:&r&7 ${msg}&r`);
+  });
+}
+function essWCmd(...args) {
+  if (!args || !args.length) return log('&cincorrect usage');
+  const ign = args[0];
+  const msg = args.slice(1).join(' ').trim();
+  if (!msg) {
+    stateEssentialDM.set(ign);
+    log(`&aCreated Essential DM with ${ign}`);
+    return;
+  }
+  sendEssentialMessage(ign, msg);
+}
+function essRCmd(ov, ...args) {
+  if (!args || !args.length) return log('&cincorrect usage');
+  const ign = ov ? lastDMIGN : lastEssentialDMIGN;
+  if (!ign) return log('&cno one to reply to :(');
+  sendEssentialMessage(ign, args.join(' '));
+}
+function essFCmd(...args) {
+  if (!args || !args.length) return log('&cincorrect usage');
+  UUIDUtil.getUUID(args[0]).thenAcceptAsync(uuid => {
+    ConnectionManager.getRelationshipManager().addFriend(uuid, true);
+    log(`&aSent Essential friend request to ${args[0]}`);
+  }).exceptionally(err => log('&cfailed to get uuid of ign'));
+}
+const essWCmdReg = reg('command', essWCmd, 'chattils').setName('we').setEnabled(settings._chatTilsEssential);
+const essWOCmdReg = reg('command', essWCmd, 'chattils').setName('w', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const essTCmdReg = reg('command', essWCmd, 'chattils').setName('te').setEnabled(settings._chatTilsEssential);
+const essTOCmdReg = reg('command', essWCmd, 'chattils').setName('t', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const essRCmdReg = reg('command', essRCmd.bind({}, false), 'chattils').setName('re').setEnabled(settings._chatTilsEssential);
+const essROCmdReg = reg('command', essRCmd.bind({}, true), 'chattils').setName('r', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const essFCmdReg = reg('command', essFCmd, 'chattils').setName('fe').setEnabled(settings._chatTilsEssential);
+const essFOCmdReg = reg('command', essFCmd, 'chattils').setName('f', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const chatCmdReg = reg('command', ...args => {
+  if (!args) args = [];
+  args.unshift('chat');
+  ChatLib.command(args.join(' '));
+  stateEssentialDM.set('');
+}, 'chattils').setName('chat', true).setEnabled(settings._chatTilsEssential);
+const sendMessageReg = reg('messageSent', (msg, evn) => {
+  if (msg.startsWith('/')) return;
+  cancel(evn);
+  sendEssentialMessage(stateEssentialDM.get(), msg);
+}, 'chattils').setEnabled(new StateProp(settings._chatTilsEssential).and(stateEssentialDM));
+
 export function init() {
   settings._chatTilsWaypointDuration.onBeforeChange(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
 }
@@ -328,6 +447,16 @@ export function load() {
   genImgArtReg.register();
   nextArtLineReg.register();
   cancelArtLines.register();
+  essWCmdReg.register();
+  essWOCmdReg.register();
+  essTCmdReg.register();
+  essTOCmdReg.register();
+  essRCmdReg.register();
+  essROCmdReg.register();
+  essFCmdReg.register();
+  essFOCmdReg.register();
+  chatCmdReg.register();
+  sendMessageReg.register();
 }
 export function unload() {
   blockNameCmd.unregister();
@@ -345,4 +474,14 @@ export function unload() {
   genImgArtReg.unregister();
   nextArtLineReg.unregister();
   cancelArtLines.unregister();
+  essWCmdReg.unregister();
+  essWOCmdReg.unregister();
+  essTCmdReg.unregister();
+  essTOCmdReg.unregister();
+  essRCmdReg.unregister();
+  essROCmdReg.unregister();
+  essFCmdReg.unregister();
+  essFOCmdReg.unregister();
+  chatCmdReg.unregister();
+  sendMessageReg.unregister();
 }

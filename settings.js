@@ -744,6 +744,11 @@ export const props = {
   chatTilsImageArtInvert: new Property('ChatTilsImageArtInvert', page, ++sort, Property.Type.Toggle, true, { desc: 'invert colors' }),
   chatTilsImageArtAlgorithm: new Property('ChatTilsImageArtAlgorithm', page, ++sort, Property.Type.Option, 'Grayscale', { desc: 'transform algorithm used', options: ['Grayscale', 'Sobel'] }),
 
+  chatTilsEssential: new Property('ChatTilsBetterEssential', page, ++sort, Property.Type.Toggle, false, { desc: 'show Essential messages in mc chat\n/we, /te, /re, and /fe for corresponding Essential actions' }),
+  chatTilsEssentialPing: new Property('ChatTilsEssentialPing', page, ++sort, Property.Type.Toggle, true, { desc: 'send chat pings on recieve message' }),
+  chatTilsEssentialNotif: new Property('ChatTilsEssentialNotification', page, ++sort, Property.Type.Toggle, false, { desc: 'send Essential notification on recieve message' }),
+  chatTilsEssentialOverrideCommands: new Property('ChatTilsBetterEssentialOverrideCommands', page, ++sort, Property.Type.Toggle, false, { desc: 'override the /w, /t, /r, and /f commands to be Essential ones' }),
+
   // 13
   enablediana: new Property('EnableDiana', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'requires skytils to work (not the meow solver)' }),
   dianaArrowToBurrow: new Property('DianaArrowToBurrow', page, ++sort, Property.Type.Toggle, true, { desc: 'draw an arrow pointing to nearest burrow' }),
