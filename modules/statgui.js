@@ -40,6 +40,7 @@ function editLocation(index) {
 
 
 function loadListeners(tries = 0) {
+  if (!settings.enablestatgui) return;
   let loc;
   try {
     TabList.getNames().some(v => {
