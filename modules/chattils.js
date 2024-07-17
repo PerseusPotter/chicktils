@@ -30,7 +30,7 @@ const worldUnloadReg = reg('worldUnload', () => {
   coords.length = 0;
   worldRenderReg.unregister();
   waypointReloadNum++;
-}, 'chattils').setEnabled(settings._chatTilsWaypointPersist);
+}, 'chattils').setEnabled(new StateProp(settings._chatTilsWaypointPersist).not());
 
 /**
  * @param {string} ign
