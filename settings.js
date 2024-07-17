@@ -1,5 +1,6 @@
 // vigilance refused to work
 
+import convertToAmaterasu from './settingsAmaterasu';
 import { centerMessage } from './util/format';
 import { log } from './util/log';
 
@@ -354,6 +355,12 @@ class Settings {
 
     // this.load();
     Client.scheduleTask(20, () => this.load(true));
+
+    this.amaterasu = convertToAmaterasu(this);
+    this.amaterasu
+      .setSize(70, 80)
+      .setPos(15, 10)
+      .apply();
   }
 
   load(isAutoLoad = false) {

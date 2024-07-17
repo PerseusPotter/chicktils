@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/PerseusPotter/Amaterasu/main/ColorScheme.schema.json",
+  "thisisacomment": "amaterasu bug idk rhino shitty engine, dont delete Amaterasu",
+  "Amaterasu": {},
+  "Button1": {
+    "text": {
+      "scale": 1.2
+    },
+    "mouseClickAnimation": {
+      "time": 0.5,
+      "type": "OUT_EXP"
+    }
+  },
+  "Button": {
+    "background": {
+      "color": [
+        0,
+        0,
+        0,
+        180
+      ],
+      "roundness": 10
+    }
+  },
+  "Switch": {
+    "switchbox": {
+      "enabledColor": [
+        0,
+        0,
+        0,
+        180
+      ],
+      "disabledColor": [
+        0,
+        0,
+        0,
+        180
+      ]
+    }
+  }
+}
