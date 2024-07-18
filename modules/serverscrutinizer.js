@@ -44,9 +44,11 @@ class TickInfo {
   _calc() {
     if (!this.dirty) return;
     this.dirty = false;
+    const d = Date.now();
+    // WHY ARE THERE UNDEFINEDS IN MY ARRAY HOLY SHIT GONNA LOSE MY MIND FUCK YOU RHINO
+    while (this.arr.length > 0 && (!this.arr[this.arr.length - 1] || d - this.arr[this.arr.length - 1] > this.maxAge)) this.arr.pop();
     if (this.arr.length === 0) return void (this.cspan = this.avg = this.mspan = 0);
 
-    const d = Date.now();
     // this.cspan = 0;
     // while (this.arr.length > this.cspan && d - this.arr[this.cspan] <= this.maxSpan) this.cspan++;
     // while the cspan can only increase by 1, it could jump if ._calc() is not called after every .add(), so we instead increase the current span in add
@@ -81,11 +83,6 @@ class TickInfo {
       }
     }
   }
-  trim() {
-    const t = Date.now();
-    // WHY ARE THERE UNDEFINEDS IN MY ARRAY HOLY SHIT GONNA LOSE MY MIND FUCK YOU RHINO
-    while (this.arr.length > 0 && (!this.arr[this.arr.length - 1] || t - this.arr[this.arr.length - 1] > this.maxAge)) this._mark().arr.pop();
-  }
   getCur() {
     this._calc();
     return Math.min(this.cap, this.cspan);
@@ -119,7 +116,6 @@ function getTickColor(val, max) {
 }
 
 const tpsCmd = reg('command', () => {
-  ticks.trim();
   log('Current TPS:', getTickColor(ticks.getCur(), 20) + ticks.getCur());
   log('Average TPS:', getTickColor(ticks.getAvg(), 20) + ticks.getAvg().toFixed(1));
   log('Minimum TPS:', getTickColor(ticks.getMin(), 20) + ticks.getMin());
@@ -139,7 +135,6 @@ function formatTps(curr, avg, min) {
 }
 const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11));
 const rendOvTps = reg('renderOverlay', () => {
-  ticks.trim();
   tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin()));
   tpsDisplay.render();
 }, 'serverscrutinizer').setEnabled(settings._serverScrutinizerTPSDisplay);
