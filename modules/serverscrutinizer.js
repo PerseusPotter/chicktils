@@ -83,7 +83,8 @@ class TickInfo {
   }
   trim() {
     const t = Date.now();
-    while (this.arr.length > 0 && t - this.arr[this.arr.length - 1] > this.maxAge) this._mark().arr.pop();
+    // WHY ARE THERE UNDEFINEDS IN MY ARRAY HOLY SHIT GONNA LOSE MY MIND FUCK YOU RHINO
+    while (this.arr.length > 0 && (!this.arr[this.arr.length - 1] || t - this.arr[this.arr.length - 1] > this.maxAge)) this._mark().arr.pop();
   }
   getCur() {
     this._calc();
