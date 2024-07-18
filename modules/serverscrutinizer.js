@@ -4,6 +4,7 @@ import createTextGui from '../util/customtextgui';
 import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
 import reg from '../util/registerer';
+import { StateProp } from '../util/state';
 
 class TickInfo {
   arr = [];
@@ -122,6 +123,7 @@ class TickInfo {
   }
 }
 
+const stateTrackTicks = new StateProp(settings._serverScrutinizerTPSDisplay).or(settings._serverScrutinizerLastTickDisplay);
 let lastLoadTime = Date.now();
 let lastTickTime = Date.now();
 const ticks = new TickInfo(settings.serverScrutinizerTPSMaxAge, 1_000, settings.serverScrutinizerTPSDisplayCap20 ? 20 : undefined);
@@ -130,11 +132,11 @@ const serverTickReg = reg('packetReceived', () => {
   const t = Date.now();
   ticks.add(t);
   lastTickTime = t;
-}, 'serverscrutinizer').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
+}, 'serverscrutinizer').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateTrackTicks);
 const worldLoadReg = reg('worldLoad', () => {
   ticks.clear();
   lastLoadTime = lastTickTime = Date.now();
-}, 'serverscrutinizer');
+}, 'serverscrutinizer').setEnabled(stateTrackTicks);
 
 function getTickColor(val, max) {
   return colorForNumber(val - max * 3 / 4, max / 4);
@@ -146,7 +148,7 @@ const tpsCmd = reg('command', () => {
   log('Average TPS:', getTickColor(ticks.getAvg(), 20) + ticks.getAvg().toFixed(1));
   log('Minimum TPS:', getTickColor(ticks.getMin(), 20) + ticks.getMin());
   log('Maximum TPS:', getTickColor(ticks.getMax(), 20) + ticks.getMax());
-}, 'serverscrutinizer').setName('tps');
+}, 'serverscrutinizer').setName('tps').setEnabled(stateTrackTicks);
 
 function formatTps(curr, avg, min, max) {
   if (Date.now() - lastLoadTime < 11_000) return ['TPS: Loading...'];
