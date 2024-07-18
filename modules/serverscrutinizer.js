@@ -8,14 +8,17 @@ import reg from '../util/registerer';
 class TickInfo {
   arr = [];
   min = [];
+  max = [];
   // rhino is bad with sparse arrays
-  idx = [];
+  idxmin = [];
+  idxmax = [];
   maxAge = 0;
   maxSpan = 0;
   dirty = true;
   cspan = 0;
   avg = 0;
-  mspan = 0;
+  minspan = 0;
+  maxspan = 0;
   cap = Number.POSITIVE_INFINITY;
   /**
    * @param {number} maxAge
@@ -41,13 +44,13 @@ class TickInfo {
     this.arr = [];
     this._mark();
   }
-  _calc() {
-    if (!this.dirty) return;
-    this.dirty = false;
+  calc() {
     const d = Date.now();
     // WHY ARE THERE UNDEFINEDS IN MY ARRAY HOLY SHIT GONNA LOSE MY MIND FUCK YOU RHINO
-    while (this.arr.length > 0 && (!this.arr[this.arr.length - 1] || d - this.arr[this.arr.length - 1] > this.maxAge)) this.arr.pop();
-    if (this.arr.length === 0) return void (this.cspan = this.avg = this.mspan = 0);
+    while (this.arr.length > 0 && (!this.arr[this.arr.length - 1] || d - this.arr[this.arr.length - 1] > this.maxAge)) this._mark().arr.pop();
+    if (!this.dirty) return;
+    this.dirty = false;
+    if (this.arr.length === 0) return void (this.cspan = this.avg = this.minspan = 0);
 
     // this.cspan = 0;
     // while (this.arr.length > this.cspan && d - this.arr[this.cspan] <= this.maxSpan) this.cspan++;
@@ -59,7 +62,7 @@ class TickInfo {
 
     this.avg = this.arr.length / this.maxAge * this.maxSpan;
 
-    const i = (function(arr, v) {
+    this.idxmin = this.idxmin.slice(0, (function(arr, v) {
       let l = 0;
       let r = arr.length;
       while (l !== r) {
@@ -69,31 +72,53 @@ class TickInfo {
         else r = m;
       }
       return r;
-    }(this.idx, this.cspan));
-    this.idx = this.idx.slice(0, i);
-    this.idx.push(this.cspan);
+    }(this.idxmin, this.cspan)));
+    this.idxmin.push(this.cspan);
     this.min[this.cspan] = this.arr[0];
 
     while (true) {
-      let i = this.idx[0];
-      if (d - this.min[i] > this.maxAge) this.idx.shift();
+      let i = this.idxmin[0];
+      if (d - this.min[i] > this.maxAge) this.idxmin.shift();
       else {
-        this.mspan = i;
+        this.minspan = i;
+        break;
+      }
+    }
+
+    this.idxmax = this.idxmax.slice(0, (function(arr, v) {
+      let l = 0;
+      let r = arr.length;
+      while (l !== r) {
+        let m = (l + r) >> 1;
+        if (arr[m] === v) return m;
+        if (arr[m] > v) l = m + 1;
+        else r = m;
+      }
+      return r;
+    }(this.idxmax, this.cspan)));
+    this.idxmax.push(this.cspan);
+    this.max[this.cspan] = this.arr[0];
+
+    while (true) {
+      let i = this.idxmax[0];
+      if (d - this.max[i] > this.maxAge) this.idxmax.shift();
+      else {
+        this.maxspan = i;
         break;
       }
     }
   }
   getCur() {
-    this._calc();
     return Math.min(this.cap, this.cspan);
   }
   getAvg() {
-    this._calc();
     return Math.min(this.cap, this.avg);
   }
   getMin() {
-    this._calc();
-    return Math.min(this.cap, this.mspan);
+    return Math.min(this.cap, this.minspan);
+  }
+  getMax() {
+    return Math.min(this.cap, this.maxspan);
   }
 }
 
@@ -116,12 +141,14 @@ function getTickColor(val, max) {
 }
 
 const tpsCmd = reg('command', () => {
+  ticks.calc();
   log('Current TPS:', getTickColor(ticks.getCur(), 20) + ticks.getCur());
   log('Average TPS:', getTickColor(ticks.getAvg(), 20) + ticks.getAvg().toFixed(1));
   log('Minimum TPS:', getTickColor(ticks.getMin(), 20) + ticks.getMin());
+  log('Maximum TPS:', getTickColor(ticks.getMax(), 20) + ticks.getMax());
 }, 'serverscrutinizer').setName('tps');
 
-function formatTps(curr, avg, min) {
+function formatTps(curr, avg, min, max) {
   if (Date.now() - lastLoadTime < 11_000) return ['TPS: Loading...'];
   if (settings.serverScrutinizerTPSDisplayCurr + settings.serverScrutinizerTPSDisplayAvg + settings.serverScrutinizerTPSDisplayMin === 1) {
     if (settings.serverScrutinizerTPSDisplayCurr || settings.serverScrutinizerTPSDisplayMin) return ['TPS: ' + getTickColor(curr, 20) + curr];
@@ -131,11 +158,13 @@ function formatTps(curr, avg, min) {
   if (settings.serverScrutinizerTPSDisplayCurr) lines.push('Current TPS: ' + getTickColor(curr, 20) + curr);
   if (settings.serverScrutinizerTPSDisplayAvg) lines.push('Average TPS: ' + getTickColor(avg, 20) + avg.toFixed(1));
   if (settings.serverScrutinizerTPSDisplayMin) lines.push('Minimum TPS: ' + getTickColor(min, 20) + min);
+  if (settings.serverScrutinizerTPSDisplayMax) lines.push('Maximum TPS: ' + getTickColor(max, 20) + max);
   return lines;
 }
-const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11));
+const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11, 21));
 const rendOvTps = reg('renderOverlay', () => {
-  tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin()));
+  ticks.calc();
+  tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin(), ticks.getMax()));
   tpsDisplay.render();
 }, 'serverscrutinizer').setEnabled(settings._serverScrutinizerTPSDisplay);
 
