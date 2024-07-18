@@ -108,7 +108,6 @@ const serverTickReg = reg('packetReceived', () => {
   const t = Date.now();
   ticks.add(t);
   lastTickTime = t;
-  lastLoadTime = 0;
 }, 'serverscrutinizer').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
 const worldLoadReg = reg('worldLoad', () => {
   ticks.clear();
