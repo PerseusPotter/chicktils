@@ -150,8 +150,8 @@ const tpsCmd = reg('command', () => {
 
 function formatTps(curr, avg, min, max) {
   if (Date.now() - lastLoadTime < 11_000) return ['TPS: Loading...'];
-  if (settings.serverScrutinizerTPSDisplayCurr + settings.serverScrutinizerTPSDisplayAvg + settings.serverScrutinizerTPSDisplayMin === 1) {
-    if (settings.serverScrutinizerTPSDisplayCurr || settings.serverScrutinizerTPSDisplayMin) return ['TPS: ' + getTickColor(curr, 20) + curr];
+  if (settings.serverScrutinizerTPSDisplayCurr + settings.serverScrutinizerTPSDisplayAvg + settings.serverScrutinizerTPSDisplayMin + settings.serverScrutinizerFPSDisplayMax === 1) {
+    if (settings.serverScrutinizerTPSDisplayCurr || settings.serverScrutinizerTPSDisplayMin || settings.serverScrutinizerTPSDisplayMax) return ['TPS: ' + getTickColor(curr, 20) + curr];
     return ['TPS: ' + getTickColor(avg, 20) + avg.toFixed(1)];
   }
   const lines = [];
