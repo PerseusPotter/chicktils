@@ -138,29 +138,29 @@ const worldLoadReg = reg('worldLoad', () => {
   lastLoadTime = lastTickTime = Date.now();
 }, 'serverscrutinizer').setEnabled(stateTrackTicks);
 
-function getTickColor(val, max) {
-  return colorForNumber(val - max * 3 / 4, max / 4);
+function getTickColor(val, max, min) {
+  return colorForNumber(val - max * min, max * (1 - min));
 }
 
 const tpsCmd = reg('command', () => {
   ticks.calc();
-  log('Current TPS:', getTickColor(ticks.getCur(), 20) + ticks.getCur());
-  log('Average TPS:', getTickColor(ticks.getAvg(), 20) + ticks.getAvg().toFixed(1));
-  log('Minimum TPS:', getTickColor(ticks.getMin(), 20) + ticks.getMin());
-  log('Maximum TPS:', getTickColor(ticks.getMax(), 20) + ticks.getMax());
+  log('Current TPS:', getTickColor(ticks.getCur(), 20, 0.75) + ticks.getCur());
+  log('Average TPS:', getTickColor(ticks.getAvg(), 20, 0.75) + ticks.getAvg().toFixed(1));
+  log('Minimum TPS:', getTickColor(ticks.getMin(), 20, 0.75) + ticks.getMin());
+  log('Maximum TPS:', getTickColor(ticks.getMax(), 20, 0.75) + ticks.getMax());
 }, 'serverscrutinizer').setName('tps').setEnabled(stateTrackTicks);
 
 function formatTps(curr, avg, min, max) {
   if (Date.now() - lastLoadTime < 11_000) return ['TPS: Loading...'];
   if (settings.serverScrutinizerTPSDisplayCurr + settings.serverScrutinizerTPSDisplayAvg + settings.serverScrutinizerTPSDisplayMin + settings.serverScrutinizerFPSDisplayMax === 1) {
-    if (settings.serverScrutinizerTPSDisplayCurr || settings.serverScrutinizerTPSDisplayMin || settings.serverScrutinizerTPSDisplayMax) return ['TPS: ' + getTickColor(curr, 20) + curr];
-    return ['TPS: ' + getTickColor(avg, 20) + avg.toFixed(1)];
+    if (settings.serverScrutinizerTPSDisplayCurr || settings.serverScrutinizerTPSDisplayMin || settings.serverScrutinizerTPSDisplayMax) return ['TPS: ' + getTickColor(curr, 20, 0.75) + curr];
+    return ['TPS: ' + getTickColor(avg, 20, 0.75) + avg.toFixed(1)];
   }
   const lines = [];
-  if (settings.serverScrutinizerTPSDisplayCurr) lines.push('Current TPS: ' + getTickColor(curr, 20) + curr);
-  if (settings.serverScrutinizerTPSDisplayAvg) lines.push('Average TPS: ' + getTickColor(avg, 20) + avg.toFixed(1));
-  if (settings.serverScrutinizerTPSDisplayMin) lines.push('Minimum TPS: ' + getTickColor(min, 20) + min);
-  if (settings.serverScrutinizerTPSDisplayMax) lines.push('Maximum TPS: ' + getTickColor(max, 20) + max);
+  if (settings.serverScrutinizerTPSDisplayCurr) lines.push('Current TPS: ' + getTickColor(curr, 20, 0.75) + curr);
+  if (settings.serverScrutinizerTPSDisplayAvg) lines.push('Average TPS: ' + getTickColor(avg, 20, 0.75) + avg.toFixed(1));
+  if (settings.serverScrutinizerTPSDisplayMin) lines.push('Minimum TPS: ' + getTickColor(min, 20, 0.75) + min);
+  if (settings.serverScrutinizerTPSDisplayMax) lines.push('Maximum TPS: ' + getTickColor(max, 20, 0.75) + max);
   return lines;
 }
 const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11, 21));
@@ -186,14 +186,14 @@ const renderTickReg = reg('renderWorld', () => frames.add(Date.now()), 'serversc
 
 function formatFps(curr, avg, min, max) {
   if (settings.serverScrutinizerFPSDisplayCurr + settings.serverScrutinizerFPSDisplayAvg + settings.serverScrutinizerFPSDisplayMin + settings.serverScrutinizerFPSDisplayMax === 1) {
-    if (settings.serverScrutinizerFPSDisplayCurr || settings.serverScrutinizerFPSDisplayMin || settings.serverScrutinizerFPSDisplayMax) return ['FPS: ' + getTickColor(curr, max) + curr];
-    return ['FPS: ' + getTickColor(avg, max) + avg.toFixed(1)];
+    if (settings.serverScrutinizerFPSDisplayCurr || settings.serverScrutinizerFPSDisplayMin || settings.serverScrutinizerFPSDisplayMax) return ['FPS: ' + getTickColor(curr, max, 0.5) + curr];
+    return ['FPS: ' + getTickColor(avg, max, 0.5) + avg.toFixed(1)];
   }
   const lines = [];
-  if (settings.serverScrutinizerFPSDisplayCurr) lines.push('Current FPS: ' + getTickColor(curr, max) + curr);
-  if (settings.serverScrutinizerFPSDisplayAvg) lines.push('Average FPS: ' + getTickColor(avg, max) + avg.toFixed(1));
-  if (settings.serverScrutinizerFPSDisplayMin) lines.push('Minimum FPS: ' + getTickColor(min, max) + min);
-  if (settings.serverScrutinizerFPSDisplayMax) lines.push('Maximum FPS: ' + getTickColor(max, max) + max);
+  if (settings.serverScrutinizerFPSDisplayCurr) lines.push('Current FPS: ' + getTickColor(curr, max, 0.5) + curr);
+  if (settings.serverScrutinizerFPSDisplayAvg) lines.push('Average FPS: ' + getTickColor(avg, max, 0.5) + avg.toFixed(1));
+  if (settings.serverScrutinizerFPSDisplayMin) lines.push('Minimum FPS: ' + getTickColor(min, max, 0.5) + min);
+  if (settings.serverScrutinizerFPSDisplayMax) lines.push('Maximum FPS: ' + getTickColor(max, max, 0.5) + max);
   return lines;
 }
 const fpsDisplay = createTextGui(() => data.serverScrutinizerFPSDisplay, () => formatFps(217, 213.1, 180, 240));
