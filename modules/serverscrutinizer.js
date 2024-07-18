@@ -114,27 +114,27 @@ const worldLoadReg = reg('worldLoad', () => {
   lastLoadTime = lastTickTime = Date.now();
 }, 'serverscrutinizer');
 
-function getTPSColor(tps) {
-  return colorForNumber(tps - 15, 5);
+function getTickColor(val, max) {
+  return colorForNumber(val - max * 3 / 4, max / 4);
 }
 
 const tpsCmd = reg('command', () => {
   ticks.trim();
-  log('Current TPS:', getTPSColor(ticks.getCur()) + ticks.getCur());
-  log('Average TPS:', getTPSColor(ticks.getAvg()) + ticks.getAvg().toFixed(1));
-  log('Minimum TPS:', getTPSColor(ticks.getMin()) + ticks.getMin());
+  log('Current TPS:', getTickColor(ticks.getCur(), 20) + ticks.getCur());
+  log('Average TPS:', getTickColor(ticks.getAvg(), 20) + ticks.getAvg().toFixed(1));
+  log('Minimum TPS:', getTickColor(ticks.getMin(), 20) + ticks.getMin());
 }, 'serverscrutinizer').setName('tps');
 
 function formatTps(curr, avg, min) {
   if (Date.now() - lastLoadTime < 11_000) return ['TPS: Loading...'];
   if (settings.serverScrutinizerTPSDisplayCurr + settings.serverScrutinizerTPSDisplayAvg + settings.serverScrutinizerTPSDisplayMin === 1) {
-    if (settings.serverScrutinizerTPSDisplayCurr || settings.serverScrutinizerTPSDisplayMin) return ['TPS: ' + getTPSColor(curr) + curr];
-    return ['TPS: ' + getTPSColor(avg) + avg.toFixed(1)];
+    if (settings.serverScrutinizerTPSDisplayCurr || settings.serverScrutinizerTPSDisplayMin) return ['TPS: ' + getTickColor(curr, 20) + curr];
+    return ['TPS: ' + getTickColor(avg, 20) + avg.toFixed(1)];
   }
   const lines = [];
-  if (settings.serverScrutinizerTPSDisplayCurr) lines.push('Current TPS: ' + getTPSColor(curr) + curr);
-  if (settings.serverScrutinizerTPSDisplayAvg) lines.push('Average TPS: ' + getTPSColor(avg) + avg.toFixed(1));
-  if (settings.serverScrutinizerTPSDisplayMin) lines.push('Minimum TPS: ' + getTPSColor(min) + min);
+  if (settings.serverScrutinizerTPSDisplayCurr) lines.push('Current TPS: ' + getTickColor(curr, 20) + curr);
+  if (settings.serverScrutinizerTPSDisplayAvg) lines.push('Average TPS: ' + getTickColor(avg, 20) + avg.toFixed(1));
+  if (settings.serverScrutinizerTPSDisplayMin) lines.push('Minimum TPS: ' + getTickColor(min, 20) + min);
   return lines;
 }
 const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11));
