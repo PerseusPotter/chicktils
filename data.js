@@ -27,6 +27,7 @@ export function setIsMain() {
  *  serverScrutinizerTPSDisplay: TextLocation;
  *  serverScrutinizerLastPacketDisplay: TextLocation;
  *  dungeonSilverfishHasteTimerLoc: TextLocation;
+*   serverScrutinizerFPSDisplay: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true }, 'data.json');
@@ -62,7 +63,8 @@ function verifyTextLocation(value) {
   'dungeonSpiritBearTimerLoc',
   'serverScrutinizerTPSDisplay',
   'serverScrutinizerLastPacketDisplay',
-  'dungeonSilverfishHasteTimerLoc'
+  'dungeonSilverfishHasteTimerLoc',
+  'serverScrutinizerFPSDisplay'
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v)

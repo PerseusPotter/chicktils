@@ -180,11 +180,36 @@ const rendOvLTD = reg('renderOverlay', () => {
   lastTickDisplay.render();
 }, 'serverscrutinizer').setEnabled(settings._serverScrutinizerLastTickDisplay);
 
+const frames = new TickInfo(settings.serverScrutinizerFPSMaxAge, 1_000);
+
+const renderTickReg = reg('renderWorld', () => frames.add(Date.now()), 'serverscrutinizer').setEnabled(settings._serverScrutinizerFPSDisplay);
+
+function formatFps(curr, avg, min, max) {
+  if (settings.serverScrutinizerFPSDisplayCurr + settings.serverScrutinizerFPSDisplayAvg + settings.serverScrutinizerFPSDisplayMin + settings.serverScrutinizerFPSDisplayMax === 1) {
+    if (settings.serverScrutinizerFPSDisplayCurr || settings.serverScrutinizerFPSDisplayMin || settings.serverScrutinizerFPSDisplayMax) return ['FPS: ' + getTickColor(curr, max) + curr];
+    return ['FPS: ' + getTickColor(avg, max) + avg.toFixed(1)];
+  }
+  const lines = [];
+  if (settings.serverScrutinizerFPSDisplayCurr) lines.push('Current FPS: ' + getTickColor(curr, max) + curr);
+  if (settings.serverScrutinizerFPSDisplayAvg) lines.push('Average FPS: ' + getTickColor(avg, max) + avg.toFixed(1));
+  if (settings.serverScrutinizerFPSDisplayMin) lines.push('Minimum FPS: ' + getTickColor(min, max) + min);
+  if (settings.serverScrutinizerFPSDisplayMax) lines.push('Maximum FPS: ' + getTickColor(max, max) + max);
+  return lines;
+}
+const fpsDisplay = createTextGui(() => data.serverScrutinizerFPSDisplay, () => formatFps(217, 213.1, 180, 240));
+const rendOvFps = reg('renderOverlay', () => {
+  frames.calc();
+  fpsDisplay.setLines(formatFps(frames.getCur(), frames.getAvg(), frames.getMin(), frames.getMax()));
+  fpsDisplay.render();
+}, 'serverscrutinizer').setEnabled(settings._serverScrutinizerFPSDisplay);
+
 export function init() {
   settings._moveTPSDisplay.onAction(() => tpsDisplay.edit());
   settings._moveLastTickDisplay.onAction(() => lastTickDisplay.edit());
   settings._serverScrutinizerTPSMaxAge.onAfterChange(v => ticks.maxAge = v);
   settings._serverScrutinizerTPSDisplayCap20.onAfterChange(v => ticks.cap = v ? 20 : Number.POSITIVE_INFINITY);
+  settings._moveFPSDisplay.onAction(() => fpsDisplay.edit());
+  settings._serverScrutinizerFPSMaxAge.onAfterChange(v => frames.maxAge = v);
 }
 export function load() {
   ticks.clear();
@@ -194,6 +219,8 @@ export function load() {
   tpsCmd.register();
   rendOvTps.register();
   rendOvLTD.register();
+  renderTickReg.register();
+  rendOvFps.register();
 }
 export function unload() {
   serverTickReg.unregister();
@@ -201,4 +228,6 @@ export function unload() {
   tpsCmd.unregister();
   rendOvTps.unregister();
   rendOvLTD.unregister();
+  renderTickReg.unregister();
+  rendOvFps.unregister();
 }

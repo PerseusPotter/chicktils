@@ -785,12 +785,20 @@ export const props = {
   serverScrutinizerTPSDisplayAvg: new Property('ServerScrutinizerDisplayAverageTPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show average tps' }),
   serverScrutinizerTPSDisplayMin: new Property('ServerScrutinizerDisplayMinimumTPS', page, ++sort, Property.Type.Toggle, false, { desc: 'show minimum tps' }),
   serverScrutinizerTPSDisplayMax: new Property('ServerScrutinizerDisplayMaximumTPS', page, ++sort, Property.Type.Toggle, false, { desc: 'show maximum tps' }),
-  serverScrutinizerTPSMaxAge: new Property('ServerScrutinizerTPSMaxAge', page, ++sort, Property.Type.Integer, 5000, { desc: 'max age of ticks, affects min tps and avg tps', min: 1000 }),
+  serverScrutinizerTPSMaxAge: new Property('ServerScrutinizerTPSMaxAge', page, ++sort, Property.Type.Integer, 5000, { desc: 'max age of ticks', min: 1000 }),
   moveTPSDisplay: new Property('MoveTPSDisplay', page, ++sort, Property.Type.Action),
 
   serverScrutinizerLastTickDisplay: new Property('ServerScrutinizerLastPacketDisplay', page, ++sort, Property.Type.Toggle, true, { desc: 'tracks last packet sent time (lag spike)' }),
   serverScrutinizerLastTickThreshold: new Property('ServerScrutinizerLastPacketThreshold', page, ++sort, Property.Type.Integer, 200, { desc: 'only show when server has not responded for this amount of time\nin ms' }),
   moveLastTickDisplay: new Property('MoveLastTickDisplay', page, ++sort, Property.Type.Action),
+
+  serverScrutinizerFPSDisplay: new Property('ServerScrutinizerFPSDisplay', page, ++sort, Property.Type.Toggle, false, { desc: 'tracks FPS' }),
+  serverScrutinizerFPSDisplayCurr: new Property('ServerScrutinizerDisplayCurrentFPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show current fps' }),
+  serverScrutinizerFPSDisplayAvg: new Property('ServerScrutinizerDisplayAverageFPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show average fps' }),
+  serverScrutinizerFPSDisplayMin: new Property('ServerScrutinizerDisplayMinimumFPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show minimum fps' }),
+  serverScrutinizerFPSDisplayMax: new Property('ServerScrutinizerDisplayMaximumFPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show maximum fps' }),
+  serverScrutinizerFPSMaxAge: new Property('ServerScrutinizerFPSMaxAge', page, ++sort, Property.Type.Integer, 5000, { desc: 'max age of ticks', min: 1000 }),
+  moveFPSDisplay: new Property('MoveFPSDisplay', page, ++sort, Property.Type.Action),
 
   // 15
 
