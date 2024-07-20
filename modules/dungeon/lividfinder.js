@@ -42,6 +42,7 @@ const blockChangeReg = reg('packetReceived', pack => {
     const bs = change.func_180088_c();
     currColor = bs.func_177229_b(BlockStainedGlass.field_176547_a).func_176765_a();
     run(() => findLivid());
+    return true;
   });
 }, 'dungeon/lividfinder').setFilteredClass(Java.type('net.minecraft.network.play.server.S22PacketMultiBlockChange')).setEnabled(stateFindLivid);
 const tickReg = reg('tick', () => {
