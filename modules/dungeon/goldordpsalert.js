@@ -19,12 +19,12 @@ const terminalsEndReg = reg('chat', () => stateIsInGoldorDps.set(true), 'dungeon
 const goldorDpsStartReg = reg('chat', () => stateIsInGoldorDps.set(false), 'dungeon/goldordpsalert').setCriteria('&r&4[BOSS] Goldor&r&c: &r&cYou have done it, you destroyed the factory…&r').setEnabled(stateGoldorDps);
 
 export function init() {
+  registerTrackPlayers(stateGoldorDps);
+
   settings._dungeonGoldorDpsStartAlert.onAfterChange(v => !v && stateIsInGoldorDps.set(false));
   settings._dungeonGoldorDpsStartAlertSound.onAfterChange(v => goldorDpsStartAlert.sound = v);
 }
 export function start() {
-  registerTrackPlayers(stateGoldorDps);
-
   stateIsInGoldorDps.set(false);
 
   tickReg.register();
