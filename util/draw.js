@@ -279,7 +279,6 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
   worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
   tess.func_78381_a();
 
-  if (!nt) GlStateManager.func_179137_b(realX, realY, realZ);
   GlStateManager.func_179084_k();
   GlStateManager.func_179141_d();
   GlStateManager.func_179098_w();
@@ -361,7 +360,6 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
   tess.func_78381_a();
 
-  if (!nt) GlStateManager.func_179137_b(realX, realY, realZ);
   GlStateManager.func_179084_k();
   GlStateManager.func_179141_d();
   GlStateManager.func_179098_w();
@@ -482,7 +480,6 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
   worldRen.func_181662_b(x2, y2, z2).func_181675_d();
   tess.func_78381_a();
 
-  GlStateManager.func_179137_b(realX, realY, realZ);
   GlStateManager.func_179084_k();
   GlStateManager.func_179141_d();
   GlStateManager.func_179098_w();
@@ -788,7 +785,6 @@ export function renderBeaconBeam(x, y, z, color, esp = false, center = true, hei
   GlStateManager.func_179098_w();
   if (esp) GlStateManager.func_179126_j();
 
-  GlStateManager.func_179137_b(realX, realY, realZ);
   GlStateManager.func_179121_F();
 }
 
