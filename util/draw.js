@@ -233,12 +233,8 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
     h *= s;
   }
 
-  const render = Client.getMinecraft().func_175606_aa();
-  const realX = lerp(render.field_70142_S, render.field_70165_t, Tessellator.partialTicks);
-  const realY = lerp(render.field_70137_T, render.field_70163_u, Tessellator.partialTicks);
-  const realZ = lerp(render.field_70136_U, render.field_70161_v, Tessellator.partialTicks);
   GlStateManager.func_179094_E();
-  if (!nt) GlStateManager.func_179137_b(-realX, -realY, -realZ);
+  if (!nt) GlStateManager.func_179137_b(-getRenderX(), -getRenderY(), -getRenderZ());
   GlStateManager.func_179090_x();
   GlStateManager.func_179147_l();
   GlStateManager.func_179140_f();
@@ -313,14 +309,9 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   w *= s;
   h *= s;
 
-  const render = Client.getMinecraft().func_175606_aa();
-  const realX = lerp(render.field_70142_S, render.field_70165_t, Tessellator.partialTicks);
-  const realY = lerp(render.field_70137_T, render.field_70163_u, Tessellator.partialTicks);
-  const realZ = lerp(render.field_70136_U, render.field_70161_v, Tessellator.partialTicks);
-
   GL11.glDisable(GL11.GL_CULL_FACE);
   GlStateManager.func_179094_E();
-  if (!nt) GlStateManager.func_179137_b(-realX, -realY, -realZ);
+  if (!nt) GlStateManager.func_179137_b(-getRenderX(), -getRenderY(), -getRenderZ());
   GlStateManager.func_179090_x();
   GlStateManager.func_179147_l();
   GlStateManager.func_179140_f();
@@ -451,13 +442,9 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
   if ((color & 0xFF) === 0) return;
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
   ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));
-  const render = Client.getMinecraft().func_175606_aa();
-  const realX = lerp(render.field_70142_S, render.field_70165_t, Tessellator.partialTicks);
-  const realY = lerp(render.field_70137_T, render.field_70163_u, Tessellator.partialTicks);
-  const realZ = lerp(render.field_70136_U, render.field_70161_v, Tessellator.partialTicks);
 
   GlStateManager.func_179094_E();
-  GlStateManager.func_179137_b(-realX, -realY, -realZ);
+  GlStateManager.func_179137_b(-getRenderX(), -getRenderY(), -getRenderZ());
   GlStateManager.func_179090_x();
   GlStateManager.func_179147_l();
   GlStateManager.func_179140_f();
@@ -704,13 +691,8 @@ export function renderBeaconBeam(x, y, z, color, esp = false, center = true, hei
   }
   ({ x, y, z, s } = rescaleRender(x, y, z));
 
-  const render = Client.getMinecraft().func_175606_aa();
-  const realX = lerp(render.field_70142_S, render.field_70165_t, Tessellator.partialTicks);
-  const realY = lerp(render.field_70137_T, render.field_70163_u, Tessellator.partialTicks);
-  const realZ = lerp(render.field_70136_U, render.field_70161_v, Tessellator.partialTicks);
-
   GlStateManager.func_179094_E();
-  GlStateManager.func_179137_b(-realX, -realY, -realZ);
+  GlStateManager.func_179137_b(-getRenderX(), -getRenderY(), -getRenderZ());
 
   const bottomOffset = 0;
   const topOffset = bottomOffset + height;
