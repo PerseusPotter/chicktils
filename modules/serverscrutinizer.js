@@ -214,6 +214,7 @@ export function init() {
 }
 export function load() {
   ticks.clear();
+  frames.clear();
 
   serverTickReg.register();
   worldLoadReg.register();
