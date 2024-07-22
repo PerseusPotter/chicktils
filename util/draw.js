@@ -778,6 +778,12 @@ export function rgbaToARGB(c) {
   return ((c & 0xFF) << 24) | c >> 8;
 }
 
+let _rescaleRender$eyeHeight = getEyeHeight();
+let _rescaleRender$rd = Client.settings.video.getRenderDistance() << 4;
+register('tick', () => {
+  _rescaleRender$eyeHeight = getEyeHeight();
+  _rescaleRender$rd = Client.settings.video.getRenderDistance() << 4;
+});
 /**
  * @param {number} x
  * @param {number} y
@@ -786,13 +792,12 @@ export function rgbaToARGB(c) {
  */
 function rescaleRender(x, y, z) {
   const rx = getRenderX();
-  const ry = getRenderY() + getEyeHeight();
+  const ry = getRenderY() + _rescaleRender$eyeHeight;
   const rz = getRenderZ();
   let d = (rx - x) ** 2 + (ry - y) ** 2 + (rz - z) ** 2;
 
-  const rd = Client.settings.video.getRenderDistance() << 4;
-  if (d >= rd * rd) {
-    d = rd / Math.sqrt(d);
+  if (d >= _rescaleRender$rd * _rescaleRender$rd) {
+    d = _rescaleRender$rd / Math.sqrt(d);
     return {
       x: lerp(rx, x, d),
       y: lerp(ry, y, d),
