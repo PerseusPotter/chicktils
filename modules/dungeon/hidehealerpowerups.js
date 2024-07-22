@@ -23,6 +23,7 @@ const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) powerupCand.push([Date.now(), e]);
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const serverTickReg = reg('packetReceived', () => {
+  if (powerupCand.length === 0) return;
   run(() => {
     const t = Date.now();
     powerupCand = powerupCand.filter(v => {

@@ -47,7 +47,7 @@ const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) possibleSkulls.push(e);
 }, 'dungeon/camp').setEnabled(stateCamp);
 const serverTickReg = reg('packetReceived', () => {
-  if (bloodOpenTime === 0) return;
+  if (bloodOpenTime === 0 || (possibleSkulls.length === 0 && bloodMobs.length === 0)) return;
   const arr = possibleSkulls;
   possibleSkulls = [];
   run(() => {
