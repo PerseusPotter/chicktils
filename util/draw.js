@@ -231,6 +231,7 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
     ({ x, y, z, s } = rescaleRender(x, y, z));
     w *= s;
     h *= s;
+    lw *= s;
   }
 
   GlStateManager.func_179094_E();
