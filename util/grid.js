@@ -23,10 +23,15 @@ export default class Grid {
     });
     this.arrs[key].push(item);
   }
-  _getById(id) {
-    const i = (this.locked ? this.oldHm : this.hm)?.get(id);
-    if (i === null || i === undefined) return [];
-    return (this.locked ? this.oldArrs : this.arrs)[i];
+  _getById(id, tries = 1) {
+    try {
+      const i = (this.locked ? this.oldHm : this.hm)?.get(id);
+      if (i === null || i === undefined) return [];
+      return (this.locked ? this.oldArrs : this.arrs)[i];
+    } catch (e) {
+      if (tries === 0) throw e;
+      return this._getById(id, tries - 1);
+    }
   }
 
   add(x, z, item) {
