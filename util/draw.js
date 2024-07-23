@@ -234,7 +234,6 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
     lw *= s;
   }
 
-  GlStateManager.func_179132_a(false);
   GlStateManager.func_179090_x();
   GlStateManager.func_179140_f();
   GlStateManager.func_179129_p();
@@ -284,7 +283,6 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
   GlStateManager.func_179145_e();
   GlStateManager.func_179089_o();
   GlStateManager.func_179084_k();
-  GlStateManager.func_179132_a(true);
   GL11.glLineWidth(2);
   if (esp) {
     GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -315,7 +313,6 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   h *= s;
 
   GL11.glDisable(GL11.GL_CULL_FACE);
-  GlStateManager.func_179132_a(false);
   GlStateManager.func_179090_x();
   GlStateManager.func_179140_f();
   GlStateManager.func_179129_p();
@@ -364,7 +361,6 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   GlStateManager.func_179145_e();
   GlStateManager.func_179089_o();
   GlStateManager.func_179084_k();
-  GlStateManager.func_179132_a(true);
   if (a !== 1) GlStateManager.func_179141_d();
   GL11.glEnable(GL11.GL_CULL_FACE);
   if (esp) {
