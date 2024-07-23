@@ -5,6 +5,7 @@ import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
+import { FrameTimer } from '../util/timers';
 
 class TickInfo {
   arr = [];
@@ -165,9 +166,12 @@ function formatTps(curr, avg, min, max) {
   return lines;
 }
 const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11, 21));
+const tpsLimiter = new FrameTimer(10);
 const rendOvTps = reg('renderOverlay', () => {
-  ticks.calc();
-  tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin(), ticks.getMax()));
+  if (tpsLimiter.shouldRender()) {
+    ticks.calc();
+    tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin(), ticks.getMax()));
+  }
   tpsDisplay.render();
 }, 'serverscrutinizer').setEnabled(settings._serverScrutinizerTPSDisplay);
 
@@ -198,9 +202,12 @@ function formatFps(curr, avg, min, max) {
   return lines;
 }
 const fpsDisplay = createTextGui(() => data.serverScrutinizerFPSDisplay, () => formatFps(217, 213.1, 180, 240));
+const fpsLimiter = new FrameTimer(10);
 const rendOvFps = reg('renderOverlay', () => {
-  frames.calc();
-  fpsDisplay.setLines(formatFps(frames.getCur(), frames.getAvg(), frames.getMin(), frames.getMax()));
+  if (fpsLimiter.shouldRender()) {
+    frames.calc();
+    fpsDisplay.setLines(formatFps(frames.getCur(), frames.getAvg(), frames.getMin(), frames.getMax()));
+  }
   fpsDisplay.render();
 }, 'serverscrutinizer').setEnabled(settings._serverScrutinizerFPSDisplay);
 
