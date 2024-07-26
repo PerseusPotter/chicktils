@@ -1,6 +1,7 @@
 import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
 import _drawBeaconBeam from '../../BeaconBeam/index';
 import { getEyeHeight } from './mc';
+import GlStateManager2 from './glStateManager';
 
 const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 const worldRen = tess.func_178180_c();
@@ -234,13 +235,13 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
     lw *= s;
   }
 
-  GlStateManager.func_179090_x();
-  GlStateManager.func_179140_f();
-  GlStateManager.func_179129_p();
-  GlStateManager.func_179084_k();
+  GlStateManager2.disableTexture2D();
+  GlStateManager2.disableLighting();
+  GlStateManager2.disableCull();
+  GlStateManager2.disableBlend();
   if (!nt) {
-    GlStateManager.func_179094_E();
-    GlStateManager.func_179137_b(-getRenderX(), -getRenderY(), -getRenderZ());
+    GlStateManager2.pushMatrix();
+    GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
   }
 
   GL11.glLineWidth(lw);
@@ -253,7 +254,7 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
   const g = ((color >> 16) & 0xFF) / 255;
   const b = ((color >> 8) & 0xFF) / 255;
   const a = ((color >> 0) & 0xFF) / 255;
-  GlStateManager.func_179131_c(r, g, b, a);
+  GlStateManager2.color(r, g, b, a);
 
   worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
@@ -278,11 +279,11 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
   worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
   tess.func_78381_a();
 
-  if (!nt) GlStateManager.func_179121_F();
-  GlStateManager.func_179098_w();
-  GlStateManager.func_179145_e();
-  GlStateManager.func_179089_o();
-  GlStateManager.func_179084_k();
+  if (!nt) GlStateManager2.popMatrix();
+  GlStateManager2.enableTexture2D();
+  GlStateManager2.enableLighting();
+  GlStateManager2.enableCull();
+  GlStateManager2.disableBlend();
   GL11.glLineWidth(1);
   if (esp) {
     GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -313,13 +314,13 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   h *= s;
 
   GL11.glDisable(GL11.GL_CULL_FACE);
-  GlStateManager.func_179090_x();
-  GlStateManager.func_179140_f();
-  GlStateManager.func_179129_p();
-  GlStateManager.func_179084_k();
+  GlStateManager2.disableTexture2D();
+  GlStateManager2.disableLighting();
+  GlStateManager2.disableCull();
+  GlStateManager2.disableBlend();
   if (!nt) {
-    GlStateManager.func_179094_E();
-    GlStateManager.func_179137_b(-getRenderX(), -getRenderY(), -getRenderZ());
+    GlStateManager2.pushMatrix();
+    GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
   }
   if (esp) {
     GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -330,8 +331,8 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   const g = ((color >> 16) & 0xFF) / 255;
   const b = ((color >> 8) & 0xFF) / 255;
   const a = ((color >> 0) & 0xFF) / 255;
-  if (a !== 1) GlStateManager.func_179147_l();
-  GlStateManager.func_179131_c(r, g, b, a);
+  if (a !== 1) GlStateManager2.enableBlend();
+  GlStateManager2.color(r, g, b, a);
 
   worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
@@ -356,12 +357,11 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
   tess.func_78381_a();
 
-  if (!nt) GlStateManager.func_179121_F();
-  GlStateManager.func_179098_w();
-  GlStateManager.func_179145_e();
-  GlStateManager.func_179089_o();
-  GlStateManager.func_179084_k();
-  if (a !== 1) GlStateManager.func_179141_d();
+  if (!nt) GlStateManager2.popMatrix();
+  GlStateManager2.enableTexture2D();
+  GlStateManager2.enableLighting();
+  GlStateManager2.enableCull();
+  if (a !== 1) GlStateManager2.disableBlend();
   GL11.glEnable(GL11.GL_CULL_FACE);
   if (esp) {
     GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -394,29 +394,29 @@ export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true,
  */
 export function drawPolygon(color, vertexes) {
   if ((color & 0xFF) === 0) return;
-  GlStateManager.func_179147_l();
-  GlStateManager.func_179090_x();
-  GlStateManager.func_179120_a(770, 771, 1, 0);
-  GlStateManager.func_179097_i();
-  GlStateManager.func_179129_p();
+  GlStateManager2.enableBlend();
+  GlStateManager2.disableTexture2D();
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 0);
+  GlStateManager2.disableDepth();
+  GlStateManager2.disableCull();
 
-  GlStateManager.func_179094_E();
+  GlStateManager2.pushMatrix();
 
   const r = ((color >> 24) & 0xFF) / 255;
   const g = ((color >> 16) & 0xFF) / 255;
   const b = ((color >> 8) & 0xFF) / 255;
   const a = ((color >> 0) & 0xFF) / 255;
-  GlStateManager.func_179131_c(r, g, b, a);
+  GlStateManager2.color(r, g, b, a);
   worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
 
   vertexes.forEach(v => worldRen.func_181662_b(v[0], v[1], v[2] || 0).func_181675_d());
   tess.func_78381_a();
-  GlStateManager.func_179121_F();
+  GlStateManager2.popMatrix();
 
-  GlStateManager.func_179084_k();
-  GlStateManager.func_179098_w();
-  GlStateManager.func_179126_j();
-  GlStateManager.func_179089_o();
+  GlStateManager2.disableBlend();
+  GlStateManager2.enableTexture2D();
+  GlStateManager2.enableDepth();
+  GlStateManager2.enableCull();
 }
 
 /**
@@ -449,13 +449,13 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
   ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));
 
-  GlStateManager.func_179094_E();
-  GlStateManager.func_179137_b(-getRenderX(), -getRenderY(), -getRenderZ());
-  GlStateManager.func_179090_x();
-  GlStateManager.func_179147_l();
-  GlStateManager.func_179140_f();
-  GlStateManager.func_179118_c();
-  GlStateManager.func_179120_a(770, 771, 1, 0);
+  GlStateManager2.pushMatrix();
+  GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
+  GlStateManager2.disableTexture2D();
+  GlStateManager2.enableBlend();
+  GlStateManager2.disableLighting();
+  GlStateManager2.disableAlpha();
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 0);
   GL11.glLineWidth(lw);
   if (esp) {
     GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -466,18 +466,18 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
   const g = ((color >> 16) & 0xFF) / 255;
   const b = ((color >> 8) & 0xFF) / 255;
   const a = ((color >> 0) & 0xFF) / 255;
-  GlStateManager.func_179131_c(r, g, b, a);
+  GlStateManager2.color(r, g, b, a);
   worldRen.func_181668_a(3, DefaultVertexFormats.field_181705_e);
 
   worldRen.func_181662_b(x1, y1, z1).func_181675_d();
   worldRen.func_181662_b(x2, y2, z2).func_181675_d();
   tess.func_78381_a();
 
-  GlStateManager.func_179084_k();
-  GlStateManager.func_179141_d();
-  GlStateManager.func_179098_w();
-  GlStateManager.func_179131_c(1, 1, 1, 1);
-  GlStateManager.func_179121_F();
+  GlStateManager2.disableBlend();
+  GlStateManager2.enableAlpha();
+  GlStateManager2.enableTexture2D();
+  GlStateManager2.color(1, 1, 1, 1);
+  GlStateManager2.popMatrix();
   GL11.glLineWidth(1);
   if (esp) {
     GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -597,27 +597,27 @@ export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
 
   GL11.glLineWidth(lw);
   GL11.glEnable(GL11.GL_LINE_SMOOTH);
-  GlStateManager.func_179147_l();
-  GlStateManager.func_179090_x();
-  GlStateManager.func_179120_a(770, 771, 1, 0);
-  GlStateManager.func_179097_i();
-  GlStateManager.func_179129_p();
+  GlStateManager2.enableBlend();
+  GlStateManager2.disableTexture2D();
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 0);
+  GlStateManager2.disableDepth();
+  GlStateManager2.disableCull();
 
-  GlStateManager.func_179094_E();
+  GlStateManager2.pushMatrix();
 
-  GlStateManager.func_179131_c(
+  GlStateManager2.color(
     (color >> 24) & 0xFF,
     (color >> 16) & 0xFF,
     (color >> 8) & 0xFF,
     (color >> 0) & 0xFF
   );
   _drawArc(x, y, r, a1, a2, segments);
-  GlStateManager.func_179121_F();
+  GlStateManager2.popMatrix();
 
-  GlStateManager.func_179084_k();
-  GlStateManager.func_179098_w();
-  GlStateManager.func_179126_j();
-  GlStateManager.func_179089_o();
+  GlStateManager2.disableBlend();
+  GlStateManager2.enableTexture2D();
+  GlStateManager2.enableDepth();
+  GlStateManager2.enableCull();
   GL11.glLineWidth(1);
   GL11.glDisable(GL11.GL_LINE_SMOOTH);
 }
@@ -635,15 +635,15 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   r = Math.min(w / 2, h / 2, r);
 
   GL11.glLineWidth(lw);
-  GlStateManager.func_179147_l();
-  GlStateManager.func_179090_x();
-  GlStateManager.func_179120_a(770, 771, 1, 0);
-  GlStateManager.func_179097_i();
-  GlStateManager.func_179129_p();
+  GlStateManager2.enableBlend();
+  GlStateManager2.disableTexture2D();
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 0);
+  GlStateManager2.disableDepth();
+  GlStateManager2.disableCull();
 
-  GlStateManager.func_179094_E();
+  GlStateManager2.pushMatrix();
 
-  GlStateManager.func_179131_c(
+  GlStateManager2.color(
     (color >> 24) & 0xFF,
     (color >> 16) & 0xFF,
     (color >> 8) & 0xFF,
@@ -667,12 +667,12 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   _drawArc(x + w - r, y + h - r, r, Math.PI * 3 / 2, 2 * Math.PI, 10);
   GL11.glDisable(GL11.GL_LINE_SMOOTH);
 
-  GlStateManager.func_179121_F();
+  GlStateManager2.popMatrix();
 
-  GlStateManager.func_179084_k();
-  GlStateManager.func_179098_w();
-  GlStateManager.func_179126_j();
-  GlStateManager.func_179089_o();
+  GlStateManager2.disableBlend();
+  GlStateManager2.enableTexture2D();
+  GlStateManager2.enableDepth();
+  GlStateManager2.enableCull();
   GL11.glLineWidth(1);
 
 }
@@ -697,21 +697,21 @@ export function renderBeaconBeam(x, y, z, color, esp = false, center = true, hei
   }
   ({ x, y, z, s } = rescaleRender(x, y, z));
 
-  GlStateManager.func_179094_E();
-  GlStateManager.func_179137_b(-getRenderX(), -getRenderY(), -getRenderZ());
+  GlStateManager2.pushMatrix();
+  GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
 
   const bottomOffset = 0;
   const topOffset = bottomOffset + height;
-  if (esp) GlStateManager.func_179097_i();
+  if (esp) GlStateManager2.disableDepth();
   Client.getMinecraft().func_110434_K().func_110577_a(beaconBeamText);
   GL11.glTexParameterf(3553, 10242, 10497);
   GL11.glTexParameterf(3553, 10243, 10497);
-  GlStateManager.func_179140_f();
-  GlStateManager.func_179089_o();
-  GlStateManager.func_179098_w();
-  GlStateManager.func_179120_a(770, 1, 1, 0);
-  GlStateManager.func_179147_l();
-  GlStateManager.func_179120_a(770, 771, 1, 0);
+  GlStateManager2.disableLighting();
+  GlStateManager2.enableCull();
+  GlStateManager2.enableTexture2D();
+  GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+  GlStateManager2.enableBlend();
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 0);
   const time = 0.2 * (World.getWorld().func_82737_E() + Tessellator.partialTicks);
   const d1 = Math.ceil(time) - time;
   const r = ((color >> 24) & 0xFF) / 255;
@@ -747,7 +747,7 @@ export function renderBeaconBeam(x, y, z, color, esp = false, center = true, hei
   worldRen.func_181662_b(x + d4, y + bottomOffset, z + d5).func_181673_a(0, d14).func_181666_a(r, g, b, 1).func_181675_d();
   worldRen.func_181662_b(x + d4, y + topOffset, z + d5).func_181673_a(0, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
   tess.func_78381_a();
-  GlStateManager.func_179129_p();
+  GlStateManager2.disableCull();
   const d12 = d1 - 1;
   const d13 = height + d12;
   worldRen.func_181668_a(7, DefaultVertexFormats.field_181709_i);
@@ -769,11 +769,11 @@ export function renderBeaconBeam(x, y, z, color, esp = false, center = true, hei
   worldRen.func_181662_b(x - w, y + bottomOffset, z - w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
   worldRen.func_181662_b(x - w, y + topOffset, z - w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
   tess.func_78381_a();
-  GlStateManager.func_179140_f();
-  GlStateManager.func_179098_w();
-  if (esp) GlStateManager.func_179126_j();
+  GlStateManager2.disableLighting();
+  GlStateManager2.enableTexture2D();
+  if (esp) GlStateManager2.enableDepth();
 
-  GlStateManager.func_179121_F();
+  GlStateManager2.popMatrix();
 }
 
 /**
