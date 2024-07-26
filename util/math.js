@@ -392,6 +392,8 @@ export function fastDistance(dx, dy) {
     max = dx;
   }
 
-  return (((max << 8) + (max << 3) - (max << 4) - (max << 1) +
-    (min << 7) - (min << 5) + (min << 3) - (min << 1)) >> 8);
+  let approx = (max * 1007) + (min * 441);
+  if (max < (min << 4)) approx -= (max * 40);
+
+  return ((approx + 512) >> 10);
 }
