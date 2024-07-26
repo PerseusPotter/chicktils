@@ -283,7 +283,7 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
   GlStateManager.func_179145_e();
   GlStateManager.func_179089_o();
   GlStateManager.func_179084_k();
-  GL11.glLineWidth(2);
+  GL11.glLineWidth(1);
   if (esp) {
     GL11.glEnable(GL11.GL_DEPTH_TEST);
     GL11.glDepthMask(true);
@@ -478,7 +478,7 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
   GlStateManager.func_179098_w();
   GlStateManager.func_179131_c(1, 1, 1, 1);
   GlStateManager.func_179121_F();
-  GL11.glLineWidth(2);
+  GL11.glLineWidth(1);
   if (esp) {
     GL11.glEnable(GL11.GL_DEPTH_TEST);
     GL11.glDepthMask(true);
@@ -618,7 +618,7 @@ export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
   GlStateManager.func_179098_w();
   GlStateManager.func_179126_j();
   GlStateManager.func_179089_o();
-  GL11.glLineWidth(2);
+  GL11.glLineWidth(1);
   GL11.glDisable(GL11.GL_LINE_SMOOTH);
 }
 
@@ -673,7 +673,7 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   GlStateManager.func_179098_w();
   GlStateManager.func_179126_j();
   GlStateManager.func_179089_o();
-  GL11.glLineWidth(2);
+  GL11.glLineWidth(1);
 
 }
 
