@@ -36,10 +36,15 @@ function findLivid() {
   stateLivid.set(World.getAllPlayers().find(v => v.getName() === name));
 }
 function processBlockState(bs) {
-  const prev = currColor;
-  currColor = bs.func_177229_b(BlockStainedGlass.field_176547_a).func_176765_a();
-  if (prev !== currColor) run(() => findLivid());
-  return prev !== currColor;
+  try {
+    const prev = currColor;
+    currColor = bs.func_177229_b(BlockStainedGlass.field_176547_a).func_176765_a();
+    if (prev !== currColor) run(() => findLivid());
+    return prev !== currColor;
+  } catch (e) {
+    // blockstate is not a glass pane (world has not loaded, etc)
+    return false;
+  }
 }
 const blockChangeReg = reg('packetReceived', pack => {
   pack.func_179844_a().some(change => {
