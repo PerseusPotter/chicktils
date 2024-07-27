@@ -35,17 +35,23 @@ function findLivid() {
   const name = nameDict[currColor] + ' Livid';
   stateLivid.set(World.getAllPlayers().find(v => v.getName() === name));
 }
+function processBlockState(bs) {
+  const prev = currColor;
+  currColor = bs.func_177229_b(BlockStainedGlass.field_176547_a).func_176765_a();
+  if (prev !== currColor) run(() => findLivid());
+  return prev !== currColor;
+}
 const blockChangeReg = reg('packetReceived', pack => {
   pack.func_179844_a().some(change => {
     const bp = getBlockPos(change.func_180090_a());
     if (bp.x !== 13 || bp.y !== 107 || bp.z !== 25) return;
-    const bs = change.func_180088_c();
-    currColor = bs.func_177229_b(BlockStainedGlass.field_176547_a).func_176765_a();
-    run(() => findLivid());
+    processBlockState(change.func_180088_c());
     return true;
   });
 }, 'dungeon/lividfinder').setFilteredClass(Java.type('net.minecraft.network.play.server.S22PacketMultiBlockChange')).setEnabled(stateFindLivid);
+const lividBP = new BlockPos(13, 107, 25);
 const tickReg = reg('tick', () => {
+  if (processBlockState(World.getBlockStateAt(lividBP))) return;
   const livid = stateLivid.get();
   if (!livid || livid.isDead()) run(() => findLivid());
 }, 'dungeon/lividfinder').setEnabled(stateFindLivid);
