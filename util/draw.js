@@ -242,18 +242,18 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
 
   GlStateManager2.disableTexture2D();
   GlStateManager2.disableLighting();
-  GlStateManager2.enableBlend();
-  GlStateManager2.disableAlpha();
+  GlStateManager2.disableCull();
   GL11.glLineWidth(lw);
   GlStateManager2.color(r, g, b, a);
   if (!nt) {
     GlStateManager2.pushMatrix();
     GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
   }
-  if (esp) {
-    GlStateManager2.disableDepth();
+  if (a !== 1) {
     GlStateManager2.depthMask(false);
+    GlStateManager2.enableBlend();
   }
+  if (esp) GlStateManager2.disableDepth();
 
   worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
@@ -281,13 +281,14 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
   if (!nt) GlStateManager2.popMatrix();
   GlStateManager2.enableTexture2D();
   GlStateManager2.enableLighting();
+  GlStateManager2.enableCull();
   GlStateManager2.disableBlend();
-  GlStateManager2.enableAlpha();
   GL11.glLineWidth(1);
-  if (esp) {
-    GlStateManager2.enableDepth();
+  if (a !== 1) {
     GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
   }
+  if (esp) GlStateManager2.enableDepth();
 }
 
 /**
@@ -319,17 +320,17 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
 
   GlStateManager2.disableTexture2D();
   GlStateManager2.disableLighting();
+  GlStateManager2.disableCull();
   GlStateManager2.color(r, g, b, a);
-  GlStateManager2.enableBlend();
   if (!nt) {
     GlStateManager2.pushMatrix();
     GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
   }
-  if (esp) {
-    GlStateManager2.disableCull();
-    GlStateManager2.disableDepth();
+  if (a !== 1) {
     GlStateManager2.depthMask(false);
+    GlStateManager2.enableBlend();
   }
+  if (esp) GlStateManager2.disableDepth();
 
   worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
@@ -357,12 +358,13 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   if (!nt) GlStateManager2.popMatrix();
   GlStateManager2.enableTexture2D();
   GlStateManager2.enableLighting();
+  GlStateManager2.enableCull();
   GlStateManager2.disableBlend();
-  if (esp) {
-    GlStateManager2.enableCull();
-    GlStateManager2.enableDepth();
+  if (a !== 1) {
     GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
   }
+  if (esp) GlStateManager2.enableDepth();
 }
 
 /**
