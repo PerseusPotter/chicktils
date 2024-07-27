@@ -1,5 +1,4 @@
 import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
-import _drawBeaconBeam from '../../BeaconBeam/index';
 import { getEyeHeight } from './mc';
 import GlStateManager2 from './glStateManager';
 
