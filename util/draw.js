@@ -598,7 +598,7 @@ export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
 
   GL11.glLineWidth(lw);
   GL11.glEnable(GL11.GL_LINE_SMOOTH);
-  GlStateManager2.enableLighting();
+  GlStateManager2.disableLighting();
   GlStateManager2.disableTexture2D();
   GlStateManager2.disableDepth();
   GlStateManager2.disableCull();
@@ -608,7 +608,7 @@ export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
   GlStateManager2.color(_r, _g, _b, _a);
   _drawArc(x, y, r, a1, a2, segments);
 
-  GlStateManager2.disableLighting();
+  GlStateManager2.enableLighting();
   GlStateManager2.enableTexture2D();
   GlStateManager2.enableDepth();
   GlStateManager2.enableCull();
