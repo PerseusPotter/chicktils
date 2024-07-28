@@ -5,6 +5,8 @@ import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
 
+const stateM7LBWaypoints = new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonM7LBWaypoints);
+
 const lbs = [
   [27, 56, 0xFF0000FF],
   [56, 124, 0x800080FF],
@@ -12,16 +14,21 @@ const lbs = [
   [82, 96, 0x0000FFFF],
   [27, 92, 0x00FF00FF]
 ];
+let nearest;
+const tickReg = reg('tick', () => {
+  nearest = lbs.map(v => [fastDistance(Player.getX() - v[0], Player.getZ() - v[1]), v]).reduce((a, v) => a ? a[0] < v[0] ? a : v : v, null)[1];
+}, 'dungeon/m7lbwaypoints').setEnabled(stateM7LBWaypoints);
 const renderWorldReg = reg('renderWorld', () => {
-  if (Player.getY() > 30) return;
-  const lb = lbs.map(v => [fastDistance(Player.getX() - v[0], Player.getZ() - v[1]), v]).reduce((a, v) => a ? a[0] < v[0] ? a : v : v, null)[1];
-  renderBeaconBeam(lb[0], 0, lb[1], lb[2], true, false, 17);
-}, 'dungeon/m7lbwaypoints').setEnabled(new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonM7LBWaypoints));
+  if (Player.getY() > 30 || !nearest) return;
+  renderBeaconBeam(nearest[0], 0, nearest[1], nearest[2], true, false, 17);
+}, 'dungeon/m7lbwaypoints').setEnabled(stateM7LBWaypoints);
 
 export function init() { }
 export function start() {
+  tickReg.register();
   renderWorldReg.register();
 }
 export function reset() {
+  tickReg.unregister();
   renderWorldReg.unregister();
 }
