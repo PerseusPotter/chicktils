@@ -79,11 +79,17 @@ export class StateProp extends StateVar {
     }
   }
 
+  /**
+   * @returns {this}
+   */
   not() {
     if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).not();
     this.op = StateProp.Operator.NOT;
     return this;
   }
+  /**
+   * @returns {this}
+   */
   and(v) {
     if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).and(v);
     const n = new StateProp(v);
@@ -92,6 +98,9 @@ export class StateProp extends StateVar {
     n.op = StateProp.Operator.AND;
     return n;
   }
+  /**
+   * @returns {this}
+   */
   or(v) {
     if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).or(v);
     const n = new StateProp(v);
@@ -122,6 +131,9 @@ export class StateProp extends StateVar {
     this.tmp = cb;
     return this;
   }
+  /**
+   * @returns {this}
+   */
   customBinary(v, cb) {
     if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).customBinary(v, cb);
     const n = new StateProp(v);
