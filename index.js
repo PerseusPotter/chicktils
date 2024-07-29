@@ -11,7 +11,7 @@ import { calcMedian } from './util/math';
 import { _setTimeout } from './util/timers';
 setIsMainS();
 setIsMainD();
-const VERSION = '0.6.8';
+const VERSION = '0.6.9';
 
 let sev;
 function tryUpdate(delay = 0) {
