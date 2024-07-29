@@ -248,7 +248,10 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
     GlStateManager2.pushMatrix();
     GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
   }
-  if (a !== 1) {
+  if (a === 1) {
+    GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
+  } else {
     GlStateManager2.depthMask(false);
     GlStateManager2.enableBlend();
     GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
@@ -325,7 +328,10 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
     GlStateManager2.pushMatrix();
     GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
   }
-  if (a !== 1) {
+  if (a === 1) {
+    GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
+  } else {
     GlStateManager2.depthMask(false);
     GlStateManager2.enableBlend();
     GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
@@ -456,7 +462,10 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
   GlStateManager2.disableAlpha();
   GL11.glLineWidth(lw);
   GlStateManager2.color(r, g, b, a);
-  if (a !== 1) {
+  if (a === 1) {
+    GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
+  } else {
     GlStateManager2.depthMask(false);
     GlStateManager2.enableBlend();
     GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
