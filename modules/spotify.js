@@ -18,7 +18,7 @@ const spotifyNames = {
  * @param {string} song
  */
 function formatSong(song) {
-  return '&2Spotify &7>&r ' + (spotifyNames[song] ?? '&a' + song.replace(/&/g, '&\uFEFF').replace(' - ', ' &7-&b '));
+  return '&2Spotify &7>&r ' + (spotifyNames[song] ?? '&a' + song.replace(/&([\da-fk-or])/g, '&🐀$1').replace(' - ', ' &7-&b '));
 }
 
 // const stateSpotifyPID = new StateVar(-1);
