@@ -800,6 +800,10 @@ export const props = {
   serverScrutinizerFPSMaxAge: new Property('ServerScrutinizerFPSMaxAge', page, ++sort, Property.Type.Integer, 5000, { desc: 'max age of ticks', min: 1000 }),
   moveFPSDisplay: new Property('MoveFPSDisplay', page, ++sort, Property.Type.Action),
 
+  enablespotify: new Property('EnableSpotifyDisplay', page, ++sort, Property.Type.Toggle, false, { desc: 'shows current song playing on spotify, only works on windows + app version' }),
+  spotifyHideNotOpen: new Property('SpotifyHideIfNotOpened', page, ++sort, Property.Type.Toggle, true, { desc: 'hide if spotify is not opened' }),
+  moveSpotifyDisplay: new Property('MoveSpotifyDisplay', page, ++sort, Property.Type.Action),
+
   // 15
 
   enableboxallentities: new Property('EnableBoxAllEntities', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
