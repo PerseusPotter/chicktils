@@ -468,7 +468,7 @@ let page = 0;
 let sort = 0;
 export const props = {
   // 1
-  enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'toggles mod globally' }),
+  enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'toggles mod globally (scuffed, it doesnt really work)' }),
   autoUpdate: new Property('CheckForUpdates', page, ++sort, Property.Type.Toggle, true, { desc: 'check for updates when loaded' }),
   isDev: new Property('IsDev', page, ++sort, Property.Type.Toggle, false, { desc: 'negatively impacts loading performance and may spam your chat' }),
   pingRefreshDelay: new Property('PingRefreshDelay', page, ++sort, Property.Type.Number, 10, { desc: 'how often (in seconds) to refresh ping. set to 0 to disable ping. requires skytils' }),
