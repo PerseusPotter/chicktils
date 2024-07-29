@@ -280,7 +280,6 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
 
   if (!nt) GlStateManager2.popMatrix();
   GlStateManager2.enableTexture2D();
-  GlStateManager2.enableLighting();
   GlStateManager2.enableAlpha();
   GL11.glLineWidth(1);
   if (a !== 1) {
@@ -358,7 +357,6 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
 
   if (!nt) GlStateManager2.popMatrix();
   GlStateManager2.enableTexture2D();
-  GlStateManager2.enableLighting();
   GlStateManager2.enableAlpha();
   GlStateManager2.enableCull();
   if (a !== 1) {
@@ -472,7 +470,6 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
 
   GlStateManager2.popMatrix();
   GlStateManager2.enableTexture2D();
-  GlStateManager2.enableLighting();
   GlStateManager2.enableAlpha();
   GL11.glLineWidth(1);
   if (a !== 1) {
@@ -608,7 +605,6 @@ export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
   GlStateManager2.color(_r, _g, _b, _a);
   _drawArc(x, y, r, a1, a2, segments);
 
-  GlStateManager2.enableLighting();
   GlStateManager2.enableTexture2D();
   GlStateManager2.enableDepth();
   GlStateManager2.enableCull();
@@ -659,7 +655,6 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   _drawArc(x + r, y + h - r, r, Math.PI, Math.PI * 3 / 2, 10);
   _drawArc(x + w - r, y + h - r, r, Math.PI * 3 / 2, 2 * Math.PI, 10);
 
-  GlStateManager2.enableLighting();
   GlStateManager2.enableTexture2D();
   GlStateManager2.enableDepth();
   GlStateManager2.enableCull();
@@ -761,7 +756,6 @@ export function renderBeaconBeam(x, y, z, color, esp = false, center = true, hei
   worldRen.func_181662_b(x - w, y + bottomOffset, z - w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
   worldRen.func_181662_b(x - w, y + topOffset, z - w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
   tess.func_78381_a();
-  GlStateManager2.disableLighting();
   GlStateManager2.enableTexture2D();
   if (esp) {
     GlStateManager2.enableDepth();
