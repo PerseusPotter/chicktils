@@ -13,7 +13,7 @@ const renderReg = reg('renderOverlay', () => {
   curr.renderEdit();
   const { x, y, s } = curr.getLoc();
 
-  Renderer.drawStringWithShadow('&7[&21&7] &fReset &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str, 50, 20);
+  Renderer.drawStringWithShadow('&7[&21&7] &fReset &8| &7[&2Scroll&7] &fResize &8| &7[&2Drag&7] &fMove' + curr.str, 50, 20);
   const x1 = x + 1;
   const x2 = x + 100 * s - 1;
   const y1 = y + 1;
@@ -46,7 +46,7 @@ editGui.registerKeyTyped((c, n) => {
   }
 });
 editGui.registerMouseDragged((x, y, b) => {
-  if (b !== 2) return;
+  if (b !== 0) return;
   if (lastX !== -1) {
     curr.getLoc().x += (x - lastX);
     curr.getLoc().y += (y - lastY);

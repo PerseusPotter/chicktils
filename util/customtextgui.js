@@ -205,7 +205,7 @@ const renderReg = reg('renderOverlay', () => {
   editDisplay.setLines(curr.getEditText());
   editDisplay.render();
 
-  const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&23&7] &fToggle Shadow &8| &7[&2Scroll&7] &fResize &8| &7[&2Middle Drag&7] &fMove' + curr.str;
+  const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&23&7] &fToggle Shadow &8| &7[&2Scroll&7] &fResize &8| &7[&2Drag&7] &fMove' + curr.str;
   // const w = Renderer.getStringWidth(editStr);
   // Renderer.drawRect(0xB0000000, 40, 15, w + 20, 20);
   drawOutlinedString(editStr, 50, 20);
@@ -242,7 +242,7 @@ editGui.registerKeyTyped((c, n) => {
   }
 });
 editGui.registerMouseDragged((x, y, b) => {
-  if (b !== 2) return;
+  if (b !== 0) return;
   if (lastX !== -1) {
     curr.getLoc().x += (x - lastX);
     curr.getLoc().y += (y - lastY);
