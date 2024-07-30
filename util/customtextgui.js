@@ -41,7 +41,7 @@ function setTextOfDisplayLineFuckChatTriggers(line, text) {
 }
 
 /**
- * @typedef {import('./events').EventEmitterImpl<'editClose' | 'editKey'> & {
+ * @typedef {import('./events').EventEmitterImpl<'editClose' | 'editKey' | 'editRender'> & {
  *  display: Display
  *  getLoc: () => import('../data').TextLocation;
  *  isEdit: boolean;
@@ -204,6 +204,7 @@ const renderReg = reg('renderOverlay', () => {
 
   editDisplay.setLines(curr.getEditText());
   editDisplay.render();
+  curr.emit('editRender');
 
   const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&23&7] &fToggle Shadow &8| &7[&2Scroll&7] &fResize &8| &7[&2Drag&7] &fMove' + curr.str;
   // const w = Renderer.getStringWidth(editStr);
