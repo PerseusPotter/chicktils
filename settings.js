@@ -845,13 +845,7 @@ const pageNames = [
   'Misc.'
 ];
 /**
- * PROPERTY TYPES ARE INCORRECT
- *
- * `settings[name]` is a primitive
- *
- * use `settings['_' + name]` to access the `Property`
- *
- * @type {Settings & Record<keyof typeof props, string | number | boolean> & { [K: string]: Property }}
+ * @type {Settings & Record<keyof typeof props, string | number | boolean> & Record<`_${keyof typeof props}`, Property>}
  */
 const settings = new Settings('ChickTils', 'settings.json', props, pageNames);
 
