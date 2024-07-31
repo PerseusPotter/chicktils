@@ -38,7 +38,7 @@ spotifyGui.on('editRender', () => {
   updatePrefix();
   const loc = spotifyGui.getTrueLoc();
   songMarquee.setText(formatSong('Rick Astley - Never Gonna Give You Up'));
-  songMarquee.render(loc.x + spotifyPrefixLen * loc.s, loc.y, loc.s, loc.b);
+  songMarquee.render(loc.x + spotifyPrefixLen * loc.s, loc.y, loc.s, spotifyGui.getLoc().b);
 });
 const songMarquee = new Marquee('Rick Astley - Never Gonna Give You Up');
 songMarquee.setMaxLen(settings.spotifyMaxSongLength);
@@ -48,7 +48,7 @@ const renderReg = reg('renderOverlay', () => {
   if (spotifyGui.isEdit) return;
   spotifyGui.render();
   const loc = spotifyGui.getTrueLoc();
-  songMarquee.render(loc.x + spotifyPrefixLen * loc.s, loc.y, loc.s, loc.b);
+  songMarquee.render(loc.x + spotifyPrefixLen * loc.s, loc.y, loc.s, spotifyGui.getLoc().b);
 }, 'spotify').setEnabled(new StateProp(settings._spotifyHideNotOpen).not().or(stateSpotifyOpen));
 const updateReg = reg('step', () => {
   if (spotifyGui.isEdit) return;
