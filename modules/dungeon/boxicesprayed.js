@@ -23,8 +23,10 @@ const entSpawnReg = reg('spawnEntity', e => {
   } else if (e instanceof EntityItem) itemCand.push(e);
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
+  allMobsBucket._lock.lock();
   allMobsBucket.lock();
   allMobsBucket.clear();
+  allMobsBucket._lock.unlock();
   allMobs = allMobs.filter(e => {
     if (e.field_70128_L) return false;
     if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) return false;

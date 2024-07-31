@@ -7,6 +7,7 @@ export default class Grid {
   oldHm;
   oldArrs;
   locked = false;
+  _lock = new (Java.type('java.util.concurrent.locks.ReentrantLock'))();
   constructor({ size = 1, key = 631, addNeighbors = 0 } = {}) {
     this.size = size;
     this.key = key;
@@ -17,6 +18,8 @@ export default class Grid {
     return (x >> this.size) * this.key + (z >> this.size);
   }
   _addWithId(id, item) {
+    this._lock.lock();
+    this._lock.unlock();
     const key = this.hm.computeIfAbsent(id, k => {
       this.arrs.push([]);
       return this.arrs.length - 1;

@@ -56,8 +56,10 @@ const entSpawnReg = reg('spawnEntity', e => {
   }
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const step2Reg = reg('step', () => {
+  mobCandBucket._lock.lock();
   mobCandBucket.lock();
   mobCandBucket.clear();
+  mobCandBucket._lock.unlock();
   mobCand = mobCand.filter(e => {
     if (e.field_70128_L) return false;
     const n = e.func_70005_c_();
@@ -94,12 +96,12 @@ function boxMobsTick() {
     if (ents.length === 0) return true;
     const ent = ents.reduce((a, v) =>
       dist(a.field_70165_t, x) +
-      dist(a.field_70163_u, y) +
-      dist(a.field_70161_v, z) <
-      dist(v.field_70165_t, x) +
-      dist(v.field_70163_u, y) +
-      dist(v.field_70161_v, z) ? a : v,
-    ents[0]);
+        dist(a.field_70163_u, y) +
+        dist(a.field_70161_v, z) <
+        dist(v.field_70165_t, x) +
+        dist(v.field_70163_u, y) +
+        dist(v.field_70161_v, z) ? a : v,
+      ents[0]);
 
     let h = 2;
     const t = getBoxMobType(n);
