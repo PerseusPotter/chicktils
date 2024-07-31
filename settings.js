@@ -801,8 +801,9 @@ export const props = {
   moveFPSDisplay: new Property('MoveFPSDisplay', page, ++sort, Property.Type.Action),
 
   enablespotify: new Property('EnableSpotifyDisplay', page, ++sort, Property.Type.Toggle, false, { desc: 'shows current song playing on spotify, only works on windows + app version' }),
-  spotifyHideNotOpen: new Property('SpotifyHideIfNotOpened', page, ++sort, Property.Type.Toggle, true, { desc: 'hide if spotify is not opened' }),
   moveSpotifyDisplay: new Property('MoveSpotifyDisplay', page, ++sort, Property.Type.Action),
+  spotifyHideNotOpen: new Property('SpotifyHideIfNotOpened', page, ++sort, Property.Type.Toggle, true, { desc: 'hide if spotify is not opened' }),
+  spotifyMaxSongLength: new Property('SpotifyMaxSongLength', page, ++sort, Property.Type.Integer, 100, { desc: 'in pixels, 0 for uncapped length', min: 0 }),
 
   // 15
 

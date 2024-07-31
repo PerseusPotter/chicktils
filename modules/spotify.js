@@ -3,6 +3,7 @@ import data from '../data';
 import reg from '../util/registerer';
 import createTextGui from '../util/customtextgui';
 import { StateProp, StateVar } from '../util/state';
+import Marquee from '../util/marquee';
 
 const ProcessBuilder = Java.type('java.lang.ProcessBuilder');
 const Scanner = Java.type('java.util.Scanner');
@@ -18,15 +19,39 @@ const spotifyNames = {
  * @param {string} song
  */
 function formatSong(song) {
-  return '&2Spotify &7>&r ' + (spotifyNames[song] ?? '&a' + song.replace(/&([\da-fk-or])/g, '&🐀$1').replace(' - ', ' &7-&b '));
+  return spotifyNames[song] ?? '&a' + song.replace(/&([\da-fk-or])/g, '&🐀$1').replace(' - ', ' &7-&b ');
 }
 
 // const stateSpotifyPID = new StateVar(-1);
 const stateSpotifyOpen = new StateVar(false);
-const spotifyGui = createTextGui(() => data.spotifyDisplayLoc, () => [formatSong('Rick Astley - Never Gonna Give You Up')]);
+const spotifyPrefix = '&2Spotify &7>&r ';
+let spotifyPrefixDisplay = '';
+// Renderer.getStringWidth(' ') === 4
+function updatePrefix() {
+  spotifyPrefixDisplay = spotifyPrefix + ' '.repeat(settings.spotifyMaxSongLength / 4 / spotifyGui.getLoc().s);
+  spotifyGui.setLine(spotifyPrefixDisplay);
+}
+const spotifyPrefixLen = Renderer.getStringWidth(spotifyPrefix);
+const spotifyGui = createTextGui(() => data.spotifyDisplayLoc, () => [spotifyPrefixDisplay]);
+updatePrefix();
+spotifyGui.on('editRender', () => {
+  updatePrefix();
+  const loc = spotifyGui.getTrueLoc();
+  songMarquee.setText(formatSong('Rick Astley - Never Gonna Give You Up'));
+  songMarquee.render(loc.x + spotifyPrefixLen * loc.s, loc.y, loc.s, loc.b);
+});
+const songMarquee = new Marquee('Rick Astley - Never Gonna Give You Up');
+songMarquee.setMaxLen(settings.spotifyMaxSongLength);
+spotifyGui.on('editClose', () => updateReg.forceTrigger());
 
-const renderReg = reg('renderOverlay', () => spotifyGui.render(), 'spotify').setEnabled(new StateProp(settings._spotifyHideNotOpen).not().or(stateSpotifyOpen));
+const renderReg = reg('renderOverlay', () => {
+  if (spotifyGui.isEdit) return;
+  spotifyGui.render();
+  const loc = spotifyGui.getTrueLoc();
+  songMarquee.render(loc.x + spotifyPrefixLen * loc.s, loc.y, loc.s, loc.b);
+}, 'spotify').setEnabled(new StateProp(settings._spotifyHideNotOpen).not().or(stateSpotifyOpen));
 const updateReg = reg('step', () => {
+  if (spotifyGui.isEdit) return;
   const proc = new ProcessBuilder(
     'cmd.exe', '/s', '/c',
     'chcp', '65001',
@@ -46,17 +71,21 @@ const updateReg = reg('step', () => {
     let parts = line.split('","');
     let name = parts.slice(8).join('","').slice(0, -1);
     if (name === 'N/A') continue;
-    spotifyGui.setLine(formatSong(name));
+    songMarquee.setText(formatSong(name));
     stateSpotifyOpen.set(true);
     return;
   }
-  spotifyGui.setLine(formatSong('NOT OPENED'));
+  songMarquee.setText(formatSong('NOT OPENED'));
   stateSpotifyOpen.set(false);
   // proc.waitFor();
 }, 'spotify').setDelay(2);
 
 export function init() {
   settings._moveSpotifyDisplay.onAction(() => spotifyGui.edit());
+  settings._spotifyMaxSongLength.onAfterChange(v => {
+    songMarquee.setMaxLen(v);
+    updatePrefix();
+  });
 }
 export function load() {
   // stateSpotifyPID.set(-1);
