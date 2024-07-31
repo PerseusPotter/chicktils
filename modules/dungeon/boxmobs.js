@@ -86,9 +86,20 @@ function boxMobsTick() {
 
     let ents = mobCandBucket.get(e.field_70165_t, e.field_70161_v);
     if (!ents) return true;
-    ents = ents.filter(v => compareFloat(v.field_70165_t, x, 1) === 0 && compareFloat(v.field_70161_v, z, 1) === 0 && v.field_70163_u < y && y - v.field_70163_u < 5).filter(v => matchesMobType(n, v));
+    ents = ents.filter(v =>
+      compareFloat(v.field_70165_t, x, 2) === 0 &&
+      compareFloat(v.field_70161_v, z, 2) === 0 &&
+      compareFloat(v.field_70163_u, y, 5) === 0
+    ).filter(v => matchesMobType(n, v));
     if (ents.length === 0) return true;
-    const ent = ents.reduce((a, v) => dist(a.field_70165_t, x) + dist(a.field_70161_v, z) > dist(v.field_70165_t, x) - dist(v.field_70161_v, z) ? v : a, ents[0]);
+    const ent = ents.reduce((a, v) =>
+      dist(a.field_70165_t, x) +
+      dist(a.field_70163_u, y) +
+      dist(a.field_70161_v, z) <
+      dist(v.field_70165_t, x) +
+      dist(v.field_70163_u, y) +
+      dist(v.field_70161_v, z) ? a : v,
+    ents[0]);
 
     let h = 2;
     const t = getBoxMobType(n);
