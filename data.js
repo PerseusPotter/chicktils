@@ -69,7 +69,7 @@ function verifyTextLocation(value) {
   'spotifyDisplayLoc'
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
-  if (!verifyTextLocation(data[v])) resetTextLocation(v)
+  if (!verifyTextLocation(data[v])) resetTextLocation(v);
 });
 
 if (!data.statLocs || !Array.isArray(data.statLocs)) {
