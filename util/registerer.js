@@ -1,6 +1,6 @@
 import { inherits } from './polyfill';
 import { StateProp, StateVar } from './state';
-import { run } from './threading';
+import { run, wrap as wrapFunc } from './threading';
 
 function wrap(orig, wrap, prop) {
   return function(...args) {
@@ -309,7 +309,7 @@ reg = function reg(type, shit, modN) {
   const Threading = Java.type('gg.essential.api.utils.Multithreading');
   const MILLISECONDS = Java.type('java.util.concurrent.TimeUnit').MILLISECONDS;
   function ChickTilsStep(cb) {
-    ChickTilsRegister.call(this, cb);
+    ChickTilsRegister.call(this, wrapFunc(cb));
     this.offset = 0;
     this.delay = 0;
     this.future = null;

@@ -1,10 +1,12 @@
+import { wrap } from './threading';
+
 const Threading = Java.type('gg.essential.api.utils.Multithreading');
 const MILLISECONDS = Java.type('java.util.concurrent.TimeUnit').MILLISECONDS;
 const timers = [];
 // index will always be truthy
 let i = 1;
 export const _setTimeout = function(cb, t, thisCtx, ...args) {
-  timers[i] = Threading.schedule(() => cb.apply(thisCtx, args), t, MILLISECONDS);
+  timers[i] = Threading.schedule(wrap(cb.bind(thisCtx, ...(args || []))), t, MILLISECONDS);
   return i++;
 };
 export const _clearTimeout = function(index) {
