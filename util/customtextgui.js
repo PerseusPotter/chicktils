@@ -54,6 +54,7 @@ function setTextOfDisplayLineFuckChatTriggers(line, text) {
  *  addLine(str: string): CustomTextGui;
  *  addLines(strs: string[]): CustomTextGui;
  *  clearLines(): CustomTextGui;
+ *  getTrueLoc(): { x: number, y: number, s: number };
  * }} CustomTextGui
  */
 const displaysF = DisplayHandler.class.getDeclaredField('displays');
@@ -187,6 +188,20 @@ function createTextGui(getLoc, getEditText, str = '') {
     cll = 0;
     cstr = BLANK_STRING;
     return this;
+  };
+  obj.getTrueLoc = function() {
+    const loc = this.getLoc();
+    const w = this.isEdit ? editDisplay.display.getWidth() : this.display.getWidth();
+    // const h = this.display.getHeight();
+    const h = cll * loc.s * 10;
+    switch (loc.a) {
+      case 0: return { x: loc.x, y: loc.y, s: loc.s };
+      case 1: return { x: loc.x - w, y: loc.y, s: loc.s };
+      case 2: return { x: loc.x, y: loc.y - h, s: loc.s };
+      case 3: return { x: loc.x - w, y: loc.y - h, s: loc.s };
+      case 4: return { x: loc.x - w / 2, y: loc.y, s: loc.s };
+      default: return { x: NaN, y: NaN, s: NaN };
+    }
   };
 
   return obj;
