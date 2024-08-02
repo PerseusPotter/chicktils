@@ -301,7 +301,7 @@ const buildEndReg = reg('chat', () => hpOverlayReg.register(), 'kuudra').setCrit
 const dpsStartReg = reg('chat', () => {
   hideTitleReg.register();
   dirOverlayReg.register();
-}, 'kuudra').setChatCriteria('&e[NPC] &cElle&f: &rPOW! SURELY THAT\'S IT! I don\'t think he has any more in him!&r');
+}, 'kuudra').setChatCriteria('&e[NPC] &cElle&f: &rPOW! SURELY THAT\'S IT! I don\'t think he has any more in him!&r').setEnabled(isT5);
 const kuudraEndReg = reg('chat', () => reset(), 'kuudra').setChatCriteria('&r&f                               &r&6&lKUUDRA DOWN!&r');
 const kuudraLeaveReg = reg('worldUnload', () => reset(), 'kuudra');
 
