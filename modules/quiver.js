@@ -3,6 +3,7 @@ import data from '../data';
 import createTextGui from '../util/customtextgui';
 import { cleanNumber, colorForNumber } from '../util/format';
 import reg from '../util/registerer';
+import { unrun } from '../util/threading';
 
 const display = createTextGui(() => data.quiverLoc, () => ['&5Flint Arrow &fx&26969'].concat(settings.quiverShowRefill ? ['&fRefill: &9Social Life &fx&d6969 &8(Instant: &9&d6969&8)'] : []));
 const quivSizes = {
@@ -95,48 +96,50 @@ const arrowTypes = {
 let shouldRender = false;
 const renderReg = reg('renderOverlay', () => shouldRender && display.render(), 'quiver');
 const updateReg = reg('step', () => {
-  shouldRender = false;
-  const inv = Player.getInventory();
-  if (!inv) return;
-  const item = inv.getStackInSlot(8);
-  if (!item) return;
-  const n = item.getRegistryName();
-  if (n !== 'minecraft:feather' && n !== 'minecraft:arrow') return;
+  unrun(() => {
+    shouldRender = false;
+    const inv = Player.getInventory();
+    if (!inv) return;
+    const item = inv.getStackInSlot(8);
+    if (!item) return;
+    const n = item.getRegistryName();
+    if (n !== 'minecraft:feather' && n !== 'minecraft:arrow') return;
 
-  const lore = item.getLore()[5];
-  if (!lore) return;
-  const m = lore.match(/^§5§o§7Active Arrow: (§.+?) §7\(§e(\d+)§7\)$/);
-  if (!m) return;
-  shouldRender = true;
-  const a = m[1];
-  const c = +m[2];
-  const maxSize = quivSizes[settings.quiverSize] || quivSizes.Giant;
-  display.clearLines();
-  display.addLine(`${a} &fx${colorForNumber(c, maxSize)}${c}`);
-  if (settings.quiverShowRefill && c / maxSize < settings.quiverShowRefillThresh) {
-    const missing = maxSize - c;
-    const data = arrowTypes[a];
-    if (!data) return;
-    const stacks = Math.floor(missing / (64 * (data.stackSize || 1)));
-    if (stacks <= 0) return;
-    const cost = (function() {
-      switch (settings.quiverRefillCost) {
-        case 'Instant': return data.instCost;
-        case 'Individual': return data.stackCost;
-        case 'Jax': return data.jaxCost || data.instCost;
-        case 'Ophelia': return data.instCost;
+    const lore = item.getLore()[5];
+    if (!lore) return;
+    const m = lore.match(/^§5§o§7Active Arrow: (§.+?) §7\(§e(\d+)§7\)$/);
+    if (!m) return;
+    shouldRender = true;
+    const a = m[1];
+    const c = +m[2];
+    const maxSize = quivSizes[settings.quiverSize] || quivSizes.Giant;
+    display.clearLines();
+    display.addLine(`${a} &fx${colorForNumber(c, maxSize)}${c}`);
+    if (settings.quiverShowRefill && c / maxSize < settings.quiverShowRefillThresh) {
+      const missing = maxSize - c;
+      const data = arrowTypes[a];
+      if (!data) return;
+      const stacks = Math.floor(missing / (64 * (data.stackSize || 1)));
+      if (stacks <= 0) return;
+      const cost = (function() {
+        switch (settings.quiverRefillCost) {
+          case 'Instant': return data.instCost;
+          case 'Individual': return data.stackCost;
+          case 'Jax': return data.jaxCost || data.instCost;
+          case 'Ophelia': return data.instCost;
+        }
+      }()) * stacks;
+      let costStr;
+      if (data.sackable) costStr = cleanNumber(cost, 1);
+      else {
+        const costStacks = cost >> 6;
+        const costItems = cost & 63;
+        if (costStacks > 0) costStr = `${costStacks}s ${costItems}`;
+        else costStr = costItems.toString();
       }
-    }()) * stacks;
-    let costStr;
-    if (data.sackable) costStr = cleanNumber(cost, 1);
-    else {
-      const costStacks = cost >> 6;
-      const costItems = cost & 63;
-      if (costStacks > 0) costStr = `${costStacks}s ${costItems}`;
-      else costStr = costItems.toString();
+      display.addLine(`&fRefill: ${data.unit} &fx&d${costStr}`);
     }
-    display.addLine(`&fRefill: ${data.unit} &fx&d${costStr}`);
-  }
+  });
 }, 'quiver').setFps(5);
 
 export function init() {
