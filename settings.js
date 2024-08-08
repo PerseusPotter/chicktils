@@ -50,13 +50,7 @@ export class Property extends StateVar {
     if (this.type === Property.Type.Action) return;
     if (v === this.value) {
       if (force) this.trigger();
-      return;
-    }
-    this.validate(v);
-    this.listeners0.forEach(cb => cb(v, old));
-    const old = this.value;
-    this.value = v;
-    this.listeners1.forEach(cb => cb(v, old));
+    } else super.set(v);
   }
   validate(v) {
     switch (this.type) {
