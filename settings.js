@@ -32,6 +32,7 @@ export class Property extends StateVar {
    * @param {{ desc: string, min: number, max: number, len: number, options: string[] }} opts
    */
   constructor(name, page, pageSort, type, defaultValue, { desc = '', min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY, len = Number.POSITIVE_INFINITY, options = [] } = {}) {
+    super(defaultValue);
     if (name.includes(' ')) throw 'bad parser deal with it';
     this.name = name;
     this.desc = desc;
