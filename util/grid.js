@@ -8,6 +8,7 @@ export default class Grid {
   oldArrs;
   locked = false;
   _lock = new (Java.type('java.util.concurrent.locks.ReentrantLock'))();
+  queue = [];
   constructor({ size = 1, key = 631, addNeighbors = 0 } = {}) {
     this.size = size;
     this.key = key;
@@ -38,6 +39,10 @@ export default class Grid {
   }
 
   add(x, z, item) {
+    if (this._lock.isLocked()) {
+      this.queue.push([x, z, item]);
+      return;
+    }
     const id = this._getId(x, z);
     this._addWithId(id, item);
     if (this.addNeighbors > 0) {
@@ -61,17 +66,26 @@ export default class Grid {
     else this.hm.clear();
     this.arrs = [];
   }
-  // stfu ok
-  lock() {
+  freeze() {
     if (this.locked) return;
     this.oldHm = this.hm;
     this.oldArrs = this.arrs;
     this.locked = true;
   }
-  unlock() {
+  unfreeze() {
     if (!this.locked) return;
     this.locked = false;
     this.oldHm = null;
     this.oldArrs = null;
+  }
+  lock() {
+    this._lock.lock();
+  }
+  unlock() {
+    this._lock.unlock();
+    if (this.queue.length > 0) {
+      this.queue.forEach(v => this.add(v[0], v[1], v[2]));
+      this.queue = [];
+    }
   }
 }
