@@ -23,10 +23,10 @@ const entSpawnReg = reg('spawnEntity', e => {
   } else if (e instanceof EntityItem) itemCand.push(e);
 }, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
-  allMobsBucket._lock.lock();
   allMobsBucket.lock();
+  allMobsBucket.freeze();
   allMobsBucket.clear();
-  allMobsBucket._lock.unlock();
+  allMobsBucket.unlock();
   allMobs = allMobs.filter(e => {
     if (e.field_70128_L) return false;
     if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) return false;
@@ -34,7 +34,7 @@ const step2Reg = reg('step', () => {
     allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
     return true;
   });
-  allMobsBucket.unlock();
+  allMobsBucket.unfreeze();
 }, 'dungeon/boxicesprayed').setFps(2).setOffset(0).setEnabled(settings._dungeonBoxIceSprayed);
 const serverTickReg = reg('packetReceived', () => {
   frozenMobs = frozenMobs.filter(v => --v[1] > 0);
