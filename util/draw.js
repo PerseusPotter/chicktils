@@ -824,7 +824,7 @@ export class JavaColorWrapper {
    */
   constructor(prop) {
     this.cache = rgbaToJavaColor(prop.valueOf());
-    prop.onAfterChange(v => this.cache = rgbaToJavaColor(v));
+    prop.listen(v => this.cache = rgbaToJavaColor(v));
   }
   get() {
     return this.cache;

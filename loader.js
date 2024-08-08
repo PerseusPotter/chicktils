@@ -52,8 +52,8 @@ export function unloadModule(name) {
 }
 
 export function postInit() {
-  JSON.parse(FileLib.read('chicktils', 'modules/modules.json')).forEach(n => settings['_enable' + n].onAfterChange(v => moduleEnableListener(n, v)));
-  settings._enableGlobal.onAfterChange(v => v ? load() : unload());
+  JSON.parse(FileLib.read('chicktils', 'modules/modules.json')).forEach(n => settings['_enable' + n].listen(v => moduleEnableListener(n, v)));
+  settings._enableGlobal.listen(v => v ? load() : unload());
 }
 
 function moduleEnableListener(name, value) {

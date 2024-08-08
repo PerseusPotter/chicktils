@@ -306,7 +306,7 @@ const fixStReg = reg('command', () => {
 }, 'diana').setName('ctsmanualfixstdiana').setEnabled(new StateVar(Boolean(GriffinBurrows)));
 
 export function init() {
-  settings._dianaAlertFoundBurrowSound.onAfterChange(v => burrowFoundAlert.sound = v);
+  settings._dianaAlertFoundBurrowSound.listen(v => burrowFoundAlert.sound = v);
 }
 export function load() {
   warpOpenReg.register();

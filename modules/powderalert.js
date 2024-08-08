@@ -35,7 +35,7 @@ const renderReg = reg('renderWorld', () => {
 }, 'powderalert');
 
 export function init() {
-  settings._powderAlertSound.onAfterChange(v => chestAlert.sound = v);
+  settings._powderAlertSound.listen(v => chestAlert.sound = v);
 }
 export function load() {
   startReg.register();

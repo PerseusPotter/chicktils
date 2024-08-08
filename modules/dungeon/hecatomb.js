@@ -46,7 +46,7 @@ export function init() {
         break;
     }
   });
-  settings._dungeonHecatombAlertSound.onAfterChange(v => hecAlert.sound = v);
+  settings._dungeonHecatombAlertSound.listen(v => hecAlert.sound = v);
 }
 export function start() {
 

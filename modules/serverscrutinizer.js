@@ -214,10 +214,10 @@ const rendOvFps = reg('renderOverlay', () => {
 export function init() {
   settings._moveTPSDisplay.onAction(() => tpsDisplay.edit());
   settings._moveLastTickDisplay.onAction(() => lastTickDisplay.edit());
-  settings._serverScrutinizerTPSMaxAge.onAfterChange(v => ticks.maxAge = v);
-  settings._serverScrutinizerTPSDisplayCap20.onAfterChange(v => ticks.cap = v ? 20 : Number.POSITIVE_INFINITY);
+  settings._serverScrutinizerTPSMaxAge.listen(v => ticks.maxAge = v);
+  settings._serverScrutinizerTPSDisplayCap20.listen(v => ticks.cap = v ? 20 : Number.POSITIVE_INFINITY);
   settings._moveFPSDisplay.onAction(() => fpsDisplay.edit());
-  settings._serverScrutinizerFPSMaxAge.onAfterChange(v => frames.maxAge = v);
+  settings._serverScrutinizerFPSMaxAge.listen(v => frames.maxAge = v);
 }
 export function load() {
   ticks.clear();

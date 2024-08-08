@@ -429,7 +429,7 @@ const sendMessageReg = reg('messageSent', (msg, evn) => {
 }, 'chattils').setEnabled(new StateProp(settings._chatTilsEssential).and(stateEssentialDM));
 
 export function init() {
-  settings._chatTilsWaypointDuration.onBeforeChange(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
+  settings._chatTilsWaypointDuration.listen(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
 }
 export function load() {
   blockNameCmd.register();

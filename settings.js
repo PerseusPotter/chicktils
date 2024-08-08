@@ -3,6 +3,7 @@
 import convertToAmaterasu from './settingsAmaterasu';
 import { centerMessage } from './util/format';
 import { log } from './util/log';
+import { StateVar } from './util/state';
 import { run } from './util/threading';
 
 // if reloading modules without cache it resets settings :(
@@ -10,7 +11,7 @@ let isMainSettings = false;
 export function setIsMain() {
   isMainSettings = true;
 };
-export class Property {
+export class Property extends StateVar {
   static Type = {
     Toggle: 0,
     Integer: 1,
@@ -46,7 +47,10 @@ export class Property {
   }
   set(v, force) {
     if (this.type === Property.Type.Action) return;
-    if (!force && v === this.value) return;
+    if (v === this.value) {
+      if (force) this.trigger();
+      return;
+    }
     this.validate(v);
     this.listeners0.forEach(cb => cb(v, old));
     const old = this.value;
@@ -294,19 +298,6 @@ export class Property {
       case Property.Type.Action: return this.value;
     }
   }
-
-  /**
-   * @param {(this: Property, newValue: string | number | boolean, oldValue: string | number | boolean) => void} cb
-   */
-  onBeforeChange(cb) {
-    this.listeners0.push(cb);
-  }
-  /**
-   * @param {(this: Property, newValue: string | number | boolean, oldValue: string | number | boolean) => void} cb
-   */
-  onAfterChange(cb) {
-    this.listeners1.push(cb);
-  }
   /**
    * @param {(this: Property) => void} cb
    */
@@ -347,7 +338,7 @@ class Settings {
     this.props = p.map(v => {
       this[v[0]] = v[1].valueOf();
       this['_' + v[0]] = v[1];
-      v[1].onAfterChange(() => this[v[0]] = v[1].valueOf());
+      v[1].listen(() => this[v[0]] = v[1].valueOf());
       return v[1];
     });
     this.pageNames = pageNames;
@@ -397,13 +388,6 @@ class Settings {
           )
       )
     );
-  }
-
-  refresh() {
-    this.props.forEach(p => {
-      p.listeners0.forEach(v => v(p.value, p.value));
-      p.listeners1.forEach(v => v(p.value, p.value));
-    });
   }
 
   prevMsgs = [];

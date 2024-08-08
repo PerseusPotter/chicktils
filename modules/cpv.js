@@ -91,7 +91,7 @@ const cmdReg = reg('command', cpv, 'cpv').setTabCompletions(autocomplete).setNam
 const neuOverride = reg('command', cpv, 'cpv').setTabCompletions(autocomplete).setName('pv', true).setEnabled(settings._cpvReplaceNeu);
 
 export function init() {
-  settings._cpvAutoCompleteParty.onAfterChange(v => {
+  settings._cpvAutoCompleteParty.listen(v => {
     if (v) Party.listen();
     else Party.unlisten();
   });

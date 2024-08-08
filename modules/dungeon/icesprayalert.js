@@ -15,7 +15,7 @@ const step2Reg = reg('step', () => {
 }, 'dungeon/icesprayalert').setFps(2).setOffset(500 / 3 * 2).setEnabled(new StateProp(stateIsInBoss).not().and(settings._dungeonIceSprayAlert));
 
 export function init() {
-  settings._dungeonIceSprayAlertSound.onAfterChange(v => iceSprayAlert.sound = v);
+  settings._dungeonIceSprayAlertSound.listen(v => iceSprayAlert.sound = v);
 }
 export function start() {
   ents = [];

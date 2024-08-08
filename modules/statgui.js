@@ -81,7 +81,7 @@ const updateReg = reg('step', () => {
 
 export function init() {
   locs.forEach((_, i) => {
-    settings['_loc' + i].onAfterChange(() => loadListeners());
+    settings['_loc' + i].listen(() => loadListeners());
     settings['_moveLoc' + i].onAction(() => editLocation(i));
   });
 }

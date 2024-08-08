@@ -15,15 +15,7 @@ export class StateVar {
     this.hooks.push(cb);
   }
   trigger() {
-    this.hooks.forEach(v => v());
-  }
-  /**
-   * @param {import('../settings').Property} p
-   */
-  static wrapProp(p) {
-    const s = new StateVar(p.valueOf());
-    p.onAfterChange(v => s.set(v));
-    return s;
+    this.hooks.forEach(v => v(this.value));
   }
 };
 
@@ -45,7 +37,7 @@ export class StateProp extends StateVar {
   };
   constructor(val) {
     super();
-    this.left = val.onAfterChange ? StateVar.wrapProp(val) : val instanceof StateVar ? val : new StateVar(val);
+    this.left = val instanceof StateVar ? val : new StateVar(val);
     this.add(this.left);
     this.op = StateProp.Operator.IDENTITY;
     this.dirt = true;
