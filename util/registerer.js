@@ -139,7 +139,6 @@ reg = function reg(type, shit, modN) {
     else _unregister();
   });
   const _setEnabled = wrap(rr, prox, val => {
-    if (!(val instanceof StateVar)) val = StateVar.wrapProp(val);
     regReq = val;
     regReq.listen(_update);
     _update();

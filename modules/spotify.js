@@ -82,7 +82,7 @@ const updateReg = reg('step', () => {
 
 export function init() {
   settings._moveSpotifyDisplay.onAction(() => spotifyGui.edit());
-  settings._spotifyMaxSongLength.onAfterChange(v => {
+  settings._spotifyMaxSongLength.listen(v => {
     songMarquee.setMaxLen(v);
     updatePrefix();
   });

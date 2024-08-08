@@ -13,7 +13,7 @@ const titleReg = reg('renderTitle', (t, s, evn) => {
 }, 'dungeon/dev4helper').setEnabled(new StateProp(settings._dungeonDev4Helper).equalsmult('Titles', 'Both').and(stateIsAtDev4));
 
 export function init() {
-  settings._dungeonDev4Helper.onAfterChange(v => v === 'None' && stateIsAtDev4.set(false));
+  settings._dungeonDev4Helper.listen(v => v === 'None' && stateIsAtDev4.set(false));
 }
 export function start() {
   stateIsAtDev4.set(false);

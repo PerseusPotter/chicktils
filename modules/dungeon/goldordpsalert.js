@@ -21,8 +21,8 @@ const goldorDpsStartReg = reg('chat', () => stateIsInGoldorDps.set(false), 'dung
 export function init() {
   registerTrackPlayers(stateGoldorDps);
 
-  settings._dungeonGoldorDpsStartAlert.onAfterChange(v => !v && stateIsInGoldorDps.set(false));
-  settings._dungeonGoldorDpsStartAlertSound.onAfterChange(v => goldorDpsStartAlert.sound = v);
+  settings._dungeonGoldorDpsStartAlert.listen(v => !v && stateIsInGoldorDps.set(false));
+  settings._dungeonGoldorDpsStartAlertSound.listen(v => goldorDpsStartAlert.sound = v);
 }
 export function start() {
   stateIsInGoldorDps.set(false);
