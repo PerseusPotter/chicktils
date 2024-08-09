@@ -1,4 +1,4 @@
-import { renderOutline, drawArrow2D, getRenderX, getRenderY, getRenderZ, renderBeaconBeam, renderLine3D, renderString, rgbaToARGB, renderWaypoint } from '../util/draw';
+import { renderOutline, drawArrow2D, getRenderX, getRenderY, getRenderZ, renderBeaconBeam, renderLine3D, renderString, renderWaypoint } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
@@ -108,7 +108,7 @@ const renderReg = reg('renderWorld', () => {
       );
       renderLine3D(c, x - 1, y, z - 1, x + 1, y, z + 1, true, 5);
       renderLine3D(c, x - 1, y, z + 1, x + 1, y, z - 1, true, 5);
-      renderString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x, y + 1, z, rgbaToARGB(c));
+      renderString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x, y + 1, z, c);
     });
   }
   if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => renderWaypoint(v.x, v.y, v.z, 1, 1, settings.kuudraEmptySupplySpotColor, true));
