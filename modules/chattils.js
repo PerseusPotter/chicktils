@@ -344,7 +344,10 @@ ConnectionManager.registerPacketHandler(Java.type('gg.essential.connectionmanage
         !EssentialConfig.INSTANCE.getEssentialFull()
       ) return;
 
-      UUIDUtil.getName(message.getSender()).thenAcceptAsync(name => onEssentialMessage(name, message.getContents())).exceptionally(err => log('&cfailed to get name of sender'));
+      UUIDUtil.getName(message.getSender()).thenAcceptAsync(name => {
+        chatManager.updateReadState(message, true);
+        onEssentialMessage(name, message.getContents());
+      }).exceptionally(err => log('&cfailed to get name of sender'));
       if (!settings.chatTilsEssentialNotif) return;
       const url = HttpUrl.parse(message.getContents());
       if (url && url.host() === 'essential.gg') {
