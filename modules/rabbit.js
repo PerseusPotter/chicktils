@@ -15,13 +15,18 @@ const eggFoundAlert = createAlert('Egg Found !');
 let eggs = [];
 let activeEggs = [2, 2, 2];
 let lastSpawnDays = [0, 0, 0];
-const unloadReg = reg('worldUnload', () => eggs = [], 'rabbit').setEnabled(stateIsSpring);
+const unloadReg = reg('worldUnload', () => {
+  eggs = [];
+  list = [];
+}, 'rabbit').setEnabled(stateIsSpring);
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
+let list = [];
 function scanEgg() {
   if (!settings.rabbitSniffer) return;
+  unrun(() => list = World.getAllEntitiesOfType(EntityArmorStand));
   run(() => {
     const l = eggs.length;
-    eggs = World.getAllEntitiesOfType(EntityArmorStand).filter(v => {
+    eggs = list.filter(v => {
       const nbt = v.entity.func_71124_b(4)?.func_77978_p();
       if (!nbt) return false;
       const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
