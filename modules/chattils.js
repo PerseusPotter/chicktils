@@ -1,7 +1,7 @@
 import settings from '../settings';
 import { renderBeaconBeam, renderOutline, renderString, renderWaypoint } from '../util/draw';
 import { execCmd, getPlayerName } from '../util/format';
-import { getLeader } from '../util/party';
+import { getLeader, getMembers, isInParty, isLeader, listen, unlisten } from '../util/party';
 import { log, logMessage } from '../util/log';
 import reg from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
@@ -366,6 +366,10 @@ ConnectionManager.registerPacketHandler(Java.type('gg.essential.connectionmanage
 }));
 function onEssentialMessage(ign, msg) {
   essentialChatCb(ign, msg);
+  if (settings.chatTilsEssentialForwardPartyDms && isLeader()) {
+    const lign = ign.toLowerCase();
+    if (Array.from(getMembers().keys()).some(v => v.toLowerCase() === lign)) ChatLib.command(`pc "${msg}" -${ign}`);
+  }
   lastEssentialDMIGN = ign;
   if (settings.chatTilsEssentialPing) World.playSound('random.orb', 1, 1);
   // the &r&7 is different than hypixel, but quick fix for links turning into r7link
@@ -415,6 +419,11 @@ const essRCmdReg = reg('command', essRCmd, 'chattils').setName('re').setEnabled(
 const essROCmdReg = reg('command', essRCmd, 'chattils').setName('r', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const essFCmdReg = reg('command', essFCmd, 'chattils').setName('fe').setEnabled(settings._chatTilsEssential);
 const essFOCmdReg = reg('command', essFCmd, 'chattils').setName('f', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const essPCCmdReg = reg('command', ...args => {
+  if (!args || !args.length) return;
+  if (!isInParty() || isLeader()) return ChatLib.command('pc ' + args.join(' '));
+  sendEssentialMessage(getLeader(), args.join(' '));
+}, 'chattils').setName('pc', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialRedirectPartyChat));
 const chatCmdReg = reg('command', ...args => {
   if (!args) args = [];
   args.unshift('chat');
@@ -429,6 +438,7 @@ const sendMessageReg = reg('messageSent', (msg, evn) => {
 
 export function init() {
   settings._chatTilsWaypointDuration.listen(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
+  (new StateProp(settings._chatTilsEssentialForwardPartyDms).or(settings._chatTilsEssentialRedirectPartyChat)).listen(v => v ? listen() : unlisten());
 }
 export function load() {
   blockNameCmd.register();
@@ -454,6 +464,7 @@ export function load() {
   essROCmdReg.register();
   essFCmdReg.register();
   essFOCmdReg.register();
+  essPCCmdReg.register();
   chatCmdReg.register();
   sendMessageReg.register();
 }
@@ -481,6 +492,7 @@ export function unload() {
   essROCmdReg.unregister();
   essFCmdReg.unregister();
   essFOCmdReg.unregister();
+  essPCCmdReg.unregister();
   chatCmdReg.unregister();
   sendMessageReg.unregister();
 }
