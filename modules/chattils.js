@@ -131,7 +131,7 @@ const wisperToReg = reg('chat', msg => {
   processMessageWaypoint(Player.getName(), msg);
 }, 'chattils').setCriteria('&dTo ${*}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const wisperFromReg = reg('chat', (ign, msg) => {
-  if (settings.chatTilsEssentialOverrideCommands) lastEssentialDMIGN = ign;
+  if (settings.chatTilsEssentialOverrideCommands) lastEssentialDMIGN = getPlayerName(ign);
   processMessageWaypoint(ign, msg);
 }, 'chattils').setCriteria('&dFrom ${ign}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const guildChatReg = reg('chat', (ign, msg) => {
