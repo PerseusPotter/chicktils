@@ -131,7 +131,7 @@ const wisperToReg = reg('chat', msg => {
   processMessageWaypoint(Player.getName(), msg);
 }, 'chattils').setCriteria('&dTo ${*}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const wisperFromReg = reg('chat', (ign, msg) => {
-  lastDMIGN = ign;
+  if (settings.chatTilsEssentialOverrideCommands) lastEssentialDMIGN = ign;
   processMessageWaypoint(ign, msg);
 }, 'chattils').setCriteria('&dFrom ${ign}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const guildChatReg = reg('chat', (ign, msg) => {
@@ -373,7 +373,6 @@ function onEssentialMessage(ign, msg) {
 }
 const stateEssentialDM = new StateVar('');
 let lastEssentialDMIGN = '';
-let lastDMIGN = '';
 function sendEssentialMessage(ign, msg) {
   const lign = ign.toLowerCase();
   const friend = (new EssentialFriendArgumentParser()).getFriends().find(v => v.getIgn().toLowerCase() === lign);
@@ -395,9 +394,9 @@ function essWCmd(...args) {
   }
   sendEssentialMessage(ign, msg);
 }
-function essRCmd(ov, ...args) {
+function essRCmd(...args) {
   if (!args || !args.length) return log('&cincorrect usage');
-  const ign = ov ? lastDMIGN : lastEssentialDMIGN;
+  const ign = lastEssentialDMIGN;
   if (!ign) return log('&cno one to reply to :(');
   sendEssentialMessage(ign, args.join(' '));
 }
@@ -412,8 +411,8 @@ const essWCmdReg = reg('command', essWCmd, 'chattils').setName('we').setEnabled(
 const essWOCmdReg = reg('command', essWCmd, 'chattils').setName('w', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const essTCmdReg = reg('command', essWCmd, 'chattils').setName('te').setEnabled(settings._chatTilsEssential);
 const essTOCmdReg = reg('command', essWCmd, 'chattils').setName('t', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
-const essRCmdReg = reg('command', essRCmd.bind({}, false), 'chattils').setName('re').setEnabled(settings._chatTilsEssential);
-const essROCmdReg = reg('command', essRCmd.bind({}, true), 'chattils').setName('r', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const essRCmdReg = reg('command', essRCmd, 'chattils').setName('re').setEnabled(settings._chatTilsEssential);
+const essROCmdReg = reg('command', essRCmd, 'chattils').setName('r', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const essFCmdReg = reg('command', essFCmd, 'chattils').setName('fe').setEnabled(settings._chatTilsEssential);
 const essFOCmdReg = reg('command', essFCmd, 'chattils').setName('f', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const chatCmdReg = reg('command', ...args => {
