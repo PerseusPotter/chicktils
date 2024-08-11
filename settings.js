@@ -441,6 +441,10 @@ class Settings {
       log(`Set ${p.name} to ${p.toString()}`);
     }
   }
+
+  refresh() {
+    this.props.forEach(v => v.trigger());
+  }
 }
 
 let page = 0;
