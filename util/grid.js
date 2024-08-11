@@ -20,12 +20,12 @@ export default class Grid {
   }
   _addWithId(id, item) {
     this._lock.lock();
-    this._lock.unlock();
     const key = this.hm.computeIfAbsent(id, k => {
       this.arrs.push([]);
       return this.arrs.length - 1;
     });
     this.arrs[key].push(item);
+    this._lock.unlock();
   }
   _getById(id, tries = 1) {
     try {
