@@ -376,6 +376,7 @@ function onEssentialMessage(ign, msg) {
   ChatLib.chat(`&dFrom &b[ESSENTIAL] ${ign}&7:&r&7 ${msg}&r`);
 }
 const stateEssentialDM = new StateVar('');
+const partyChatEssentialDm = 'this is a party chat';
 let lastEssentialDMIGN = '';
 function sendEssentialMessage(ign, msg) {
   const lign = ign.toLowerCase();
@@ -411,6 +412,9 @@ function essFCmd(...args) {
     log(`&aSent Essential friend request to ${args[0]}`);
   }).exceptionally(err => log('&cfailed to get uuid of ign'));
 }
+function essPCmd(msg) {
+  sendEssentialMessage(getLeader(), '/pc ' + msg);
+}
 const essWCmdReg = reg('command', essWCmd, 'chattils').setName('we').setEnabled(settings._chatTilsEssential);
 const essWOCmdReg = reg('command', essWCmd, 'chattils').setName('w', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const essTCmdReg = reg('command', essWCmd, 'chattils').setName('te').setEnabled(settings._chatTilsEssential);
@@ -422,18 +426,25 @@ const essFOCmdReg = reg('command', essFCmd, 'chattils').setName('f', true).setEn
 const essPCCmdReg = reg('command', ...args => {
   if (!args || !args.length) return;
   if (!isInParty() || isLeader()) return ChatLib.command('pc ' + args.join(' '));
-  sendEssentialMessage(getLeader(), '/pc ' + args.join(' '));
+  essPCmd(args.join(' '));
 }, 'chattils').setName('pc', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialRedirectPartyChat));
 const chatCmdReg = reg('command', ...args => {
   if (!args) args = [];
-  args.unshift('chat');
-  ChatLib.command(args.join(' '));
-  stateEssentialDM.set('');
+  if (settings.chatTilsEssentialRedirectPartyChat && (args[0] === 'p' || args[0] === 'party')) {
+    if (stateEssentialDM.get() === partyChatEssentialDm) log('&cYou\'re already in this channel!');
+    else log('&aYou are now in the &6PARTY &achannel');
+    stateEssentialDM.set(partyChatEssentialDm);
+  } else {
+    args.unshift('chat');
+    ChatLib.command(args.join(' '));
+    stateEssentialDM.set('');
+  }
 }, 'chattils').setName('chat', true).setEnabled(settings._chatTilsEssential);
 const sendMessageReg = reg('messageSent', (msg, evn) => {
   if (msg.startsWith('/')) return;
   cancel(evn);
-  sendEssentialMessage(stateEssentialDM.get(), msg);
+  if (stateEssentialDM.get() === partyChatEssentialDm) essPCmd(msg);
+  else sendEssentialMessage(stateEssentialDM.get(), msg);
 }, 'chattils').setEnabled(new StateProp(settings._chatTilsEssential).and(stateEssentialDM));
 
 export function init() {

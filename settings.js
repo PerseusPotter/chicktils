@@ -743,7 +743,7 @@ export const props = {
   chatTilsEssentialNotif: new Property('ChatTilsEssentialNotification', page, ++sort, Property.Type.Toggle, false, { desc: 'send Essential notification on recieve message' }),
   chatTilsEssentialOverrideCommands: new Property('ChatTilsBetterEssentialOverrideCommands', page, ++sort, Property.Type.Toggle, false, { desc: 'override the /w, /t, /r, and /f commands to be Essential ones' }),
   chatTilsEssentialForwardPartyDms: new Property('ChatTilsEssentialForwardPartyDms', page, ++sort, Property.Type.Toggle, false, { desc: 'when leader in a party, any essential dms from party members will be forwarded to party chat' }),
-  chatTilsEssentialRedirectPartyChat: new Property('ChatTilsEssentialRedirectPartyChat', page, ++sort, Property.Type.Toggle, false, { desc: 'redirect /pc to message leader on essentials' }),
+  chatTilsEssentialRedirectPartyChat: new Property('ChatTilsEssentialRedirectPartyChat', page, ++sort, Property.Type.Toggle, false, { desc: 'redirect /pc to message leader on essentials\nalso enables /chat p and /chat party' }),
 
   // 13
   enablediana: new Property('EnableDiana', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'requires skytils to work (not the meow solver)' }),
