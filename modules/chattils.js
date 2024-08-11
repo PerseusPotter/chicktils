@@ -366,9 +366,9 @@ ConnectionManager.registerPacketHandler(Java.type('gg.essential.connectionmanage
 }));
 function onEssentialMessage(ign, msg) {
   essentialChatCb(ign, msg);
-  if (settings.chatTilsEssentialForwardPartyDms && isLeader()) {
+  if (settings.chatTilsEssentialForwardPartyDms && isLeader() && msg.startsWith('/pc ')) {
     const lign = ign.toLowerCase();
-    if (Array.from(getMembers().keys()).some(v => v.toLowerCase() === lign)) ChatLib.command(`pc "${msg}" -${ign}`);
+    if (Array.from(getMembers().keys()).some(v => v.toLowerCase() === lign)) ChatLib.command(`pc "${msg.slice('/pc '.length)}" -${ign}`);
   }
   lastEssentialDMIGN = ign;
   if (settings.chatTilsEssentialPing) World.playSound('random.orb', 1, 1);
@@ -422,7 +422,7 @@ const essFOCmdReg = reg('command', essFCmd, 'chattils').setName('f', true).setEn
 const essPCCmdReg = reg('command', ...args => {
   if (!args || !args.length) return;
   if (!isInParty() || isLeader()) return ChatLib.command('pc ' + args.join(' '));
-  sendEssentialMessage(getLeader(), args.join(' '));
+  sendEssentialMessage(getLeader(), '/pc ' + args.join(' '));
 }, 'chattils').setName('pc', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialRedirectPartyChat));
 const chatCmdReg = reg('command', ...args => {
   if (!args) args = [];
