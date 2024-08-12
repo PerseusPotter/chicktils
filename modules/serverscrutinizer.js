@@ -130,7 +130,7 @@ let lastTickTime = Date.now();
 const ticks = new TickInfo(settings.serverScrutinizerTPSMaxAge, 1_000, settings.serverScrutinizerTPSDisplayCap20 ? 20 : undefined);
 
 const serverTickReg = reg('packetReceived', pack => {
-  if (pack.func_148888_e()) return;
+  if (pack.func_148890_d() > 0) return;
   const t = Date.now();
   ticks.add(t);
   lastTickTime = t;
