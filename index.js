@@ -195,6 +195,7 @@ if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
 }
 
 const worldLoadOnce = register('worldLoad', () => {
+  worldLoadOnce.unregister();
   new Thread(() => {
     Thread.sleep(1000);
     // TODO: check for skyblock
@@ -202,7 +203,6 @@ const worldLoadOnce = register('worldLoad', () => {
     if (settings.autoUpdate && tryUpdate(1000) !== -1) { }
     else loadMod();
 
-    worldLoadOnce.unregister();
   }).start();
 });
 
