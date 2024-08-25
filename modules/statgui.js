@@ -69,6 +69,7 @@ const unloadReg = reg('worldUnload', unloadListeners, 'statgui');
 
 const renderReg = reg('renderOverlay', () => display.render(), 'statgui');
 const updateReg = reg('step', () => {
+  // extremely rare concurrent mod, could run in main thread but not worth :)
   const lines = TabList.getNames();
   // locs[16] === 'Catacombs'
   const startI = (currLoc === 16 ? lines.findIndex(v => v.startsWith('§r§e§lSkills:')) : lines.indexOf('§r§e§lStats:§r'));
