@@ -46,7 +46,7 @@ function setTextOfDisplayLineFuckChatTriggers(line, text) {
  *  getLoc: () => import('../data').TextLocation;
  *  isEdit: boolean;
  *  getEditText: () => string[];
- *  str: string;
+ *  customEditMsg: string;
  *  edit(): void;
  *  render(): void;
  *  setLine(str: string): CustomTextGui;
@@ -65,7 +65,7 @@ displaysF.setAccessible(true);
  * @param {string?} customEditMsg
  * @returns {CustomTextGui}
  */
-function createTextGui(getLoc, getEditText, str = '') {
+function createTextGui(getLoc, getEditText, customEditMsg = '') {
   /**
    * @type {CustomTextGui}
    */
@@ -76,7 +76,7 @@ function createTextGui(getLoc, getEditText, str = '') {
   obj.getLoc = getLoc;
   obj.isEdit = false;
   obj.getEditText = getEditText;
-  obj.str = str;
+  obj.customEditMsg = customEditMsg;
   obj.edit = function() {
     this.isEdit = true;
     curr = this;
@@ -221,7 +221,7 @@ const renderReg = reg('renderOverlay', () => {
   editDisplay.setLines(curr.getEditText());
   editDisplay.render();
 
-  const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&23&7] &fToggle Shadow &8| &7[&2Scroll&7] &fResize &8| &7[&2Drag&7] &fMove' + curr.str;
+  const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&23&7] &fToggle Shadow &8| &7[&2Scroll&7] &fResize &8| &7[&2Drag&7] &fMove' + curr.customEditMsg;
   // const w = Renderer.getStringWidth(editStr);
   // Renderer.drawRect(0xB0000000, 40, 15, w + 20, 20);
   drawOutlinedString(editStr, 50, 20);
