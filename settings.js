@@ -502,6 +502,7 @@ export const props = {
   dungeonBoxMobColor: new Property('DungeonBoxMobColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color for basic mobs' }),
   dungeonBoxKeyColor: new Property('DungeonBoxKeyColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color for wither/blood keys' }),
   dungeonBoxSAColor: new Property('DungeonBoxSAColor', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: 'color for SAs' }),
+  dungeonBoxSMColor: new Property('DungeonBoxSkeleMasterColor', page, ++sort, Property.Type.Color, 0xFF8000FF, { desc: 'color for skele masters' }),
   dungeonBoxFelColor: new Property('DungeonBoxFelColor', page, ++sort, Property.Type.Color, 0x00FF80FF, { desc: 'color for fels' }),
   dungeonBoxChonkColor: new Property('DungeonBoxChonkersColor', page, ++sort, Property.Type.Color, 0xFF0080FF, { desc: 'color for withermancers, commanders, lords, and super archers' }),
   dungeonBoxMiniColor: new Property('DungeonBoxMiniColor', page, ++sort, Property.Type.Color, 0xB400B4FF, { desc: 'color for LAs,  FAs, and AAs' }),
