@@ -13,25 +13,35 @@ let mobCand = [];
 let nameCand = [];
 const mobCandBucket = new Grid();
 
+const boxColors = [
+  'dungeonBoxKeyColor',
+  'dungeonBoxSAColor',
+  'dungeonBoxFelColor',
+  'dungeonBoxSMColor',
+  'dungeonBoxChonkColor',
+  'dungeonBoxChonkColor',
+  'dungeonBoxMiniColor',
+  'dungeonBoxMobColor'
+];
 function getBoxMobType(n) {
-  if (n.includes('Fels', 6)) return 1;
+  if (n.includes('Fels', 6)) return 2;
 
-  if (n.includes('Skeleton Master')) return 2;
+  if (n.includes('Skeleton Master')) return 3;
 
-  if (n.includes('Withermancer', 6)) return 3;
+  if (n.includes('Withermancer', 6)) return 4;
 
-  // if (n.includes('Zombie Lord', 6)) return 4;
-  // if (n.includes('Skeleton Lord', 6)) return 4;
-  if (n.includes('Lord', 6)) return 4;
-  if (n.includes('Zombie Commander', 6)) return 4;
-  if (n.includes('Super Archer')) return 4;
+  // if (n.includes('Zombie Lord', 6)) return 5;
+  // if (n.includes('Skeleton Lord', 6)) return 5;
+  if (n.includes('Lord', 6)) return 5;
+  if (n.includes('Zombie Commander', 6)) return 5;
+  if (n.includes('Super Archer')) return 5;
 
-  // if (n.includes('Lost Adventurer', 6)) return 5;
-  // if (n.includes('Frozen Adventurer', 6)) return 5;
-  if (n.includes('Adventurer', 6)) return 5;
-  if (n.includes('Angry Archaeologist', 6)) return 5;
+  // if (n.includes('Lost Adventurer', 6)) return 6;
+  // if (n.includes('Frozen Adventurer', 6)) return 6;
+  if (n.includes('Adventurer', 6)) return 6;
+  if (n.includes('Angry Archaeologist', 6)) return 6;
 
-  return 6;
+  return 7;
 }
 const EntityZombie = Java.type('net.minecraft.entity.monster.EntityZombie');
 const EntitySkeleton = Java.type('net.minecraft.entity.monster.EntitySkeleton');
@@ -67,7 +77,7 @@ const step2Reg = reg('step', () => {
     if (e.field_70128_L) return false;
     const n = e.func_70005_c_();
     if (n === 'Shadow Assassin') {
-      boxMobs.put(e, { yO: 0, h: 2, c: settings.dungeonBoxSAColor });
+      boxMobs.put(e, { yO: 0, h: 2, c: 1 });
       return false;
     }
     mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
@@ -81,7 +91,7 @@ function boxMobsTick() {
     if (e.field_70128_L) return;
     const n = e.func_70005_c_();
     if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
-      boxMobsBuff.push([e, { yO: -1, h: 1, c: settings.dungeonBoxKeyColor }]);
+      boxMobsBuff.push([e, { yO: -1, h: 1, c: 0 }]);
       return;
     }
     if (!n.startsWith('§6✯ ')) return;
@@ -106,30 +116,8 @@ function boxMobsTick() {
         dist(v.field_70161_v, z) ? a : v,
       ents[0]);
 
-    let h = 2;
-    let c;
-    switch (getBoxMobType(n)) {
-      case 1:
-        h = 3;
-        c = settings.dungeonBoxFelColor;
-        break;
-      case 2:
-        c = settings.dungeonBoxSMColor;
-        break;
-      case 3:
-        h = 3;
-      case 4:
-        c = settings.dungeonBoxChonkColor;
-        break;
-      case 5:
-        c = settings.dungeonBoxMiniColor;
-        break;
-      case 6:
-        c = settings.dungeonBoxMobColor;
-        break;
-
-      default: throw 'not supposed to happen';
-    }
+    const c = getBoxMobType(n);
+    const h = c === 2 || c === 4 ? 3 : 2;
     boxMobsBuff.push([ent, { yO: 0, h, c }]);
   });
   if (boxMobsBuff.length) unrun(() => boxMobsBuff.forEach(v => boxMobs.put(v[0], v[1])));
@@ -141,7 +129,7 @@ const serverTickReg = reg('packetReceived', () => {
 const clientTickReg = reg('tick', () => run(boxMobsTick), 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity);
-  if (data) renderOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, data.c, settings.dungeonBoxMobEsp, true, undefined, true);
+  if (data) renderOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, settings[boxColors[data.c]], settings.dungeonBoxMobEsp, true, undefined, true);
 }, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 
 export function init() { }
