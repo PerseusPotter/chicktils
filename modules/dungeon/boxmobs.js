@@ -16,19 +16,22 @@ const mobCandBucket = new Grid();
 function getBoxMobType(n) {
   if (n.includes('Fels', 6)) return 1;
 
-  if (n.includes('Withermancer', 6)) return 2;
-  // if (n.includes('Zombie Lord', 6)) return 2;
-  // if (n.includes('Skeleton Lord', 6)) return 2;
-  if (n.includes('Lord', 6)) return 2;
-  if (n.includes('Zombie Commander', 6)) return 2;
-  if (n.includes('Super Archer')) return 2;
+  if (n.includes('Skeleton Master')) return 2;
 
-  // if (n.includes('Lost Adventurer', 6)) return 3;
-  // if (n.includes('Frozen Adventurer', 6)) return 3;
-  if (n.includes('Adventurer', 6)) return 3;
-  if (n.includes('Angry Archaeologist', 6)) return 3;
+  if (n.includes('Withermancer', 6)) return 3;
 
-  return 4;
+  // if (n.includes('Zombie Lord', 6)) return 4;
+  // if (n.includes('Skeleton Lord', 6)) return 4;
+  if (n.includes('Lord', 6)) return 4;
+  if (n.includes('Zombie Commander', 6)) return 4;
+  if (n.includes('Super Archer')) return 4;
+
+  // if (n.includes('Lost Adventurer', 6)) return 5;
+  // if (n.includes('Frozen Adventurer', 6)) return 5;
+  if (n.includes('Adventurer', 6)) return 5;
+  if (n.includes('Angry Archaeologist', 6)) return 5;
+
+  return 6;
 }
 const EntityZombie = Java.type('net.minecraft.entity.monster.EntityZombie');
 const EntitySkeleton = Java.type('net.minecraft.entity.monster.EntitySkeleton');
@@ -104,16 +107,28 @@ function boxMobsTick() {
       ents[0]);
 
     let h = 2;
-    const t = getBoxMobType(n);
-    let c = settings.dungeonBoxMobColor;
-    if (t === 1) {
-      h = 3;
-      c = settings.dungeonBoxFelColor;
-    } else if (t === 2) {
-      c = settings.dungeonBoxChonkColor;
-      if (n.includes('Withermancer', 6)) h = 3;
-    } else if (t === 3) {
-      c = settings.dungeonBoxMiniColor;
+    let c;
+    switch (getBoxMobType(n)) {
+      case 1:
+        h = 3;
+        c = settings.dungeonBoxFelColor;
+        break;
+      case 2:
+        c = settings.dungeonBoxSMColor;
+        break;
+      case 3:
+        h = 3;
+      case 4:
+        c = settings.dungeonBoxChonkColor;
+        break;
+      case 5:
+        c = settings.dungeonBoxMiniColor;
+        break;
+      case 6:
+        c = settings.dungeonBoxMobColor;
+        break;
+
+      default: throw 'not supposed to happen';
     }
     boxMobsBuff.push([ent, { yO: 0, h, c }]);
   });
