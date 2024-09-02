@@ -67,10 +67,15 @@ const createRegister = function(type, shit) {
 
 /**
  * isRegistered() => boolean;
+ *
  * setRegistered(v: boolean) => this;
+ *
  * setEnabled(val: StateVar | import('../settings').Property) => this;
+ *
  * update() => this;
+ *
  * forceTrigger(...args: any[]) => any;
+ *
  * @type {typeof register}
  */
 let reg;
