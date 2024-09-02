@@ -39,7 +39,7 @@ const cb = reg('command', ...args => {
   else if (args[0] === 'list') cbl.forceTrigger();
   else if (args[0] === 'remove') cbr.forceTrigger();
   else log('&4?? use get/set/list/remove');
-}, 'clipboard').setName('clipboard').setAliases('cb').setTabCompletions(tabcompletion({ get: [], set: [], list: [], remove: [] }));
+}, 'clipboard').setName('clipboard').setTabCompletions(tabcompletion({ get: [], set: [], list: [], remove: [] }));
 
 export function init() { }
 export function load() {

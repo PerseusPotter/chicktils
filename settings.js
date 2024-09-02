@@ -813,7 +813,7 @@ export const props = {
   cpvAutoCompleteTabList: new Property('ChickTilsAutoCompleteTabList', page, ++sort, Property.Type.Toggle, true, { desc: 'autocomplete /pv with names from tab list' }),
   cpvAutoCompleteParty: new Property('ChickTilsAutoCompleteParty', page, ++sort, Property.Type.Toggle, true, { desc: 'autcomplete /pv with party members' }),
 
-  enableclipboard: new Property('EnableClipboardThing', page, ++sort, Property.Type.Toggle, true, { desc: '/clipboard or /cb\nset, get, list, and remove\n/cbs and /cbg and /cbl and /cbr\n/clipboard set <name> | /cb get <name> | /cbl | /cbr <name>' })
+  enableclipboard: new Property('EnableClipboardThing', page, ++sort, Property.Type.Toggle, true, { desc: '/clipboard\nset, get, list, and remove\n/cbs and /cbg and /cbl and /cbr\n/clipboard set <name> | /cbg <name> | /clipboard list | /cbr <name>' })
 };
 const pageNames = [
   '',
