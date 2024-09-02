@@ -29,9 +29,10 @@ export function setIsMain() {
  *  dungeonSilverfishHasteTimerLoc: TextLocation;
  *  serverScrutinizerFPSDisplay: TextLocation;
  *  spotifyDisplayLoc: TextLocation;
+ *  clipboardData: Record<string, string>
  * }}
  */
-const data = new PogObject('chicktils', { firstLoad: true }, 'data.json');
+const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
 
 function reset(key, mute) {
   if (!data.firstLoad && !mute) log(`&4unable to read data &7"&b${key}&7"&4, resetting it`);
