@@ -7,14 +7,19 @@ const StringBuilder = Java.type('java.lang.StringBuilder');
  * @returns {string}
  */
 export function get() {
-  const t = board.getContents(null);
-  const r = DataFlavor.selectBestTextFlavor(t.getTransferDataFlavors()).getReaderForText(t);
-  const s = new StringBuilder();
-  let b = new Packages.java.lang.reflect.Array.newInstance(Character.TYPE, 65536);
-  let l;
-  while ((l = r.read(b, 0, 65536)) > 0) s.append(b, 0, l);
-  r.close();
-  return s.toString();
+  try {
+    const t = board.getContents(null);
+    const r = DataFlavor.selectBestTextFlavor(t.getTransferDataFlavors()).getReaderForText(t);
+    const s = new StringBuilder();
+    let b = new Packages.java.lang.reflect.Array.newInstance(Character.TYPE, 65536);
+    let l;
+    while ((l = r.read(b, 0, 65536)) > 0) s.append(b, 0, l);
+    r.close();
+    return s.toString();
+  } catch (e) {
+    // nothing in clipboard
+    return '';
+  }
 }
 /**
  * @param {string} v
