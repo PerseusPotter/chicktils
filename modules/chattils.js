@@ -425,7 +425,10 @@ const essTOCmdReg = reg('command', essWCmd, 'chattils').setName('t', true).setEn
 const essRCmdReg = reg('command', essRCmd, 'chattils').setName('re').setEnabled(settings._chatTilsEssential);
 const essROCmdReg = reg('command', essRCmd, 'chattils').setName('r', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const essFCmdReg = reg('command', essFCmd, 'chattils').setName('fe').setEnabled(settings._chatTilsEssential);
-const essFOCmdReg = reg('command', essFCmd, 'chattils').setName('f', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const essFOCmdReg = reg('command', ...args => {
+  if (args && args[0] === 'list') ChatLib.command('f ' + args.join(' '));
+  else essFCmd(...args);
+}, 'chattils').setName('f', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const essPCCmdReg = reg('command', ...args => {
   if (!args || !args.length) return;
   if (!isInParty() || isLeader()) return ChatLib.command('pc ' + args.join(' '));
