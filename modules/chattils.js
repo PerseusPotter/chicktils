@@ -71,6 +71,12 @@ const odinMelodies = [
   'Melody terminal is at 50%',
   'Melody terminal is at 75%'
 ];
+const weirdMelodies = [
+  'Melody ♪ Terminal [0/4]!',
+  'Melody ♪ Terminal [1/4]!',
+  'Melody ♪ Terminal [2/4]!',
+  'Melody ♪ Terminal [3/4]!'
+];
 function hideMessage(option, evn) {
   if (option === 'False') return;
   stateCancelNextPing.set(true);
@@ -86,11 +92,16 @@ function tryMelody(ign, msg, evn, mel) {
       helper.deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
     }
   } else {
-    const i = odinMelodies.indexOf(msg);
+    let i = odinMelodies.indexOf(msg);
+    let arr = odinMelodies;
+    if (i < 0) {
+      i = weirdMelodies.indexOf(msg);
+      arr = weirdMelodies;
+    }
     if (i >= 0) {
       hideMessage(settings.chatTilsHideMelody, evn);
       if (settings.chatTilsCompactMelody && helper) {
-        const prev = i === 0 ? mel : odinMelodies[i - 1];
+        const prev = i === 0 ? mel : arr[i - 1];
         helper.deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
       }
     }
@@ -106,7 +117,7 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
 
   if (settings.chatTilsHideBonzo !== 'False' && msg.startsWith('Bonzo Procced')) return hideMessage(settings.chatTilsHideBonzo, evn);
   if (settings.chatTilsHidePhoenix !== 'False' && msg.startsWith('Phoenix Procced')) return hideMessage(settings.chatTilsHidePhoenix, evn);
-  if (settings.chatTilsHideLeap !== 'False' && (msg.startsWith('Leaped to ') || msg.startsWith('Leaping to ') || msg.startsWith('I\'m leaping to '))) return hideMessage(settings.chatTilsHideLeap, evn);
+  if (settings.chatTilsHideLeap !== 'False' && ['Leaped to ', 'Leaping to ', 'I\'m leaping to ', '[Leaped]: ➜'].some(v => msg.startsWith(v))) return hideMessage(settings.chatTilsHideLeap, evn);
   if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
     const lIgn = ign.toLowerCase();
     let mel = melodyMessages.get(lIgn);
@@ -121,6 +132,9 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
     } else if (msg === odinMelodies[0]) {
       melodyMessages.set(lIgn, lastMessages.get(lIgn));
       tryMelody(ign, msg, evn, lastMessages.get(lIgn));
+    } else if (msg === weirdMelodies[0]) {
+      melodyMessages.set(lIgn, msg);
+      tryMelody(ign, msg, evn, msg);
     } else lastMessages.set(lIgn, msg);
   }
 }, 'chattils').setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
