@@ -140,7 +140,7 @@ const updateReg = reg('step', () => {
       display.addLine(`&fRefill: ${data.unit} &fx&d${costStr}`);
     }
   });
-}, 'quiver').setFps(5);
+}, 'quiver').setFps(2);
 
 export function init() {
   settings._moveQuiver.onAction(() => display.edit());
