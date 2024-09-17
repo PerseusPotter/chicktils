@@ -88,7 +88,7 @@ function crashGame(txt) {
 }
 
 register('command', ...args => {
-  if (!args) args = ['config'];
+  if (!args) args = ['config', 'gui'];
 
   const cmdName = args.shift();
 
@@ -119,8 +119,9 @@ register('command', ...args => {
         log(getPing());
         break;
       case 'config':
-        if (args.length === 0) return settings.amaterasu.openGui();
-        if (args[0] === 'view') {
+        if (args.length === 0) args[0] = 'view';
+        if (args[0] === 'gui') settings.amaterasu.openGui();
+        else if (args[0] === 'view') {
           if (args.length === 1) args[1] = settings.minPage.toString();
           // how scuffed do you want it: yes
           const p = new Property('pageHelper', 0, 0, Property.Type.Integer, 1, { min: settings.minPage, max: settings.maxPage });
