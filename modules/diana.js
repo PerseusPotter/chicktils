@@ -174,7 +174,7 @@ function updateGuess() {
   let gy = 100;
   let topBlock;
   while (gy >= 60) {
-    let i = World.getBlockAt(~~gx, gy, ~~gz).type.getID();
+    let i = World.getBlockAt(Math.floor(gx), gy, Math.floor(gz)).type.getID();
     if (!topBlock && i !== 0) topBlock = gy;
     if (i === 2) break;
     gy--;
