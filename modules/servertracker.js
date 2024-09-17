@@ -52,6 +52,7 @@ const warpLocs = {
   'hollows': 9,
   'ch': 9,
   'nucleus': 9,
+  'nuc': 9,
   'spider': 10,
   'spiders': 10,
   'top': 10,
