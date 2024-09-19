@@ -71,7 +71,7 @@ const updateReg = reg('step', () => {
     let parts = line.split('","');
     let name = parts.slice(8).join('","').slice(0, -1);
     if (name === 'N/A') continue;
-    songMarquee.setText(formatSong(name));
+    songMarquee.setText(formatSong(name.trim()));
     stateSpotifyOpen.set(true);
     return;
   }
