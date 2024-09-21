@@ -78,7 +78,9 @@ const dropLocsStatic = [
   { x: -106, y: 79, z: -113 },
   { x: -98, y: 79, z: -113 },
   { x: -94, y: 79, z: -106 },
-  { x: -98, y: 79, z: -99 }
+  { x: -98, y: 79, z: -99 },
+
+  { x: -139.5, y: 79, z: -90.5 }
 ];
 let dropLocs = dropLocsStatic.slice();
 let pearlLocs = [];
