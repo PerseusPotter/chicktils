@@ -3,7 +3,8 @@ import data from '../data';
 import createTextGui from '../util/customtextgui';
 import { cleanNumber, colorForNumber } from '../util/format';
 import reg from '../util/registerer';
-import { unrun } from '../util/threading';
+import { getItemId } from '../util/mc';
+import { StateVar } from '../util/state';
 
 const display = createTextGui(() => data.quiverLoc, () => ['&5Flint Arrow &fx&26969'].concat(settings.quiverShowRefill ? ['&fRefill: &9Social Life &fx&d6969 &8(Instant: &9&d6969&8)'] : []));
 const quivSizes = {
@@ -93,23 +94,21 @@ const arrowTypes = {
     sackable: true
   }
 };
-let shouldRender = false;
-const renderReg = reg('renderOverlay', () => shouldRender && display.render(), 'quiver');
-const updateReg = reg('step', () => {
-  unrun(() => {
-    shouldRender = false;
-    const inv = Player.getInventory();
-    if (!inv) return;
-    const item = inv.getStackInSlot(8);
-    if (!item) return;
-    const n = item.getRegistryName();
+const enableRender = new StateVar(false);
+const renderReg = reg('renderOverlay', () => display.render(), 'quiver').setEnabled(enableRender);
+const updateReg = reg('packetReceived', pack => {
+  if (pack.func_148911_c()) return;
+  enableRender.set(Boolean(function() {
+    const it = pack.func_148910_d()[44];
+    if (!it) return;
+    const n = getItemId(it);
     if (n !== 'minecraft:feather' && n !== 'minecraft:arrow') return;
 
+    const item = new Item(it);
     const lore = item.getLore()[5];
     if (!lore) return;
     const m = lore.match(/^§5§o§7Active Arrow: (§.+?) §7\(§e(\d+)§7\)$/);
     if (!m) return;
-    shouldRender = true;
     const a = m[1];
     const c = +m[2];
     const maxSize = quivSizes[settings.quiverSize] || quivSizes.Giant;
@@ -139,8 +138,9 @@ const updateReg = reg('step', () => {
       }
       display.addLine(`&fRefill: ${data.unit} &fx&d${costStr}`);
     }
-  });
-}, 'quiver').setFps(2);
+    return true;
+  }()));
+}, 'quiver').setFilteredClass(net.minecraft.network.play.server.S30PacketWindowItems);
 
 export function init() {
   settings._moveQuiver.onAction(() => display.edit());
