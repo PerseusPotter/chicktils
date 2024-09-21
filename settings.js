@@ -815,7 +815,9 @@ export const props = {
 
   enableclipboard: new Property('EnableClipboardThing', page, ++sort, Property.Type.Toggle, true, { desc: '/clipboard\nset, get, list, and remove\n/cbs and /cbg and /cbl and /cbr\n/clipboard set <name> | /cbg <name> | /clipboard list | /cbr <name>' }),
 
-  enablevision: new Property('DisableBlindness', page, ++sort, Property.Type.Toggle, false, { desc: 'disable blindness' })
+  enablevision: new Property('DisableBlindness', page, ++sort, Property.Type.Toggle, true, { desc: 'disable blindness' }),
+
+  enablecake: new Property('EnableCakeHelper', page, ++sort, Property.Type.Toggle, true, { desc: 'i like eat cake.' })
 };
 const pageNames = [
   '',
