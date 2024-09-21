@@ -86,7 +86,9 @@ let supplies = [];
 let chunks = [];
 let ticksUntilPickup = 0;
 let pickupStart = 0;
+let pickupAmount = 0;
 let lastPickUpdate = 0;
+let lastPickUpdateTime = 0;
 let isOnCannon = false;
 let isT5 = new StateVar(false);
 let kuuder;
@@ -94,7 +96,7 @@ const hpDisplay = createTextGui(() => data.kuudraHpLoc, () => ['&d300M']);
 const renderReg = reg('renderWorld', () => {
   if (settings.kuudraRenderPearlTarget && pearlLocs.length > 0) {
     const c = settings.kuudraPearlTargetColor;
-    const timeLeft = ticksUntilPickup - (Date.now() - pickupStart);
+    const timeLeft = ticksUntilPickup - (Date.now() - lastPickUpdateTime);
     pearlLocs.forEach(v => {
       const { x, y, z } = intersectPL(
         Math.sin(v.phi) * Math.cos(v.theta),
@@ -193,15 +195,18 @@ const supplyPickReg = reg('renderTitle', (title, sub) => {
   const progress = +m[1];
   const t = Date.now();
   if (progress === 0) {
-    if (pickupStart && t - pickupStart < 1000) return;
+    if (t - pickupStart < 1000) return;
     pickupStart = t;
     ticksUntilPickup = 14 * 500;
     lastPickUpdate = progress;
+    lastPickUpdateTime = t;
     return;
   }
-  if (lastPickUpdate > 0) return;
-  ticksUntilPickup = Math.floor(100 / progress - 1) * 500;
+  if (lastPickUpdate === progress) return;
+  if (lastPickUpdate === 0) pickupAmount = progress;
   lastPickUpdate = progress;
+  lastPickUpdateTime = t;
+  ticksUntilPickup = Math.round(100 / pickupAmount - Math.round(progress / pickupAmount)) * 500;
 }, 'kuudra').setEnabled(settings._kuudraRenderPearlTarget);
 
 const hideTitleReg = reg('renderTitle', (_, __, evn) => cancel(evn), 'kuudra').setEnabled(settings._kuudraDrawHpGui);
@@ -247,7 +252,9 @@ function onBuildStart() {
   chunks = [];
   ticksUntilPickup = 0;
   pickupStart = 0;
+  pickupAmount = 0;
   lastPickUpdate = 0;
+  lastPickUpdateTime = 0;
   isOnCannon = false;
   supplyPickReg.unregister();
   cannonReg.register();
