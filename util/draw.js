@@ -1,6 +1,7 @@
 import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
 import { getEyeHeight } from './mc';
 import GlStateManager2 from './glStateManager';
+import reg from './registerer';
 
 const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 const worldRen = tess.func_178180_c();
@@ -33,6 +34,13 @@ function getPitch() {
   const p = Player.getPlayer();
   if (!p) return 0;
   return p.field_70127_C + (p.field_70125_A - p.field_70127_C) * Tessellator.partialTicks;
+}
+let lastServerTickTime = Date.now();
+let cachedServerTickPartial = 0;
+reg('serverTick', () => lastServerTickTime = Date.now(), 'draw');
+reg(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, () => cachedServerTickPartial = Math.min(1, (Date.now() - lastServerTickTime) / 50));
+export function getPartialServerTick() {
+  return cachedServerTickPartial;
 }
 
 /**

@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import data from '../../data';
-import { renderOutline, renderFilledBox, renderString } from '../../util/draw';
+import { renderOutline, renderFilledBox, renderString, getPartialServerTick } from '../../util/draw';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import getPing from '../../util/ping';
@@ -143,16 +143,16 @@ const renderWorldReg = reg('renderWorld', () => {
       y = lerp(lastEstY, estY, smoothFactor);
       z = lerp(lastEstZ, estZ, smoothFactor);
     }
-    const m = (maxTtl - ttl - Tessellator.partialTicks + getPing() / 50) / maxTtl;
+    const m = (maxTtl - ttl - getPartialServerTick() + getPing() / 50) / maxTtl;
     renderOutline(x, y + 1.5, z, 1, 2, settings.dungeonCampWireColor, settings.dungeonCampBoxEsp, true, 3);
     renderFilledBox(x, y + 2.5 - m, z, m, 2 * m, settings.dungeonCampBoxColor, settings.dungeonCampBoxEsp);
 
-    if (settings.dungeonCampTimer) renderString(((ttl - Tessellator.partialTicks) / 20).toFixed(2), x, y + 1, z);
+    if (settings.dungeonCampTimer) renderString(((ttl - getPartialServerTick()) / 20).toFixed(2), x, y + 1, z);
   });
 }, 'dungeon/camp').setEnabled(stateCampFinal);
 const renderOverlayReg = reg('renderOverlay', () => {
   if (lastSpawnedBloodMob && lastSpawnedBloodMob.ttl) {
-    const d = (lastSpawnedBloodMob.ttl + 1 - Tessellator.partialTicks) * 50;
+    const d = (lastSpawnedBloodMob.ttl + 1 - getPartialServerTick()) * 50;
     dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
     dialogueSkipTimer.render();
   }
