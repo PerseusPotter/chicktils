@@ -22,7 +22,7 @@ const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand')
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) powerupCand.push([Date.now(), e]);
 }, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
-const serverTickReg = reg('packetReceived', () => {
+const serverTickReg = reg('serverTick', () => {
   if (powerupCand.length === 0) return;
   run(() => {
     const t = Date.now();
@@ -55,7 +55,7 @@ const serverTickReg = reg('packetReceived', () => {
       return false;
     });
   });
-}, 'dungeon/hidehealerpowerups').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(settings._dungeonHideHealerPowerups);
+}, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (!id.equals(EnumParticleTypes.REDSTONE)) return;

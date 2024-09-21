@@ -358,10 +358,31 @@ reg = function reg(type, shit, modN) {
     this.offset = ~~offset;
     return this;
   };
+  function ChickTilsServerTick(cb) {
+    ChickTilsRegister.call(this, cb);
+  }
+  inherits(ChickTilsServerTick, ChickTilsRegister);
+  ChickTilsServerTick.list = new Map();
+  listenList(ChickTilsServerTick.list);
+  ChickTilsServerTick.prototype.getList = function getList() {
+    return ChickTilsServerTick.list;
+  };
+  ChickTilsServerTick.tickReg = reg('packetReceived', pack => {
+    if (pack.func_148890_d() > 0) return;
+    ChickTilsServerTick.list.forEach(v => v.cb());
+  }, 'ChickTilsServerTick').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
+  ChickTilsServerTick.prototype.update = function update() {
+    if (ChickTilsServerTick.list.size) {
+      ChickTilsServerTick.tickReg.register();
+    } else {
+      ChickTilsServerTick.tickReg.unregister();
+    }
+  };
 
   customRegs['command'] = ChickTilsCommand;
   customRegs['spawnEntity'] = ChickTilsSpawnEntity;
   customRegs['step'] = ChickTilsStep;
+  customRegs['serverTick'] = ChickTilsServerTick;
 }
 
 export default reg;

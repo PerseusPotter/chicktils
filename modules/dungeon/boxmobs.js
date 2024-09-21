@@ -122,10 +122,10 @@ function boxMobsTick() {
   });
   if (boxMobsBuff.length) unrun(() => boxMobsBuff.forEach(v => boxMobs.put(v[0], v[1])));
 }
-const serverTickReg = reg('packetReceived', () => {
+const serverTickReg = reg('serverTick', () => {
   clientTickReg.unregister();
   run(boxMobsTick);
-}, 'dungeon/boxmobs').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBoxMob);
+}, 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const clientTickReg = reg('tick', () => run(boxMobsTick), 'dungeon/boxmobs').setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity);
