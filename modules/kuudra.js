@@ -170,13 +170,16 @@ const updateReg1 = reg('step', () => {
     const c = chunks.filter(v => !v.isDead());
     unrun(() => chunks = c);
   }
-  World.getAllEntities().forEach(e => {
-    if (e.entity instanceof EntityArmorStand && e.getName() === '§a§l✓ SUPPLIES RECEIVED ✓') unrun(() => {
-      dropLocs.forEach(v => v.d = fastDistance(v.x - e.getX(), v.z - e.getZ()));
-      dropLocs.sort((a, b) => a.d - b.d);
-      if (dropLocs.length > 0 && dropLocs[0].d < 4) dropLocs.shift();
-    });
-    if (e.entity instanceof EntityMagmaCube && e.entity.func_70809_q() === 30 && e.entity.func_110143_aJ() <= 100_000) kuuder = new EntityLivingBase(e.entity);
+  unrun(() => {
+    const ent = World.getAllEntities();
+    run(() => ent.forEach(e => {
+      if (e.entity instanceof EntityArmorStand && e.getName() === '§a§l✓ SUPPLIES RECEIVED ✓') unrun(() => {
+        dropLocs.forEach(v => v.d = fastDistance(v.x - e.getX(), v.z - e.getZ()));
+        dropLocs.sort((a, b) => a.d - b.d);
+        if (dropLocs.length > 0 && dropLocs[0].d < 4) dropLocs.shift();
+      });
+      if (e.entity instanceof EntityMagmaCube && e.entity.func_70809_q() === 30 && e.entity.func_110143_aJ() <= 100_000) kuuder = new EntityLivingBase(e.entity);
+    }));
   });
 }, 'kuudra').setFps(1);
 const bossBarReg = reg('renderBossHealth', () => {
