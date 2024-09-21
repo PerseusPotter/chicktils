@@ -57,7 +57,7 @@ const tickReg = reg('tick', () => {
     };
   }
 }, 'dungeon/spiritbear').setEnabled(new StateProp(ticks).equals(0).and(stateInFM4));
-const serverTickReg = reg('packetReceived', () => ticks.set(ticks.get() - 1), 'dungeon/spiritbear').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateBearSpawning);
+const serverTickReg = reg('serverTick', () => ticks.set(ticks.get() - 1), 'dungeon/spiritbear').setEnabled(stateBearSpawning);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (!id.equals(EnumParticleTypes.SPELL_MOB)) return;

@@ -129,12 +129,11 @@ let lastLoadTime = Date.now();
 let lastTickTime = Date.now();
 const ticks = new TickInfo(settings.serverScrutinizerTPSMaxAge, 1_000, settings.serverScrutinizerTPSDisplayCap20 ? 20 : undefined);
 
-const serverTickReg = reg('packetReceived', pack => {
-  if (pack.func_148890_d() > 0) return;
+const serverTickReg = reg('serverTick', () => {
   const t = Date.now();
   ticks.add(t);
   lastTickTime = t;
-}, 'serverscrutinizer').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateTrackTicks);
+}, 'serverscrutinizer').setEnabled(stateTrackTicks);
 const worldLoadReg = reg('worldLoad', () => {
   ticks.clear();
   lastLoadTime = lastTickTime = Date.now();

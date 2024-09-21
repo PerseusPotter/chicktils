@@ -46,7 +46,7 @@ const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand')
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) possibleSkulls.push(e);
 }, 'dungeon/camp').setEnabled(stateCamp);
-const serverTickReg = reg('packetReceived', () => {
+const serverTickReg = reg('serverTick', () => {
   if (bloodOpenTime === 0 || (possibleSkulls.length === 0 && bloodMobs.length === 0)) return;
   const arr = possibleSkulls;
   possibleSkulls = [];
@@ -125,7 +125,7 @@ const serverTickReg = reg('packetReceived', () => {
       else motionData.set(v[0], v[1]);
     }));
   });
-}, 'dungeon/camp').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(stateCampFinal);
+}, 'dungeon/camp').setEnabled(stateCampFinal);
 const renderWorldReg = reg('renderWorld', () => {
   const t = Date.now();
   motionData.forEach(({ estX, estY, estZ, lastEstX, lastEstY, lastEstZ, ttl, maxTtl, lastUpdate }) => {

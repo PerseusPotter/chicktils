@@ -18,7 +18,7 @@ const tickReg = reg('tick', () => {
     inst.getOutputStream().flush();
   } else instaMidProc.set(void 0);
 }, 'dungeon/necrondrag').setEnabled(new StateProp(instaMidProc).notequals(undefined));
-const serverTickReg = reg('packetReceived', () => necronDragTicks.set(necronDragTicks.get() - 1), 'dungeon/necrondrag').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction')).setEnabled(new StateProp(necronDragTicks).notequals(0));
+const serverTickReg = reg('serverTick', () => necronDragTicks.set(necronDragTicks.get() - 1), 'dungeon/necrondrag').setEnabled(new StateProp(necronDragTicks).notequals(0));
 const necronStartReg = reg('chat', () => {
   necronDragTicks.set(settings.dungeonNecronDragDuration);
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc.set(runHelper('InstaMidHelper'));
