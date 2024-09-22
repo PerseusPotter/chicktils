@@ -142,6 +142,7 @@ export function init() {
     require('./dungeon/boxwithers'),
     require('./dungeon/camp'),
     require('./dungeon/dev4helper'),
+    require('./dungeon/dev4highlight'),
     require('./dungeon/goldordpsalert'),
     require('./dungeon/hecatomb'),
     require('./dungeon/hidefallingblocks'),
