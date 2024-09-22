@@ -568,6 +568,10 @@ export const props = {
 
   dungeonDev4Helper: new Property('DungeonClearViewDev4', page, ++sort, Property.Type.Option, 'Both', { desc: 'clearer vision while doing 4th dev', options: ['None', 'Titles', 'Particles', 'Both'] }),
 
+  dungeonDev4HighlightBlock: new Property('DungeonDev4HighlightBlock', page, ++sort, Property.Type.Toggle, true, { desc: 'highlights emerald block green, bypasses chunk updates' }),
+  dungeonDev4HighlightBlockColor: new Property('DungeonDev4HighlightBlockColor', page, ++sort, Property.Type.Color, 0x50C878FF),
+  dungeonDev4HighlightBlockEsp: new Property('DungeonDev4HighlightBlockEsp', page, ++sort, Property.Type.Toggle, false),
+
   dungeonStairStonkHelper: new Property('DungeonStairStonkHelper', page, ++sort, Property.Type.Toggle, false, { desc: 'stair stonker stuff' }),
   dungeonStairStonkHelperColor: new Property('DungeonStairStonkHelperColor', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: 'draw line to align yourself to dig down a stair\nsame as soopy but does not cut fps in half' }),
   dungeonStairStonkHelperHighlightColor: new Property('DungeonStairStonkHelperHighlightColor', page, ++sort, Property.Type.Color, 0x7DF9FF80, { desc: 'highlight stairs this color if they need to be ghosted to stonk' }),
