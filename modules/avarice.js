@@ -77,8 +77,8 @@ const arachneServerTick = reg('serverTick', () => {
     arachnePossBig = arachnePossBig.filter(v => {
       const hp = v[1].func_110140_aT().func_111152_a('generic.maxHealth').func_111125_b();
       if (
-        (stateIsArachne.get() === 1 && (hp === 20_000 || hp === 40_000)) ||
-        (stateIsArachne.get() === 2 && (hp === 100_000 || hp === 200_000))
+        (stateIsArachne.get() & 1 && (hp === 20_000 || hp === 40_000)) ||
+        (stateIsArachne.get() & 2 && (hp === 100_000 || hp === 200_000))
       ) {
         arachneEnt = v[1];
         return false;
