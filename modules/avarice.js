@@ -40,6 +40,7 @@ const stateDoArachne = new StateProp(settings._avariceArachne).and(stateIsArachn
 
 const arachneStartReg1 = reg('chat', () => stateIsArachne.set(1), 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: Ahhhh...A Calling...&r').setEnabled(settings._avariceArachne);
 const arachneStartReg2 = reg('chat', () => stateIsArachne.set(2), 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: So it is time.&r').setEnabled(settings._avariceArachne);
+const arachneLeechReg = reg('chat', () => stateIsArachne.get() || stateIsArachne.set(3), 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: ').setStart().setEnabled(settings._avariceArachne);
 const arachneEndReg = reg('chat', () => stateIsArachne.set(0), 'avarice').setCriteria('&r&f                              &r&6&lARACHNE DOWN!&r').setEnabled(settings._avariceArachne);
 const arachneLeaveReg = reg('worldUnload', () => stateIsArachne.set(0), 'avarice').setEnabled(settings._avariceArachne);
 
@@ -74,8 +75,8 @@ const arachneServerTick = reg('serverTick', () => {
     arachnePossSmall = arachnePossSmall.filter(v => {
       const hp = v[1].func_110140_aT().func_111152_a('generic.maxHealth').func_111125_b();
       if (
-        (stateIsArachne.get() === 1 && [4_000, 8_000, 16_000, 32_000].includes(hp)) ||
-        (stateIsArachne.get() === 2 && [20_000, 40_000, 80_000, 160_000].includes(hp))
+        (stateIsArachne.get() & 1 && [4_000, 8_000, 16_000, 32_000].includes(hp)) ||
+        (stateIsArachne.get() & 2 && [20_000, 40_000, 80_000, 160_000].includes(hp))
       ) {
         arachneBroodEnts.put(v[1], 0);
         return false;
@@ -142,6 +143,7 @@ export function load() {
   coinUpdateReg.register();
   arachneStartReg1.register();
   arachneStartReg2.register();
+  arachneLeechReg.register();
   arachneEndReg.register();
   arachneLeaveReg.register();
   arachneSpawnReg.register();
@@ -155,6 +157,7 @@ export function unload() {
   coinUpdateReg.unregister();
   arachneStartReg1.unregister();
   arachneStartReg2.unregister();
+  arachneLeechReg.unregister();
   arachneEndReg.unregister();
   arachneLeaveReg.unregister();
   arachneSpawnReg.unregister();
