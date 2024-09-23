@@ -26,8 +26,21 @@ export function timeToStr(t) {
   return years + weeks + days;
 }
 
+/**
+ * @param {number} n
+ * @param {number?} e
+ * @returns {string}
+ */
 export function cleanNumber(n, e = 2) {
   return Number.isInteger(n) ? n.toString() : n.toFixed(e);
+}
+
+/**
+ * @param {number} n
+ * @returns {string}
+ */
+export function commaNumber(n) {
+  return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 /**
