@@ -40,7 +40,11 @@ const stateDoArachne = new StateProp(settings._avariceArachne).and(stateIsArachn
 
 const arachneStartReg1 = reg('chat', () => stateIsArachne.set(1), 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: Ahhhh...A Calling...&r').setEnabled(settings._avariceArachne);
 const arachneStartReg2 = reg('chat', () => stateIsArachne.set(2), 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: So it is time.&r').setEnabled(settings._avariceArachne);
-const arachneLeechReg = reg('chat', () => stateIsArachne.get() || stateIsArachne.set(3), 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: ').setStart().setEnabled(settings._avariceArachne);
+const arachneLeechReg = reg('chat', () => {
+  if (stateIsArachne.get()) return;
+  stateIsArachne.set(3);
+  World.getAllEntities().forEach(v => arachneSpawnReg.forceTrigger(v.entity));
+}, 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: ').setStart().setEnabled(settings._avariceArachne);
 const arachneEndReg = reg('chat', () => stateIsArachne.set(0), 'avarice').setCriteria('&r&f                              &r&6&lARACHNE DOWN!&r').setEnabled(settings._avariceArachne);
 const arachneLeaveReg = reg('worldUnload', () => stateIsArachne.set(0), 'avarice').setEnabled(settings._avariceArachne);
 
