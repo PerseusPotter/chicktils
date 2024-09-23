@@ -29,7 +29,8 @@ export function setIsMain() {
  *  dungeonSilverfishHasteTimerLoc: TextLocation;
  *  serverScrutinizerFPSDisplay: TextLocation;
  *  spotifyDisplayLoc: TextLocation;
- *  clipboardData: Record<string, string>
+ *  clipboardData: Record<string, string>;
+ *  avariceCoinCounterLoc: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -67,7 +68,8 @@ function verifyTextLocation(value) {
   'serverScrutinizerLastPacketDisplay',
   'dungeonSilverfishHasteTimerLoc',
   'serverScrutinizerFPSDisplay',
-  'spotifyDisplayLoc'
+  'spotifyDisplayLoc',
+  'avariceCoinCounterLoc'
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v);

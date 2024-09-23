@@ -797,6 +797,23 @@ export const props = {
 
   // 15
 
+  enableavarice: new Property('EnableAvariceAddons', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'things for avarice' }),
+
+  avariceShowCoinCounter: new Property('AvariceShowCoinCounter', page, ++sort, Property.Type.Toggle, true, { desc: 'show avarice coins in a hud' }),
+  moveAvariceCoinCounter: new Property('MoveAvariceCoinCounter', page, ++sort, Property.Type.Action),
+
+  avariceArachne: new Property('AvariceBigSpooderHelper', page, ++sort, Property.Type.Toggle, true, { desc: 'big spooder go die, i hate nons' }),
+  avariceArachneHideBroodNames: new Property('AvariceHideSmallSpooderNames', page, ++sort, Property.Type.Toggle, true, { desc: 'make small spooder names go bye' }),
+  avariceArachneBoxBigSpooder: new Property('AvariceBoxBigSpooder', page, ++sort, Property.Type.Toggle, true),
+  avariceArachneBoxBigSpooderColor: new Property('AvariceBoxBigSpooderColor', page, ++sort, Property.Type.Color, 0xEB38BBFF),
+  avariceArachneBoxBigSpooderEsp: new Property('AvariceBoxBigSpooderEsp', page, ++sort, Property.Type.Toggle, false),
+  avariceArachneBoxBigSpooderDrawArrow: new Property('AvariceBoxBigSpooderDrawArrow', page, ++sort, Property.Type.Toggle, true),
+  avariceArachneBoxSmallSpooders: new Property('AvariceBoxSmallSpooders', page, ++sort, Property.Type.Toggle, true),
+  avariceArachneBoxSmallSpoodersColor: new Property('AvariceBoxSmallSpoodersColor', page, ++sort, Property.Type.Color, 0x26ED5EFF),
+  avariceArachneBoxSmallSpoodersEsp: new Property('AvariceBoxSmallSpoodersEsp', page, ++sort, Property.Type.Toggle, false),
+
+  // 16
+
   enableboxallentities: new Property('EnableBoxAllEntities', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
   boxAllEntitiesColor: new Property('BoxAllEntitiesColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   boxAllEntitiesEsp: new Property('BoxAllEntitiesEsp', page, ++sort, Property.Type.Toggle, true),
@@ -839,6 +856,7 @@ const pageNames = [
   'ChatTils',
   'Diana',
   'HUD',
+  'Avarice Addons',
   'Misc.'
 ];
 /**
