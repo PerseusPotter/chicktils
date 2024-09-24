@@ -74,6 +74,14 @@ export function getEyeHeight(ent) {
   return (ent || Player.getPlayer())?.func_70047_e() || 0;
 }
 
+/**
+ * @param {import ('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>} ent
+ * @returns {number}
+ */
+export function getMaxHp(ent) {
+  return ent.func_110140_aT().func_111152_a('generic.maxHealth').func_111125_b();
+}
+
 const Vec3 = Java.type('net.minecraft.util.Vec3');
 /**
  * @param {{ x: number, y: number, z: number}} pos
