@@ -812,6 +812,8 @@ export const props = {
   avariceArachneBoxSmallSpoodersColor: new Property('AvariceBoxSmallSpoodersColor', page, ++sort, Property.Type.Color, 0x26ED5EFF),
   avariceArachneBoxSmallSpoodersEsp: new Property('AvariceBoxSmallSpoodersEsp', page, ++sort, Property.Type.Toggle, false),
 
+  avariceTaraTrader: new Property('AvariceTaraTrader', page, ++sort, Property.Type.Toggle, false, { desc: 'block hits on tara if slayer quest not started\nlag go brr' }),
+
   // 16
 
   enableboxallentities: new Property('EnableBoxAllEntities', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
