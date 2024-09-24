@@ -812,7 +812,7 @@ export const props = {
   avariceArachneBoxSmallSpoodersColor: new Property('AvariceBoxSmallSpoodersColor', page, ++sort, Property.Type.Color, 0x26ED5EFF),
   avariceArachneBoxSmallSpoodersEsp: new Property('AvariceBoxSmallSpoodersEsp', page, ++sort, Property.Type.Toggle, false),
 
-  avariceTaraTrader: new Property('AvariceTaraTrader', page, ++sort, Property.Type.Toggle, false, { desc: 'block hits on tara if slayer quest not started\nlag go brr' }),
+  avariceTaraTrader: new Property('AvariceTaraTrader', page, ++sort, Property.Type.Toggle, false, { desc: 'block hits on tara if slayer quest not started\nlag go brr\nnote: doesnt block custom hits (i.e. >3 block range)' }),
 
   // 16
 
