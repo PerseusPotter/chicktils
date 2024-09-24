@@ -178,7 +178,7 @@ const followReg = reg(net.minecraftforge.client.event.ClientChatReceivedEvent, e
   log(`Open chat then click anywhere on-screen to follow &b${ign}`);
 }, 'chattils').setEnabled(settings._chatTilsClickAnywhereFollow);
 const clickChatReg = reg(net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post, evn => {
-  if (Java.type('org.lwjgl.input.Mouse').getEventButtonState() || Java.type('org.lwjgl.input.Mouse').getEventButton() != 0 || !(evn.gui instanceof Java.type('net.minecraft.client.gui.GuiChat'))) return;
+  if (Java.type('org.lwjgl.input.Mouse').getEventButtonState() || Java.type('org.lwjgl.input.Mouse').getEventButton() !== 0 || !(evn.gui instanceof Java.type('net.minecraft.client.gui.GuiChat'))) return;
   if (!lastFollowToken || Date.now() - lastFollowTime > 10_000) return;
   execCmd(lastFollowToken.slice(1));
 }, 'chattils').setEnabled(settings._chatTilsClickAnywhereFollow);
