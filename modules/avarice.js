@@ -4,7 +4,7 @@ import createTextGui from '../util/customtextgui';
 import { drawArrow3DPos, renderOutline, renderTracer } from '../util/draw';
 import { commaNumber } from '../util/format';
 import { lerp } from '../util/math';
-import { getItemId } from '../util/mc';
+import { getItemId, getMaxHp } from '../util/mc';
 import reg from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
 import { run, unrun } from '../util/threading';
@@ -76,7 +76,7 @@ const arachneSpawnReg = reg('spawnEntity', ent => {
 function arachneTick() {
   run(() => {
     arachnePossBig = arachnePossBig.filter(v => {
-      const hp = v[1].func_110140_aT().func_111152_a('generic.maxHealth').func_111125_b();
+      const hp = getMaxHp(v[1]);
       if (
         (stateIsArachne.get() & 1 && (hp === 20_000 || hp === 40_000)) ||
         (stateIsArachne.get() & 2 && (hp === 100_000 || hp === 200_000))
@@ -87,7 +87,7 @@ function arachneTick() {
       return --v[0] > 0;
     });
     arachnePossSmall = arachnePossSmall.filter(v => {
-      const hp = v[1].func_110140_aT().func_111152_a('generic.maxHealth').func_111125_b();
+      const hp = getMaxHp(v[1]);
       if (
         (stateIsArachne.get() & 1 && [4_000, 8_000, 16_000, 32_000].includes(hp)) ||
         (stateIsArachne.get() & 2 && [20_000, 40_000, 80_000, 160_000].includes(hp))
