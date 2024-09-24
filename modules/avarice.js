@@ -152,12 +152,17 @@ const stateTaraStarted = new StateVar(0);
 const SlayerFeatures = Java.type('gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures');
 const taraHitReg = reg('attackEntity', (ent, evn) => {
   const e = ent.entity;
-  if (!(e instanceof EntitySpider)) return;
-  if (getMaxHp(e) !== 2_400_000) return;
+  if (e instanceof EntityCaveSpider) {
+    if (getMaxHp(e) < 1_000_000_000) return;
+  } else if (e instanceof EntitySpider) {
+    if (getMaxHp(e) !== 2_400_000) return;
+  } else return;
+
   if (
     stateTaraStarted.get() === 0 &&
     !(SlayerFeatures && SlayerFeatures.INSTANCE.getHasSlayerText())
   ) return;
+
   cancel(evn);
 }, 'avarice').setEnabled(new StateProp(stateDoingTara).and(settings._avariceTaraTrader));
 const taraStartReg = reg('chat', () => {
