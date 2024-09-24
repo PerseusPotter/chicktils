@@ -146,6 +146,30 @@ const arachnePointReg = reg('renderOverlay', () => {
     false, 5
   );
 }, 'avarice').setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(new StateProp(settings._preferUseTracer).not()));
+
+const stateDoingTara = new StateVar(false);
+const stateTaraStarted = new StateVar(0);
+const SlayerFeatures = Java.type('gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures');
+const taraHitReg = reg('attackEntity', (ent, evn) => {
+  const e = ent.entity;
+  if (!(e instanceof EntitySpider)) return;
+  if (getMaxHp(e) !== 2_400_000) return;
+  if (
+    stateTaraStarted.get() === 0 &&
+    !(SlayerFeatures && SlayerFeatures.INSTANCE.getHasSlayerText())
+  ) return;
+  cancel(evn);
+}, 'avarice').setEnabled(new StateProp(stateDoingTara).and(settings._avariceTaraTrader));
+const taraStartReg = reg('chat', () => {
+  stateDoingTara.set(true);
+  stateTaraStarted.set(10);
+}, 'avarice').setCriteria('&r   &5&l» &7Slay &c2,000 Combat XP &7worth of Spiders&7.&r').setEnabled(settings._avariceTaraTrader);
+const taraLeaveReg = reg('worldUnload', () => {
+  stateDoingTara.set(false);
+  stateTaraStarted.set(0);
+}, 'avarice').setEnabled(new StateProp(stateDoingTara).and(settings._avariceTaraTrader));
+const taraServerTickReg = reg('serverTick', () => stateTaraStarted.set(stateTaraStarted.get() - 1), 'avarice').setEnabled(new StateProp(stateTaraStarted).notequals(0));
+
 export function init() {
   settings._moveAvariceCoinCounter.onAction(() => coinCounter.edit());
 }
@@ -158,6 +182,8 @@ export function load() {
   arachnePossBig = [];
   arachnePossSmall = [];
   arachnePossNames = [];
+  stateDoingTara.set(false);
+  stateTaraStarted.set(0);
 
   coinRenderReg.register();
   coinUpdateReg.register();
@@ -173,6 +199,10 @@ export function load() {
   arachneRenderReg.register();
   arachneTracerReg.register();
   arachnePointReg.register();
+  taraHitReg.register();
+  taraStartReg.register();
+  taraLeaveReg.register();
+  taraServerTickReg.register();
 }
 export function unload() {
   coinRenderReg.unregister();
@@ -189,4 +219,8 @@ export function unload() {
   arachneRenderReg.unregister();
   arachneTracerReg.unregister();
   arachnePointReg.unregister();
+  taraHitReg.unregister();
+  taraStartReg.unregister();
+  taraLeaveReg.unregister();
+  taraServerTickReg.unregister();
 }
