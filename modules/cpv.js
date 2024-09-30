@@ -3,7 +3,6 @@ import reg from '../util/registerer';
 import settings from '../settings';
 import { log } from '../util/log';
 import * as Party from '../util/party';
-import { getPlayerName } from '../util/format';
 import { run } from '../util/threading';
 
 const userUUIDC = new Map();
@@ -64,25 +63,11 @@ function cpv(user) {
 const autocomplete = function(args) {
   const list = [];
   if (settings.cpvAutoCompleteParty) Party.getMembers().forEach(v => list.push(v));
-  if (settings.cpvAutoCompleteTabList) {
-    const tab = TabList.getNames();
-    let expectEmpty = false;
-    for (let i = 1; i < tab.length; i++) {
-      let s = tab[i];
-      if (expectEmpty) {
-        if (s !== '§r') break;
-        expectEmpty = false;
-        continue;
-      }
-      if (s === '§r' || /^§r§7and \d+ other players\.\.\.§r$/.test(s)) break;
-      if (s.startsWith('§r Revive Stones:')) {
-        expectEmpty = true;
-        continue;
-      }
-      if (s.startsWith('§r Ultimate:') || s.startsWith('§r         §r§a§lPlayers')) continue;
-      list.push(getPlayerName(s));
-    }
-  }
+  if (settings.cpvAutoCompleteTabList) Player.getPlayer().field_71174_a.func_175106_d().forEach(v => {
+    const t = v.func_178850_i();
+    if (!t || !t.func_96661_b().startsWith('a')) return;
+    list.push(v.func_178845_a().getName());
+  });
   const a = args[0].toLowerCase();
   if (a) return list.filter(v => v.toLowerCase().startsWith(a));
   return list;
