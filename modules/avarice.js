@@ -167,7 +167,7 @@ const taraHitReg = reg('attackEntity', (ent, evn) => {
 }, 'avarice').setEnabled(new StateProp(stateDoingTara).and(settings._avariceTaraTrader));
 const taraStartReg = reg('chat', () => {
   stateDoingTara.set(true);
-  stateTaraStarted.set(10);
+  stateTaraStarted.set(15);
 }, 'avarice').setCriteria('&r   &5&l» &7Slay &c2,000 Combat XP &7worth of Spiders&7.&r').setEnabled(settings._avariceTaraTrader);
 const taraLeaveReg = reg('worldUnload', () => {
   stateDoingTara.set(false);
