@@ -33,13 +33,13 @@ export const getSbDate = (function() {
   };
 }());
 
-/**=
+/**
  * @param {Item | import ('../../@types/External').JavaClass<'net.minecraft.item.ItemStack'>} item
  * @returns {string}
  */
 export function getSbId(item) {
   if (!item) return '';
-  return (item.itemStack ? item.itemStack : item).func_77978_p()?.func_74775_l('ExtraAttributes')?.func_74779_i('id');
+  return (item.itemStack ? item.itemStack : item).func_77978_p()?.func_74775_l('ExtraAttributes')?.func_74779_i('id') ?? '';
 }
 
 /**
