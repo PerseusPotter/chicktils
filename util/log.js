@@ -42,9 +42,8 @@ function format(obj, depth = 3) {
   }
 
 }
-export function logDebug(obj, escapeFormatting = false) {
+export function logDebug(obj) {
   let str = Object.entries(obj).map(([k, v]) => k + ': ' + format(v)).join('\n');
-  if (escapeFormatting) str = str.replace(/(&|§)/g, '$1﻿');
   log(str);
 }
 
