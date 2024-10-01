@@ -203,7 +203,7 @@ reg = function reg(type, shit, modN) {
   // :(
   // [gg.skytils.skytilsmod.features.impl.handlers.NamespacedCommands:registerCommandHelper:81]: WARNING! Command aaa has 0; owners: []
   function ChickTilsCommand(cb) {
-    ChickTilsRegister.call(this, wrap(cb));
+    ChickTilsRegister.call(this, wrapFunc(cb));
     this.id = '';
     this.tabCb = null;
     this.tabArr = new ArrayList();
@@ -262,7 +262,7 @@ reg = function reg(type, shit, modN) {
   };
   ChickTilsCommand.prototype.setTabCompletions = function setTabCompletions(...args) {
     if (!args) args = [];
-    else if (args.length === 1 && typeof args[0] === 'function') this.tabCb = wrap(args[0]);
+    else if (args.length === 1 && typeof args[0] === 'function') this.tabCb = wrapFunc(args[0]);
     else args.forEach(v => this.tabArr.add(v.toString()));
     return this;
   };
