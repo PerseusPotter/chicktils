@@ -12,9 +12,9 @@ export function unrun(cb) {
   else Client.scheduleTask(cb);
 }
 export function wrap(cb) {
-  return function() {
+  return function(...args) {
     try {
-      cb();
+      cb(...args);
     } catch (e) {
       log('error', e);
       log(e.stack);
