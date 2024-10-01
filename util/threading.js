@@ -14,7 +14,8 @@ export function unrun(cb) {
 export function wrap(cb) {
   return function(...args) {
     try {
-      cb(...args);
+      if (args && args.length && !(args.length === 1 && args[0] === undefined)) cb(...args);
+      else cb();
     } catch (e) {
       log('error', e);
       log(e.stack);
