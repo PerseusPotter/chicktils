@@ -76,7 +76,7 @@ const createRegister = function(type, shit) {
  *
  * forceTrigger(...args: any[]) => any;
  *
- * @type {typeof register}
+ * @type {typeof register & ((triggerType: 'spawnEntity', callback: (entity: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick', callback: () => void) => import('../../@types/IRegister').Trigger)}
  */
 let reg;
 reg = function reg(type, shit, modN) {
