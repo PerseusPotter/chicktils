@@ -4,11 +4,10 @@ import { StateProp } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
 
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
-const entSpawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => {
-  const e = evn.entity;
+const entSpawnReg = reg('spawnEntity', e => {
   if (!(e instanceof EntityArmorStand)) return;
   if (e.field_70163_u < 9 || e.field_70163_u > 25 || e.field_70161_v > 45) return;
-  evn.setCanceled(true);
+  World.getWorld().func_72900_e(e);
 }, 'dungeon/hidewitherking').setEnabled(new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonHideWitherKing));
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const partSpawnReg = reg('spawnParticle', (p, i, evn) => {
