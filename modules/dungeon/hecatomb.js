@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import createAlert from '../../util/alert';
-import { listenBossMessages } from '../dungeon.js';
+import { listenBossMessages, stateFloor } from '../dungeon.js';
 
 const hecAlert = createAlert('Hecatomb');
 
@@ -39,7 +39,7 @@ export function init() {
         if (msg === `Maybe in another life. Until then, meet my ultimate corpse.`) onBossEnd();
         break;
       case 'Necron':
-        if (msg === `All this, for nothing...`) onBossEnd();
+        if (msg === `All this, for nothing...` && stateFloor.get() === 'F7') onBossEnd();
         break;
       case 'Wither King':
         // if (msg === `Incredible. You did what I couldn't do myself.`) onBossEnd();
