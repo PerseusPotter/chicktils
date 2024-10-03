@@ -14,8 +14,10 @@ function _getUUID(user) {
     if (uuid) uuid = JSON.parse(uuid).id;
     if (uuid) return uuid;
   } catch (e) { }
-  uuid = urlToString('https://api.ashcon.app/mojang/v2/uuid/' + user);
-  if (uuid && uuid.length === 36) return uuid;
+  try {
+    uuid = urlToString('https://api.ashcon.app/mojang/v2/uuid/' + user);
+    if (uuid && uuid.length === 36) return uuid;
+  } catch (e) { }
   return '';
 }
 function getUUID(user) {
