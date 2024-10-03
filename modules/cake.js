@@ -17,6 +17,22 @@ const cakes = [
   '&f+1❂ True Defense',
   '&b+1✯ Magic Find'
 ];
+const colors = [
+  '&5purple',
+  '&alime',
+  '&dpink',
+  '&blight blue',
+  '&4red',
+  '&1blue',
+  '&6brown',
+  '&eyellow',
+  '&fwhite',
+  '&6orange',
+  '&3teal',
+  '&2green',
+  '&8gray',
+  '&0black'
+];
 
 let lastEatTime = 0;
 let lastEat = new Set();
@@ -34,7 +50,7 @@ function onEat(cake) {
     new TextComponent(`&bEaten ${14 - lastEat.size}/14 cakes.`)
       .setHover('show_text', [
         '&aMissing:',
-        ...lastEat.values()
+        ...Array.from(lastEat.values()).map(v => `${v} &r&7(${colors[cakes.indexOf(v)]}&7)`)
       ].join('\n'))
   );
   logMessage(prevMsg);
