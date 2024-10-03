@@ -42,8 +42,6 @@ export class Property extends StateVar {
     this.value = defaultValue;
     this.defaultValue = defaultValue;
     this.opts = { min, max, len, options };
-    this.listeners0 = [];
-    this.listeners1 = [];
     this.actionListeners = [];
   }
   set(v, force) {
