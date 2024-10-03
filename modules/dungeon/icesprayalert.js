@@ -18,10 +18,10 @@ export function init() {
   settings._dungeonIceSprayAlertSound.listen(v => iceSprayAlert.sound = v);
 }
 export function start() {
-  ents = [];
-
   step2Reg.register();
 }
 export function reset() {
+  ents = [];
+
   step2Reg.unregister();
 }
