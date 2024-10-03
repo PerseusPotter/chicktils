@@ -816,6 +816,11 @@ export const props = {
 
   // 16
 
+  enablesacks: new Property('EnableSackTils', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'does things with the sacks message\nto turn on settings -> personal -> chat feedback -> sack notifs' }),
+  sacksDisableMessage: new Property('SackTilsDisableMessage', page, ++sort, Property.Type.Toggle, true, { desc: 'hide the message' }),
+
+  // 17
+
   enableboxallentities: new Property('EnableBoxAllEntities', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
   boxAllEntitiesColor: new Property('BoxAllEntitiesColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   boxAllEntitiesEsp: new Property('BoxAllEntitiesEsp', page, ++sort, Property.Type.Toggle, true),
@@ -859,6 +864,7 @@ const pageNames = [
   'Diana',
   'HUD',
   'Avarice Addons',
+  'SackTils',
   'Misc.'
 ];
 /**
