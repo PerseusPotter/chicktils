@@ -11,7 +11,15 @@ let isMainSettings = false;
 export function setIsMain() {
   isMainSettings = true;
 };
+/**
+ * @template {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7} T
+ * @template {string | number | boolean | null} V
+ * @template {string} O
+ */
 export class Property extends StateVar {
+  /**
+   * @type {{ Toggle: 0, Integer: 1, Number: 2, Percent: 3, Text: 4, Color: 5, Option: 6, Action: 7 }}
+   */
   static Type = {
     Toggle: 0,
     Integer: 1,
@@ -27,9 +35,9 @@ export class Property extends StateVar {
    * @param {string} name
    * @param {number} page
    * @param {number} pageSort
-   * @param {number} type
-   * @param {any} defaultValue
-   * @param {{ desc: string, min: number, max: number, len: number, options: string[] }} opts
+   * @param {T} type
+   * @param {V} defaultValue
+   * @param {{ desc: string, min: number, max: number, len: number, options: O[] }} opts
    */
   constructor(name, page, pageSort, type, defaultValue, { desc = '', min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY, len = Number.POSITIVE_INFINITY, options = [] } = {}) {
     super(defaultValue);
@@ -39,8 +47,19 @@ export class Property extends StateVar {
     this.page = page;
     this.sort = pageSort;
     this.type = type;
+    /**
+     * @type {T extends 0 ? boolean : T extends 4 ? string : T extends 6 ? O : T extends 7 ? null : number}
+     */
+    this.value;
+    // typescript </3
     this.value = defaultValue;
+    /**
+     * @type {V}
+     */
     this.defaultValue = defaultValue;
+    /**
+     * @type {{ min?: number, max?: number, len?: number, options?: O[] }}
+     */
     this.opts = { min, max, len, options };
     this.actionListeners = [];
   }
@@ -864,7 +883,7 @@ const pageNames = [
   'Misc.'
 ];
 /**
- * @type {Settings & Record<keyof typeof props, string | number | boolean> & Record<`_${keyof typeof props}`, Property>}
+ * @type {Settings & { [x in keyof typeof props]: typeof props[x]['value'] } & { [x in keyof typeof props as `_${x}`]: typeof props[x] }}
  */
 const settings = new Settings('ChickTils', 'settings.json', props, pageNames);
 
