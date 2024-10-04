@@ -793,6 +793,9 @@ export const props = {
   spotifyHideNotOpen: new Property('SpotifyHideIfNotOpened', page, ++sort, Property.Type.Toggle, true, { desc: 'hide if spotify is not opened' }),
   spotifyMaxSongLength: new Property('SpotifyMaxSongLength', page, ++sort, Property.Type.Integer, 100, { desc: 'in pixels, 0 for uncapped length', min: 0 }),
 
+  enablesacks: new Property('EnableSackTils', page, ++sort, Property.Type.Toggle, false, { desc: 'does things with the sacks message\nto turn on settings -> personal -> chat feedback -> sack notifs' }),
+  sacksDisableMessage: new Property('SackTilsDisableMessage', page, ++sort, Property.Type.Toggle, true, { desc: 'hide the message' }),
+
   // 15
 
   enableavarice: new Property('EnableAvariceAddons', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'things for avarice' }),
@@ -813,11 +816,6 @@ export const props = {
   avariceTaraTrader: new Property('AvariceTaraTrader', page, ++sort, Property.Type.Toggle, false, { desc: 'block hits on tara if slayer quest not started\nlag go brr\nnote: doesnt block custom hits (i.e. >3 block range)' }),
 
   // 16
-
-  enablesacks: new Property('EnableSackTils', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'does things with the sacks message\nto turn on settings -> personal -> chat feedback -> sack notifs' }),
-  sacksDisableMessage: new Property('SackTilsDisableMessage', page, ++sort, Property.Type.Toggle, true, { desc: 'hide the message' }),
-
-  // 17
 
   enableboxallentities: new Property('EnableBoxAllEntities', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
   boxAllEntitiesInvis: new Property('BoxAllEntitiesInvisible', page, ++sort, Property.Type.Toggle, false, { desc: 'box invisible entities' }),
@@ -863,7 +861,6 @@ const pageNames = [
   'Diana',
   'HUD',
   'Avarice Addons',
-  'SackTils',
   'Misc.'
 ];
 /**
