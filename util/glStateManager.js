@@ -342,6 +342,5 @@ export default {
    */
   callList(list) {
     GlStateManager.func_179148_o(list);
-  },
-
+  }
 };
