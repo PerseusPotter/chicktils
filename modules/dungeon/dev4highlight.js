@@ -30,6 +30,7 @@ const blockMultiChangeReg = reg('packetReceived', pack => {
   pack.func_179844_a().some(v => blockUpdate(v.func_180090_a(), v.func_180088_c()));
 }).setFilteredClass(net.minecraft.network.play.server.S22PacketMultiBlockChange).setEnabled(stateEnable);
 const renderReg = reg('renderWorld', () => {
+  if (emBlockPos === resetPos) return;
   renderFilledBox(
     emBlockPos[0] - 0.005, emBlockPos[1] - 0.005, emBlockPos[2] - 0.005,
     1.01, 1.01,
