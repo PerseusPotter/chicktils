@@ -157,12 +157,6 @@ const tickReg = reg('tick', () => {
     pearlLocs = dropLocs.map(({ x, y, z }) => solvePearl(x - px, y - py, z - pz)).filter(v => !Number.isNaN(v.phi));
   });
 }).setEnabled(settings._kuudraRenderPearlTarget);
-const customBossBar = createBossBar('§6﴾ §c§lKuudra§6 ﴿', () => {
-  if (!kuuder) return 100_000;
-  const h = kuuder.getHP();
-  if (h <= 25_000) return h * 4;
-  return (h - 25_000) / 3 * 4;
-}, 100_000);
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const EntityMagmaCube = Java.type('net.minecraft.entity.monster.EntityMagmaCube');
 const updateReg1 = reg('step', () => {
@@ -186,8 +180,15 @@ const updateReg1 = reg('step', () => {
     }));
   });
 }).setFps(1);
+
+const customBossBar = createBossBar('§6﴾ §c§lKuudra§6 ﴿', () => {
+  if (!kuuder) return 100_000;
+  const h = kuuder.getHP();
+  if (h <= 25_000) return h * 4;
+  return (h - 25_000) / 3 * 4;
+}, 100_000);
 const bossBarReg = reg('renderBossHealth', () => {
-  setBossBar(customBossBar, false);
+  setBossBar(customBossBar);
 }).setEnabled(new StateProp(settings._kuudraCustomBossBar).and(isT5));
 
 const supplyPickReg = reg('renderTitle', (title, sub) => {
