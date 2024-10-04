@@ -18,47 +18,6 @@ export function getRegs() {
   return allRegs;
 }
 
-const trackPerformance = false;
-/**
- * @typedef {{ cum: number, num: number, min: number, max: number }} PerfomanceData
- */
-/**
- * @typedef {Record<string, PerfomanceData>} PerformanceDataBundled
- */
-/**
- * @type {PerformanceDataBundled}
- */
-let performanceDataTick = {};
-/**
- * @type {PerformanceDataBundled}
- */
-let performanceDataRend = {};
-/**
- * @type {{ tick: PerformanceDataBundled, rend: PerformanceDataBundled }[]}
- */
-const performanceDataHist = [];
-if (trackPerformance) {
-  let rc = 0;
-  let gc = 0;
-  const renderReg = register(net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent, evn => {
-    if (evn.phase.toString() === 'START') return;
-    if (rc >= gc) performanceDataHist.push({ rend: performanceDataRend });
-    else performanceDataHist[rc].rend = performanceDataRend;
-    rc++;
-    performanceDataRend = {};
-  });
-  const gameReg = register(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, evn => {
-    if (evn.phase.toString() === 'START') return;
-    if (gc >= rc) performanceDataHist.push({ tick: performanceDataTick });
-    else performanceDataHist[gc].tick = performanceDataTick;
-    gc++;
-    performanceDataTick = {};
-  });
-  register('command', () => {
-    FileLib.write('chicktils', 'performancedata.json', JSON.stringify(performanceDataHist));
-  }).setName('chicktilsdumpperformancedataregister');
-}
-
 const customRegs = {};
 const createRegister = function(type, shit) {
   if (type in customRegs) return new (customRegs[type])(shit);
@@ -79,28 +38,7 @@ const createRegister = function(type, shit) {
  * @type {typeof register & ((triggerType: 'spawnEntity', callback: (entity: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick', callback: () => void) => import('../../@types/IRegister').Trigger)}
  */
 let reg;
-reg = function reg(type, shit, modN) {
-  if (!modN) throw 'no module name';
-  if (trackPerformance) {
-    const key = `${modN}-${type}`;
-    const System = Java.type('java.lang.System');
-    const oshit = shit;
-    const isRend = typeof type === 'string' && (type.toLowerCase().includes('render') || type === 'step');
-    shit = function() {
-      const start = System.nanoTime();
-      oshit.apply(null, arguments);
-      const time = System.nanoTime() - start;
-      const data = isRend ? performanceDataRend : performanceDataTick;
-      if (!(key in data)) data[key] = { cum: time, num: 1, max: time, min: time };
-      else {
-        const inst = data[key];
-        inst.cum += time;
-        inst.num++;
-        if (time > inst.max) inst.max = time;
-        if (time < inst.min) inst.min = time;
-      }
-    };
-  }
+reg = function reg(type, shit) {
   const rr = createRegister(type, shit);
   let isReg = false;
   let isAReg = false;
@@ -298,8 +236,8 @@ reg = function reg(type, shit, modN) {
       ChickTilsSpawnEntity.newMobs.forEach(v => ChickTilsSpawnEntity.list.forEach(c => c.cb(v)));
       ChickTilsSpawnEntity.newMobs = [];
     });
-  }, 'ChickTilsSpawnEntity');
-  ChickTilsSpawnEntity.spawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => ChickTilsSpawnEntity.newMobs.push(evn.entity), 'ChickTilsSpawnEntity');
+  });
+  ChickTilsSpawnEntity.spawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => ChickTilsSpawnEntity.newMobs.push(evn.entity));
   ChickTilsSpawnEntity.prototype.update = function update() {
     if (ChickTilsSpawnEntity.list.size) {
       ChickTilsSpawnEntity.tickReg.register();
@@ -370,7 +308,7 @@ reg = function reg(type, shit, modN) {
   ChickTilsServerTick.tickReg = reg('packetReceived', pack => {
     if (pack.func_148890_d() > 0) return;
     ChickTilsServerTick.list.forEach(v => v.cb());
-  }, 'ChickTilsServerTick').setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
+  }).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
   ChickTilsServerTick.prototype.update = function update() {
     if (ChickTilsServerTick.list.size) {
       ChickTilsServerTick.tickReg.register();

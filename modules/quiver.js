@@ -95,7 +95,7 @@ const arrowTypes = {
   }
 };
 const enableRender = new StateVar(false);
-const renderReg = reg('renderOverlay', () => display.render(), 'quiver').setEnabled(enableRender);
+const renderReg = reg('renderOverlay', () => display.render()).setEnabled(enableRender);
 const updateReg = reg('packetReceived', pack => {
   if (pack.func_148911_c()) return;
   enableRender.set(Boolean(function() {
@@ -140,7 +140,7 @@ const updateReg = reg('packetReceived', pack => {
     }
     return true;
   }()));
-}, 'quiver').setFilteredClass(net.minecraft.network.play.server.S30PacketWindowItems);
+}).setFilteredClass(net.minecraft.network.play.server.S30PacketWindowItems);
 
 export function init() {
   settings._moveQuiver.onAction(() => display.edit());

@@ -56,7 +56,7 @@ const warpOpenReg = reg('guiOpened', evn => {
       return item && getItemId(item) === 'minecraft:paper';
     });
   });
-}, 'diana');
+});
 
 const burrowFoundAlert = createAlert('Burrow Found');
 let numNotStartBurrows = 0;
@@ -66,18 +66,18 @@ let guessLoc = null;
 const renderArrowOvReg = reg('renderOverlay', () => {
   const l = targetLoc || guessLoc;
   if (l) drawArrow3DPos(settings.dianaArrowToBurrowColor, l[0], l[1] + 1, l[2], false);
-}, 'diana').setEnabled(new StateProp(settings._preferUseTracer).not().and(settings._dianaArrowToBurrow));
+}).setEnabled(new StateProp(settings._preferUseTracer).not().and(settings._dianaArrowToBurrow));
 const renderArrowWrldReg = reg('renderWorld', () => {
   const l = targetLoc || guessLoc;
   if (l) renderTracer(settings.dianaArrowToBurrowColor, l[0], l[1] + 1, l[2], false);
-}, 'diana').setEnabled(new StateProp(settings._preferUseTracer).and(settings._dianaArrowToBurrow));
+}).setEnabled(new StateProp(settings._preferUseTracer).and(settings._dianaArrowToBurrow));
 const renderWrldReg = reg('renderWorld', () => {
   if (guessLoc) {
     renderWaypoint(guessLoc[0], guessLoc[1], guessLoc[2], 1, 1, settings.dianaGuessFromParticlesColor, true, true);
     renderBeaconBeam(guessLoc[0], guessLoc[1] + 1, guessLoc[2], settings.dianaGuessFromParticlesColor, true, true);
     // renderString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
   }
-}, 'diana').setEnabled(settings._dianaGuessFromParticles);
+}).setEnabled(settings._dianaGuessFromParticles);
 const GriffinBurrows = Java.type('gg.skytils.skytilsmod.features.impl.events.GriffinBurrows');
 // 0 repetition, clean code
 const tickReg = reg('tick', () => {
@@ -160,7 +160,7 @@ const tickReg = reg('tick', () => {
   });
   if (closest) targetLoc = [closest.getX() + 0.5, closest.getY(), closest.getZ() + 0.5];
   else targetLoc = null;
-}, 'diana').setEnabled(new StateVar(Boolean(GriffinBurrows)));
+}).setEnabled(new StateVar(Boolean(GriffinBurrows)));
 
 let prevSounds = [];
 let prevParticles = [];
@@ -216,7 +216,7 @@ const soundPlayReg = reg('soundPlay', (pos, name, vol, pit, cat, evn) => {
   const { r, b } = linReg(prevSounds.map((v, i) => [i, v[1]]));
   guessD = Math.E / b;
   updateGuess();
-}, 'diana').setEnabled(settings._dianaGuessFromParticles);
+}).setEnabled(settings._dianaGuessFromParticles);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const spawnPartReg = reg('spawnParticle', (part, id, evn) => {
   if (!id.equals(EnumParticleTypes.DRIP_LAVA)) return;
@@ -238,7 +238,7 @@ const spawnPartReg = reg('spawnParticle', (part, id, evn) => {
   guessDir[0] = m;
   guessDir[1] = b * m;
   updateGuess();
-}, 'diana').setEnabled(settings._dianaGuessFromParticles);
+}).setEnabled(settings._dianaGuessFromParticles);
 
 const startBurrowReg = reg('chat', () => {
   numNotStartBurrows = 0;
@@ -255,7 +255,7 @@ const startBurrowReg = reg('chat', () => {
   soundPlayReg.register();
   spawnPartReg.register();
   unloadReg.register();
-}, 'diana').setCriteria('&r&eYou dug out a Griffin Burrow! &r&7(1/4)&r');
+}).setCriteria('&r&eYou dug out a Griffin Burrow! &r&7(1/4)&r');
 const unloadReg = reg('worldUnload', () => {
   renderArrowOvReg.unregister();
   renderArrowWrldReg.unregister();
@@ -266,7 +266,7 @@ const unloadReg = reg('worldUnload', () => {
   spawnPartReg.unregister();
   targetLoc = null;
   guessLoc = null;
-}, 'diana');
+});
 
 const warpKey = new KeyBind('Diana Warp', data.dianaWarpKey, 'ChickTils');
 warpKey.registerKeyRelease(() => {
@@ -303,7 +303,7 @@ const fixStReg = reg('command', () => {
     });
     guess.remove(nearest);
   }
-}, 'diana').setName('ctsmanualfixstdiana').setEnabled(new StateVar(Boolean(GriffinBurrows)));
+}).setName('ctsmanualfixstdiana').setEnabled(new StateVar(Boolean(GriffinBurrows)));
 
 export function init() {
   settings._dianaAlertFoundBurrowSound.listen(v => burrowFoundAlert.sound = v);

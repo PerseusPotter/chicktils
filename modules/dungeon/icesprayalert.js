@@ -12,7 +12,7 @@ const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand')
 const step2Reg = reg('step', () => {
   if (ents.some(e => e.getName().includes('Ice Spray Wand'))) iceSprayAlert.show(settings.dungeonIceSprayAlertTime);
   unrun(() => ents = World.getAllEntitiesOfType(EntityArmorStand));
-}, 'dungeon/icesprayalert').setFps(2).setOffset(500 / 3 * 2).setEnabled(new StateProp(stateIsInBoss).not().and(settings._dungeonIceSprayAlert));
+}).setFps(2).setOffset(500 / 3 * 2).setEnabled(new StateProp(stateIsInBoss).not().and(settings._dungeonIceSprayAlert));
 
 export function init() {
   settings._dungeonIceSprayAlertSound.listen(v => iceSprayAlert.sound = v);

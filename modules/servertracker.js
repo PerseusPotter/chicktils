@@ -18,8 +18,8 @@ const warpReg = reg('chat', id => {
   } else log('new server');
   lastWarp = t;
   currServ = id;
-}, 'servertracker').setCriteria('Sending to server ${id}...');
-const unloadReg = reg('worldUnload', () => (Date.now() - lastWarp > 1000) && (currServ = ''), 'servertracker');
+}).setCriteria('Sending to server ${id}...');
+const unloadReg = reg('worldUnload', () => (Date.now() - lastWarp > 1000) && (currServ = ''));
 
 let lastLoc = '';
 const warpLocs = {
@@ -88,12 +88,12 @@ const regs = [
       _setTimeout(() => ChatLib.command('warp ' + loc), settings.serverTrackerTransferCd - t);
     } else ChatLib.command('warp ' + loc);
     lastLoc = loc;
-  }, 'servertracker').setTabCompletions(tabComplete).setName('warp', true),
-  reg('command', () => ChatLib.command('warp island', true), 'servertracker').setName('is', true),
-  reg('command', () => ChatLib.command('warp hub', true), 'servertracker').setName('hub', true),
-  reg('command', () => ChatLib.command('warp forge', true), 'servertracker').setName('warpforge', true),
-  reg('command', () => ChatLib.command('warp dungeon_hub', true), 'servertracker').setName('dn', true),
-  reg('command', () => ChatLib.command('warp dungeon_hub', true), 'servertracker').setName('dh', true)
+  }).setTabCompletions(tabComplete).setName('warp', true),
+  reg('command', () => ChatLib.command('warp island', true)).setName('is', true),
+  reg('command', () => ChatLib.command('warp hub', true)).setName('hub', true),
+  reg('command', () => ChatLib.command('warp forge', true)).setName('warpforge', true),
+  reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dn', true),
+  reg('command', () => ChatLib.command('warp dungeon_hub', true)).setName('dh', true)
 ];
 
 export function init() { }

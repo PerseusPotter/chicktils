@@ -79,7 +79,7 @@ const entSpawnReg = reg('spawnEntity', e => {
       p.me = e;
     }
   }
-}, 'dungeon');
+});
 const getPlayersStep2Reg = reg('step', () => {
   const tab = TabList.getNames();
   let expectEmpty = false;
@@ -115,11 +115,11 @@ const getPlayersStep2Reg = reg('step', () => {
     }
     getPlayersStep2Reg.unregister();
   }
-}, 'dungeon').setFps(2);
+}).setFps(2);
 
-// const dungeonJoinReq = reg('chat', () => dungeon.emit('dungeonJoin'), 'dungeon').setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}');
-const dungeonStartReg = reg('chat', () => start(), 'dungeon').setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
-const dungeonLeaveReg = reg('worldUnload', () => reset(), 'dungeon');
+// const dungeonJoinReq = reg('chat', () => dungeon.emit('dungeonJoin'))setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}');
+const dungeonStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
+const dungeonLeaveReg = reg('worldUnload', () => reset());
 const bossMessageReg = reg('chat', (name, msg) => {
   bossCbs.forEach(v => v(name, msg));
   if (name === 'The Watcher') return;
@@ -129,8 +129,8 @@ const bossMessageReg = reg('chat', (name, msg) => {
     if (msg === `If I had spent more time studying and less time watching anime, maybe mother would be here with me!`) return;
   }
   stateIsInBoss.set(true);
-}, 'dungeon').setCriteria(/^&r&(?:c|4)\[BOSS\] (.+?)&r&(?:f|c): (?:&.)*(.+?)&r$/);
-// const dungeonEndReg = reg('chat', () => dungeon.emit('dungeonEnd'), 'dungeon').setChatCriteria('&r&f                            &r&fTeam Score:').setParameter('START');
+}).setCriteria(/^&r&(?:c|4)\[BOSS\] (.+?)&r&(?:f|c): (?:&.)*(.+?)&r$/);
+// const dungeonEndReg = reg('chat', () => dungeon.emit('dungeonEnd')).setChatCriteria('&r&f                            &r&fTeam Score:').setParameter('START');
 
 export function init() {
   modules = [

@@ -49,7 +49,7 @@ const renderReg = reg('renderOverlay', () => {
   spotifyGui.render();
   const loc = spotifyGui.getTrueLoc();
   songMarquee.render(loc.x + spotifyPrefixLen * loc.s, loc.y, loc.s, spotifyGui.getLoc().b);
-}, 'spotify').setEnabled(new StateProp(settings._spotifyHideNotOpen).not().or(stateSpotifyOpen));
+}).setEnabled(new StateProp(settings._spotifyHideNotOpen).not().or(stateSpotifyOpen));
 const updateReg = reg('step', () => {
   if (spotifyGui.isEdit) return;
   const proc = new ProcessBuilder(
@@ -78,7 +78,7 @@ const updateReg = reg('step', () => {
   songMarquee.setText(formatSong('NOT OPENED'));
   stateSpotifyOpen.set(false);
   // proc.waitFor();
-}, 'spotify').setDelay(2);
+}).setDelay(2);
 
 export function init() {
   settings._moveSpotifyDisplay.onAction(() => spotifyGui.edit());

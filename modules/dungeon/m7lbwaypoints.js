@@ -17,11 +17,11 @@ const lbs = [
 let nearest;
 const tickReg = reg('tick', () => {
   nearest = lbs.map(v => [fastDistance(Player.getX() - v[0], Player.getZ() - v[1]), v]).reduce((a, v) => a ? a[0] < v[0] ? a : v : v, null)[1];
-}, 'dungeon/m7lbwaypoints').setEnabled(stateM7LBWaypoints);
+}).setEnabled(stateM7LBWaypoints);
 const renderWorldReg = reg('renderWorld', () => {
   if (Player.getY() > 30 || !nearest) return;
   renderBeaconBeam(nearest[0], 0, nearest[1], nearest[2], true, false, 17);
-}, 'dungeon/m7lbwaypoints').setEnabled(stateM7LBWaypoints);
+}).setEnabled(stateM7LBWaypoints);
 
 export function init() { }
 export function start() {

@@ -10,14 +10,14 @@ const rcReg = reg('playerInteract', (action, pos) => {
   if (!action.equals(PlayerInteractEventAction.RIGHT_CLICK_BLOCK)) return;
   let i = chests.findIndex(v => v.x === pos.x && v.y === pos.y && v.z === pos.z);
   if (i >= 0) chests.splice(i, 1);
-}, 'powderalert');
+});
 function reset() {
   chests = [];
   rcReg.unregister();
   renderReg.unregister();
   unloadReg.unregister();
 }
-const unloadReg = reg('worldUnload', () => reset(), 'powderalert');
+const unloadReg = reg('worldUnload', () => reset());
 const startReg = reg('chat', () => {
   renderReg.register();
   rcReg.register();
@@ -28,11 +28,11 @@ const startReg = reg('chat', () => {
     chestAlert.text = 'Chest x' + chests.length;
     chestAlert.show(settings.powderAlertTime);
   });
-}, 'powderalert').setCriteria('&r&aYou uncovered a treasure chest!&r');
+}).setCriteria('&r&aYou uncovered a treasure chest!&r');
 
 const renderReg = reg('renderWorld', () => {
   chests.forEach(v => renderWaypoint(v.x, v.y, v.z, 1, 1, settings.powderBoxColor, settings.powderBoxEsp, false));
-}, 'powderalert');
+});
 
 export function init() {
   settings._powderAlertSound.listen(v => chestAlert.sound = v);

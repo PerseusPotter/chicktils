@@ -14,7 +14,7 @@ import { StateProp, StateVar } from './state';
  * }} Alert
  */
 const activeAlert = new StateVar(null);
-const renderReg = reg('renderOverlay', () => activeAlert.get()?._display?.render(), 'alert').setEnabled(new StateProp(activeAlert).notequals(null));
+const renderReg = reg('renderOverlay', () => activeAlert.get()?._display?.render()).setEnabled(new StateProp(activeAlert).notequals(null));
 
 const createAlert = (function() {
   const alertSound = new Sound({ source: 'orb.ogg', priority: true, attenuation: 0, pitch: 0.5, volume: 1 });

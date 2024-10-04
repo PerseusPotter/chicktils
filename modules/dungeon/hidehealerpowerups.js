@@ -21,7 +21,7 @@ const hiddenPowerupsBucket = new Grid({ size: 0, addNeighbors: 1 });
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) powerupCand.push([Date.now(), e]);
-}, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
+}).setEnabled(settings._dungeonHideHealerPowerups);
 const serverTickReg = reg('serverTick', () => {
   if (powerupCand.length === 0) return;
   run(() => {
@@ -55,17 +55,17 @@ const serverTickReg = reg('serverTick', () => {
       return false;
     });
   });
-}, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
+}).setEnabled(settings._dungeonHideHealerPowerups);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (!id.equals(EnumParticleTypes.REDSTONE)) return;
   const b = part.underlyingEntity.func_70535_g();
   if (b === 0 || b > 10) return;
   if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 1 && dist(e.field_70161_v, part.getZ()) < 1 && dist(e.field_70163_u, part.getY() < 5))) cancel(evn);
-}, 'dungeon/hidehealerpowerups').triggerIfCanceled(false).setEnabled(settings._dungeonHideHealerPowerups);
+}).triggerIfCanceled(false).setEnabled(settings._dungeonHideHealerPowerups);
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.containsKey(e.entity)) cancel(evn);
-}, 'dungeon/hidehealerpowerups').setEnabled(settings._dungeonHideHealerPowerups);
+}).setEnabled(settings._dungeonHideHealerPowerups);
 
 export function init() { }
 export function start() {

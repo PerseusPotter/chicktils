@@ -26,8 +26,8 @@ const tickReg = reg('tick', () => {
     stateEnableTimer.set(true);
     hasteTimer.setLine(`&l${colorForNumber(duration, 300)}${(duration / 20).toFixed(1)}s`);
   }
-}, 'dungeon/silverfishhastetimer').setEnabled(settings._dungeonSilverfishHasteTimer);
-const renderOvReg = reg('renderOverlay', () => hasteTimer.render(), 'dungeon/silverfishhastetimer').setEnabled(stateEnableTimer);
+}).setEnabled(settings._dungeonSilverfishHasteTimer);
+const renderOvReg = reg('renderOverlay', () => hasteTimer.render()).setEnabled(stateEnableTimer);
 
 export function init() {
   settings._moveSilverfishHasteTimer.onAction(() => hasteTimer.edit());

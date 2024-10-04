@@ -56,8 +56,8 @@ const tickReg = reg('tick', () => {
       z: lerp(fm4Center.z, thorn.getZ(), d)
     };
   }
-}, 'dungeon/spiritbear').setEnabled(new StateProp(ticks).equals(0).and(stateInFM4));
-const serverTickReg = reg('serverTick', () => ticks.set(ticks.get() - 1), 'dungeon/spiritbear').setEnabled(stateBearSpawning);
+}).setEnabled(new StateProp(ticks).equals(0).and(stateInFM4));
+const serverTickReg = reg('serverTick', () => ticks.set(ticks.get() - 1)).setEnabled(stateBearSpawning);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (!id.equals(EnumParticleTypes.SPELL_MOB)) return;
@@ -78,15 +78,15 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
       z: bZ * d + fm4Center.z
     };
   }
-}, 'dungeon/spiritbear').setEnabled(stateBearSpawning);
+}).setEnabled(stateBearSpawning);
 const spiritBearSpawnReg = reg('chat', () => {
   resetFM4Vars();
   ticks.set(-1);
-}, 'dungeon/spiritbear').setCriteria('&r&a&lA &r&5&lSpirit Bear &r&a&lhas appeared!&r').setEnabled(stateInFM4);
+}).setCriteria('&r&a&lA &r&5&lSpirit Bear &r&a&lhas appeared!&r').setEnabled(stateInFM4);
 const spiritBowDropReg = reg('chat', () => {
   ticks.set(0);
   justSpawned = true;
-}, 'dungeon/spiritbear').setCriteria('&r&a&lThe &r&5&lSpirit Bow &r&a&lhas dropped!&r').setEnabled(stateInFM4);
+}).setCriteria('&r&a&lThe &r&5&lSpirit Bow &r&a&lhas dropped!&r').setEnabled(stateInFM4);
 const renderWorldReg = reg('renderWorld', () => {
   if (!est) return;
   const dt = Date.now() - prevTime;
@@ -108,12 +108,12 @@ const renderWorldReg = reg('renderWorld', () => {
   renderFilledBox(x, y + 1 - m, z, m, 2 * m, settings.dungeonSpiritBearBoxColor, settings.dungeonSpiritBearBoxEsp);
 
   if (settings.dungeonSpiritBearTimer) renderString(((ticks.get() - getPartialServerTick()) / 20).toFixed(2), x, y + 2.5, z);
-}, 'dungeon/spiritbear').setEnabled(stateBearSpawning);
+}).setEnabled(stateBearSpawning);
 const renderOvlyReg = reg('renderOverlay', () => {
   const d = (ticks.get() + 1 - getPartialServerTick()) * 50;
   spiritBearTimer.setLine(`§l${colorForNumber(d, bearSpawnTicks * 50)}${(d / 1000).toFixed(2)}s`.toString());
   spiritBearTimer.render();
-}, 'dungeon/spiritbear').setEnabled(new StateProp(settings._dungeonSpiritBearTimerHud).and(stateBearSpawning));
+}).setEnabled(new StateProp(settings._dungeonSpiritBearTimerHud).and(stateBearSpawning));
 
 export function init() {
   settings._dungeonSpiritBearSmoothTime.listen(v => spiritBearGuessDelay.delay = v);

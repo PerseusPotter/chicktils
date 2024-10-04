@@ -67,7 +67,7 @@ const entSpawnReg = reg('spawnEntity', e => {
     mobCand.push(e);
     mobCandBucket.add(e.field_70165_t, e.field_70161_v, e);
   }
-}, 'dungeon/boxmobs').setEnabled(stateBoxMob);
+}).setEnabled(stateBoxMob);
 const step2Reg = reg('step', () => {
   mobCandBucket.lock();
   mobCandBucket.freeze();
@@ -84,7 +84,7 @@ const step2Reg = reg('step', () => {
     return true;
   });
   mobCandBucket.unfreeze();
-}, 'dungeon/boxmobs').setFps(2).setOffset(500 / 3).setEnabled(stateBoxMob);
+}).setFps(2).setOffset(500 / 3).setEnabled(stateBoxMob);
 function boxMobsTick() {
   const boxMobsBuff = [];
   nameCand = nameCand.filter(e => {
@@ -125,12 +125,12 @@ function boxMobsTick() {
 const serverTickReg = reg('serverTick', () => {
   clientTickReg.unregister();
   run(boxMobsTick);
-}, 'dungeon/boxmobs').setEnabled(stateBoxMob);
-const clientTickReg = reg('tick', () => run(boxMobsTick), 'dungeon/boxmobs').setEnabled(stateBoxMob);
+}).setEnabled(stateBoxMob);
+const clientTickReg = reg('tick', () => run(boxMobsTick)).setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity);
   if (data) renderOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, settings[boxColors[data.c]], settings.dungeonBoxMobEsp, true, undefined, true);
-}, 'dungeon/boxmobs').setEnabled(stateBoxMob);
+}).setEnabled(stateBoxMob);
 
 export function init() { }
 export function start() {

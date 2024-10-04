@@ -55,8 +55,8 @@ function onEat(cake) {
   );
   logMessage(prevMsg);
 }
-const eatReg = reg('chat', onEat, 'cake').setCriteria('&r&d&lYum! &r&eYou gain &r${cake} &r&efor &r&a48 &r&ehours!&r');
-const refreshReg = reg('chat', onEat, 'cake').setCriteria('&r&d&lBig Yum! &r&eYou refresh &r${cake} &r&efor &r&a48 &r&ehours!&r');
+const eatReg = reg('chat', onEat).setCriteria('&r&d&lYum! &r&eYou gain &r${cake} &r&efor &r&a48 &r&ehours!&r');
+const refreshReg = reg('chat', onEat).setCriteria('&r&d&lBig Yum! &r&eYou refresh &r${cake} &r&efor &r&a48 &r&ehours!&r');
 
 export function init() { }
 export function load() {

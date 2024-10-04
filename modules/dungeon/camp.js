@@ -45,7 +45,7 @@ function addSkull(skull) {
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) possibleSkulls.push(e);
-}, 'dungeon/camp').setEnabled(stateCamp);
+}).setEnabled(stateCamp);
 const serverTickReg = reg('serverTick', () => {
   if (bloodOpenTime === 0 || (possibleSkulls.length === 0 && bloodMobs.length === 0)) return;
   const arr = possibleSkulls;
@@ -125,7 +125,7 @@ const serverTickReg = reg('serverTick', () => {
       else motionData.set(v[0], v[1]);
     }));
   });
-}, 'dungeon/camp').setEnabled(stateCampFinal);
+}).setEnabled(stateCampFinal);
 const renderWorldReg = reg('renderWorld', () => {
   const t = Date.now();
   motionData.forEach(({ estX, estY, estZ, lastEstX, lastEstY, lastEstZ, ttl, maxTtl, lastUpdate }) => {
@@ -149,15 +149,15 @@ const renderWorldReg = reg('renderWorld', () => {
 
     if (settings.dungeonCampTimer) renderString(((ttl - getPartialServerTick()) / 20).toFixed(2), x, y + 1, z);
   });
-}, 'dungeon/camp').setEnabled(stateCampFinal);
+}).setEnabled(stateCampFinal);
 const renderOverlayReg = reg('renderOverlay', () => {
   if (lastSpawnedBloodMob && lastSpawnedBloodMob.ttl) {
     const d = (lastSpawnedBloodMob.ttl + 1 - getPartialServerTick()) * 50;
     dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
     dialogueSkipTimer.render();
   }
-}, 'dungeon/camp').setEnabled(stateCamp.and(settings._dungeonCampSkipTimer));
-const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = Date.now()), 'dungeon/camp').setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r').setEnabled(stateCamp);
+}).setEnabled(stateCamp.and(settings._dungeonCampSkipTimer));
+const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = Date.now())).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r').setEnabled(stateCamp);
 
 export function init() {
   listenBossMessages((name, msg) => {

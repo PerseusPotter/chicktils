@@ -12,7 +12,7 @@ import { run, unrun } from '../util/threading';
 const coinCounterEnabled = new StateVar(false);
 const coinCounter = createTextGui(() => data.avariceCoinCounterLoc, () => ['&7Coins: &669,426,942']);
 
-const coinRenderReg = reg('renderOverlay', () => coinCounter.render(), 'avarice').setEnabled(new StateProp(settings._avariceShowCoinCounter).and(coinCounterEnabled));
+const coinRenderReg = reg('renderOverlay', () => coinCounter.render()).setEnabled(new StateProp(settings._avariceShowCoinCounter).and(coinCounterEnabled));
 const coinUpdateReg = reg('packetReceived', pack => {
   if (pack.func_149175_c() !== 0 || pack.func_149173_d() !== 5) return;
   coinCounterEnabled.set(Boolean(function() {
@@ -33,30 +33,30 @@ const coinUpdateReg = reg('packetReceived', pack => {
 
     return true;
   }()));
-}, 'avarice').setFilteredClass(net.minecraft.network.play.server.S2FPacketSetSlot).setEnabled(settings._avariceShowCoinCounter);
+}).setFilteredClass(net.minecraft.network.play.server.S2FPacketSetSlot).setEnabled(settings._avariceShowCoinCounter);
 
 const stateIsArachne = new StateVar(0);
 const stateDoArachne = new StateProp(settings._avariceArachne).and(stateIsArachne);
 const stateArachneRecentDead = new StateVar(false);
 const stateArachneLeech = new StateProp(stateArachneRecentDead).not().and(settings._avariceArachne).and(new StateProp(stateIsArachne).equals(0));
 
-const arachneStartReg1 = reg('chat', () => stateIsArachne.set(1), 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: Ahhhh...A Calling...&r').setEnabled(settings._avariceArachne);
-const arachneStartReg2 = reg('chat', () => stateIsArachne.set(2), 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: So it is time.&r').setEnabled(settings._avariceArachne);
+const arachneStartReg1 = reg('chat', () => stateIsArachne.set(1)).setCriteria('&r&c[BOSS] Arachne&r&f: Ahhhh...A Calling...&r').setEnabled(settings._avariceArachne);
+const arachneStartReg2 = reg('chat', () => stateIsArachne.set(2)).setCriteria('&r&c[BOSS] Arachne&r&f: So it is time.&r').setEnabled(settings._avariceArachne);
 function arachneLeech() {
   stateIsArachne.set(3);
   World.getAllEntities().forEach(v => arachneSpawnReg.forceTrigger(v.entity));
 }
-const arachneLeechReg1 = reg('chat', arachneLeech, 'avarice').setCriteria('&r&c[BOSS] Arachne&r&f: ').setStart().setEnabled(stateArachneLeech);
-const arachneLeechReg2 = reg('chat', arachneLeech, 'avarice').setCriteria('&r&cThe boss is already spawning!&r').setEnabled(stateArachneLeech);
+const arachneLeechReg1 = reg('chat', arachneLeech).setCriteria('&r&c[BOSS] Arachne&r&f: ').setStart().setEnabled(stateArachneLeech);
+const arachneLeechReg2 = reg('chat', arachneLeech).setCriteria('&r&cThe boss is already spawning!&r').setEnabled(stateArachneLeech);
 const arachneEndReg = reg('chat', () => {
   stateIsArachne.set(0);
   stateArachneRecentDead.set(true);
-}, 'avarice').setCriteria('&r&f                              &r&6&lARACHNE DOWN!&r').setEnabled(settings._avariceArachne);
+}).setCriteria('&r&f                              &r&6&lARACHNE DOWN!&r').setEnabled(settings._avariceArachne);
 const arachneLeaveReg = reg('worldUnload', () => {
   stateIsArachne.set(0);
   stateArachneRecentDead.set(false);
   arachneClientTick.register();
-}, 'avarice').setEnabled(settings._avariceArachne);
+}).setEnabled(settings._avariceArachne);
 
 let arachneEnt;
 stateIsArachne.listen(v => v || (arachneEnt = null));
@@ -72,7 +72,7 @@ const arachneSpawnReg = reg('spawnEntity', ent => {
   if (settings.avariceArachneHideBroodNames && ent instanceof EntityArmorStand) arachnePossNames.push([5, ent]);
   if (settings.avariceArachneBoxBigSpooder && (!arachneEnt || arachneEnt.field_70128_L) && ent instanceof EntitySpider && !(ent instanceof EntityCaveSpider)) arachnePossBig.push([100, ent]);
   if (settings.avariceArachneBoxSmallSpooders && ent instanceof EntityCaveSpider) arachnePossSmall.push([5, ent]);
-}, 'avarice').setEnabled(stateDoArachne);
+}).setEnabled(stateDoArachne);
 function arachneTick() {
   run(() => {
     arachnePossBig = arachnePossBig.filter(v => {
@@ -107,11 +107,11 @@ function arachneTick() {
     });
   });
 }
-const arachneClientTick = reg('tick', arachneTick, 'avarice').setEnabled(stateDoArachne.and(settings._avariceArachneHideBroodNames));
+const arachneClientTick = reg('tick', arachneTick).setEnabled(stateDoArachne.and(settings._avariceArachneHideBroodNames));
 const arachneServerTick = reg('serverTick', () => {
   arachneClientTick.unregister();
   arachneTick();
-}, 'avarice').setEnabled(stateDoArachne.and(settings._avariceArachneHideBroodNames));
+}).setEnabled(stateDoArachne.and(settings._avariceArachneHideBroodNames));
 
 const arachneRenderReg = reg('postRenderEntity', (ent, pos) => {
   const e = ent.entity;
@@ -127,7 +127,7 @@ const arachneRenderReg = reg('postRenderEntity', (ent, pos) => {
     settings.avariceArachneBoxSmallSpoodersColor, settings.avariceArachneBoxSmallSpoodersEsp,
     true, 5, true
   );
-}, 'avarice').setEnabled(stateDoArachne);
+}).setEnabled(stateDoArachne);
 const arachneTracerReg = reg('renderWorld', partial => {
   if (arachneEnt && !arachneEnt.field_70128_L) renderTracer(
     settings.avariceArachneBoxBigSpooderColor,
@@ -136,7 +136,7 @@ const arachneTracerReg = reg('renderWorld', partial => {
     lerp(arachneEnt.field_70166_s, arachneEnt.field_70161_v, partial),
     false
   );
-}, 'avarice').setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(settings._preferUseTracer));
+}).setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(settings._preferUseTracer));
 const arachnePointReg = reg('renderOverlay', () => {
   if (arachneEnt && !arachneEnt.field_70128_L) drawArrow3DPos(
     settings.avariceArachneBoxBigSpooderColor,
@@ -145,7 +145,7 @@ const arachnePointReg = reg('renderOverlay', () => {
     lerp(arachneEnt.field_70166_s, arachneEnt.field_70161_v, Tessellator.partialTicks),
     false, 5
   );
-}, 'avarice').setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(new StateProp(settings._preferUseTracer).not()));
+}).setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(new StateProp(settings._preferUseTracer).not()));
 
 const stateDoingTara = new StateVar(false);
 const stateTaraStarted = new StateVar(0);
@@ -164,16 +164,16 @@ const taraHitReg = reg('attackEntity', (ent, evn) => {
   ) return;
 
   cancel(evn);
-}, 'avarice').setEnabled(new StateProp(stateDoingTara).and(settings._avariceTaraTrader));
+}).setEnabled(new StateProp(stateDoingTara).and(settings._avariceTaraTrader));
 const taraStartReg = reg('chat', () => {
   stateDoingTara.set(true);
   stateTaraStarted.set(15);
-}, 'avarice').setCriteria('&r   &5&l» &7Slay &c2,000 Combat XP &7worth of Spiders&7.&r').setEnabled(settings._avariceTaraTrader);
+}).setCriteria('&r   &5&l» &7Slay &c2,000 Combat XP &7worth of Spiders&7.&r').setEnabled(settings._avariceTaraTrader);
 const taraLeaveReg = reg('worldUnload', () => {
   stateDoingTara.set(false);
   stateTaraStarted.set(0);
-}, 'avarice').setEnabled(new StateProp(stateDoingTara).and(settings._avariceTaraTrader));
-const taraServerTickReg = reg('serverTick', () => stateTaraStarted.set(stateTaraStarted.get() - 1), 'avarice').setEnabled(new StateProp(stateTaraStarted).notequals(0));
+}).setEnabled(new StateProp(stateDoingTara).and(settings._avariceTaraTrader));
+const taraServerTickReg = reg('serverTick', () => stateTaraStarted.set(stateTaraStarted.get() - 1)).setEnabled(new StateProp(stateTaraStarted).notequals(0));
 
 export function init() {
   settings._moveAvariceCoinCounter.onAction(() => coinCounter.edit());

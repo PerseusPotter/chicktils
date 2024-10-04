@@ -18,7 +18,7 @@ const actionBarReg = reg('actionBar', (curr, max) => {
   const maxHp = Math.ceil(playerE.func_110138_aP());
   const hpph = max / maxHp;
   actualAbsorb = Math.min(Math.max(Math.ceil(curr / hpph) - hp, 0), settings.absorptionMaxHearts);
-}, 'absorption').setChatCriteria('${curr}/${max}❤${*}');
+}).setChatCriteria('${curr}/${max}❤${*}');
 
 const renderHeartReg = reg('renderHealth', evn => {
   const playerE = Player.getPlayer();
@@ -123,7 +123,7 @@ const renderHeartReg = reg('renderHealth', evn => {
   }
 
   GL11.glDisable(GL11.GL_BLEND);
-}, 'absorption');
+});
 
 export function init() { }
 export function load() {
