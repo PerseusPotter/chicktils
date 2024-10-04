@@ -19,12 +19,12 @@ function onPuzzleFail(name) {
   shitterAlert.show(5_000);
   architectUseReg.register();
 }
-const puzzleFailReg = reg('chat', onPuzzleFail, 'dungeon/autoarchitect').setCriteria('&r&c&lPUZZLE FAIL! &r&${name} ${*}').setEnabled(stateArchitect);
-const quizFailReg = reg('chat', onPuzzleFail, 'dungeon/autoarchitect').setCriteria('&r&4[STATUE] Oruo the Omniscient&r&f: &r&${name} &r&cchose the wrong answer! I shall never forget this moment of misrememberance.&r').setEnabled(stateArchitect);
+const puzzleFailReg = reg('chat', onPuzzleFail).setCriteria('&r&c&lPUZZLE FAIL! &r&${name} ${*}').setEnabled(stateArchitect);
+const quizFailReg = reg('chat', onPuzzleFail).setCriteria('&r&4[STATUE] Oruo the Omniscient&r&f: &r&${name} &r&cchose the wrong answer! I shall never forget this moment of misrememberance.&r').setEnabled(stateArchitect);
 const architectUseReg = reg('chat', () => {
   shitterAlert.hide();
   architectUseReg.unregister();
-}, 'dungeon/autoarchitect').setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}').setEnabled(stateArchitect);
+}).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}').setEnabled(stateArchitect);
 
 export function init() { }
 export function start() {

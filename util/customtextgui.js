@@ -226,7 +226,7 @@ const renderReg = reg('renderOverlay', () => {
   // Renderer.drawRect(0xB0000000, 40, 15, w + 20, 20);
   drawOutlinedString(editStr, 50, 20);
   Renderer.drawCircle(0xFF0000FF, curr.getLoc().x, curr.getLoc().y, 5, 10);
-}, 'customtextgui').setPriority(Priority.LOWEST);
+}).setPriority(Priority.LOWEST);
 
 let lastX = -1;
 let lastY = -1;

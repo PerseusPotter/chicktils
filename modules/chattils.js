@@ -13,10 +13,10 @@ import { _setTimeout } from '../util/timers';
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
   if (ign) blockedNames.add(ign);
-}, 'chattils').setName('ctschatwaypointblock').setEnabled(settings._chatTilsWaypoint);
+}).setName('ctschatwaypointblock').setEnabled(settings._chatTilsWaypoint);
 
 const coords = [];
-const removeOldestCmd = reg('command', () => coords.shift(), 'chattils').setName('ctsremoveoldestwaypoint').setEnabled(settings._chatTilsWaypoint);
+const removeOldestCmd = reg('command', () => coords.shift()).setName('ctsremoveoldestwaypoint').setEnabled(settings._chatTilsWaypoint);
 const worldRenderReg = reg('renderWorld', () => {
   if (settings.chatTilsWaypointType !== 'None') coords.forEach(v => {
     if (settings.chatTilsWaypointType === 'Box') renderWaypoint(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
@@ -24,13 +24,13 @@ const worldRenderReg = reg('renderWorld', () => {
   });
   if (settings.chatTilsWaypointBeacon) coords.forEach(v => renderBeaconBeam(v.x, v.y + 1, v.z, settings.chatTilsWaypointColor, true, false));
   if (settings.chatTilsWaypointName) coords.forEach(v => renderString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(settings.chatTilsWaypointColor)*/));
-}, 'chattils');
+});
 let waypointReloadNum = 0;
 const worldUnloadReg = reg('worldUnload', () => {
   coords.length = 0;
   worldRenderReg.unregister();
   waypointReloadNum++;
-}, 'chattils').setEnabled(new StateProp(settings._chatTilsWaypointPersist).not());
+}).setEnabled(new StateProp(settings._chatTilsWaypointPersist).not());
 
 /**
  * @param {string} ign
@@ -111,7 +111,7 @@ function tryMelody(ign, msg, evn, mel) {
 const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 const allChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}, 'chattils').setCriteria(/^&r([^>]+?)&(?:7|f): (.+?)&r$/).setEnabled(settings._chatTilsWaypoint);
+}).setCriteria(/^&r([^>]+?)&(?:7|f): (.+?)&r$/).setEnabled(settings._chatTilsWaypoint);
 const partyChatReg = reg('chat', (ign, msg, evn) => {
   processMessageWaypoint(ign, msg);
 
@@ -137,22 +137,22 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
       tryMelody(ign, msg, evn, msg);
     } else lastMessages.set(lIgn, msg);
   }
-}, 'chattils').setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
+}).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
 const coopChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
-}, 'chattils').setCriteria('&r&bCo-op > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
+}).setCriteria('&r&bCo-op > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const wisperToReg = reg('chat', msg => {
   processMessageWaypoint(Player.getName(), msg);
-}, 'chattils').setCriteria('&dTo ${*}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
+}).setCriteria('&dTo ${*}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const wisperFromReg = reg('chat', (ign, msg) => {
   if (settings.chatTilsEssentialOverrideCommands) lastEssentialDMIGN = getPlayerName(ign);
   processMessageWaypoint(ign, msg);
-}, 'chattils').setCriteria('&dFrom ${ign}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
+}).setCriteria('&dFrom ${ign}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const guildChatReg = reg('chat', (ign, msg) => {
   // better not be able to contain [ in guild ranks
   if (ign.endsWith(']')) ign = ign.split(0, ign.lastIndexOf('['));
   processMessageWaypoint(ign, msg);
-}, 'chattils').setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
+}).setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
 function essentialChatCb(ign, msg) {
   processMessageWaypoint(ign, msg);
 }
@@ -162,7 +162,7 @@ const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
   if (name !== 'random.orb' || vol !== 1 || pitch !== 1) return;
   cancel(evn);
   stateCancelNextPing.set(false);
-}, 'chattils').setEnabled(new StateProp(stateCancelNextPing).and(new StateProp(settings._chatTilsHideBonzo).notequals('False').or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False'))));
+}).setEnabled(new StateProp(stateCancelNextPing).and(new StateProp(settings._chatTilsHideBonzo).notequals('False').or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False'))));
 
 // https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/features/FasterMaddoxCalling.java#L24
 let lastFollowTime = 0;
@@ -176,12 +176,12 @@ const followReg = reg(net.minecraftforge.client.event.ClientChatReceivedEvent, e
   lastFollowTime = Date.now();
   lastFollowToken = evn.message.func_150256_b().func_150235_h()?.func_150668_b();
   log(`Open chat then click anywhere on-screen to follow &b${ign}`);
-}, 'chattils').setEnabled(settings._chatTilsClickAnywhereFollow);
+}).setEnabled(settings._chatTilsClickAnywhereFollow);
 const clickChatReg = reg(net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post, evn => {
   if (Java.type('org.lwjgl.input.Mouse').getEventButtonState() || Java.type('org.lwjgl.input.Mouse').getEventButton() !== 0 || !(evn.gui instanceof Java.type('net.minecraft.client.gui.GuiChat'))) return;
   if (!lastFollowToken || Date.now() - lastFollowTime > 10_000) return;
   execCmd(lastFollowToken.slice(1));
-}, 'chattils').setEnabled(settings._chatTilsClickAnywhereFollow);
+}).setEnabled(settings._chatTilsClickAnywhereFollow);
 
 let imgArtLines = [];
 let imgArtId = 0;
@@ -298,7 +298,7 @@ const genImgArtReg = (function() {
       }
       ChatLib.command('printimageline', true);
     });
-  }, 'chattils').setName('printimage').setEnabled(settings._chatTilsImageArt);
+  }).setName('printimage').setEnabled(settings._chatTilsImageArt);
 }());
 const nextArtLineMsg = new Message(new TextComponent('&a[NEXT]').setClick('run_command', '/printimageline'), ' ', new TextComponent('&4[CANCEL]').setClick('run_command', '/printimagecancel'));
 function printNextLine() {
@@ -319,13 +319,13 @@ function printNextLine() {
     } else log('all lines printed!');
   }, 500);
 }
-const nextArtLineReg = reg('command', () => printNextLine(), 'chattils').setName('printimageline').setEnabled(settings._chatTilsImageArt);
+const nextArtLineReg = reg('command', () => printNextLine()).setName('printimageline').setEnabled(settings._chatTilsImageArt);
 const cancelArtLines = reg('command', () => {
   if (imgArtLines.length) {
     log(`cleared ${imgArtLines.length} remaining lines`);
     imgArtLines = [];
   } else log('&cno lines to clear');
-}, 'chattils').setName('printimagecancel').setEnabled(settings._chatTilsImageArt);
+}).setName('printimagecancel').setEnabled(settings._chatTilsImageArt);
 
 const ConnectionManager = Java.type('gg.essential.Essential').getInstance().getConnectionManager();
 const ChatManager = ConnectionManager.getChatManager();
@@ -432,22 +432,22 @@ function essFCmd(...args) {
 function essPCmd(msg) {
   sendEssentialMessage(getLeader(), '/pc ' + msg);
 }
-const essWCmdReg = reg('command', essWCmd, 'chattils').setName('we').setEnabled(settings._chatTilsEssential);
-const essWOCmdReg = reg('command', essWCmd, 'chattils').setName('w', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
-const essTCmdReg = reg('command', essWCmd, 'chattils').setName('te').setEnabled(settings._chatTilsEssential);
-const essTOCmdReg = reg('command', essWCmd, 'chattils').setName('t', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
-const essRCmdReg = reg('command', essRCmd, 'chattils').setName('re').setEnabled(settings._chatTilsEssential);
-const essROCmdReg = reg('command', essRCmd, 'chattils').setName('r', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
-const essFCmdReg = reg('command', essFCmd, 'chattils').setName('fe').setEnabled(settings._chatTilsEssential);
+const essWCmdReg = reg('command', essWCmd).setName('we').setEnabled(settings._chatTilsEssential);
+const essWOCmdReg = reg('command', essWCmd).setName('w', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const essTCmdReg = reg('command', essWCmd).setName('te').setEnabled(settings._chatTilsEssential);
+const essTOCmdReg = reg('command', essWCmd).setName('t', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const essRCmdReg = reg('command', essRCmd).setName('re').setEnabled(settings._chatTilsEssential);
+const essROCmdReg = reg('command', essRCmd).setName('r', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+const essFCmdReg = reg('command', essFCmd).setName('fe').setEnabled(settings._chatTilsEssential);
 const essFOCmdReg = reg('command', ...args => {
   if (args && ['accept', 'add', 'best', 'deny', 'help', 'list', 'nickname', 'notifications', 'remove', 'removeall', 'requests']) ChatLib.command('f ' + args.join(' '));
   else essFCmd(...args);
-}, 'chattils').setName('f', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
+}).setName('f', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const essPCCmdReg = reg('command', ...args => {
   if (!args || !args.length) return;
   if (!isInParty() || isLeader()) return ChatLib.command('pc ' + args.join(' '));
   essPCmd(args.join(' '));
-}, 'chattils').setName('pc', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialRedirectPartyChat));
+}).setName('pc', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialRedirectPartyChat));
 const chatCmdReg = reg('command', ...args => {
   if (!args) args = [];
   if (settings.chatTilsEssentialRedirectPartyChat && (args[0] === 'p' || args[0] === 'party')) {
@@ -459,13 +459,13 @@ const chatCmdReg = reg('command', ...args => {
     ChatLib.command(args.join(' '));
     stateEssentialDM.set('');
   }
-}, 'chattils').setName('chat', true).setEnabled(settings._chatTilsEssential);
+}).setName('chat', true).setEnabled(settings._chatTilsEssential);
 const sendMessageReg = reg('messageSent', (msg, evn) => {
   if (msg.startsWith('/')) return;
   cancel(evn);
   if (stateEssentialDM.get() === partyChatEssentialDm) essPCmd(msg);
   else sendEssentialMessage(stateEssentialDM.get(), msg);
-}, 'chattils').setEnabled(new StateProp(settings._chatTilsEssential).and(stateEssentialDM));
+}).setEnabled(new StateProp(settings._chatTilsEssential).and(stateEssentialDM));
 
 export function init() {
   settings._chatTilsWaypointDuration.listen(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));

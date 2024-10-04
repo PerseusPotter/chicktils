@@ -35,7 +35,7 @@ const stairBreakReg = reg('blockBreak', b => {
       brokenStairBucket.add(x, z, [n, [x, y + 1.02, z + 0.76], [x + 1, y + 1.02, z + 0.76]]);
       break;
   }
-}, 'dungeon/stairstonkhelper').setEnabled(settings._dungeonStairStonkHelper);
+}).setEnabled(settings._dungeonStairStonkHelper);
 const tickReg = reg('tick', () => {
   const id = brokenStairBucket._getId(Player.getX(), Player.getZ());
   if (id !== cID) {
@@ -55,7 +55,7 @@ const tickReg = reg('tick', () => {
   const m = b.func_176201_c(bState);
   if (m === 1 || m === 3) return;
   lookPos = getBlockPos(bPos);
-}, 'stairstonkhelper');
+});
 const renderWorldReg = reg('renderWorld', () => {
   if (!cArr) {
     const id = brokenStairBucket._getId(Player.getX(), Player.getZ());
@@ -76,7 +76,7 @@ const renderWorldReg = reg('renderWorld', () => {
   });
 
   if (lookPos) renderFilledBox(lookPos.x - 0.005, lookPos.y - 0.005, lookPos.z - 0.005, 1.01, 1.01, settings.dungeonStairStonkHelperHighlightColor, false, false);
-}, 'dungeon/stairstonkhelper').setEnabled(settings._dungeonStairStonkHelper);
+}).setEnabled(settings._dungeonStairStonkHelper);
 
 export function init() { }
 export function start() {

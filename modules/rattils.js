@@ -18,7 +18,7 @@ function reset() {
   cheeseRenderReg.unregister();
   unloadReg.unregister();
 }
-const unloadReg = reg('worldUnload', () => reset(), 'rattils');
+const unloadReg = reg('worldUnload', () => reset());
 const EntityItem = Java.type('net.minecraft.entity.item.EntityItem');
 function scanCheese() {
   run(() => {
@@ -53,14 +53,14 @@ const cheeseSpawnReg = reg('chat', () => {
   scanCheese();
   cheeseAlert.show(settings.ratTilsAlertTime);
   if (settings.ratTilsMessage) ChatLib.command('pc [RatTils] ' + settings.ratTilsMessage);
-}, 'rattils').setCriteria('CHEESE! You smell Cheese nearby!');
-const cheeseStepReg = reg('step', () => scanCheese(), 'rattils').setFps(5);
+}).setCriteria('CHEESE! You smell Cheese nearby!');
+const cheeseStepReg = reg('step', () => scanCheese()).setFps(5);
 const cheesePickReg = reg('chat', (name, t) => {
   Client.scheduleTask(() => scanCheese());
   ChatLib.command(`pc [RatTils] Buffed ${name}`);
   if (name in players) _clearTimeout(players[name]);
   players[name] = _setTimeout(() => log(`Rat Buff to ${name} has expired.`), t * 1000);
-}, 'rattils').setCriteria('CHEESE! You buffed ${name} giving them +${*}✯ Magic Find for ${t} seconds!');
+}).setCriteria('CHEESE! You buffed ${name} giving them +${*}✯ Magic Find for ${t} seconds!');
 const cheeseRenderReg = reg('renderWorld', () => {
   cheese.forEach(v => {
     const x = v.getRenderX();
@@ -68,8 +68,8 @@ const cheeseRenderReg = reg('renderWorld', () => {
     const z = v.getRenderZ();
     renderOutline(x, y, z, 0.5, 0.5, settings.ratTilsBoxColor, settings.ratTilsBoxEsp);
   });
-}, 'rattils');
-const muteReg = reg('soundPlay', (pos, name, vol, pitch, category, evn) => vol === 1 && (Math.abs(pitch - 1.19047) < 0.0001) && cancel(evn), 'rattils').setCriteria('mob.bat.idle').setEnabled(settings._ratTilsMuteSound);
+});
+const muteReg = reg('soundPlay', (pos, name, vol, pitch, category, evn) => vol === 1 && (Math.abs(pitch - 1.19047) < 0.0001) && cancel(evn)).setCriteria('mob.bat.idle').setEnabled(settings._ratTilsMuteSound);
 
 export function init() {
   settings._ratTilsAlertSound.listen(v => cheeseAlert.sound = v);

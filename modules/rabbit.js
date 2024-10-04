@@ -18,7 +18,7 @@ let lastSpawnDays = [0, 0, 0];
 const unloadReg = reg('worldUnload', () => {
   eggs = [];
   list = [];
-}, 'rabbit').setEnabled(stateIsSpring);
+}).setEnabled(stateIsSpring);
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 let list = [];
 function scanEgg() {
@@ -53,8 +53,8 @@ const eggSpawnReg = reg('step', () => {
 
     if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertFoundTime);
   });
-}, 'rabbit').setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
-const eggStepReg = reg('step', () => scanEgg(), 'rabbit').setDelay(2).setEnabled(new StateProp(stateIsSpring).and(settings._rabbitSniffer));
+}).setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
+const eggStepReg = reg('step', () => scanEgg()).setDelay(2).setEnabled(new StateProp(stateIsSpring).and(settings._rabbitSniffer));
 const types = {
   Breakfast: 0,
   Lunch: 1,
@@ -64,8 +64,8 @@ function onCollect(type) {
   activeEggs[types[type]] = 1;
   Client.scheduleTask(() => scanEgg());
 }
-const eggCollectReg = reg('chat', onCollect, 'rabbit').setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').setEnabled(stateIsSpring);
-const eggAlrCollectReg = reg('chat', onCollect, 'rabbit').setCriteria('&r&cYou have already collected this Chocolate ${type} Egg&r&c! Try again when it respawns!&r').setEnabled(stateIsSpring);
+const eggCollectReg = reg('chat', onCollect).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').setEnabled(stateIsSpring);
+const eggAlrCollectReg = reg('chat', onCollect).setCriteria('&r&cYou have already collected this Chocolate ${type} Egg&r&c! Try again when it respawns!&r').setEnabled(stateIsSpring);
 const eggRenWrldReg = reg('renderWorld', () => {
   eggs.forEach(v => {
     const x = v.getRenderX();
@@ -75,10 +75,10 @@ const eggRenWrldReg = reg('renderWorld', () => {
     renderBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.rabbitBoxEsp);
   });
   if (settings.preferUseTracer && eggs.length > 0) renderTracer(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
-}, 'rabbit').setEnabled(stateIsSpring);
+}).setEnabled(stateIsSpring);
 const eggRendOvReg = reg('renderOverlay', () => {
   if (eggs.length > 0) drawArrow3DPos(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
-}, 'rabbit').setEnabled(new StateProp(settings._preferUseTracer).not().and(stateIsSpring));
+}).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateIsSpring));
 
 const guiReg = reg('guiOpened', evn => {
   if (!settings.rabbitShowBestUpgrade) return;
@@ -158,7 +158,7 @@ const guiReg = reg('guiOpened', evn => {
       Client.scheduleTask(4, () => update(inv));
     });
   });
-}, 'rabbit').setEnabled(settings._rabbitShowBestUpgrade);
+}).setEnabled(settings._rabbitShowBestUpgrade);
 
 const prevMessages = {};
 const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
@@ -170,7 +170,7 @@ const promoteReg = reg('chat', (name, lvl, status, evn) => {
   const msg = new Message(`${name}&7 -> Lvl &b${lvl} ${status}`);
   msg.chat();
   prevMessages[n] = msg.getFormattedText();
-}, 'rabbit').setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r').setEnabled(settings._rabbitCondenseChat);
+}).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r').setEnabled(settings._rabbitCondenseChat);
 
 export function init() {
   settings._rabbitAlertSpawnSound.listen(v => eggSpawnAlert.sound = v);

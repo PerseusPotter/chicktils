@@ -74,8 +74,8 @@ const autocomplete = function(args) {
   if (a) return list.filter(v => v.toLowerCase().startsWith(a));
   return list;
 };
-const cmdReg = reg('command', cpv, 'cpv').setTabCompletions(autocomplete).setName('cpv');
-const neuOverride = reg('command', cpv, 'cpv').setTabCompletions(autocomplete).setName('pv', true).setEnabled(settings._cpvReplaceNeu);
+const cmdReg = reg('command', cpv).setTabCompletions(autocomplete).setName('cpv');
+const neuOverride = reg('command', cpv).setTabCompletions(autocomplete).setName('pv', true).setEnabled(settings._cpvReplaceNeu);
 
 export function init() {
   settings._cpvAutoCompleteParty.listen(v => {

@@ -133,11 +133,11 @@ const serverTickReg = reg('serverTick', () => {
   const t = Date.now();
   ticks.add(t);
   lastTickTime = t;
-}, 'serverscrutinizer').setEnabled(stateTrackTicks);
+}).setEnabled(stateTrackTicks);
 const worldLoadReg = reg('worldLoad', () => {
   ticks.clear();
   lastLoadTime = lastTickTime = Date.now();
-}, 'serverscrutinizer').setEnabled(stateTrackTicks);
+}).setEnabled(stateTrackTicks);
 
 function getTickColor(val, max, min) {
   return colorForNumber(val - max * min, max * (1 - min));
@@ -149,7 +149,7 @@ const tpsCmd = reg('command', () => {
   log('Average TPS:', getTickColor(ticks.getAvg(), 20, 0.75) + ticks.getAvg().toFixed(1));
   log('Minimum TPS:', getTickColor(ticks.getMin(), 20, 0.75) + ticks.getMin());
   log('Maximum TPS:', getTickColor(ticks.getMax(), 20, 0.75) + ticks.getMax());
-}, 'serverscrutinizer').setName('tps').setEnabled(stateTrackTicks);
+}).setName('tps').setEnabled(stateTrackTicks);
 
 function formatTps(curr, avg, min, max) {
   if (Date.now() - lastLoadTime < 11_000) return ['TPS: Loading...'];
@@ -172,7 +172,7 @@ const rendOvTps = reg('renderOverlay', () => {
     tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin(), ticks.getMax()));
   }
   tpsDisplay.render();
-}, 'serverscrutinizer').setEnabled(settings._serverScrutinizerTPSDisplay);
+}).setEnabled(settings._serverScrutinizerTPSDisplay);
 
 const lastTickDisplay = createTextGui(() => data.serverScrutinizerLastPacketDisplay, () => ['zzz for &469.42s']);
 const rendOvLTD = reg('renderOverlay', () => {
@@ -182,11 +182,11 @@ const rendOvLTD = reg('renderOverlay', () => {
   if (t < settings.serverScrutinizerLastTickThreshold) return;
   lastTickDisplay.setLine(`zzz for ${colorForNumber(2000 - t, 2000)}${(t / 1000).toFixed(2)}s`);
   lastTickDisplay.render();
-}, 'serverscrutinizer').setEnabled(settings._serverScrutinizerLastTickDisplay);
+}).setEnabled(settings._serverScrutinizerLastTickDisplay);
 
 const frames = new TickInfo(settings.serverScrutinizerFPSMaxAge, 1_000);
 
-const renderTickReg = reg('renderWorld', () => frames.add(Date.now()), 'serverscrutinizer').setEnabled(settings._serverScrutinizerFPSDisplay);
+const renderTickReg = reg('renderWorld', () => frames.add(Date.now())).setEnabled(settings._serverScrutinizerFPSDisplay);
 
 function formatFps(curr, avg, min, max) {
   if (settings.serverScrutinizerFPSDisplayCurr + settings.serverScrutinizerFPSDisplayAvg + settings.serverScrutinizerFPSDisplayMin + settings.serverScrutinizerFPSDisplayMax === 1) {
@@ -208,7 +208,7 @@ const rendOvFps = reg('renderOverlay', () => {
     fpsDisplay.setLines(formatFps(frames.getCur(), frames.getAvg(), frames.getMin(), frames.getMax()));
   }
   fpsDisplay.render();
-}, 'serverscrutinizer').setEnabled(settings._serverScrutinizerFPSDisplay);
+}).setEnabled(settings._serverScrutinizerFPSDisplay);
 
 export function init() {
   settings._moveTPSDisplay.onAction(() => tpsDisplay.edit());

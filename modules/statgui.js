@@ -58,16 +58,16 @@ function loadListeners(tries = 0) {
     renderReg.register();
   } else unloadListeners();
 }
-const loadReg = reg('worldLoad', () => _setTimeout(() => loadListeners(10), 1000), 'statgui');
+const loadReg = reg('worldLoad', () => _setTimeout(() => loadListeners(10), 1000));
 
 function unloadListeners() {
   // currLoc = -1;
   updateReg.unregister();
   renderReg.unregister();
 }
-const unloadReg = reg('worldUnload', unloadListeners, 'statgui');
+const unloadReg = reg('worldUnload', unloadListeners);
 
-const renderReg = reg('renderOverlay', () => display.render(), 'statgui');
+const renderReg = reg('renderOverlay', () => display.render());
 const updateReg = reg('step', () => {
   // extremely rare concurrent mod, could run in main thread but not worth :)
   const lines = TabList.getNames();
@@ -78,7 +78,7 @@ const updateReg = reg('step', () => {
   if (endI < 0) endI = lines.length;
 
   unrun(() => display.setLines(lines.slice(startI + 1, endI)));
-}, 'statgui').setFps(2);
+}).setFps(2);
 
 export function init() {
   locs.forEach((_, i) => {

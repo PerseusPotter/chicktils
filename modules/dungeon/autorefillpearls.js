@@ -29,7 +29,7 @@ const step1Reg = reg('step', () => {
     }
     execCmd('gfs ENDER_PEARL ' + (settings.dungeonAutoRefillPearlsAmount - c));
   });
-}, 'dungeon/autorefillpearls').setDelay(1).setEnabled(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls));
+}).setDelay(1).setEnabled(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls));
 
 export function init() { }
 export function start() {

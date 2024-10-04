@@ -22,7 +22,7 @@ const renderReg = reg('renderOverlay', () => {
   Renderer.drawLine(0xFFFF0000, x2, y1, x2, y2, 2);
   Renderer.drawLine(0xFFFF0000, x2, y2, x1, y2, 2);
   Renderer.drawLine(0xFFFF0000, x1, y2, x1, y1, 2);
-}, 'customgui').setPriority(Priority.LOWEST);
+}).setPriority(Priority.LOWEST);
 
 let lastX = -1;
 let lastY = -1;

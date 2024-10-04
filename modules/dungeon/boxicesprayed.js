@@ -21,7 +21,7 @@ const entSpawnReg = reg('spawnEntity', e => {
     allMobs.push(e);
     allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
   } else if (e instanceof EntityItem) itemCand.push(e);
-}, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
+}).setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
   allMobsBucket.lock();
   allMobsBucket.freeze();
@@ -35,7 +35,7 @@ const step2Reg = reg('step', () => {
     return true;
   });
   allMobsBucket.unfreeze();
-}, 'dungeon/boxicesprayed').setFps(2).setOffset(0).setEnabled(settings._dungeonBoxIceSprayed);
+}).setFps(2).setOffset(0).setEnabled(settings._dungeonBoxIceSprayed);
 const serverTickReg = reg('serverTick', () => {
   frozenMobs = frozenMobs.filter(v => --v[1] > 0);
   run(() => {
@@ -113,7 +113,7 @@ const serverTickReg = reg('serverTick', () => {
     });
     if (frozenBuff.length) unrun(() => frozenMobs = frozenMobs.concat(frozenBuff));
   });
-}, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
+}).setEnabled(settings._dungeonBoxIceSprayed);
 const renderWorldReg = reg('renderWorld', partial => {
   frozenMobs.forEach(([e]) => {
     if (e.field_70128_L) return;
@@ -125,7 +125,7 @@ const renderWorldReg = reg('renderWorld', partial => {
     renderOutline(x, y, z, w, h, settings.dungeonBoxIceSprayedOutlineColor, settings.dungeonBoxIceSprayedEsp, true, 5);
     renderFilledBox(x, y, z, w, h, settings.dungeonBoxIceSprayedFillColor, settings.dungeonBoxIceSprayedEsp);
   });
-}, 'dungeon/boxicesprayed').setEnabled(settings._dungeonBoxIceSprayed);
+}).setEnabled(settings._dungeonBoxIceSprayed);
 
 export function init() {
   registerTrackPlayers(settings._dungeonBoxIceSprayed);

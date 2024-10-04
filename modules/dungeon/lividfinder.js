@@ -53,22 +53,22 @@ const blockChangeReg = reg('packetReceived', pack => {
     processBlockState(change.func_180088_c());
     return true;
   });
-}, 'dungeon/lividfinder').setFilteredClass(Java.type('net.minecraft.network.play.server.S22PacketMultiBlockChange')).setEnabled(stateFindLivid);
+}).setFilteredClass(Java.type('net.minecraft.network.play.server.S22PacketMultiBlockChange')).setEnabled(stateFindLivid);
 const lividBP = new BlockPos(13, 107, 25);
 const tickReg = reg('tick', () => {
   if (processBlockState(World.getBlockStateAt(lividBP))) return;
   const livid = stateLivid.get();
   if (!livid || livid.isDead()) run(() => findLivid());
-}, 'dungeon/lividfinder').setEnabled(stateFindLivid);
+}).setEnabled(stateFindLivid);
 const rendWrldReg = reg('renderWorld', () => {
   const livid = stateLivid.get();
   renderOutline(livid.getRenderX(), livid.getRenderY(), livid.getRenderZ(), 1, 2, settings.dungeonBoxLividColor, settings.dungeonBoxLividEsp, true, 5);
   if (settings.preferUseTracer) renderTracer(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ(), false);
-}, 'dungeon/lividfinder').setEnabled(stateFindLivid.and(stateLivid));
+}).setEnabled(stateFindLivid.and(stateLivid));
 const rendOverReg = reg('renderOverlay', () => {
   const livid = stateLivid.get();
   drawArrow3DPos(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ(), false, 5);
-}, 'dungeon/lividfinder').setEnabled(stateFindLivid.and(stateLivid).and(new StateProp(settings._preferUseTracer).not()));
+}).setEnabled(stateFindLivid.and(stateLivid).and(new StateProp(settings._preferUseTracer).not()));
 
 export function init() { }
 export function start() {

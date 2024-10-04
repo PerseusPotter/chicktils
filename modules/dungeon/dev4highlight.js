@@ -25,10 +25,10 @@ function blockUpdate(bp, bs) {
 }
 const blockChangeReg = reg('packetReceived', pack => {
   blockUpdate(pack.func_179827_b(), pack.func_180728_a());
-}, 'dungeon/dev4highlight').setFilteredClass(net.minecraft.network.play.server.S23PacketBlockChange).setEnabled(stateEnable);
+}).setFilteredClass(net.minecraft.network.play.server.S23PacketBlockChange).setEnabled(stateEnable);
 const blockMultiChangeReg = reg('packetReceived', pack => {
   pack.func_179844_a().some(v => blockUpdate(v.func_180090_a(), v.func_180088_c()));
-}, 'dungeon/dev4highlight').setFilteredClass(net.minecraft.network.play.server.S22PacketMultiBlockChange).setEnabled(stateEnable);
+}).setFilteredClass(net.minecraft.network.play.server.S22PacketMultiBlockChange).setEnabled(stateEnable);
 const renderReg = reg('renderWorld', () => {
   renderFilledBox(
     emBlockPos[0] - 0.005, emBlockPos[1] - 0.005, emBlockPos[2] - 0.005,
@@ -36,7 +36,7 @@ const renderReg = reg('renderWorld', () => {
     settings.dungeonDev4HighlightBlockColor, settings.dungeonDev4HighlightBlockEsp,
     false
   );
-}, 'dungeon/dev4highlight').setEnabled(stateEnable);
+}).setEnabled(stateEnable);
 
 export function init() { }
 export function start() {
