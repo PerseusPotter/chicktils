@@ -27,7 +27,7 @@ const renderOverlayReg = reg('renderOverlay', () => {
   const d = necronDragTicks.get() * 50;
   necronDragTimer.setLine(`§l${colorForNumber(d, settings.dungeonNecronDragDuration * 50)}${(d / 1000).toFixed(2)}s`.toString());
   necronDragTimer.render();
-}).setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen').and(new StateProp(necronDragTicks).notequals(0)));
+}).setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen', 'Both').and(new StateProp(necronDragTicks).notequals(0)));
 
 export function init() {
   settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());
