@@ -73,7 +73,7 @@ export class StateProp extends StateVar {
   }
   evaluate() {
     switch (this.op) {
-      case StateProp.Operator.IDENTITY: return this.left.get();
+      case StateProp.Operator.IDENTITY: return Boolean(this.left.get());
       case StateProp.Operator.NOT: return !this.left.get();
       case StateProp.Operator.AND: return this.left.get() && this.right.get();
       case StateProp.Operator.OR: return this.left.get() || this.right.get();
