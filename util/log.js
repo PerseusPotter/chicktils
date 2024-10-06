@@ -41,8 +41,8 @@ function format(obj, depth = 3) {
       return '{ ' + ent.map(([k, v]) => `${k}: ${format(v, depth - 1)}`).join(', ') + ' }';
   }
 }
-export function logDebug(obj) {
-  let str = Object.entries(obj).map(([k, v]) => k + ': ' + format(v)).join('\n');
+export function logDebug(obj, depth) {
+  let str = Object.entries(obj).map(([k, v]) => k + ': ' + format(v, depth)).join('\n');
   log(str);
 }
 
