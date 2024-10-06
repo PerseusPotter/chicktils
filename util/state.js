@@ -1,16 +1,31 @@
+/**
+ * @template T
+ */
 export class StateVar {
+  /**
+   * @param {T} val
+   */
   constructor(val) {
     this.value = val;
     this.hooks = [];
   }
+  /**
+   * @returns {T}
+   */
   get() {
     return this.value;
   }
+  /**
+   * @param {T} v
+   */
   set(v) {
     if (this.value === v) return;
     this.value = v;
     this.trigger();
   }
+  /**
+   * @param {(newValue: T) => void} cb
+   */
   listen(cb) {
     this.hooks.push(cb);
   }
