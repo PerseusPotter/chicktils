@@ -21,8 +21,8 @@ const sackMsgReg = reg('chat', (time, evn) => {
 
     items.set(name, amnt);
   }
-}).setCriteria(/^&6\[Sacks\] &r&a\+\d+&r&e items?&r&e(?:, &r&c-\d+&r&e items?&r&e)?\.&r&8 \(Last (\d+)s\.\)&r$/);
-const sackDeleteMsgReg = reg('chat', evn => cancel(evn)).setCriteria(/^&6\[Sacks\] &r&c-\d+&r&e items?&r&e\.&r&8 \(Last \d+s\.\)&r$/).setEnabled(settings._sacksDisableMessage);
+}).setCriteria(/^&6\[Sacks\] &r&a\+[\d,]+&r&e items?&r&e(?:, &r&c-[\d,]+&r&e items?&r&e)?\.&r&8 \(Last (\d+)s\.\)&r$/);
+const sackDeleteMsgReg = reg('chat', evn => cancel(evn)).setCriteria(/^&6\[Sacks\] &r&c-[\d,]+&r&e items?&r&e\.&r&8 \(Last \d+s\.\)&r$/).setEnabled(settings._sacksDisableMessage);
 
 export function init() { }
 export function load() {
