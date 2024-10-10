@@ -148,12 +148,9 @@ const renderReg = reg('renderWorld', () => {
 
 const tickReg = reg('tick', () => {
   run(() => {
-    let look = Player.getPlayer()?.func_70040_Z();
-    if (look) look = normalize(rotate(look.field_72450_a, 0, look.field_72449_c, Math.PI / 2, 0, 0), 0.25);
-    else look = { x: 0, y: 0, z: 0 };
-    const px = Player.getX() + look.x;
-    const py = Player.getY() + getEyeHeight() - 0.1;
-    const pz = Player.getZ() + look.z;
+    const px = Math.floor(Player.getX()) + 0.5;
+    const py = Math.ceil(Player.getY() + getEyeHeight());
+    const pz = Math.floor(Player.getZ()) + 0.5;
     pearlLocs = dropLocs.map(({ x, y, z }) => solvePearl(x - px, y - py, z - pz)).filter(v => !Number.isNaN(v.phi));
   });
 }).setEnabled(settings._kuudraRenderPearlTarget);
