@@ -815,6 +815,14 @@ export const props = {
   enablesacks: new Property('EnableSackTils', page, ++sort, Property.Type.Toggle, false, { desc: 'does things with the sacks message\nto turn on settings -> personal -> chat feedback -> sack notifs' }),
   sacksDisableMessage: new Property('SackTilsDisableMessage', page, ++sort, Property.Type.Toggle, true, { desc: 'hide the message' }),
 
+  enabledeployable: new Property('EnableDeployableTils', page, ++sort, Property.Type.Toggle, false),
+  deployableHUD: new Property('DeployableHUD', page, ++sort, Property.Type.Option, 'Compact', { desc: 'show current deployable\nwhat is bubblegum?', options: ['Compact', 'Full', 'None'] }),
+  moveDeployableHUD: new Property('MoveDeployableHUD', page, ++sort, Property.Type.Action),
+  deployableAssumeJalapeno: new Property('DeployableAssumeJalapeno', page, ++sort, Property.Type.Toggle, true, { desc: 'assume flares have jalapeno applied\n(cannot detect programmatically because fuck hypixel)' }),
+  deployableHUDColorTimer: new Property('DeployableHUDColorTime', page, ++sort, Property.Type.Toggle, true, { desc: 'color the timer based on time remaining' }),
+  deployableParticlesOwn: new Property('DeployableParticlesOwn', page, ++sort, Property.Type.Option, 'Default', { options: ['Default', 'None', 'Custom'], desc: 'only applies to own deployables' }),
+  deployableParticlesOther: new Property('DeployableParticlesOther', page, ++sort, Property.Type.Option, 'Default', { options: ['Default', 'None', 'Custom'] }),
+
   // 15
 
   enableavarice: new Property('EnableAvariceAddons', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'things for avarice' }),
