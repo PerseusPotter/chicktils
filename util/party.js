@@ -20,7 +20,7 @@ export function getMembers() {
   return _members;
 }
 
-export function testLoad() {
+function testLoad() {
   // if (!_hasLoaded) log('please run /pl');
   if (!_hasLoaded) {
     log('Loading Party...');
@@ -103,7 +103,12 @@ const regs = [
   }).setCriteria('${p1} has promoted ${p2} &r&eto Party Leader&r'),
 
   reg('chat', p => addMember(p)).setCriteria('${p} &r&ejoined the party.&r'),
-  reg('chat', p => addMember(p)).setCriteria('&dParty Finder &r&f> ${p} &r&ejoined the ${*}'),
+  reg('chat', p => {
+    if (getPlayerName(p) === Player.getName()) {
+      _hasLoaded = false;
+      testLoad();
+    } else addMember(p);
+  }).setCriteria('&dParty Finder &r&f> ${p} &r&ejoined the ${*}'),
   reg('chat', p => removeMember(p)).setCriteria('&eKicked ${p} because they were offline.&r'),
   reg('chat', p => removeMember(p)).setCriteria('${p} &r&ewas removed from your party because they disconnected.&r'),
   reg('chat', p => removeMember(p)).setCriteria('${p} &r&ehas been removed from the party.&r'),
