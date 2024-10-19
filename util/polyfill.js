@@ -1,4 +1,4 @@
-https://github.com/isaacs/inherits/blob/main/inherits_browser.js
+// https://github.com/isaacs/inherits/blob/main/inherits_browser.js
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   var _inherits = function inherits(ctor, superCtor) {
