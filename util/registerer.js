@@ -1,5 +1,5 @@
 import { inherits } from './polyfill';
-import { StateProp } from './state';
+import { StateVar } from './state';
 import { run, wrap as wrapFunc } from './threading';
 
 function wrap(orig, wrap, prop) {
@@ -52,7 +52,7 @@ reg = function reg(type, shit) {
   const rr = createRegister(type, shit);
   let isReg = false;
   let isAReg = false;
-  let regReq = new StateProp(true);
+  let regReq = new StateVar(true);
   const props = new Map();
   const prox = new Proxy({}, {
     get(t, p, r) {
