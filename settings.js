@@ -844,6 +844,17 @@ export const props = {
 
   // 16
 
+  enablegreatspook: new Property('EnableGreatSpook', ++page, sort = 0, Property.Type.Toggle, false),
+  greatSpookPrimalTimer: new Property('GreatSpookPrimalTimer', page, ++sort, Property.Type.Toggle, true, { desc: 'timer until primal fear can spawn' }),
+  moveGreatSpookPrimalTimer: new Property('MoveGreatSpookPrimalTimer', page, ++sort, Property.Type.Action),
+  greatSpookPrimalTimerHideReady: new Property('GreatSpookPrimalTimerHideReady', page, ++sort, Property.Type.Toggle, false, { desc: 'when cd is ready hide timer rather than show "READY"' }),
+  greatSpookPrimalCd: new Property('GreatSpookPrimalCd', page, ++sort, Property.Type.Integer, 75, { desc: 'cd between spawns, in seconds\ncheck at hub -> tyashoi alchemist' }),
+  greatSpookPrimalAlert: new Property('GreatSpookPrimalAlert', page, ++sort, Property.Type.Toggle, true, { desc: 'show alert when primal is ready' }),
+  greatSpookPrimalAlertTime: new Property('GreatSpookPrimalAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
+  greatSpookPrimalAlertSound: new Property('GreatSpookPrimalAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
+
+  // 17
+
   enableboxallentities: new Property('EnableBoxAllEntities', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
   boxAllEntitiesInvis: new Property('BoxAllEntitiesInvisible', page, ++sort, Property.Type.Toggle, false, { desc: 'box invisible entities' }),
   boxAllEntitiesColor: new Property('BoxAllEntitiesColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
@@ -888,6 +899,7 @@ const pageNames = [
   'Diana',
   'HUD',
   'Avarice Addons',
+  'Great Spook',
   'Misc.'
 ];
 /**
