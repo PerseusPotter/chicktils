@@ -880,7 +880,9 @@ export const props = {
 
   enablevision: new Property('DisableBlindness', page, ++sort, Property.Type.Toggle, true, { desc: 'disable blindness' }),
 
-  enablecake: new Property('EnableCakeHelper', page, ++sort, Property.Type.Toggle, true, { desc: 'i like eat cake.' })
+  enablecake: new Property('EnableCakeHelper', page, ++sort, Property.Type.Toggle, true, { desc: 'i like eat cake.' }),
+
+  enableunfocus: new Property('PreventRenderingWhenUnfocused', page, ++sort, Property.Type.Toggle, false, { desc: 'similar to patcher\'s unfocused fps\nbut instead of capping fps, it completely stops rendering' })
 };
 const pageNames = [
   '',
