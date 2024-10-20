@@ -334,10 +334,6 @@ reg = function reg(type, shit) {
   ChickTilsServerTick2.cTickReg = reg('tick', () => {
     ChickTilsServerTick2.list.forEach(v => v.cb());
   }).setEnabled(cTickEnabled);
-  ChickTilsServerTick2.sTickReg = reg('serverTick', () => {
-    cTickEnabled.set(false);
-    ChickTilsServerTick2.list.forEach(v => v.cb());
-  });
   ChickTilsServerTick2.worldReg = reg('worldLoad', () => cTickEnabled.set(true));
   ChickTilsServerTick2.prototype.update = function update() {
     if (ChickTilsServerTick2.list.size) {
@@ -358,6 +354,10 @@ reg = function reg(type, shit) {
   customRegs['serverTick'] = ChickTilsServerTick;
   customRegs['serverTick2'] = ChickTilsServerTick2;
 
+  ChickTilsServerTick2.sTickReg = reg('serverTick', () => {
+    cTickEnabled.set(false);
+    ChickTilsServerTick2.list.forEach(v => v.cb());
+  });
   ChickTilsSpawnEntity.tickReg = reg('serverTick2', () => {
     if (ChickTilsSpawnEntity.newMobs.length === 0) return;
     run(() => {
