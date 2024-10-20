@@ -75,6 +75,7 @@ reg = function reg(type, shit) {
     }
   });
   const _register = wrap(rr, prox, () => {
+    if (isReg) return;
     if (!isAReg && regReq.get()) {
       isAReg = true;
       rr.register();
@@ -82,6 +83,7 @@ reg = function reg(type, shit) {
     isReg = true;
   });
   const _unregister = wrap(rr, prox, () => {
+    if (!isReg) return;
     if (isAReg) rr.unregister();
     isReg = false;
     isAReg = false;
