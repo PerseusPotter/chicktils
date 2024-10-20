@@ -53,7 +53,7 @@ const tickReg = reg('tick', () => {
   const b = bState.func_177230_c();
   if (!(b instanceof BlockStairs)) return;
   const m = b.func_176201_c(bState);
-  if (m === 1 || m === 3) return;
+  if (m & 1) return;
   lookPos = getBlockPos(bPos);
 });
 const renderWorldReg = reg('renderWorld', () => {
