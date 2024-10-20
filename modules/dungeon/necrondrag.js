@@ -18,7 +18,7 @@ const tickReg = reg('tick', () => {
     inst.getOutputStream().flush();
   } else instaMidProc.set(void 0);
 }).setEnabled(new StateProp(instaMidProc).notequals(undefined));
-const serverTickReg = reg('serverTick', () => necronDragTicks.set(necronDragTicks.get() - 1)).setEnabled(new StateProp(necronDragTicks).notequals(0));
+const serverTickReg = reg('serverTick2', () => necronDragTicks.set(necronDragTicks.get() - 1)).setEnabled(new StateProp(necronDragTicks).notequals(0));
 const necronStartReg = reg('chat', () => {
   necronDragTicks.set(settings.dungeonNecronDragDuration);
   if (settings.dungeonNecronDragTimer === 'InstaMid' || settings.dungeonNecronDragTimer === 'Both') instaMidProc.set(runHelper('InstaMidHelper'));

@@ -36,7 +36,7 @@ const step2Reg = reg('step', () => {
   });
   allMobsBucket.unfreeze();
 }).setFps(2).setOffset(0).setEnabled(settings._dungeonBoxIceSprayed);
-const serverTickReg = reg('serverTick', () => {
+const serverTickReg = reg('serverTick2', () => {
   frozenMobs = frozenMobs.filter(v => --v[1] > 0);
   run(() => {
     const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');

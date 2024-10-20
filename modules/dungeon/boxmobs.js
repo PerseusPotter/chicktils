@@ -85,48 +85,45 @@ const step2Reg = reg('step', () => {
   });
   mobCandBucket.unfreeze();
 }).setFps(2).setOffset(500 / 3).setEnabled(stateBoxMob);
-function boxMobsTick() {
-  const boxMobsBuff = [];
-  nameCand = nameCand.filter(e => {
-    if (e.field_70128_L) return;
-    const n = e.func_70005_c_();
-    if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
-      boxMobsBuff.push([e, { yO: -1, h: 1, c: 0 }]);
-      return;
-    }
-    if (!n.startsWith('§6✯ ')) return;
-    const x = e.field_70165_t;
-    const y = e.field_70163_u;
-    const z = e.field_70161_v;
+const serverTickReg = reg('serverTick2', () => {
+  run(() => {
+    const boxMobsBuff = [];
+    nameCand = nameCand.filter(e => {
+      if (e.field_70128_L) return;
+      const n = e.func_70005_c_();
+      if (n === '§c§cBlood Key' || n === '§6§8Wither Key') {
+        boxMobsBuff.push([e, { yO: -1, h: 1, c: 0 }]);
+        return;
+      }
+      if (!n.startsWith('§6✯ ')) return;
+      const x = e.field_70165_t;
+      const y = e.field_70163_u;
+      const z = e.field_70161_v;
 
-    let ents = mobCandBucket.get(e.field_70165_t, e.field_70161_v);
-    if (!ents) return true;
-    ents = ents.filter(v =>
-      compareFloat(v.field_70165_t, x, 2) === 0 &&
-      compareFloat(v.field_70161_v, z, 2) === 0 &&
-      compareFloat(v.field_70163_u, y, 5) === 0
-    ).filter(v => matchesMobType(n, v));
-    if (ents.length === 0) return true;
-    const ent = ents.reduce((a, v) =>
-      dist(a.field_70165_t, x) +
-        dist(a.field_70163_u, y) +
-        dist(a.field_70161_v, z) <
-        dist(v.field_70165_t, x) +
-        dist(v.field_70163_u, y) +
-        dist(v.field_70161_v, z) ? a : v,
-      ents[0]);
+      let ents = mobCandBucket.get(e.field_70165_t, e.field_70161_v);
+      if (!ents) return true;
+      ents = ents.filter(v =>
+        compareFloat(v.field_70165_t, x, 2) === 0 &&
+        compareFloat(v.field_70161_v, z, 2) === 0 &&
+        compareFloat(v.field_70163_u, y, 5) === 0
+      ).filter(v => matchesMobType(n, v));
+      if (ents.length === 0) return true;
+      const ent = ents.reduce((a, v) =>
+        dist(a.field_70165_t, x) +
+          dist(a.field_70163_u, y) +
+          dist(a.field_70161_v, z) <
+          dist(v.field_70165_t, x) +
+          dist(v.field_70163_u, y) +
+          dist(v.field_70161_v, z) ? a : v,
+        ents[0]);
 
-    const c = getBoxMobType(n);
-    const h = c === 2 || c === 4 ? 3 : 2;
-    boxMobsBuff.push([ent, { yO: 0, h, c }]);
+      const c = getBoxMobType(n);
+      const h = c === 2 || c === 4 ? 3 : 2;
+      boxMobsBuff.push([ent, { yO: 0, h, c }]);
+    });
+    if (boxMobsBuff.length) unrun(() => boxMobsBuff.forEach(v => boxMobs.put(v[0], v[1])));
   });
-  if (boxMobsBuff.length) unrun(() => boxMobsBuff.forEach(v => boxMobs.put(v[0], v[1])));
-}
-const serverTickReg = reg('serverTick', () => {
-  clientTickReg.unregister();
-  run(boxMobsTick);
 }).setEnabled(stateBoxMob);
-const clientTickReg = reg('tick', () => run(boxMobsTick)).setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity);
   if (data) renderOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, settings[boxColors[data.c]], settings.dungeonBoxMobEsp, true, undefined, true);
@@ -142,13 +139,11 @@ export function start() {
   entSpawnReg.register();
   step2Reg.register();
   serverTickReg.register();
-  clientTickReg.register();
   renderEntPostReg.register();
 }
 export function reset() {
   entSpawnReg.unregister();
   step2Reg.unregister();
   serverTickReg.unregister();
-  clientTickReg.unregister();
   renderEntPostReg.unregister();
 }

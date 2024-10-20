@@ -20,7 +20,7 @@ export function getRegs() {
 
 const customRegs = {};
 /**
- * @type {typeof register & ((triggerType: 'spawnEntity', callback: (entity: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick', callback: () => void) => import('../../@types/IRegister').Trigger)}
+ * @type {typeof register & ((triggerType: 'spawnEntity', callback: (entity: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick', callback: () => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick2', callback: () => void) => import('../../@types/IRegister').Trigger)}
  */
 const createRegister = function(type, shit) {
   if (type in customRegs) return new (customRegs[type])(shit);
@@ -240,13 +240,6 @@ reg = function reg(type, shit) {
     return ChickTilsSpawnEntity.list;
   };
   ChickTilsSpawnEntity.newMobs = [];
-  ChickTilsSpawnEntity.tickReg = reg('tick', () => {
-    if (ChickTilsSpawnEntity.newMobs.length === 0) return;
-    run(() => {
-      ChickTilsSpawnEntity.newMobs.forEach(v => ChickTilsSpawnEntity.list.forEach(c => c.cb(v)));
-      ChickTilsSpawnEntity.newMobs = [];
-    });
-  });
   ChickTilsSpawnEntity.spawnReg = reg(net.minecraftforge.event.entity.EntityJoinWorldEvent, evn => ChickTilsSpawnEntity.newMobs.push(evn.entity));
   ChickTilsSpawnEntity.prototype.update = function update() {
     if (ChickTilsSpawnEntity.list.size) {
@@ -306,6 +299,7 @@ reg = function reg(type, shit) {
     this.offset = ~~offset;
     return this;
   };
+
   function ChickTilsServerTick(cb) {
     ChickTilsRegister.call(this, cb);
   }
@@ -327,10 +321,50 @@ reg = function reg(type, shit) {
     }
   };
 
+  function ChickTilsServerTick2(cb) {
+    ChickTilsRegister.call(this, cb);
+  }
+  inherits(ChickTilsServerTick2, ChickTilsRegister);
+  ChickTilsServerTick2.list = new Map();
+  listenList(ChickTilsServerTick2.list);
+  ChickTilsServerTick2.prototype.getList = function getList() {
+    return ChickTilsServerTick2.list;
+  };
+  const cTickEnabled = new StateVar(true);
+  ChickTilsServerTick2.cTickReg = reg('tick', () => {
+    ChickTilsServerTick2.list.forEach(v => v.cb());
+  }).setEnabled(cTickEnabled);
+  ChickTilsServerTick2.sTickReg = reg('serverTick', () => {
+    cTickEnabled.set(false);
+    ChickTilsServerTick2.list.forEach(v => v.cb());
+  });
+  ChickTilsServerTick2.worldReg = reg('worldLoad', () => cTickEnabled.set(true));
+  ChickTilsServerTick2.prototype.update = function update() {
+    if (ChickTilsServerTick2.list.size) {
+      cTickEnabled.set(true);
+      ChickTilsServerTick2.cTickReg.register();
+      ChickTilsServerTick2.sTickReg.register();
+      ChickTilsServerTick2.worldReg.register();
+    } else {
+      ChickTilsServerTick2.cTickReg.unregister();
+      ChickTilsServerTick2.sTickReg.unregister();
+      ChickTilsServerTick2.worldReg.unregister();
+    }
+  };
+
   customRegs['command'] = ChickTilsCommand;
   customRegs['spawnEntity'] = ChickTilsSpawnEntity;
   customRegs['step'] = ChickTilsStep;
   customRegs['serverTick'] = ChickTilsServerTick;
+  customRegs['serverTick2'] = ChickTilsServerTick2;
+
+  ChickTilsSpawnEntity.tickReg = reg('serverTick2', () => {
+    if (ChickTilsSpawnEntity.newMobs.length === 0) return;
+    run(() => {
+      ChickTilsSpawnEntity.newMobs.forEach(v => ChickTilsSpawnEntity.list.forEach(c => c.cb(v)));
+      ChickTilsSpawnEntity.newMobs = [];
+    });
+  });
 }
 
 export default reg;
