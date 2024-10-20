@@ -103,7 +103,7 @@ const renderWorldReg = reg('renderWorld', () => {
     y = lerp(estPrev.y, est.y, smoothFactor);
     z = lerp(estPrev.z, est.z, smoothFactor);
   }
-  const m = (bearSpawnTicks - ticks.get() - getPartialServerTick() + getPing() / 50) / bearSpawnTicks;
+  const m = Math.min(1, (bearSpawnTicks - ticks.get() - getPartialServerTick() + getPing() / 50) / bearSpawnTicks);
   renderOutline(x, y, z, 1, 2, settings.dungeonSpiritBearWireColor, settings.dungeonSpiritBearBoxEsp, true, 3);
   renderFilledBox(x, y + 1 - m, z, m, 2 * m, settings.dungeonSpiritBearBoxColor, settings.dungeonSpiritBearBoxEsp);
 
