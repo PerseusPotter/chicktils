@@ -12,9 +12,10 @@ const EntityWither = Java.type('net.minecraft.entity.boss.EntityWither');
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityWither) withers.push(new EntityLivingBase(e));
 }).setEnabled(stateBoxWithers);
-const tickReg = reg('tick', () => withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither' && v.getMaxHP() !== 300)).setEnabled(stateBoxWithers);
+const tickReg = reg('tick', () => withers = withers.filter(v => !v.isDead() && v.getName() === 'Wither')).setEnabled(stateBoxWithers);
 const renderWorldReg = reg('renderWorld', () => {
   withers.forEach(e => {
+    if (e.getMaxHP() === 300) return;
     const x = e.getRenderX();
     const y = e.getRenderY();
     const z = e.getRenderZ();
