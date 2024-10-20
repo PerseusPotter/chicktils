@@ -32,7 +32,7 @@ const createRegister = function(type, shit) {
  * @typedef {{
  *  isRegistered() => boolean;
  *  setRegistered(v: boolean) => C;
- *  setEnabled(v: import('./state').StateVar | import('../settings').Property) => C;
+ *  setEnabled(v: StateVar | import('../settings').Property) => C;
  *  update(): C;
  *  forceTrigger(...args: any[]) => any;
  * }} O
