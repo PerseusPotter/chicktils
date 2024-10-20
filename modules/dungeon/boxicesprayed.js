@@ -117,6 +117,7 @@ const serverTickReg = reg('serverTick2', () => {
 const renderWorldReg = reg('renderWorld', partial => {
   frozenMobs.forEach(([e]) => {
     if (e.field_70128_L) return;
+    if (e.func_110143_aJ() <= 0) return;
     const x = lerp(e.field_70169_q, e.field_70165_t, partial);
     const y = lerp(e.field_70167_r, e.field_70163_u, partial);
     const z = lerp(e.field_70166_s, e.field_70161_v, partial);

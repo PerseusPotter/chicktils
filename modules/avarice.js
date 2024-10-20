@@ -123,7 +123,7 @@ const arachneRenderReg = reg('postRenderEntity', (ent, pos) => {
   );
 }).setEnabled(stateDoArachne);
 const arachneTracerReg = reg('renderWorld', partial => {
-  if (arachneEnt && !arachneEnt.field_70128_L) renderTracer(
+  if (arachneEnt && !arachneEnt.field_70128_L && arachneEnt.func_110143_aJ() > 0) renderTracer(
     settings.avariceArachneBoxBigSpooderColor,
     lerp(arachneEnt.field_70169_q, arachneEnt.field_70165_t, partial),
     lerp(arachneEnt.field_70167_r, arachneEnt.field_70163_u, partial) + 0.5,
@@ -132,7 +132,7 @@ const arachneTracerReg = reg('renderWorld', partial => {
   );
 }).setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(settings._preferUseTracer));
 const arachnePointReg = reg('renderOverlay', () => {
-  if (arachneEnt && !arachneEnt.field_70128_L) drawArrow3DPos(
+  if (arachneEnt && !arachneEnt.field_70128_L && arachneEnt.func_110143_aJ() > 0) drawArrow3DPos(
     settings.avariceArachneBoxBigSpooderColor,
     lerp(arachneEnt.field_70169_q, arachneEnt.field_70165_t, Tessellator.partialTicks),
     lerp(arachneEnt.field_70167_r, arachneEnt.field_70163_u, Tessellator.partialTicks) + 0.5,
