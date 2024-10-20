@@ -143,7 +143,7 @@ const renderWorldReg = reg('renderWorld', () => {
       y = lerp(lastEstY, estY, smoothFactor);
       z = lerp(lastEstZ, estZ, smoothFactor);
     }
-    const m = (maxTtl - ttl - getPartialServerTick() + getPing() / 50) / maxTtl;
+    const m = Math.min(1, (maxTtl - ttl - getPartialServerTick() + getPing() / 50) / maxTtl);
     renderOutline(x, y + 1.5, z, 1, 2, settings.dungeonCampWireColor, settings.dungeonCampBoxEsp, true, 3);
     renderFilledBox(x, y + 2.5 - m, z, m, 2 * m, settings.dungeonCampBoxColor, settings.dungeonCampBoxEsp);
 
