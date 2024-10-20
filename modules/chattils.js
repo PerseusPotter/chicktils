@@ -117,6 +117,7 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
 
   if (settings.chatTilsHideBonzo !== 'False' && msg.startsWith('Bonzo Procced')) return hideMessage(settings.chatTilsHideBonzo, evn);
   if (settings.chatTilsHidePhoenix !== 'False' && msg.startsWith('Phoenix Procced')) return hideMessage(settings.chatTilsHidePhoenix, evn);
+  if (settings.chatTilsHideSpirit !== 'False' && msg.startsWith('Spirit Procced')) return hideMessage(settings.chatTilsHideSpirit, evn);
   if (settings.chatTilsHideLeap !== 'False' && ['Leaped to ', 'Leaping to ', 'I\'m leaping to ', '[Leaped]: ➜'].some(v => msg.startsWith(v))) return hideMessage(settings.chatTilsHideLeap, evn);
   if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
     const lIgn = ign.toLowerCase();
