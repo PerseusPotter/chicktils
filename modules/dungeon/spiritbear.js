@@ -5,7 +5,7 @@ import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import getPing from '../../util/ping';
 import createTextGui from '../../util/customtextgui';
-import { lerp, linReg } from '../../util/math';
+import { fastDistance, lerp, linReg } from '../../util/math';
 import { log } from '../../util/log';
 import { StateProp, StateVar } from '../../util/state';
 import { DelayTimer } from '../../util/timers';
@@ -62,7 +62,7 @@ const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (!id.equals(EnumParticleTypes.SPELL_MOB)) return;
   const pos = { x: part.getX(), y: part.getY(), z: part.getZ(), t: ticks.get() };
-  if (pos.y < fm4Center.y || pos.y > lastY || Math.hypot(pos.x - fm4Center.x, pos.z - fm4Center.z) > 10) return;
+  if (pos.y < fm4Center.y || pos.y > lastY || fastDistance(pos.x - fm4Center.x, pos.z - fm4Center.z) > 10) return;
 
   lastY = pos.y;
   particles.push(pos);
