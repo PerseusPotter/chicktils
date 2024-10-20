@@ -371,19 +371,15 @@ const knownEEnts = new (Java.type('java.util.WeakHashMap'))();
 const knownNEnts = new (Java.type('java.util.WeakHashMap'))();
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 function serverTick() {
+}
+const serverTickReg = reg('serverTick', () => {
   for (let i = deployables.length - 1; i >= 0; i--) {
     if (--deployables[i].ttl <= 0) {
       if (deployables[i].isOwn) ownDeployLoc = null;
       deployables.splice(i, 1);
     } else if (deployables[i].ent.field_70128_L) deployables.splice(i, 1);
   }
-}
-const serverTickReg = reg('serverTick', () => {
-  tempTickReg.unregister();
-  serverTick();
 });
-const worldLoadReg = reg('worldLoad', () => tempTickReg.register());
-const tempTickReg = reg('tick', () => serverTick());
 const equipmentReg = reg('packetReceived', (pack, doDupe) => {
   if (pack.func_149388_e() !== 4) return;
   const ent = World.getWorld().func_73045_a(pack.func_149389_d());
@@ -543,8 +539,6 @@ export function load() {
   renderReg.register();
   tickCalcActiveReg.register();
   serverTickReg.register();
-  worldLoadReg.register();
-  tempTickReg.register();
   equipmentReg.register();
   soundReg.register();
   unloadReg.register();
@@ -555,8 +549,6 @@ export function unload() {
   renderReg.unregister();
   tickCalcActiveReg.unregister();
   serverTickReg.unregister();
-  worldLoadReg.unregister();
-  tempTickReg.unregister();
   equipmentReg.unregister();
   soundReg.unregister();
   unloadReg.unregister();

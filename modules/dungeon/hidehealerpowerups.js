@@ -22,7 +22,7 @@ const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand')
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) powerupCand.push([Date.now(), e]);
 }).setEnabled(settings._dungeonHideHealerPowerups);
-const serverTickReg = reg('serverTick', () => {
+const serverTickReg = reg('serverTick2', () => {
   if (powerupCand.length === 0) return;
   run(() => {
     const t = Date.now();

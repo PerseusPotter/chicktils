@@ -46,7 +46,7 @@ const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand')
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) possibleSkulls.push(e);
 }).setEnabled(stateCamp);
-const serverTickReg = reg('serverTick', () => {
+const serverTickReg = reg('serverTick2', () => {
   if (bloodOpenTime === 0 || (possibleSkulls.length === 0 && bloodMobs.length === 0)) return;
   const arr = possibleSkulls;
   possibleSkulls = [];

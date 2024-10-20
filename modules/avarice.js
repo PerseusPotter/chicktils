@@ -55,7 +55,6 @@ const arachneEndReg = reg('chat', () => {
 const arachneLeaveReg = reg('worldUnload', () => {
   stateIsArachne.set(0);
   stateArachneRecentDead.set(false);
-  arachneClientTick.register();
 }).setEnabled(settings._avariceArachne);
 
 let arachneEnt;
@@ -73,7 +72,7 @@ const arachneSpawnReg = reg('spawnEntity', ent => {
   if (settings.avariceArachneBoxBigSpooder && (!arachneEnt || arachneEnt.field_70128_L) && ent instanceof EntitySpider && !(ent instanceof EntityCaveSpider)) arachnePossBig.push([100, ent]);
   if (settings.avariceArachneBoxSmallSpooders && ent instanceof EntityCaveSpider) arachnePossSmall.push([5, ent]);
 }).setEnabled(stateDoArachne);
-function arachneTick() {
+const arachneServerTick = reg('serverTick2', () => {
   run(() => {
     arachnePossBig = arachnePossBig.filter(v => {
       const hp = getMaxHp(v[1]);
@@ -106,11 +105,6 @@ function arachneTick() {
       return n === 'Armor Stand' && --v[0] > 0;
     });
   });
-}
-const arachneClientTick = reg('tick', arachneTick).setEnabled(stateDoArachne.and(settings._avariceArachneHideBroodNames));
-const arachneServerTick = reg('serverTick', () => {
-  arachneClientTick.unregister();
-  arachneTick();
 }).setEnabled(stateDoArachne.and(settings._avariceArachneHideBroodNames));
 
 const arachneRenderReg = reg('postRenderEntity', (ent, pos) => {
@@ -199,7 +193,6 @@ export function load() {
   arachneEndReg.register();
   arachneLeaveReg.register();
   arachneSpawnReg.register();
-  arachneClientTick.register();
   arachneServerTick.register();
   arachneRenderReg.register();
   arachneTracerReg.register();
@@ -219,7 +212,6 @@ export function unload() {
   arachneEndReg.unregister();
   arachneLeaveReg.unregister();
   arachneSpawnReg.unregister();
-  arachneClientTick.unregister();
   arachneServerTick.unregister();
   arachneRenderReg.unregister();
   arachneTracerReg.unregister();
