@@ -8,7 +8,7 @@ import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
 import { run, unrun } from '../util/threading';
-const { gsl_sf_lambert_W0: W, intersectPL, normalize, rotate, fastDistance } = require('../util/math');
+const { gsl_sf_lambert_W0: W, intersectPL, fastDistance } = require('../util/math');
 
 /**
  * t_{heta}=y_{aw}+90
@@ -94,7 +94,7 @@ let lastPickUpdateTime = 0;
 let isOnCannon = false;
 let isT5 = new StateVar(false);
 let kuuder;
-const hpDisplay = createTextGui(() => data.kuudraHpLoc, () => ['&d300M']);
+const hpDisplay = createTextGui(() => data.kuudraHpLoc, () => ['&2300M']);
 const renderReg = reg('renderWorld', () => {
   if (settings.kuudraRenderPearlTarget && pearlLocs.length > 0) {
     const c = settings.kuudraPearlTargetColor;
