@@ -70,14 +70,16 @@ const unloadReg = reg('worldUnload', unloadListeners);
 const renderReg = reg('renderOverlay', () => display.render());
 const updateReg = reg('step', () => {
   // extremely rare concurrent mod, could run in main thread but not worth :)
-  const lines = TabList.getNames();
-  // locs[16] === 'Catacombs'
-  const startI = (currLoc === 16 ? lines.findIndex(v => v.startsWith('§r§e§lSkills:')) : lines.indexOf('§r§e§lStats:§r'));
-  if (startI < 0) return display.setLine('&cUnable to find stats');
-  let endI = lines.findIndex((v, i) => i > startI && (v === '§r' || !v.startsWith('§r ')));
-  if (endI < 0) endI = lines.length;
+  try {
+    const lines = TabList.getNames();
+    // locs[16] === 'Catacombs'
+    const startI = (currLoc === 16 ? lines.findIndex(v => v.startsWith('§r§e§lSkills:')) : lines.indexOf('§r§e§lStats:§r'));
+    if (startI < 0) return unrun(() => display.setLine('&cUnable to find stats'));
+    let endI = lines.findIndex((v, i) => i > startI && (v === '§r' || !v.startsWith('§r ')));
+    if (endI < 0) endI = lines.length;
 
-  unrun(() => display.setLines(lines.slice(startI + 1, endI)));
+    unrun(() => display.setLines(lines.slice(startI + 1, endI)));
+  } catch (_) { }
 }).setFps(2);
 
 export function init() {
