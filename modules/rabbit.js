@@ -9,6 +9,7 @@ import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
 import { run, unrun } from '../util/threading';
 
 const stateIsSpring = new StateVar(false);
+const stateDoSpring = new StateProp(settings._rabbitSniffer).and(stateIsSpring);
 
 const eggSpawnAlert = createAlert('Egg Spawned !');
 const eggFoundAlert = createAlert('Egg Found !');
@@ -54,7 +55,7 @@ const eggSpawnReg = reg('step', () => {
     if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertFoundTime);
   });
 }).setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
-const eggStepReg = reg('step', () => scanEgg()).setDelay(2).setEnabled(new StateProp(stateIsSpring).and(settings._rabbitSniffer));
+const eggStepReg = reg('step', () => scanEgg()).setDelay(2).setEnabled(stateDoSpring);
 const types = {
   Breakfast: 0,
   Lunch: 1,
@@ -64,8 +65,8 @@ function onCollect(type) {
   activeEggs[types[type]] = 1;
   Client.scheduleTask(() => scanEgg());
 }
-const eggCollectReg = reg('chat', onCollect).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').setEnabled(stateIsSpring);
-const eggAlrCollectReg = reg('chat', onCollect).setCriteria('&r&cYou have already collected this Chocolate ${type} Egg&r&c! Try again when it respawns!&r').setEnabled(stateIsSpring);
+const eggCollectReg = reg('chat', onCollect).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').setEnabled(stateDoSpring);
+const eggAlrCollectReg = reg('chat', onCollect).setCriteria('&r&cYou have already collected this Chocolate ${type} Egg&r&c! Try again when it respawns!&r').setEnabled(stateDoSpring);
 const eggRenWrldReg = reg('renderWorld', () => {
   eggs.forEach(v => {
     const x = v.getRenderX();
@@ -75,10 +76,10 @@ const eggRenWrldReg = reg('renderWorld', () => {
     renderBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.rabbitBoxEsp);
   });
   if (settings.preferUseTracer && eggs.length > 0) renderTracer(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
-}).setEnabled(stateIsSpring);
+}).setEnabled(stateDoSpring);
 const eggRendOvReg = reg('renderOverlay', () => {
   if (eggs.length > 0) drawArrow3DPos(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
-}).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateIsSpring));
+}).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateDoSpring));
 
 const guiReg = reg('guiOpened', evn => {
   if (!settings.rabbitShowBestUpgrade) return;
