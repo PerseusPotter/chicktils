@@ -5,6 +5,7 @@ import { _clearTimeout, _setTimeout } from '../util/timers';
 import { log } from '../util/log';
 import reg from '../util/registerer';
 import { run } from '../util/threading';
+import { getPlayerName } from '../util/format';
 
 const cheeseAlert = createAlert('Cheese !');
 let cheese = [];
@@ -53,14 +54,15 @@ const cheeseSpawnReg = reg('chat', () => {
   scanCheese();
   cheeseAlert.show(settings.ratTilsAlertTime);
   if (settings.ratTilsMessage) ChatLib.command('pc [RatTils] ' + settings.ratTilsMessage);
-}).setCriteria('CHEESE! You smell Cheese nearby!');
+}).setCriteria('&r&e&lCHEESE! &r&7You smell Cheese nearby!&r');
 const cheeseStepReg = reg('step', () => scanCheese()).setFps(5);
 const cheesePickReg = reg('chat', (name, t) => {
+  name = getPlayerName(name);
   Client.scheduleTask(() => scanCheese());
   ChatLib.command(`pc [RatTils] Buffed ${name}`);
   if (name in players) _clearTimeout(players[name]);
   players[name] = _setTimeout(() => log(`Rat Buff to ${name} has expired.`), t * 1000);
-}).setCriteria('CHEESE! You buffed ${name} giving them +${*}✯ Magic Find for ${t} seconds!');
+}).setCriteria('&r&e&lCHEESE!&r&7 You buffed ${name} giving them &r&b+${*}✯ Magic Find&r&7 for &r&a${t}&r&7 seconds&r&7!&r');
 const cheeseRenderReg = reg('renderWorld', () => {
   cheese.forEach(v => {
     const x = v.getRenderX();

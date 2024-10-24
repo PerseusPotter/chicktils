@@ -12,7 +12,7 @@ let actualAbsorb = 0;
 const actionBarReg = reg('actionBar', (curr, max) => {
   const playerE = Player.getPlayer();
   if (!playerE) return;
-  curr = +curr.replace(/,/g, '');
+  curr = +curr.slice(2).replace(/,/g, '');
   max = +max.replace(/,/g, '');
   const hp = Math.ceil(Player.getHP());
   const maxHp = Math.ceil(playerE.func_110138_aP());

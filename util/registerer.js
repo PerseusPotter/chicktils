@@ -350,11 +350,168 @@ reg = function reg(type, shit) {
     }
   };
 
+  const _chatParams = new Map([
+    ['<c>', 'CONTAINS'],
+    ['<contains>', 'CONTAINS'],
+    ['c', 'CONTAINS'],
+    ['contains', 'CONTAINS'],
+    ['<s>', 'START'],
+    ['<start>', 'START'],
+    ['s', 'START'],
+    ['start', 'START'],
+    ['<e>', 'END'],
+    ['<end>', 'END'],
+    ['e', 'END'],
+    ['end', 'END']
+  ]);
+  // enforces color codes mwahahaha
+  function ChickTilsChat(cb) {
+    ChickTilsRegister.call(this, cb);
+    this.caseInsens = false;
+    this.mode = 0;
+    /** @type {RegExp} */
+    this.regex = null;
+    this.params = new Set();
+    this.doTrigIfCanceled = true;
+    this.rawCrit = null;
+  }
+  inherits(ChickTilsChat, ChickTilsRegister);
+  ChickTilsChat.list = new Map();
+  listenList(ChickTilsChat.list);
+  ChickTilsChat.prototype.getList = function getList() {
+    return ChickTilsChat.list;
+  };
+  ChickTilsChat.processMessage = function processMessage(str, list, type, message) {
+    let doCancel = false;
+    const fakeEvn = {
+      type,
+      message,
+      isCancelable() { return true; },
+      setCanceled(v) { doCancel = v; }
+    };
+    list.forEach(v => {
+      if (doCancel && !v.doTrigIfCanceled) return;
+      let args = [fakeEvn];
+      if (v.mode === 1) {
+        if (v.params.size === 0) {
+          if (v.rawCrit !== str) return;
+        } else {
+          const i = str.indexOf(v.rawCrit);
+          if (i < 0) return;
+          if (v.params.has('START') && i > 0) return;
+          if (v.params.has('END') && i < str.length - v.rawCrit.length) return;
+          // if (v.params.has('CONTAINS')) {}
+        }
+      } else if (v.mode === 2) {
+        v.regex.lastIndex = 0;
+        const m = v.regex.exec(str);
+        if (!m) return;
+        if ((v.params.size === 0 || v.params.has('START')) && m.index > 0) return;
+        if ((v.params.size === 0 || v.params.has('END')) && m.index < str.length - m[0].length) return;
+        // if (v.params.has('CONTAINS')) {}
+        args = m.slice(1).concat(args);
+      } else return;
+      v.cb.apply(v, args);
+    });
+    return doCancel;
+  };
+  ChickTilsChat.packReg = reg('packetReceived', (pack, evn) => {
+    const type = pack.func_179841_c();
+    /** @type {Map<string, ChickTilsChat>} */
+    const list = type === 2 ? ChickTilsActionBar.list : ChickTilsChat.list;
+    if (list.size === 0) return;
+    const str = ChatLib.replaceFormatting(pack.func_148915_c().func_150254_d());
+    if (ChickTilsChat.processMessage(str, list, type, pack.func_148915_c())) cancel(evn);
+  }).setFilteredClass(Java.type('net.minecraft.network.play.server.S02PacketChat'));
+  ChickTilsChat.prototype.update = function update() {
+    if (ChickTilsChat.list.size || ChickTilsActionBar.list.size) {
+      ChickTilsChat.packReg.register();
+    } else {
+      ChickTilsChat.packReg.unregister();
+    }
+  };
+  ChickTilsChat.prototype.triggerIfCanceled = function triggerIfCanceled(bool) {
+    this.doTrigIfCanceled = bool;
+  };
+  ChickTilsChat.prototype.addParameter = function addParameter(param) {
+    this.addParameters(param);
+  };
+  ChickTilsChat.prototype.addParameters = function addParameters(...params) {
+    params.forEach(v => {
+      const p = _chatParams.get(v.toLowerCase());
+      if (p) this.params.add(p);
+    });
+    if (this.mode === 2) this._updateCriteria();
+  };
+  ChickTilsChat.prototype.setParameter = function setParameter(param) {
+    this.setParameters(param);
+  };
+  ChickTilsChat.prototype.setParameters = function setParameters(...params) {
+    this.params.clear();
+    this.addParameters(...params);
+  };
+  ChickTilsChat.prototype.setExact = function setExact() {
+    this.params.clear();
+    if (this.mode === 2) this._updateCriteria();
+  };
+  ChickTilsChat.prototype.setStart = function setStart() {
+    this.setParameter('start');
+  };
+  ChickTilsChat.prototype.setEnd = function setEnd() {
+    this.setParameter('end');
+  };
+  ChickTilsChat.prototype.setContains = function setContains() {
+    this.setParameter('contains');
+  };
+  ChickTilsChat.prototype.setCaseInsensitive = function setCaseInsensitive() {
+    this.caseInsens = true;
+    this._updateCriteria();
+  };
+  ChickTilsChat.prototype.setCriteria = function setCriteria(crit) {
+    this.setChatCriteria(crit);
+  };
+  ChickTilsChat.prototype.setChatCriteria = function setChatCriteria(crit) {
+    this.rawCrit = crit;
+    this._updateCriteria();
+  };
+  ChickTilsChat.prototype._updateCriteria = function _updateCriteria() {
+    this.mode = 0;
+    if (typeof this.rawCrit === 'string') {
+      if (!this.caseInsens && !/\${(?:\*|\w+)}/.test(this.rawCrit)) this.mode = 1;
+      else {
+        this.mode = 2;
+        // https://stackoverflow.com/a/3561711
+        this.regex = new RegExp(
+          this.rawCrit
+            .replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
+            .replace(/\\\$\\{\\\*?\\}/g, '(?:.+)')
+            .replace(/\\\$\\{\w+\\}/g, '(.+)'),
+          this.caseInsens ? 'i' : ''
+        );
+      }
+    } else if (this.rawCrit?.exec) {
+      this.mode = 2;
+      this.regex = new RegExp(this.rawCrit.source, (this.params.has('START') ? 'y' : 'g') + (this.caseInsens || this.rawCrit.ignoreCase ? 'i' : '') + this.rawCrit.flags.replace(/[^msuv]/g, ''));
+    } else throw 'Expected String or Regexp Object';
+  };
+
+  function ChickTilsActionBar(cb) {
+    ChickTilsChat.call(this, cb);
+  }
+  inherits(ChickTilsActionBar, ChickTilsChat);
+  ChickTilsActionBar.list = new Map();
+  listenList(ChickTilsActionBar.list);
+  ChickTilsActionBar.prototype.getList = function getList() {
+    return ChickTilsActionBar.list;
+  };
+
   customRegs['command'] = ChickTilsCommand;
   customRegs['spawnEntity'] = ChickTilsSpawnEntity;
   customRegs['step'] = ChickTilsStep;
   customRegs['serverTick'] = ChickTilsServerTick;
   customRegs['serverTick2'] = ChickTilsServerTick2;
+  customRegs['chat'] = ChickTilsChat;
+  customRegs['actionBar'] = ChickTilsActionBar;
 
   ChickTilsServerTick2.sTickReg = reg('serverTick', () => {
     cTickEnabled.set(false);
@@ -370,3 +527,7 @@ reg = function reg(type, shit) {
 }
 
 export default reg;
+
+export function simulate(msg) {
+  customRegs.chat.processMessage(msg, customRegs.chat.list, 1, new TextComponent(msg).chatComponentText);
+}
