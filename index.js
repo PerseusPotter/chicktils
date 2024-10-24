@@ -188,7 +188,11 @@ register('command', ...args => {
     view: [],
     edit: Object.values(props).map(p => [p.name, p.type === Property.Type.Option ? p.opts.options : p.type === Property.Type.Toggle ? ['true', 'false'] : []]).reduce((a, [k, v]) => (a[k] = v, a), {})
   },
-  reload: []
+  reload: [],
+  unload: [],
+  update: [],
+  ping: [],
+  stats: [],
 })).setName('chicktils').setAliases('csm', 'cts');
 
 if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
