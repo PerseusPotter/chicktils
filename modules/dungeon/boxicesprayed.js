@@ -45,7 +45,9 @@ const serverTickReg = reg('serverTick2', () => {
     const icers = getPlayers().filter(({ e }) => {
       if (!e) return;
       const heldItem = e === Player ? e.getHeldItem() : e.getItemInSlot(0);
-      return heldItem && getSbId(heldItem) === 'ICE_SPRAY_WAND';
+      if (!heldItem) return;
+      const id = getSbId(heldItem);
+      return id === 'ICE_SPRAY_WAND' || id === 'STARRED_ICE_SPRAY_WAND';
     });
     const wS = 1;
     const l = 8;
