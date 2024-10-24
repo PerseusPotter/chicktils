@@ -6,7 +6,7 @@ import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
 import { centerMessage, cleanNumber } from './util/format';
 import getPing from './util/ping';
-import { getRegs } from './util/registerer';
+import { getRegs, simulate } from './util/registerer';
 import { calcMedian } from './util/math';
 import { _setTimeout } from './util/timers';
 setIsMainS();
@@ -107,7 +107,8 @@ register('command', ...args => {
           ' &3/chicktils config view [<page>] &l-> &bopens the settings',
           ' &3/chicktils config edit <name> [<value>] &l-> &bopens the settings',
           ' &3/chicktils config search <search term> &l-> &bsearches the settings',
-          ' &3/chicktils stats &l-> &bshows stats'
+          ' &3/chicktils stats &l-> &bshows stats',
+          ' &3/chicktils simulate <message> &l-> &bsimulates chat message'
         ].forEach(v => ChatLib.chat(v));
         break;
       case 'update':
@@ -173,6 +174,9 @@ register('command', ...args => {
         ).chat();
         break;
       }
+      case 'simulate':
+        simulate(args.join(' '));
+        break;
       default:
         throw 'Unknown command: ' + cmdName;
     }
@@ -193,6 +197,7 @@ register('command', ...args => {
   update: [],
   ping: [],
   stats: [],
+  simulate: []
 })).setName('chicktils').setAliases('csm', 'cts');
 
 if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
