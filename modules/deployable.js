@@ -370,9 +370,7 @@ const tickCalcActiveReg = reg('tick', () => {
 const knownEEnts = new (Java.type('java.util.WeakHashMap'))();
 const knownNEnts = new (Java.type('java.util.WeakHashMap'))();
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
-function serverTick() {
-}
-const serverTickReg = reg('serverTick', () => {
+const serverTickReg = reg('serverTick2', () => {
   for (let i = deployables.length - 1; i >= 0; i--) {
     if (--deployables[i].ttl <= 0) {
       if (deployables[i].isOwn) ownDeployLoc = null;
