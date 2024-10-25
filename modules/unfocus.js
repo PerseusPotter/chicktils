@@ -1,7 +1,8 @@
 import reg from '../util/registerer';
 
-const LWJGLDisplay = org.lwjgl.opengl.Display;
-const TickEvent = net.minecraftforge.fml.common.gameevent.TickEvent;
+const isActive = org.lwjgl.opengl.Display.isActive;
+const START = net.minecraftforge.fml.common.gameevent.TickEvent.Phase.START;
+let p = null;
 const renderReg = reg(net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent, evn => {
   /*
   field_71454_w is checked twice per render tick
@@ -9,11 +10,16 @@ const renderReg = reg(net.minecraftforge.fml.common.gameevent.TickEvent.RenderTi
   begin render tick -> check field_71454_w -> RenderTickEvent.START -> update mouse -> check field_71454_w -> rendering -> RenderTickEvent.END -> end of render tick
   we only intercept the 2nd check to not render, however we still want to process mouse movements so the game doesn't "freeze"
   */
-  Client.getMinecraft().field_71454_w = evn.phase.equals(TickEvent.Phase.START) && !LWJGLDisplay.isActive();
+  const v = evn.phase.equals(START) && !isActive();
+  if (v !== p) {
+    p = v;
+    Client.getMinecraft().field_71454_w = p;
+  }
 });
 
 export function init() { }
 export function load() {
+  p = null;
   renderReg.register();
 }
 export function unload() {
