@@ -18,7 +18,7 @@ const warpReg = reg('chat', id => {
   } else log('new server');
   lastWarp = t;
   currServ = id;
-}).setCriteria('Sending to server ${id}...');
+}).setCriteria('&7Sending to server ${id}...&r');
 const unloadReg = reg('worldUnload', () => (Date.now() - lastWarp > 1000) && (currServ = ''));
 
 let lastLoc = '';
