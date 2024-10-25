@@ -151,7 +151,7 @@ const wisperFromReg = reg('chat', (ign, msg) => {
 }).setCriteria('&dFrom ${ign}&7: &r&7${msg}&r').setEnabled(settings._chatTilsWaypoint);
 const guildChatReg = reg('chat', (ign, msg) => {
   // better not be able to contain [ in guild ranks
-  if (ign.endsWith(']')) ign = ign.split(0, ign.lastIndexOf('['));
+  if (ign.endsWith(']')) ign = ign.slice(0, ign.lastIndexOf('[') - 3);
   processMessageWaypoint(ign, msg);
 }).setCriteria('&r&2Guild > ${ign}&f: &r${msg}&r').setEnabled(settings._chatTilsWaypoint);
 function essentialChatCb(ign, msg) {
