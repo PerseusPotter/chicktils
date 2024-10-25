@@ -174,9 +174,12 @@ register('command', ...args => {
         ).chat();
         break;
       }
-      case 'simulate':
-        simulate(args.join(' '));
+      case 'simulate': {
+        const s = args.join(' ');
+        simulate(s);
+        ChatLib.chat(s);
         break;
+      }
       default:
         throw 'Unknown command: ' + cmdName;
     }
