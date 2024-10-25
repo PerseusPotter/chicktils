@@ -7,6 +7,17 @@ import { compareFloat, dist } from '../util/math';
 import { colorForNumber } from '../util/format';
 import GlStateManager2 from '../util/glStateManager';
 
+function spawnParticle(x, y, z, r, g, b, age) {
+  // World.particle.spawnParticle('REDSTONE', x, y, z, 0, 0, 0).setMaxAge(age).setColor(r, g, b, 1);
+  const part = Client.getMinecraft().field_71438_f.func_174974_b(
+    30, true,
+    x, y, z,
+    0, 0, 0
+  );
+  if (!part) return;
+  part.field_70547_e = age;
+  part.func_70538_b(r, g, b);
+}
 /**
  * @typedef {{ ent: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>, ttl: number, isFlux: boolean, prio: number, id: string, stats: string[], range: number, isOwn: boolean, y: number }} Deployable
  */
@@ -26,11 +37,11 @@ const DEPLOYABLE_DATA = {
         let a = 2 * Math.PI * i / 20;
         let x = Math.cos(a);
         let z = Math.sin(a);
-        World.particle.spawnParticle(
-          'REDSTONE',
+        spawnParticle(
           x + pos[0], y + pos[1], z + pos[2],
-          0, 0, 0
-        ).setMaxAge(10).setColor(0.2, 0.8, 0.16, 1);
+          0.2, 0.8, 0.16,
+          10
+        );
       }
     }
   },
@@ -55,35 +66,35 @@ const DEPLOYABLE_DATA = {
         const k = 0.04;
         for (let i = 0; i < 3; i++) {
           let o = 2 * Math.PI * i / 3;
-          World.particle.spawnParticle(
-            'REDSTONE',
+          spawnParticle(
             2 * Math.cos(t + o) / Math.cosh(k * t) + pos[0],
             2 * Math.tanh(k * t) + pos[1],
             2 * Math.sin(t + o) / Math.cosh(k * t) + pos[2],
-            0, 0, 0
-          ).setMaxAge(t > 50 ? 10 : 20).setColor(0, 0.5, 1, 1);
+            0, 0.5, 1,
+            t > 50 ? 10 : 20
+          );
         }
       } else if (t < 90) {
         t -= 69;
-        World.particle.spawnParticle(
-          'REDSTONE',
+        spawnParticle(
           pos[0],
           -0.005 * t * t + 2 + pos[1],
           pos[2],
-          0, 0, 0
-        ).setMaxAge(10).setColor(0, 0.5, 1, 1);
+          0, 0.5, 1,
+          10
+        );
       } else {
         const r = 2 * (t - 90) / 10;
         const n = 30;
         for (let i = 0; i < n; i++) {
           let a = 2 * Math.PI * i / n + Math.random() / 20;
-          World.particle.spawnParticle(
-            'REDSTONE',
+          spawnParticle(
             r * Math.cos(a) + pos[0],
             pos[1],
             r * Math.sin(a) + pos[2],
-            0, 0, 0
-          ).setMaxAge(5).setColor(0, 0.5, 1, 1);
+            0, 0.5, 1,
+            5
+          );
         }
       }
     }
@@ -127,13 +138,13 @@ const DEPLOYABLE_DATA = {
         const vz = nx * uy - ny * ux;
         for (let i = 0; i < n; i++) {
           let a = 2 * Math.PI * i / n;
-          World.particle.spawnParticle(
-            'REDSTONE',
+          spawnParticle(
             r * (ux * Math.cos(a) + vx * Math.sin(a)) + pos[0],
             r * (uy * Math.cos(a) + vy * Math.sin(a)) + y,
             r * (uz * Math.cos(a) + vz * Math.sin(a)) + pos[2],
-            0, 0, 0
-          ).setMaxAge(3).setColor(...c);
+            c[0], c[1], c[2],
+            3
+          );
         }
       });
     }
@@ -184,13 +195,13 @@ const DEPLOYABLE_DATA = {
       t /= 3;
       for (let i = 0; i < n; i++) {
         let v = i * 30 / n + t;
-        World.particle.spawnParticle(
-          'REDSTONE',
+        spawnParticle(
           R * (k * Math.cos(v) * Math.cos(k * v) + Math.sin(v) * Math.sin(k * v)) + pos[0],
           R * Math.sqrt(1 - k * k) * Math.cos(k * v) + pos[1],
           R * (k * Math.sin(v) * Math.cos(k * v) - Math.cos(v) * Math.sin(k * v)) + pos[2],
-          0, 0, 0
-        ).setMaxAge(20).setColor(0.2, 0.8, 0.16, 1);
+          0.2, 0.8, 0.16,
+          20
+        );
       }
     }
   },
@@ -215,13 +226,13 @@ const DEPLOYABLE_DATA = {
       t /= 5;
       for (let i = 0; i < k; i++) {
         let v = i * 30 / n + t;
-        World.particle.spawnParticle(
-          'REDSTONE',
+        spawnParticle(
           R * Math.cos(n * v) * Math.cos(v) + pos[0],
           R * Math.sin(n * v) + pos[1],
           R * Math.cos(n * v) * Math.sin(v) + pos[2],
-          0, 0, 0
-        ).setMaxAge(20).setColor(0, 0.5, 1, 1);
+          0, 0.5, 1,
+          20
+        );
       }
     }
   },
@@ -251,13 +262,13 @@ const DEPLOYABLE_DATA = {
       t /= 10;
       for (let i = 0; i < n; i++) {
         let o = 2 * Math.PI * i / n;
-        World.particle.spawnParticle(
-          'REDSTONE',
+        spawnParticle(
           a * Math.sin(p * t + u + o) + pos[0],
           b * Math.sin(t) + pos[1],
           a * Math.sin(q * t + v + o) + pos[2],
-          0, 0, 0
-        ).setMaxAge(20).setColor(0.6, 0.1, 0.8, 1);
+          0.6, 0.1, 0.8,
+          20
+        );
       }
     }
   }
