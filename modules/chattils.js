@@ -169,7 +169,8 @@ const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
 let lastFollowTime = 0;
 let lastFollowToken = '';
 const followReg = reg(net.minecraftforge.client.event.ClientChatReceivedEvent, evn => {
-  const msg = evn.message.func_150254_d().match(/^§9§l» (.+?) §eis traveling to (.+?) §e§lFOLLOW§r$/);
+  if (evn.type === 2) return;
+  const msg = evn.message.func_150254_d().match(/^ §9§l» (.+?) §eis traveling to (.+?) §e§lFOLLOW§r$/);
   if (!msg) return;
   const ign = getPlayerName(msg[1]);
   if (ign === Player.getName()) return;
