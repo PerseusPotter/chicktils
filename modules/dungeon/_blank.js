@@ -5,7 +5,7 @@ import { renderOutline, renderFilledBox, renderLine3D, renderString, renderBeaco
 import createAlert from '../../util/alert';
 import reg from '../../util/registerer';
 import { colorForNumber, execCmd, getPlayerName } from '../../util/format';
-import getPing from '../../util/ping';
+import { getPing } from '../../util/ping';
 import runHelper from '../../util/runner';
 import createTextGui from '../../util/customtextgui';
 import { compareFloat, cross, dist, lerp, linReg, normalize, rotate } from '../../util/math';

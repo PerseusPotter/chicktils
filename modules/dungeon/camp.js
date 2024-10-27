@@ -3,7 +3,7 @@ import data from '../../data';
 import { renderOutline, renderFilledBox, renderString, getPartialServerTick } from '../../util/draw';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
-import getPing from '../../util/ping';
+import { getAveragePing } from '../../util/ping';
 import createTextGui from '../../util/customtextgui';
 import { dist, lerp, linReg } from '../../util/math';
 import { StateProp, StateVar } from '../../util/state';
@@ -143,16 +143,16 @@ const renderWorldReg = reg('renderWorld', () => {
       y = lerp(lastEstY, estY, smoothFactor);
       z = lerp(lastEstZ, estZ, smoothFactor);
     }
-    const m = Math.min(1, (maxTtl - ttl + getPartialServerTick() + getPing() / 50) / maxTtl);
+    const m = Math.min(1, (maxTtl - ttl + getPartialServerTick() + getAveragePing() / 50) / maxTtl);
     renderOutline(x, y + 1.5, z, 1, 2, settings.dungeonCampWireColor, settings.dungeonCampBoxEsp, true, 3);
     renderFilledBox(x, y + 2.5 - m, z, m, 2 * m, settings.dungeonCampBoxColor, settings.dungeonCampBoxEsp);
 
-    if (settings.dungeonCampTimer) renderString(((ttl - getPartialServerTick()) / 20).toFixed(2), x, y + 1, z);
+    if (settings.dungeonCampTimer) renderString(((ttl - getPartialServerTick() - getAveragePing() / 50) / 20).toFixed(2), x, y + 1, z);
   });
 }).setEnabled(stateCampFinal);
 const renderOverlayReg = reg('renderOverlay', () => {
   if (lastSpawnedBloodMob && lastSpawnedBloodMob.ttl) {
-    const d = (lastSpawnedBloodMob.ttl - getPartialServerTick()) * 50;
+    const d = (lastSpawnedBloodMob.ttl - getPartialServerTick() - getAveragePing() / 50) * 50;
     dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
     dialogueSkipTimer.render();
   }

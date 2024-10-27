@@ -5,7 +5,7 @@ import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
 import { centerMessage, cleanNumber } from './util/format';
-import getPing from './util/ping';
+import { getPing, getAveragePing } from './util/ping';
 import { getRegs, simulate } from './util/registerer';
 import { calcMedian } from './util/math';
 import { _setTimeout } from './util/timers';
@@ -117,7 +117,8 @@ register('command', ...args => {
         }).start();
         break;
       case 'ping':
-        log(getPing());
+        log('ping:', getPing());
+        log('avg ping:', getAveragePing());
         break;
       case 'config':
         if (args.length === 0) args[0] = 'view';
