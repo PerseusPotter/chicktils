@@ -13,6 +13,7 @@ const stateSolution = new StateVar();
 const stateIsPD = new StateVar(true);
 
 const clicks = new Map();
+let totalClicks = 0;
 function getFrameId(y, z) {
   const dy = y - 120;
   const dz = z - 75;
@@ -25,15 +26,15 @@ function getFramePos(id) {
 }
 // snagged from bloom
 const solutions = [
-  [9 | (1 << 4), 7, 1, 1, 9, 9, 9, 9, 9, 7, 9, 3, 9, 7, 9, 9, 9, 7, 9, 3, 9, 7, 9, 9, 9, 7, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 1, 1],
-  [9 | (2 << 4), 9, 1, 1, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 1, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 1, 1, 9],
-  [9 | (1 << 4), 5, 5, 7, 1, 1, 9, 9, 9, 3, 9, 7, 9, 3, 9, 9, 9, 3, 9, 9, 9, 3, 9, 9, 9, 3, 9, 9, 9, 3, 9, 9, 9, 9, 9, 9, 9, 9],
-  [9 | (2 << 4), 9, 9, 7, 1, 9, 9, 9, 9, 9, 1, 1, 9, 9, 9, 9, 9, 9, 9, 7, 1, 9, 9, 9, 9, 9, 1, 1, 9, 9, 9, 9, 9, 9, 9, 3, 1, 9],
-  [9 | (2 << 4), 9, 9, 9, 9, 9, 9, 9, 9, 9, 7, 9, 7, 9, 9, 9, 9, 7, 1, 9, 5, 7, 9, 9, 9, 7, 9, 9, 9, 7, 9, 9, 9, 5, 5, 9, 1, 1],
-  [9 | (1 << 4), 7, 1, 1, 9, 9, 9, 9, 9, 7, 9, 3, 9, 9, 9, 9, 9, 9, 9, 3, 9, 9, 9, 9, 9, 9, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 1, 1],
-  [9 | (1 << 4), 5, 5, 7, 9, 9, 9, 9, 9, 3, 9, 7, 9, 7, 9, 9, 9, 3, 9, 9, 9, 7, 9, 9, 9, 3, 9, 9, 9, 7, 9, 9, 9, 3, 1, 1, 1, 1],
-  [9 | (1 << 4), 7, 1, 1, 9, 9, 9, 9, 9, 7, 9, 3, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 7, 9, 3, 9, 9, 9, 9, 9, 5, 5, 3],
-  [9 | (2 << 4), 9, 1, 9, 7, 9, 9, 9, 9, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 1, 1, 9]
+  [9, 7, 1, 1, 9, 9, 9, 9, 9, 7, 9, 3, 9, 7, 9, 9, 9, 7, 9, 3, 9, 7, 9, 9, 9, 7, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 1, 1],
+  [9, 9, 1, 1, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 1, 1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1, 1, 1, 9],
+  [9, 5, 5, 7, 1, 1, 9, 9, 9, 3, 9, 7, 9, 3, 9, 9, 9, 3, 9, 9, 9, 3, 9, 9, 9, 3, 9, 9, 9, 3, 9, 9, 9, 9, 9, 9, 9, 9],
+  [9, 9, 9, 7, 1, 9, 9, 9, 9, 9, 1, 1, 9, 9, 9, 9, 9, 9, 9, 7, 1, 9, 9, 9, 9, 9, 1, 1, 9, 9, 9, 9, 9, 9, 9, 3, 1, 9],
+  [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 7, 9, 7, 9, 9, 9, 9, 7, 1, 9, 5, 7, 9, 9, 9, 7, 9, 9, 9, 7, 9, 9, 9, 5, 5, 9, 1, 1],
+  [9, 7, 1, 1, 9, 9, 9, 9, 9, 7, 9, 3, 9, 9, 9, 9, 9, 9, 9, 3, 9, 9, 9, 9, 9, 9, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 1, 1],
+  [9, 5, 5, 7, 9, 9, 9, 9, 9, 3, 9, 7, 9, 7, 9, 9, 9, 3, 9, 9, 9, 7, 9, 9, 9, 3, 9, 9, 9, 7, 9, 9, 9, 3, 1, 1, 1, 1],
+  [9, 7, 1, 1, 9, 9, 9, 9, 9, 7, 9, 3, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 7, 9, 3, 9, 9, 9, 9, 9, 5, 5, 3],
+  [9, 9, 1, 9, 7, 9, 9, 9, 9, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 9, 7, 9, 9, 9, 9, 9, 3, 1, 1, 9]
 ];
 
 const tickReg = reg('tick', () => stateAtAA.set(
@@ -55,11 +56,14 @@ const calcReg = reg('tick', () => {
     if (!item || getItemId(item) !== 'minecraft:arrow') return;
     frames[id] = e.entity.func_82333_j();
   });
-  const sol = solutions.find(a => a.every((v, i) => !((v >= 9) ^ (frames[i] === 9))));
+  const sol = solutions.find(a => a.every((v, i) => !((v === 9) ^ (frames[i] === 9))));
   if (sol) {
+    clicks.clear();
+    totalClicks = 0;
     stateSolution.set(sol);
     sol.forEach((v, i) => {
       const d = (v - frames[i] + 8) & 7;
+      totalClicks += d;
       if (d > 0) clicks.set(i, d);
     });
   }
@@ -77,7 +81,8 @@ const playerInteractReg = reg('packetSent', (pack, evn) => {
   if (!id) return;
 
   const c = clicks.get(id) ?? 0;
-  if (c > (settings.dungeonArrowAlignLeavePD && stateIsPD.get() && id === (stateSolution.get()[0] >> 4))) {
+  if (c > (settings.dungeonArrowAlignLeavePD && stateIsPD.get() && totalClicks === 1)) {
+    totalClicks--;
     if (c > 1) clicks.set(id, c - 1);
     else clicks.delete(id);
     return;
@@ -88,6 +93,8 @@ const playerInteractReg = reg('packetSent', (pack, evn) => {
     settings.dungeonArrowAlignBlock === 'WhenCrouching' && isSneaking ||
     settings.dungeonArrowAlignBlock === 'ExceptWhenCrouching' && !isSneaking
   ) return cancel(evn);
+  totalClicks--;
+  if (c === 0) totalClicks += 8;
   clicks.set(id, (c + 7) & 7);
 }).setFilteredClass(net.minecraft.network.play.client.C02PacketUseEntity).setEnabled(stateDoArrowAlign.and(stateSolution));
 const renderWorldReg = reg('renderWorld', () => {
@@ -104,6 +111,7 @@ export function start() {
   stateAtAA.set(false);
   stateSolution.set(null);
   clicks.clear();
+  totalClicks = 0;
   stateIsPD.set(true);
 
   tickReg.register();
