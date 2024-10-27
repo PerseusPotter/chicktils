@@ -5,9 +5,9 @@ import reg from '../util/registerer';
 
 let chests = [];
 const chestAlert = createAlert('chest');
-const PlayerInteractEventAction = Java.type('net.minecraftforge.event.entity.player.PlayerInteractEvent').Action;
+const PlayerInteractAction = Java.type('com.chattriggers.ctjs.minecraft.listeners.ClientListener').INSTANCE.PlayerInteractAction;
 const rcReg = reg('playerInteract', (action, pos) => {
-  if (!action.equals(PlayerInteractEventAction.RIGHT_CLICK_BLOCK)) return;
+  if (!action.equals(PlayerInteractAction.RIGHT_CLICK_BLOCK)) return;
   let i = chests.findIndex(v => v.x === pos.x && v.y === pos.y && v.z === pos.z);
   if (i >= 0) chests.splice(i, 1);
 });
