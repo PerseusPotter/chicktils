@@ -3,9 +3,10 @@ import settings from '../settings';
 import createTextGui from '../util/customtextgui';
 import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
+import { getAveragePing, getPing } from '../util/ping';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
-import { FrameTimer } from '../util/timers';
+import { DelayTimer, FrameTimer } from '../util/timers';
 
 class TickInfo {
   arr = [];
@@ -214,6 +215,29 @@ const rendOvFps = reg('renderOverlay', () => {
   fpsDisplay.render();
 }).setEnabled(settings._serverScrutinizerFPSDisplay);
 
+function formatPingN(n) {
+  if (n < 50) return `&a${n.toFixed(2)} &7ms`;
+  if (n < 100) return `&2${n.toFixed(2)} &7ms`;
+  if (n < 150) return `&e${n.toFixed(2)} &7ms`;
+  if (n < 200) return `&6${n.toFixed(2)} &7ms`;
+  return `&c${n.toFixed(2)} &7ms`;
+}
+function formatPing(c, a) {
+  if (settings.serverScrutinizerPingDisplayCurr && settings.serverScrutinizerPingDisplayAvg) return [
+    'Current Ping: ' + formatPingN(c),
+    'Average Ping: ' + formatPingN(a)
+  ];
+  if (settings.serverScrutinizerPingDisplayCurr) return ['Ping: ' + formatPingN(c)];
+  if (settings.serverScrutinizerPingDisplayAvg) return ['Ping: ' + formatPingN(a)];
+  return [];
+}
+const pingDisplay = createTextGui(() => data.serverScrutinizerPingDisplay, () => formatPing(69.42, 42.69));
+const pingLimiter = new DelayTimer(1000);
+const rendOvPing = reg('renderOverlay', () => {
+  if (pingLimiter.shouldTick()) pingDisplay.setLines(formatPing(getPing(), getAveragePing()));
+  pingDisplay.render();
+}).setEnabled(settings._serverScrutinizerPingDisplay);
+
 export function init() {
   settings._moveTPSDisplay.onAction(() => tpsDisplay.edit());
   settings._moveLastTickDisplay.onAction(() => lastTickDisplay.edit());
@@ -221,6 +245,7 @@ export function init() {
   settings._serverScrutinizerTPSDisplayCap20.listen(v => ticks.cap = v ? 20 : Number.POSITIVE_INFINITY);
   settings._moveFPSDisplay.onAction(() => fpsDisplay.edit());
   settings._serverScrutinizerFPSMaxAge.listen(v => frames.maxAge = v);
+  settings._movePingDisplay.onAction(() => pingDisplay.edit());
 }
 export function load() {
   ticks.clear();
@@ -233,6 +258,7 @@ export function load() {
   rendOvLTD.register();
   renderTickReg.register();
   rendOvFps.register();
+  rendOvPing.register();
 }
 export function unload() {
   serverTickReg.unregister();
@@ -242,4 +268,5 @@ export function unload() {
   rendOvLTD.unregister();
   renderTickReg.unregister();
   rendOvFps.unregister();
+  rendOvPing.unregister();
 }
