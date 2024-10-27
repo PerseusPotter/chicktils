@@ -158,6 +158,7 @@ export function init() {
     require('./dungeon/necrondrag'),
     require('./dungeon/playsoundkey'),
     require('./dungeon/silverfishhastetimer'),
+    require('./dungeon/simonsays'),
     require('./dungeon/spiritbear'),
     require('./dungeon/stairstonkhelper'),
     require('./dungeon/terminalbreakdown'),
