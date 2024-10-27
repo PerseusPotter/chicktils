@@ -20,12 +20,13 @@ export function getAveragePing() {
   const p = getPing();
   if (pingWindow.length === 0) {
     pingWindow.push(p);
+    pingSum += p;
     return p;
   }
   if (p === pingWindow[0]) return pingSum / pingWindow.length;
   if (pingWindow.length === PING_WINDOW_SIZE) {
     const m = pingSum / pingWindow.length;
-    const stddev = pingWindow.reduce((a, v) => a + (v - m) ** 2, 0) / (PING_WINDOW_SIZE - 1);
+    const stddev = Math.sqrt(pingWindow.reduce((a, v) => a + (v - m) ** 2, 0)) / (PING_WINDOW_SIZE - 1);
     // 10 lmao
     if (Math.abs(p - m) / stddev > 10) return m;
   }
