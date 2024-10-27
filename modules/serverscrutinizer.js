@@ -154,8 +154,10 @@ const tpsCmd = reg('command', () => {
 function formatTps(curr, avg, min, max) {
   if (Date.now() - lastLoadTime < 11_000) return ['TPS: Loading...'];
   if (settings.serverScrutinizerTPSDisplayCurr + settings.serverScrutinizerTPSDisplayAvg + settings.serverScrutinizerTPSDisplayMin + settings.serverScrutinizerFPSDisplayMax === 1) {
-    if (settings.serverScrutinizerTPSDisplayCurr || settings.serverScrutinizerTPSDisplayMin || settings.serverScrutinizerTPSDisplayMax) return ['TPS: ' + getTickColor(curr, 20, 0.75) + curr];
-    return ['TPS: ' + getTickColor(avg, 20, 0.75) + avg.toFixed(1)];
+    if (settings.serverScrutinizerTPSDisplayCurr) return ['TPS: ' + getTickColor(curr, 20, 0.75) + curr];
+    if (settings.serverScrutinizerTPSDisplayAvg) return ['TPS: ' + getTickColor(avg, 20, 0.75) + avg.toFixed(1)];
+    if (settings.serverScrutinizerTPSDisplayMin) return ['TPS: ' + getTickColor(min, 20, 0.75) + min];
+    if (settings.serverScrutinizerTPSDisplayMax) return ['TPS: ' + getTickColor(max, 20, 0.75) + max];
   }
   const lines = [];
   if (settings.serverScrutinizerTPSDisplayCurr) lines.push('Current TPS: ' + getTickColor(curr, 20, 0.75) + curr);
@@ -190,8 +192,10 @@ const renderTickReg = reg('renderWorld', () => frames.add(Date.now())).setEnable
 
 function formatFps(curr, avg, min, max) {
   if (settings.serverScrutinizerFPSDisplayCurr + settings.serverScrutinizerFPSDisplayAvg + settings.serverScrutinizerFPSDisplayMin + settings.serverScrutinizerFPSDisplayMax === 1) {
-    if (settings.serverScrutinizerFPSDisplayCurr || settings.serverScrutinizerFPSDisplayMin || settings.serverScrutinizerFPSDisplayMax) return ['FPS: ' + getTickColor(curr, max, 0.5) + curr];
-    return ['FPS: ' + getTickColor(avg, max, 0.5) + avg.toFixed(1)];
+    if (settings.serverScrutinizerFPSDisplayCurr) return ['FPS: ' + getTickColor(curr, max, 0.5) + curr];
+    if (settings.serverScrutinizerFPSDisplayAvg) return ['FPS: ' + getTickColor(avg, max, 0.5) + avg.toFixed(1)];
+    if (settings.serverScrutinizerFPSDisplayMin) return ['FPS: ' + getTickColor(min, max, 0.5) + min];
+    if (settings.serverScrutinizerFPSDisplayMax) return ['FPS: ' + getTickColor(max, max, 0.5) + max];
   }
   const lines = [];
   if (settings.serverScrutinizerFPSDisplayCurr) lines.push('Current FPS: ' + getTickColor(curr, max, 0.5) + curr);
