@@ -24,13 +24,13 @@ export class StateVar {
     this.trigger();
   }
   /**
-   * @param {(newValue: T) => void} cb
+   * @param {(this: this, newValue: T) => void} cb
    */
   listen(cb) {
     this.hooks.push(cb);
   }
   trigger() {
-    this.hooks.forEach(v => v(this.value));
+    this.hooks.forEach(v => v.call(this, this.value));
   }
 };
 
