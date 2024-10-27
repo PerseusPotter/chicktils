@@ -1,5 +1,5 @@
 const prefix = '&7[&2ChickTils&7]&f ';
-const DUMP_TO_FILE = true;
+const DUMP_TO_FILE = false;
 
 export const log = (function() {
   if (DUMP_TO_FILE) {
