@@ -646,6 +646,9 @@ export const props = {
   dungeonDragonHelperPrioNS: new Property('DungeonDragonHelperPrioNoSplit', page, ++sort, Property.Type.Text, 'robpg', { desc: 'priority to use when NOT splitting\nbers team -> robpg <- arch team' }),
   dungeonDragonHelperBersTeam: new Property('DungeonDragonHelperBersTeam', page, ++sort, Property.Type.Text, 'bmh', { desc: 'classes that go w/ bers team\nb m h | a t' }),
 
+  dungeonLBPullProgress: new Property('DungeonLBPullProgress', page, ++sort, Property.Type.Toggle, false, { desc: 'play sounds indicating bow pull progress (accounting for lag)' }),
+  dungeonLBPullProgressVolume: new Property('DungeonLBPullProgressVolume', page, ++sort, Property.Type.Number, 1, { min: 0, max: 2 }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
