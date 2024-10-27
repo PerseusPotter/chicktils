@@ -135,6 +135,7 @@ const bossMessageReg = reg('chat', (name, msg) => {
 
 export function init() {
   modules = [
+    require('./dungeon/arrowalign'),
     require('./dungeon/autoarchitect'),
     require('./dungeon/autorefillpearls'),
     require('./dungeon/boxicesprayed'),

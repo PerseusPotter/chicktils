@@ -657,6 +657,10 @@ export const props = {
   dungeonSimonSaysColor3: new Property('DungeonSimonSaysColorOther', page, ++sort, Property.Type.Color, 0xFF0000A0, { desc: 'color of the other buttons' }),
   dungeonSimonSaysBlock: new Property('DungeonSimonSaysBlockClicks', page, ++sort, Property.Type.Option, 'ExceptWhenCrouching', { desc: 'block incorrect clicks', options: ['Never', 'Always', 'WhenCrouching', 'ExceptWhenCrouching'] }),
 
+  dungeonArrowAlign: new Property('DungeonArrowAlign', page, ++sort, Property.Type.Toggle, false),
+  dungeonArrowAlignBlock: new Property('DungeonArrowAlignBlockClicks', page, ++sort, Property.Type.Option, 'ExceptWhenCrouching', { desc: 'block incorrect clicks', options: ['Never', 'Always', 'WhenCrouching', 'ExceptWhenCrouching'] }),
+  dungeonArrowAlignLeavePD: new Property('DungeonArrowAlignLeaveOnePD', page, ++sort, Property.Type.Toggle, true, { desc: 'leave 1 frame at 1 click away during pd' }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
