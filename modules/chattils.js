@@ -22,7 +22,7 @@ const worldRenderReg = reg('renderWorld', () => {
     if (settings.chatTilsWaypointType === 'Box') renderWaypoint(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
     else renderOutline(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
   });
-  if (settings.chatTilsWaypointBeacon) coords.forEach(v => renderBeaconBeam(v.x, v.y + 1, v.z, settings.chatTilsWaypointColor, true, false));
+  if (settings.chatTilsWaypointBeacon) coords.forEach(v => renderBeaconBeam(v.x, v.y + 1, v.z, settings.chatTilsWaypointColor, settings.useScuffedBeacon, true, false));
   if (settings.chatTilsWaypointName) coords.forEach(v => renderString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(settings.chatTilsWaypointColor)*/));
 });
 let waypointReloadNum = 0;

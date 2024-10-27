@@ -20,7 +20,7 @@ const tickReg = reg('tick', () => {
 }).setEnabled(stateM7LBWaypoints);
 const renderWorldReg = reg('renderWorld', () => {
   if (Player.getY() > 30 || !nearest) return;
-  renderBeaconBeam(nearest[0], 0, nearest[1], nearest[2], true, false, 17);
+  renderBeaconBeam(nearest[0], 0, nearest[1], nearest[2], settings.useScuffedBeacon, true, false, 17);
 }).setEnabled(stateM7LBWaypoints);
 
 export function init() { }

@@ -73,7 +73,7 @@ const eggRenWrldReg = reg('renderWorld', () => {
     const y = v.getRenderY();
     const z = v.getRenderZ();
     renderOutline(x, y + 1.5, z, 0.5, 0.5, settings.rabbitBoxColor, settings.rabbitBoxEsp);
-    renderBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.rabbitBoxEsp);
+    renderBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.useScuffedBeacon, settings.rabbitBoxEsp);
   });
   if (settings.preferUseTracer && eggs.length > 0) renderTracer(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
 }).setEnabled(stateDoSpring);

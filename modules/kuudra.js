@@ -122,7 +122,7 @@ const renderReg = reg('renderWorld', () => {
     const z = v.getRenderZ();
     renderWaypoint(x, y, z, 3.6, 11.7, settings.kuudraBoxSuppliesGiantColor, settings.kuudraBoxSuppliesEsp, false);
     renderOutline(x - 3.25, y + 8, z + 2, 2.5, 2.5, settings.kuudraBoxSuppliesColor, settings.kuudraBoxSuppliesEsp, false);
-    renderBeaconBeam(x - 2.5, y + 11, z + 2.75, settings.kuudraBoxSuppliesColor, settings.kuudraBoxSuppliesEsp, false);
+    renderBeaconBeam(x - 2.5, y + 11, z + 2.75, settings.kuudraBoxSuppliesColor, settings.useScuffedBeacon, settings.kuudraBoxSuppliesEsp, false);
   });
   if (settings.kuudraBoxChunks && chunks.length > 0) chunks.forEach(v => {
     const x = v.getRenderX();
