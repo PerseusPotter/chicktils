@@ -15,6 +15,7 @@ export function setIsMain() {
  * @template {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7} T
  * @template {string | number | boolean | null} V
  * @template {string} O
+ * @extends {StateVar<T extends 0 ? boolean : T extends 4 ? string : T extends 6 ? O : T extends 7 ? null : number>}
  */
 export class Property extends StateVar {
   /**
