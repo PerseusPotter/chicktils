@@ -103,14 +103,14 @@ const renderWorldReg = reg('renderWorld', () => {
     y = lerp(estPrev.y, est.y, smoothFactor);
     z = lerp(estPrev.z, est.z, smoothFactor);
   }
-  const m = Math.min(1, (bearSpawnTicks - ticks.get() - getPartialServerTick() + getPing() / 50) / bearSpawnTicks);
+  const m = Math.min(1, (bearSpawnTicks - ticks.get() + getPartialServerTick() + getPing() / 50) / bearSpawnTicks);
   renderOutline(x, y, z, 1, 2, settings.dungeonSpiritBearWireColor, settings.dungeonSpiritBearBoxEsp, true, 3);
   renderFilledBox(x, y + 1 - m, z, m, 2 * m, settings.dungeonSpiritBearBoxColor, settings.dungeonSpiritBearBoxEsp);
 
   if (settings.dungeonSpiritBearTimer) renderString(((ticks.get() - getPartialServerTick()) / 20).toFixed(2), x, y + 2.5, z);
 }).setEnabled(stateBearSpawning);
 const renderOvlyReg = reg('renderOverlay', () => {
-  const d = (ticks.get() + 1 - getPartialServerTick()) * 50;
+  const d = (ticks.get() - getPartialServerTick()) * 50;
   spiritBearTimer.setLine(`§l${colorForNumber(d, bearSpawnTicks * 50)}${(d / 1000).toFixed(2)}s`.toString());
   spiritBearTimer.render();
 }).setEnabled(new StateProp(settings._dungeonSpiritBearTimerHud).and(stateBearSpawning));
