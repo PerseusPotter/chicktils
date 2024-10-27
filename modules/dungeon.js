@@ -150,6 +150,7 @@ export function init() {
     require('./dungeon/hidefallingblocks'),
     require('./dungeon/hidehealerpowerups'),
     require('./dungeon/hidewitherking'),
+    require('./dungeon/lbpullprogress'),
     require('./dungeon/lividfinder'),
     require('./dungeon/icesprayalert'),
     require('./dungeon/m7lbwaypoints'),
