@@ -74,7 +74,7 @@ const renderArrowWrldReg = reg('renderWorld', () => {
 const renderWrldReg = reg('renderWorld', () => {
   if (guessLoc) {
     renderWaypoint(guessLoc[0], guessLoc[1], guessLoc[2], 1, 1, settings.dianaGuessFromParticlesColor, true, true);
-    renderBeaconBeam(guessLoc[0], guessLoc[1] + 1, guessLoc[2], settings.dianaGuessFromParticlesColor, true, true);
+    renderBeaconBeam(guessLoc[0], guessLoc[1] + 1, guessLoc[2], settings.dianaGuessFromParticlesColor, settings.useScuffedBeacon, true, true);
     // renderString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
   }
 }).setEnabled(settings._dianaGuessFromParticles);

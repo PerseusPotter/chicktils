@@ -686,17 +686,19 @@ const beaconBeamText = new ResourceLocation('textures/entity/beacon_beam.png');
  * @param {number} y
  * @param {number} z
  * @param {number} color rgba
+ * @param {boolean} scuffed
  * @param {boolean?} esp is visible through walls (false)
  * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} height (300)
  * @link https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/98f4f6140ab8371f1fd18846f5489318af2b2252/src/main/java/io/github/moulberry/notenoughupdates/core/util/render/RenderUtils.java#L220
  */
-export function renderBeaconBeam(x, y, z, color, esp = false, center = true, height = 300) {
+export function renderBeaconBeam(x, y, z, color, scuffed, esp = false, center = true, height = 300) {
   if ((color & 0xFF) === 0) return;
   if (!center) {
     x += 0.5;
     z += 0.5;
   }
+  if (scuffed) return renderFilledBox(x, y, z, 0.4, height - y, color, esp);
   ({ x, y, z, s } = rescaleRender(x, y, z));
 
   GlStateManager2.pushMatrix();
