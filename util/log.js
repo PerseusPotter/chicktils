@@ -1,8 +1,20 @@
 const prefix = '&7[&2ChickTils&7]&f ';
+const DUMP_TO_FILE = true;
 
-export function log(...args) {
-  ChatLib.chat(prefix + args.join(' '));
-}
+export const log = (function() {
+  if (DUMP_TO_FILE) {
+    var Logger = java.util.logging.Logger.getLogger('ChicktilsLogger');
+    const FileHandler = new java.util.logging.FileHandler('./config/ChatTriggers/modules/chicktils/log-%u.log');
+    Logger.addHandler(FileHandler);
+    const Formatter = new java.util.logging.SimpleFormatter();
+    FileHandler.setFormatter(Formatter);
+  }
+  return function(...args) {
+    if (DUMP_TO_FILE) Logger.info(args.join(' '));
+    else ChatLib.chat(prefix + args.join(' '));
+  }
+}());
+
 /**
  * @param {Message} msg
  */
