@@ -73,7 +73,8 @@ export function roundRoomCoords(c) {
 
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) {
-    const p = players.find(v => v.ign === e.func_70005_c_());
+    const n = e.func_70005_c_();
+    const p = players.find(v => v.ign === n);
     if (p) {
       p.e = new EntityLivingBase(e);
       p.me = e;
