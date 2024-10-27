@@ -661,6 +661,9 @@ export const props = {
   dungeonArrowAlignBlock: new Property('DungeonArrowAlignBlockClicks', page, ++sort, Property.Type.Option, 'ExceptWhenCrouching', { desc: 'block incorrect clicks', options: ['Never', 'Always', 'WhenCrouching', 'ExceptWhenCrouching'] }),
   dungeonArrowAlignLeavePD: new Property('DungeonArrowAlignLeaveOnePD', page, ++sort, Property.Type.Toggle, true, { desc: 'leave 1 frame at 1 click away during pd' }),
 
+  dungeonGoldorFrenzyTimer: new Property('DungeonGoldorFrenzyTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'show timer until next goldor frenzy tick' }),
+  moveGoldorFrenzyTimer: new Property('MoveGoldorFrenzyTimer', page, ++sort, Property.Type.Action),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),

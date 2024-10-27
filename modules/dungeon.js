@@ -147,6 +147,7 @@ export function init() {
     require('./dungeon/dev4highlight'),
     require('./dungeon/dragonhelper'),
     require('./dungeon/goldordpsalert'),
+    require('./dungeon/goldorfrenzytimer'),
     require('./dungeon/hecatomb'),
     require('./dungeon/hidefallingblocks'),
     require('./dungeon/hidehealerpowerups'),
