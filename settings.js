@@ -651,6 +651,12 @@ export const props = {
   dungeonLBPullProgressVolume: new Property('DungeonLBPullProgressVolume', page, ++sort, Property.Type.Number, 1, { min: 0, max: 5 }),
   dungeonLBPullProgressThreshold: new Property('DungeonLBPullProgressThreshold', page, ++sort, Property.Type.Integer, 8, { desc: 'how many ticks to swap to different sound\n0: always, 21: never', min: 0, max: 21 }),
 
+  dungeonSimonSays: new Property('DungeonSimonSays', page, ++sort, Property.Type.Toggle, false),
+  dungeonSimonSaysColor1: new Property('DungeonSimonSaysColor', page, ++sort, Property.Type.Color, 0x00FF00A0, { desc: 'color of the button to press ' }),
+  dungeonSimonSaysColor2: new Property('DungeonSimonSaysColorNext', page, ++sort, Property.Type.Color, 0xFFFF00A0, { desc: 'color of the next button to press' }),
+  dungeonSimonSaysColor3: new Property('DungeonSimonSaysColorOther', page, ++sort, Property.Type.Color, 0xFF0000A0, { desc: 'color of the other buttons' }),
+  dungeonSimonSaysBlock: new Property('DungeonSimonSaysBlockClicks', page, ++sort, Property.Type.Option, 'ExceptWhenCrouching', { desc: 'block incorrect clicks', options: ['Never', 'Always', 'WhenCrouching', 'ExceptWhenCrouching'] }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
