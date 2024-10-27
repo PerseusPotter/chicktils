@@ -35,6 +35,7 @@ export function setIsMain() {
  *  greatSpookPrimalTimerLoc: TextLocation;
  *  dragonHelperTimer: TextLocation;
  *  goldorFrenzyTimer: TextLocation;
+ *  serverScrutinizerPingDisplay: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -77,7 +78,8 @@ function verifyTextLocation(value) {
   'deployableHUDLoc',
   'greatSpookPrimalTimerLoc',
   'dragonHelperTimer',
-  'goldorFrenzyTimer'
+  'goldorFrenzyTimer',
+  'serverScrutinizerPingDisplay'
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v);

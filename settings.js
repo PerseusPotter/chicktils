@@ -839,6 +839,11 @@ export const props = {
   serverScrutinizerFPSMaxAge: new Property('ServerScrutinizerFPSMaxAge', page, ++sort, Property.Type.Integer, 5000, { desc: 'max age of ticks', min: 1000 }),
   moveFPSDisplay: new Property('MoveFPSDisplay', page, ++sort, Property.Type.Action),
 
+  serverScrutinizerPingDisplay: new Property('ServerScrutinizerPingDisplay', page, ++sort, Property.Type.Toggle, false, { desc: 'tracks ping' }),
+  serverScrutinizerPingDisplayCurr: new Property('ServerScrutinizerDisplayCurrentPing', page, ++sort, Property.Type.Toggle, true, { desc: 'show current ping' }),
+  serverScrutinizerPingDisplayAvg: new Property('ServerScrutinizerDisplayAveragePing', page, ++sort, Property.Type.Toggle, true, { desc: 'show average ping' }),
+  movePingDisplay: new Property('MovePingDisplay', page, ++sort, Property.Type.Action),
+
   enablespotify: new Property('EnableSpotifyDisplay', page, ++sort, Property.Type.Toggle, false, { desc: 'shows current song playing on spotify, only works on windows + app version' }),
   moveSpotifyDisplay: new Property('MoveSpotifyDisplay', page, ++sort, Property.Type.Action),
   spotifyHideNotOpen: new Property('SpotifyHideIfNotOpened', page, ++sort, Property.Type.Toggle, true, { desc: 'hide if spotify is not opened' }),
