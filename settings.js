@@ -67,7 +67,7 @@ export class Property extends StateVar {
   set(v, force) {
     if (this.type === Property.Type.Action) return;
     if (v === this.value) {
-      if (force) this.trigger();
+      if (force) this.trigger(v);
     } else super.set(v);
   }
   validate(v) {
@@ -461,7 +461,7 @@ class Settings {
   }
 
   refresh() {
-    this.props.forEach(v => v.trigger());
+    this.props.forEach(v => v.trigger(v.value));
   }
 }
 

@@ -20,17 +20,18 @@ export class StateVar {
    */
   set(v) {
     if (this.value === v) return;
+    const o = this.value;
     this.value = v;
-    this.trigger();
+    this.trigger(o);
   }
   /**
-   * @param {(this: this, newValue: T) => void} cb
+   * @param {(this: this, newValue: T, oldValue: T) => void} cb
    */
   listen(cb) {
     this.hooks.push(cb);
   }
-  trigger() {
-    this.hooks.forEach(v => v.call(this, this.value));
+  trigger(o) {
+    this.hooks.forEach(v => v.call(this, this.value, o));
   }
 };
 
