@@ -37,8 +37,8 @@ function getPitch() {
 }
 let lastServerTickTime = Date.now();
 let cachedServerTickPartial = 0;
-reg('serverTick', () => lastServerTickTime = Date.now());
-reg(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, () => cachedServerTickPartial = Math.min(1, (Date.now() - lastServerTickTime) / 50));
+reg('serverTick', () => lastServerTickTime = Date.now()).register();
+reg(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, () => cachedServerTickPartial = Math.min(1, (Date.now() - lastServerTickTime) / 50)).register();
 export function getPartialServerTick() {
   return cachedServerTickPartial;
 }
