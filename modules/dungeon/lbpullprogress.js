@@ -21,7 +21,8 @@ const tickReg = reg('tick', () => {
 }).setEnabled(settings._dungeonLBPullProgress);
 const serverTickReg = reg('serverTick2', () => {
   totalTicks++;
-  World.playSound('note.pling', settings.dungeonLBPullProgressVolume, Math.min(2, rescale(totalTicks, 0, 20, 0.5, 2)));
+  const ticks = Math.min(20, totalTicks);
+  World.playSound(ticks >= settings.dungeonLBPullProgressThreshold ? 'random.successful_hit' : 'note.pling', settings.dungeonLBPullProgressVolume, rescale(ticks, 0, 20, 0.5, 2));
 }).setEnabled(new StateProp(settings._dungeonLBPullProgress).and(statePullingLb));
 
 export function init() { }

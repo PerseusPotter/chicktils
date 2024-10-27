@@ -647,7 +647,8 @@ export const props = {
   dungeonDragonHelperBersTeam: new Property('DungeonDragonHelperBersTeam', page, ++sort, Property.Type.Text, 'bmh', { desc: 'classes that go w/ bers team\nb m h | a t' }),
 
   dungeonLBPullProgress: new Property('DungeonLBPullProgress', page, ++sort, Property.Type.Toggle, false, { desc: 'play sounds indicating bow pull progress (accounting for lag)' }),
-  dungeonLBPullProgressVolume: new Property('DungeonLBPullProgressVolume', page, ++sort, Property.Type.Number, 1, { min: 0, max: 2 }),
+  dungeonLBPullProgressVolume: new Property('DungeonLBPullProgressVolume', page, ++sort, Property.Type.Number, 1, { min: 0, max: 5 }),
+  dungeonLBPullProgressThreshold: new Property('DungeonLBPullProgressThreshold', page, ++sort, Property.Type.Integer, 8, { desc: 'how many ticks to swap to different sound\n0: always, 21: never', min: 0, max: 21 }),
 
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
