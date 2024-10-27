@@ -144,6 +144,7 @@ export function init() {
     require('./dungeon/camp'),
     require('./dungeon/dev4helper'),
     require('./dungeon/dev4highlight'),
+    require('./dungeon/dragonhelper'),
     require('./dungeon/goldordpsalert'),
     require('./dungeon/hecatomb'),
     require('./dungeon/hidefallingblocks'),

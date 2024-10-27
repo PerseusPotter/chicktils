@@ -634,6 +634,18 @@ export const props = {
 
   dungeonHideWitherKing: new Property('DungeonHideWitherKing', page, ++sort, Property.Type.Toggle, true, { desc: 'dont render wither king tentacles' }),
 
+  dungeonDragonHelper: new Property('DungeonDragonHelper', page, ++sort, Property.Type.Toggle, false),
+  dungeonDragonHelperTimer2D: new Property('DungeonDragonHelperTimerHUD', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer until dragon spawn on hud' }),
+  moveDragonHelperTimer: new Property('MoveDragonHelperTimer', page, ++sort, Property.Type.Action),
+  dungeonDragonHelperTimer3D: new Property('DungeonDragonHelperTimerWorld', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer until dragon spawn under its chin' }),
+  dungeonDragonHelperAlert: new Property('DungeonDragonHelperAlert', page, ++sort, Property.Type.Option, 'None', { desc: 'show alert when dragon is spawning', options: ['None', 'All', 'Split'] }),
+  dungeonDragonHelperAlertTime: new Property('DungeonDragonHelperAlertTime', page, ++sort, Property.Type.Integer, 1000, { desc: 'in ms', min: 0 }),
+  dungeonDragonHelperAlertSound: new Property('DungeonDragonHelperAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
+  dungeonDragonHelperSplit: new Property('DungeonDragonHelperSplit', page, ++sort, Property.Type.Toggle, true, { desc: 'do you split' }),
+  dungeonDragonHelperPrioS: new Property('DungeonDragonHelperPrioSplit', page, ++sort, Property.Type.Text, 'ogrbp', { desc: 'priority to use when splitting\nbers team -> ogrbp <- arch team' }),
+  dungeonDragonHelperPrioNS: new Property('DungeonDragonHelperPrioNoSplit', page, ++sort, Property.Type.Text, 'robpg', { desc: 'priority to use when NOT splitting\nbers team -> robpg <- arch team' }),
+  dungeonDragonHelperBersTeam: new Property('DungeonDragonHelperBersTeam', page, ++sort, Property.Type.Text, 'bmh', { desc: 'classes that go w/ bers team\nb m h | a t' }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
