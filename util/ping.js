@@ -28,7 +28,7 @@ export function getAveragePing() {
     const m = pingSum / pingWindow.length;
     const stddev = Math.sqrt(pingWindow.reduce((a, v) => a + (v - m) ** 2, 0)) / (PING_WINDOW_SIZE - 1);
     // 10 lmao
-    if (Math.abs(p - m) / stddev > 10) return m;
+    if ((p - m) / stddev > 10) return m;
   }
   pingWindow.unshift(p);
   pingSum += p;
