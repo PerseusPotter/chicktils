@@ -49,6 +49,12 @@ const tickReg = reg('tick', () => stateAtAA.set(
 )).setEnabled(stateArrowAlign);
 const EntityItemFrame = net.minecraft.entity.item.EntityItemFrame;
 const calcReg = reg('tick', () => {
+  /**
+   * > const x = n => ((n - 1) << (32 - Math.clz32(n))) + n + 1;
+   * > // 5x5
+   * > x(5);
+   * < 38
+   */
   const frames = new Array(38).fill(9);
   World.getAllEntitiesOfType(EntityItemFrame).forEach(e => {
     const x = Math.floor(e.getX());
