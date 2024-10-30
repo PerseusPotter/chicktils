@@ -81,9 +81,9 @@ const regs = [
   reg('command', loc => {
     if (!loc) return ChatLib.command('warp');
     let t = Date.now() - lastWarp;
+    // yes warping in same server has cd (just no cd message appears)
     // if (warpLocs[lastLoc] !== warpLocs[loc] && t < settings.serverTrackerTransferCd) {
     if (t < settings.serverTrackerTransferCd) {
-      // yes warping in same server has cd (just no cd message appears)
       if (settings.serverTrackerCdMessage) log(settings.serverTrackerCdMessage);
       _setTimeout(() => ChatLib.command('warp ' + loc), settings.serverTrackerTransferCd - t);
     } else ChatLib.command('warp ' + loc);
