@@ -17,6 +17,7 @@ const renderWorldReg = reg('renderWorld', () => {
     renderOutline(x, y, z, 0.8, 2, c, settings.dungeonBoxTeammatesEsp);
   });
 }).setEnabled(settings._dungeonBoxTeammates);
+
 export function init() {
   registerTrackPlayers(settings._dungeonBoxTeammates);
 }
