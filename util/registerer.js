@@ -6,7 +6,7 @@ function wrap(orig, wrap, prop) {
   return function(...args) {
     prop.apply(orig, args[0] === undefined && args.length === 1 ? [] : args);
     return wrap;
-  }
+  };
 }
 
 /**
