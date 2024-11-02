@@ -1,5 +1,5 @@
 import { inherits } from './polyfill';
-import { StateVar } from './state';
+import { StateProp, StateVar } from './state';
 import { run, wrap as wrapFunc } from './threading';
 
 function wrap(orig, wrap, prop) {
@@ -505,6 +505,44 @@ reg = function reg(type, shit) {
     return ChickTilsActionBar.list;
   };
 
+  function ChickTilsWorldLoad(cb) {
+    ChickTilsRegister.call(this, cb);
+  }
+  inherits(ChickTilsWorldLoad, ChickTilsRegister);
+  ChickTilsWorldLoad.list = new Map();
+  listenList(ChickTilsWorldLoad.list);
+  ChickTilsWorldLoad.prototype.getList = function getList() {
+    return ChickTilsWorldLoad.list;
+  };
+  const stateWorldLoaded = new StateVar(false);
+  ChickTilsWorldLoad.worldLoadReg = reg('worldLoad', () => {
+    ChickTilsWorldLoad.list.forEach(v => v.cb());
+    stateWorldLoaded.set(true);
+  }).setEnabled(new StateProp(stateWorldLoaded).not());
+  ChickTilsWorldLoad.prototype.update = function update() {
+    if (ChickTilsWorldLoad.list.size || ChickTilsWorldUnload.list.size) {
+      ChickTilsWorldLoad.worldLoadReg.register();
+      ChickTilsWorldUnload.worldUnloadReg.register();
+    } else {
+      ChickTilsWorldLoad.worldLoadReg.unregister();
+      ChickTilsWorldUnload.worldUnloadReg.unregister();
+    }
+  };
+  function ChickTilsWorldUnload(cb) {
+    ChickTilsRegister.call(this, cb);
+  }
+  inherits(ChickTilsWorldUnload, ChickTilsRegister);
+  ChickTilsWorldUnload.list = new Map();
+  listenList(ChickTilsWorldUnload.list);
+  ChickTilsWorldUnload.prototype.getList = function getList() {
+    return ChickTilsWorldUnload.list;
+  };
+  ChickTilsWorldUnload.worldUnloadReg = reg('worldUnload', () => {
+    ChickTilsWorldUnload.list.forEach(v => v.cb());
+    stateWorldLoaded.set(false);
+  }).setEnabled(stateWorldLoaded);
+  ChickTilsWorldUnload.prototype.update = ChickTilsWorldLoad.prototype.update;
+
   customRegs['command'] = ChickTilsCommand;
   customRegs['spawnEntity'] = ChickTilsSpawnEntity;
   customRegs['step'] = ChickTilsStep;
@@ -512,6 +550,8 @@ reg = function reg(type, shit) {
   customRegs['serverTick2'] = ChickTilsServerTick2;
   customRegs['chat'] = ChickTilsChat;
   customRegs['actionBar'] = ChickTilsActionBar;
+  customRegs['worldLoad'] = ChickTilsWorldLoad;
+  customRegs['worldUnload'] = ChickTilsWorldUnload;
 
   ChickTilsServerTick2.sTickReg = reg('serverTick', () => {
     cTickEnabled.set(false);
