@@ -44,6 +44,7 @@ export function loadModule(name) {
       log(e.message);
       log(e.stack);
     }
+    console.log(e + '\n' + e.stack);
   }
 }
 export function unloadModule(name) {
