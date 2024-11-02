@@ -51,15 +51,15 @@ const createAlert = (function() {
      */
     let obj = Object.create(proto);
     obj._display = createTextGui(() => ({ a: 4, s: scale, x: Renderer.screen.getWidth() / 2, y: Renderer.screen.getHeight() / 2 - 30, b: true }));
-    obj._display.display.setTextColor(Renderer.RED);
-    obj._display.setLine(txt);
+    obj._display.setLine('&c' + txt);
     obj.sound = sound;
     Object.defineProperty(obj, 'text', {
       get() {
-        return obj._display.display.getLine(0).getText();
+        return txt;
       },
       set(v) {
-        obj._display.setLine(v);
+        txt = v;
+        obj._display.setLine('&c' + v);
       }
     });
     return obj;
