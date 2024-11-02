@@ -175,7 +175,7 @@ const DEPLOYABLE_DATA = {
       DEPLOYABLE_DATA.OVERFLUX_POWER_ORB.parts.call(this, t, pos, y);
     }
   },
-  'ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzMwNjIyMywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjJlMmJmNmMxZWMzMzAyNDc5MjdiYTYzNDc5ZTU4NzJhYzY2YjA2OTAzYzg2YzgyYjUyZGFjOWYxYzk3MTQ1OCIKICAgIH0KICB9Cn0=': {
+  '20878304-7e4f-3dd1-b1f9-72d50bbb9fce': {
     duration: 20 * 3 * 60,
     range: 40 ** 2,
     stats: [
@@ -205,7 +205,7 @@ const DEPLOYABLE_DATA = {
       }
     }
   },
-  'ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzMyNjQzMiwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWQyYmY5ODY0NzIwZDg3ZmQwNmI4NGVmYTgwYjc5NWM0OGVkNTM5YjE2NTIzYzNiMWYxOTkwYjQwYzAwM2Y2YiIKICAgIH0KICB9Cn0=': {
+  'ee51537a-c348-3492-be77-d835d8d98cdd': {
     duration: 20 * 3 * 60,
     range: 40 ** 2,
     stats: [
@@ -236,7 +236,7 @@ const DEPLOYABLE_DATA = {
       }
     }
   },
-  'ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzM0NzQ4OSwKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAwNjJjYzk4ZWJkYTcyYTZhNGI4OTc4M2FkY2VmMjgxNWI0ODNhMDFkNzNlYTg3YjNkZjc2MDcyYTg5ZDEzYiIKICAgIH0KICB9Cn0=': {
+  '680f7ffe-6925-396e-9d6c-7b3fe6c57e11': {
     duration: 20 * 3 * 60,
     range: 40 ** 2,
     stats: [
@@ -424,8 +424,7 @@ const equipmentReg = reg('packetReceived', (pack, doDupe) => {
     return;
   }
 
-  // SkullOwner.Id changes :/
-  const txId = nbt.func_74775_l('SkullOwner')?.func_74775_l('Properties')?.func_150295_c('textures', 10)?.func_150305_b(0)?.func_74779_i('Value');
+  const txId = nbt.func_74775_l('SkullOwner')?.func_74779_i('Id');
   if (!txId) return;
 
   const data = DEPLOYABLE_DATA[txId];
