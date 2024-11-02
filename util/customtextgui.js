@@ -92,6 +92,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   };
   let cs = 1;
   let cb = false;
+  let cc = 0;
   let dirty = true;
   /** @type {import('../../@types/Libs').Image} */
   let img;
@@ -108,6 +109,11 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       cb = l.b;
     }
     cs = l.s;
+    if (cc !== l.c) {
+      dirty = true;
+      lines.forEach(v => v.w = -1);
+      cc = l.c;
+    }
     const tl = obj.getTrueLoc();
     rx = tl.x;
     ry = tl.y;
@@ -151,6 +157,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     const ascent = tmpG.getFontMetrics().getAscent();
 
     lineW = 0;
+    lineVW = 0;
     hasObf = false;
     lines.forEach(v => {
       if (v.o.length) hasObf = true;
@@ -261,13 +268,15 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
 
     lines.forEach((v, i) => {
       const y = i * FONT_RENDER_SIZE + ascent;
-      g.setFont(fonts[0]);
-      if (cb) {
+      let x = 0;
+      if (cc === 1) x = lineVW - v.vw;
+      else if (cc === 2) x = (lineVW - v.vw) / 2;
+      if (cb && v.b) {
         g.setColor(COLORS_SHADOW.f);
         g.drawString(v.b.getIterator(), 2, y + 2);
       }
       g.setColor(COLORS.f);
-      g.drawString(v.a.getIterator(), 0, y);
+      g.drawString(v.a.getIterator(), x, y);
     });
     g.dispose();
 
@@ -307,6 +316,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   obj.clearLines = function() {
     lines = [];
     lineW = 0;
+    lineVW = 0;
     hasObf = false;
     return this;
   };
@@ -323,14 +333,11 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     const loc = this.getLoc();
     const w = this.getWidth();
     const h = lines.length * this.getHeight();
-    switch (loc.a) {
-      case 0: return { x: loc.x, y: loc.y, s: loc.s };
-      case 1: return { x: loc.x - w, y: loc.y, s: loc.s };
-      case 2: return { x: loc.x, y: loc.y - h, s: loc.s };
-      case 3: return { x: loc.x - w, y: loc.y - h, s: loc.s };
-      case 4: return { x: loc.x - w / 2, y: loc.y, s: loc.s };
-      default: return { x: NaN, y: NaN, s: NaN };
-    }
+    return {
+      x: loc.c === 3 ? loc.x - w / 2 : loc.a & 1 ? loc.x - w : loc.x,
+      y: loc.a & 2 ? loc.y - h : loc.y,
+      s: loc.s
+    };
   };
 
   return obj;
@@ -351,7 +358,7 @@ const renderReg = reg('renderOverlay', () => {
   curr.render();
   editDisplay.render();
 
-  const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&23&7] &fToggle Shadow &8| &7[&2Scroll&7] &fResize &8| &7[&2Drag&7] &fMove' + curr.customEditMsg;
+  const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&23&7] &fChange Alignment &8| &7[&24&7] &fToggle Shadow\n&7[&2Scroll&7] &fResize &8| &7[&2Drag&7] &fMove' + curr.customEditMsg;
   // const w = Renderer.getStringWidth(editStr);
   // Renderer.drawRect(0xB0000000, 40, 15, w + 20, 20);
   drawOutlinedString(editStr, 50, 20);
@@ -381,6 +388,9 @@ editGui.registerKeyTyped((c, n) => {
       l.a = (l.a + 1) & 3;
       break;
     case 4:
+      l.c = (l.c + 1) & 3;
+      break;
+    case 5:
       l.b = !l.b;
       break;
     default:
