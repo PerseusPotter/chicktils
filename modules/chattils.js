@@ -9,6 +9,7 @@ import { run } from '../util/threading';
 import { dither, fromImage, fromURL, grayscale, guassian, resize, sharpen, sobel } from '../util/image';
 import { getImage } from '../util/clipboard';
 import { _setTimeout } from '../util/timers';
+import { deleteMessages } from '../util/helper';
 
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
@@ -86,10 +87,10 @@ function tryMelody(ign, msg, evn, mel) {
   if (mel.trim() === msg) hideMessage(settings.chatTilsHideMelody, evn);
   else if (msg.startsWith(mel) && msg.endsWith('/4')) {
     hideMessage(settings.chatTilsHideMelody, evn);
-    if (settings.chatTilsCompactMelody && helper) {
+    if (settings.chatTilsCompactMelody) {
       const prog = +msg.slice(-3, -2);
       const prev = prog === 1 ? mel : `${mel} ${prog - 1}/4`;
-      helper.deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
+      deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
     }
   } else {
     let i = odinMelodies.indexOf(msg);
@@ -100,15 +101,14 @@ function tryMelody(ign, msg, evn, mel) {
     }
     if (i >= 0) {
       hideMessage(settings.chatTilsHideMelody, evn);
-      if (settings.chatTilsCompactMelody && helper) {
+      if (settings.chatTilsCompactMelody) {
         const prev = i === 0 ? mel : arr[i - 1];
-        helper.deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
+        deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
       }
     }
   }
 }
 
-const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 const allChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
 }).setCriteria(/^&r([^>]+?)&(?:7|f): (.+?)&r$/).setEnabled(settings._chatTilsWaypoint);
@@ -314,7 +314,7 @@ function printNextLine() {
   if (settings.chatTilsImageArtParty) l = '/pc ' + l;
   ChatLib.say(l);
   _setTimeout(() => {
-    helper.deleteMessages([nextArtLineMsg.getFormattedText()]);
+    deleteMessages([nextArtLineMsg.getFormattedText()]);
     if (imgArtLines.length) {
       if (settings.chatTilsImageArtAutoPrint) printNextLine();
       else nextArtLineMsg.chat();

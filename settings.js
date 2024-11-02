@@ -2,6 +2,7 @@
 
 import convertToAmaterasu from './settingsAmaterasu';
 import { centerMessage } from './util/format';
+import { deleteMessages } from './util/helper';
 import { log } from './util/log';
 import { StateVar } from './util/state';
 import { run } from './util/threading';
@@ -334,11 +335,6 @@ export class Property extends StateVar {
   }
 }
 
-const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
-function deleteMessages(msgs) {
-  if (!helper) return;
-  helper.deleteMessages(msgs.map(v => v.getFormattedText()));
-}
 class Settings {
   constructor(module, path, props, pageNames) {
     this.module = module;
@@ -417,7 +413,7 @@ class Settings {
     msgs.unshift(new Message(centerMessage(`&d&l${this.module} &b&l${this.pageNames[page]} &d&lSettings`)));
     msgs.push(pageNav);
     // this.prevMsgs.forEach(v => ChatLib.deleteChat(v));
-    deleteMessages(this.prevMsgs);
+    deleteMessages(this.prevMsgs.map(v => v.getFormattedText()));
     msgs.forEach(v => v.chat());
     this.prevMsgs = msgs;
   }
@@ -439,7 +435,7 @@ class Settings {
     const msgs = props.map(({ s, p }, i) => p.getMessage(i & 1, this.module, s));
     msgs.unshift(new Message(centerMessage(`&d&l${this.module} &b&l"${str}" &d&lSettings`)));
     // this.prevMsgs.forEach(v => ChatLib.deleteChat(v));
-    deleteMessages(this.prevMsgs);
+    deleteMessages(this.prevMsgs.map(v => v.getFormattedText()));
     msgs.forEach(v => v.chat());
     this.prevMsgs = msgs;
   }

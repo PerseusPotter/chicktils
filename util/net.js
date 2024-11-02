@@ -1,3 +1,5 @@
+import { removeCertCheck } from './helper';
+
 // modified from soopy
 const File = Java.type('java.io.File');
 const URL = Java.type('java.net.URL');
@@ -9,7 +11,7 @@ export function urlToFile(url, dst, connecttimeout = 1000, readtimeout = 1000) {
   d.getParentFile().mkdirs();
   if (d.exists()) d.delete();
   const connection = new URL(url).openConnection();
-  Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper').removeCertCheck(connection);
+  removeCertCheck(connection);
   connection.setDoOutput(true);
   connection.setConnectTimeout(connecttimeout);
   connection.setReadTimeout(readtimeout);
@@ -36,7 +38,7 @@ export function streamToString(stream) {
 export function urlToString(url, connecttimeout = 1000, readtimeout = 1000) {
   try {
     const connection = new URL(url).openConnection();
-    // Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper').removeCertCheck(connection);
+    // removeCertCheck(connection);
     connection.setDoOutput(true);
     connection.setConnectTimeout(connecttimeout);
     connection.setReadTimeout(readtimeout);
