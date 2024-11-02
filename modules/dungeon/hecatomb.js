@@ -5,22 +5,21 @@ import { listenBossMessages, stateFloor } from '../dungeon.js';
 const hecAlert = createAlert('Hecatomb');
 
 function onBossEnd() {
-  if (!settings.dungeonHecatombAlert) return;
-  /**
-   * @type {{getName(): string}[]}
-   */
-  const lines = Scoreboard.getLines(false);
-  let score = lines[6].getName();
-  if (!score) return;
-  score = score.removeFormatting().match(/\((\d+)\)/);
-  if (!score) return;
-  score = +(score[1]);
-  if (score < 270) return;
+  let score = -1;
+  const sb = Scoreboard.getLines(false);
+  for (let i = 0; i < sb.length; i++) {
+    let m = sb[i].getName().match(/^Cleared:.+?\((\d+)\)$/);
+    if (!m) continue;
+    score = +m[1];
+    break;
+  }
+  if (Number.isNaN(score) || score < 270) return;
   hecAlert.show(settings.dungeonHecatombAlertTime);
 }
 
 export function init() {
   listenBossMessages((name, msg) => {
+    if (!settings.dungeonHecatombAlert) return;
     if (name.endsWith('Livid') && msg === `Impossible! How did you figure out which one I was?!`) return onBossEnd();
     switch (name) {
       case 'Bonzo':
