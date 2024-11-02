@@ -204,10 +204,6 @@ register('command', ...args => {
   simulate: []
 })).setName('chicktils').setAliases('csm', 'cts');
 
-if (!Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper')?.instance) {
-  log('helper mod not found, some features may not work');
-}
-
 const worldLoadOnce = register('worldLoad', () => {
   worldLoadOnce.unregister();
   new Thread(() => {

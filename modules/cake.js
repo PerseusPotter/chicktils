@@ -1,3 +1,4 @@
+import { deleteMessages } from '../util/helper';
 import { logMessage } from '../util/log';
 import reg from '../util/registerer';
 
@@ -37,12 +38,11 @@ const colors = [
 let lastEatTime = 0;
 let lastEat = new Set();
 let prevMsg;
-const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 function onEat(cake) {
   const t = Date.now();
   if (t - lastEatTime > 5 * 60 * 1000) lastEat = new Set(cakes);
   lastEatTime = t;
-  if (helper && prevMsg) helper.deleteMessages([prevMsg.getFormattedText()]);
+  if (prevMsg) deleteMessages([prevMsg.getFormattedText()]);
 
   lastEat.delete(cake);
   if (lastEat.size === 0) prevMsg = new Message('&aAll cakes eaten!');

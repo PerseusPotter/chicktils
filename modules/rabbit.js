@@ -7,6 +7,7 @@ import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
 import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
 import { run, unrun } from '../util/threading';
+import { deleteMessages } from '../util/helper';
 
 const stateIsSpring = new StateVar(false);
 const stateDoSpring = new StateProp(settings._rabbitSniffer).and(stateIsSpring);
@@ -162,12 +163,10 @@ const guiReg = reg('guiOpened', evn => {
 }).setEnabled(settings._rabbitShowBestUpgrade);
 
 const prevMessages = {};
-const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 const promoteReg = reg('chat', (name, lvl, status, evn) => {
-  if (!helper) return;
   const n = name.removeFormatting();
   cancel(evn);
-  helper.deleteMessages([prevMessages[n]]);
+  deleteMessages([prevMessages[n]]);
   const msg = new Message(`${name}&7 -> Lvl &b${lvl} ${status}`);
   msg.chat();
   prevMessages[n] = msg.getFormattedText();

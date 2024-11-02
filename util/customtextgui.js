@@ -1,4 +1,5 @@
 import { drawOutlinedString } from './draw';
+import { removeLastElement } from './helper';
 import reg from './registerer';
 const EventEmitter = require('./events');
 
@@ -13,7 +14,6 @@ function getLine() {
 function freeLines(lines) {
   dlPool = dlPool.concat(lines);
 }
-const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 const MouseListener = Java.type('com.chattriggers.ctjs.minecraft.listeners.MouseListener');
 const clickListenersF = MouseListener.class.getDeclaredField('clickListeners');
 clickListenersF.setAccessible(true);
@@ -21,10 +21,8 @@ const draggedListenersF = MouseListener.class.getDeclaredField('draggedListeners
 draggedListenersF.setAccessible(true);
 function createNonShitDisplayLineFuckChatTriggers() {
   const line = new DisplayLine('');
-  if (helper) {
-    helper.removeLastElement(clickListenersF, MouseListener);
-    helper.removeLastElement(draggedListenersF, MouseListener);
-  }
+  removeLastElement(clickListenersF, MouseListener);
+  removeLastElement(draggedListenersF, MouseListener);
   return line;
 }
 const textWidthF = DisplayLine.class.getSuperclass().getDeclaredField('textWidth');

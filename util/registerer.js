@@ -1,3 +1,4 @@
+import { removeElementMap, removeElementSet } from './helper';
 import { inherits } from './polyfill';
 import { StateProp, StateVar } from './state';
 import { run, wrap as wrapFunc } from './threading';
@@ -145,7 +146,6 @@ reg = function reg(type, shit) {
   }());
 
   const ClientCommandHandler = Java.type('net.minecraftforge.client.ClientCommandHandler').instance;
-  const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
   const commandMapF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71562_a');
   commandMapF.setAccessible(true);
   const commandSetF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71561_b');
@@ -193,8 +193,8 @@ reg = function reg(type, shit) {
     if (!this._init) return false;
     this._init = false;
     if (this.getList().get(this.id) !== this) return false;
-    helper.removeElementMap(commandMapF, ClientCommandHandler, this.id);
-    helper.removeElementSet(commandSetF, ClientCommandHandler, this.jcmd);
+    removeElementMap(commandMapF, ClientCommandHandler, this.id);
+    removeElementSet(commandSetF, ClientCommandHandler, this.jcmd);
     return true;
   };
   ChickTilsCommand.prototype._reinstantiate = function _reinstantiate() {

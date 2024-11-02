@@ -1,6 +1,6 @@
 import settings from '../settings';
 import { colorForNumber } from '../util/format';
-import { log } from '../util/log';
+import { addTooltip, clearTooltip } from '../util/helper';
 import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
 import reg from '../util/registerer';
 import { DelayTimer } from '../util/timers';
@@ -76,7 +76,6 @@ const fossils = [
 const route = [31, 32, 21, 22, 25, 12, 19, 23, 30, 40];
 
 let tooltipReg;
-const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 const guiReg = reg('guiOpened', evn => {
   const gui = evn.gui;
   if (gui.getClass().getSimpleName() !== 'GuiChest') return;
@@ -245,8 +244,7 @@ const guiReg = reg('guiOpened', evn => {
       const opt = item.func_77960_j() === 0 ? settings.excavatorSolverDustTooltip : settings.excavatorSolverDirtTooltip;
       if (opt === 'Default') return;
       else {
-        if (!helper) return log('cannot hide tooltips without helper mod :(');
-        helper.clearTooltip(evn);
+        clearTooltip(evn);
         if (opt === 'Custom') {
           if (item.func_77960_j() === 0) {
             if (!cacheTTFossil) {
@@ -258,7 +256,7 @@ const guiReg = reg('guiOpened', evn => {
               cacheTTFossil.push(`§7Type: ${fossilTypes}`);
               cacheTTFossil.push(`${colorForNumber(dc, size)}${dc}§7/${size}`);
             }
-            cacheTTFossil.forEach(v => helper.addTooltip(evn, v));
+            cacheTTFossil.forEach(v => addTooltip(evn, v));
           } else {
             if (poss.length === 0) return;
             let i = 0;
@@ -269,7 +267,7 @@ const guiReg = reg('guiOpened', evn => {
               }
               if (i === 54) return;
             }
-            helper.addTooltip(evn, `${colorForNumber(hist[i], poss.length)}${(hist[i] / poss.length * 100).toFixed(0)}%`);
+            addTooltip(evn, `${colorForNumber(hist[i], poss.length)}${(hist[i] / poss.length * 100).toFixed(0)}%`);
           }
         }
       }
