@@ -1,7 +1,7 @@
 import settings from '../settings';
 import data from '../data';
 import reg from '../util/registerer';
-import createTextGui from '../util/customtextgui';
+import createTextGui, { editDisplay } from '../util/customtextgui';
 import { StateProp, StateVar } from '../util/state';
 import Marquee from '../util/marquee';
 
@@ -37,7 +37,7 @@ spotifyGui.on('editRender', () => {
   updatePrefix();
   const loc = spotifyGui.getTrueLoc();
   songMarquee.setText(formatSong('Rick Astley - Never Gonna Give You Up'));
-  songMarquee.render(loc.x + spotifyGui.getVisibleWidth() + 4, loc.y, loc.s, spotifyGui.getLoc().b);
+  songMarquee.render(loc.x + editDisplay.getVisibleWidth() + 4, loc.y, loc.s, spotifyGui.getLoc().b);
 });
 const songMarquee = new Marquee('Rick Astley - Never Gonna Give You Up', 0.05);
 songMarquee.setMaxLen(settings.spotifyMaxSongLength);

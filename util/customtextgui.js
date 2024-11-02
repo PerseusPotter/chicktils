@@ -1,4 +1,5 @@
 import { drawOutlinedString, rgbaToJavaColor } from './draw';
+import GlStateManager2 from './glStateManager';
 import reg from './registerer';
 const EventEmitter = require('./events');
 
@@ -67,7 +68,7 @@ const RenderingHints = Java.type('java.awt.RenderingHints');
   }, {});
 }
 /**
- * @typedef {{ s: string, a: any, b: any, o: [number, number, number][], w: number, vw: number }} Line
+ * @typedef {{ s: string, a: any, b: any, o: [number, number, number][], w: number, vw: number, d: boolean }} Line
  */
 /**
  * @param {() => import('../data').TextLocation} getLoc
@@ -96,7 +97,6 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   let dirty = true;
   /** @type {import('../../@types/Libs').Image} */
   let img;
-  let imgO;
   let rx = 0;
   let ry = 0;
   let rw = 0;
@@ -105,13 +105,13 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     const l = obj.getLoc();
     if (cb !== l.b) {
       dirty = true;
-      lines.forEach(v => v.w = -1);
+      lines.forEach(v => v.d = true);
       cb = l.b;
     }
     cs = l.s;
     if (cc !== l.c) {
       dirty = true;
-      lines.forEach(v => v.w = -1);
+      lines.forEach(v => v.d = true);
       cc = l.c;
     }
     const tl = obj.getTrueLoc();
@@ -125,25 +125,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   let lineW = 0;
   let lineVW = 0;
   let hasObf = false;
-  obj.render = function() {
-    updateLocCache();
-    if (this.isEdit) return;
-    if (lines.length === 0) return;
-
-    if (img) img.draw(rx, ry, rw, rh);
-    if (imgO) {
-      imgO.draw(rx, ry, rw, rh);
-      imgO.destroy();
-      imgO = null;
-    }
-
-    if (hasObf) {
-      // TODO: actually create imgO
-    }
-
-    if (!dirty) return;
-    if (img) img.destroy();
-
+  const updateLines = () => {
     const tmpI = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
     const tmpG = tmpI.createGraphics();
     if (arialFontHeight === -1) {
@@ -152,16 +134,14 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       courierFontHeight = tmpG.getFontMetrics(f[1]).getHeight();
       fonts = createFonts();
     }
-
     tmpG.setFont(fonts[0]);
-    const ascent = tmpG.getFontMetrics().getAscent();
 
     lineW = 0;
     lineVW = 0;
     hasObf = false;
     lines.forEach(v => {
-      if (v.o.length) hasObf = true;
-      if (v.w >= 0) {
+      if (!v.d) {
+        if (v.o.length) hasObf = true;
         lineW = Math.max(lineW, v.w);
         lineVW = Math.max(lineVW, v.vw);
         return;
@@ -211,11 +191,13 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
         }
         s += obfS >= 0 ? ' ' : c;
       }
-
       const a = new AttributedString(s);
       const b = cb ? new AttributedString(s) : null;
+      a.addAttribute(TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
+      b?.addAttribute(TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
       o.forEach(v => a.addAttribute(TextAttribute.FONT, fonts[1], v[0], v[1]));
       atts.forEach(({ t, s, e }) => {
+        if (s === e) return;
         if (t in COLORS) {
           if (b) b.addAttribute(TextAttribute.FOREGROUND, COLORS_SHADOW[t], s, e);
           a.addAttribute(TextAttribute.FOREGROUND, COLORS[t], s, e);
@@ -245,9 +227,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       });
 
       v.a = a;
-      a.addAttribute(TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
       v.b = b;
-      b?.addAttribute(TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
       if (o.length) {
         hasObf = true;
         o.forEach(v => v.unshift(new TextLayout(a.getIterator(null, v[0], v[1]), tmpG.getFontRenderContext()).getAdvance()));
@@ -258,12 +238,16 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       lineW = Math.max(lineW, v.w);
       v.vw = tly.getVisibleAdvance();
       lineVW = Math.max(lineVW, v.vw);
+      v.d = false;
     });
     tmpG.dispose();
-
+  };
+  const renderImage = () => {
     // extra spacing for hanging characters
-    const bimg = new BufferedImage(lineW + (cb ? 2 : 0), FONT_RENDER_SIZE * (lines.length + 1) + (cb ? 2 : 0), BufferedImage.TYPE_INT_ARGB);
+    const bimg = new BufferedImage(lineW + (cb ? FONT_RENDER_SIZE / 10 : 0), FONT_RENDER_SIZE * (lines.length + 1) + (cb ? FONT_RENDER_SIZE / 10 : 0), BufferedImage.TYPE_INT_ARGB);
     const g = bimg.createGraphics();
+    g.setFont(fonts[0]);
+    const ascent = g.getFontMetrics().getAscent();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     lines.forEach((v, i) => {
@@ -273,14 +257,35 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       else if (cc === 2) x = (lineVW - v.vw) / 2;
       if (cb && v.b) {
         g.setColor(COLORS_SHADOW.f);
-        g.drawString(v.b.getIterator(), 2, y + 2);
+        g.drawString(v.b.getIterator(), x + FONT_RENDER_SIZE / 10, y + FONT_RENDER_SIZE / 10);
       }
       g.setColor(COLORS.f);
       g.drawString(v.a.getIterator(), x, y);
     });
     g.dispose();
 
-    img = new Image(bimg);
+    return bimg;
+  };
+  obj.render = function() {
+    if (this.isEdit) return;
+    if (lines.length === 0) return;
+
+    GlStateManager2.depthMask(false);
+    GlStateManager2.enableBlend();
+    GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+    updateLocCache();
+    img?.draw(rx, ry, rw, rh);
+    GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
+    if (!dirty) return;
+
+    img?.destroy();
+    updateLines();
+    img = new Image(renderImage());
+    updateLocCache();
+
+    // TODO: draw obf
+
     dirty = false;
   };
   obj.setLine = function(str) {
@@ -300,13 +305,13 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     strs.forEach((v, i) => {
       if (i < lines.length && v === lines[i].s) return;
       dirty = true;
-      lines[i] = { s: v, a: null, b: null, o: [], w: -1, vw: -1 };
+      lines[i] = { s: v, a: null, b: null, o: [], w: -1, vw: -1, d: true };
     });
     return this;
   };
   obj.addLine = function(str) {
     dirty = true;
-    lines.push({ s: str, a: null, b: null, o: [], w: -1, vw: -1 });
+    lines.push({ s: str, a: null, b: null, o: [], w: -1, vw: -1, d: true });
     return this;
   };
   obj.addLines = function(strs) {
@@ -321,13 +326,13 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     return this;
   };
   obj.getVisibleWidth = function() {
-    return MC_FONT_SIZE / FONT_RENDER_SIZE * lineVW * cs;
+    return MC_FONT_SIZE / FONT_RENDER_SIZE * lineVW * this.getLoc().s;
   };
   obj.getWidth = function() {
-    return MC_FONT_SIZE / FONT_RENDER_SIZE * lineW * cs;
+    return MC_FONT_SIZE / FONT_RENDER_SIZE * lineW * this.getLoc().s;
   };
   obj.getHeight = function() {
-    return MC_FONT_SIZE * cs;
+    return MC_FONT_SIZE * this.getLoc().s;
   };
   obj.getTrueLoc = function() {
     const loc = this.getLoc();
@@ -345,7 +350,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
 export default createTextGui;
 
 const editGui = new Gui();
-const editDisplay = createTextGui(() => curr.getLoc(), () => []);
+export const editDisplay = createTextGui(() => curr.getLoc(), () => []);
 /**
  * @type {CustomTextGui}
  */
@@ -355,7 +360,6 @@ const renderReg = reg('renderOverlay', () => {
 
   curr.emit('editRender');
   editDisplay.setLines(curr.getEditText());
-  curr.render();
   editDisplay.render();
 
   const editStr = '&7[&21&7] &fReset &8| &7[&22&7] &fChange Anchor &8| &7[&23&7] &fChange Alignment &8| &7[&24&7] &fToggle Shadow\n&7[&2Scroll&7] &fResize &8| &7[&2Drag&7] &fMove' + curr.customEditMsg;
