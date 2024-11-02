@@ -38,7 +38,7 @@ export function streamToString(stream) {
 export function urlToString(url, connecttimeout = 1000, readtimeout = 1000) {
   try {
     const connection = new URL(url).openConnection();
-    // removeCertCheck(connection);
+    removeCertCheck(connection);
     connection.setDoOutput(true);
     connection.setConnectTimeout(connecttimeout);
     connection.setReadTimeout(readtimeout);
