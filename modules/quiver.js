@@ -6,7 +6,7 @@ import reg from '../util/registerer';
 import { getItemId } from '../util/mc';
 import { StateVar } from '../util/state';
 
-const display = createTextGui(() => data.quiverLoc, () => ['&5Flint Arrow &fx&26969'].concat(settings.quiverShowRefill ? ['&fRefill: &9Social Life &fx&d6969 &8(Instant: &9&d6969&8)'] : []));
+const display = createTextGui(() => data.quiverLoc, () => ['&5Flint Arrow &fx&26969'].concat(settings.quiverShowRefill ? ['&fRefill: &9Social Life &fx&d6969 &8(Instant: &d6969&8)'] : []));
 const quivSizes = {
   Medium: 27 * 64,
   Large: 36 * 64,
