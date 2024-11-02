@@ -19,7 +19,7 @@ export function wrap(cb) {
     } catch (e) {
       log('error', e);
       log(e.stack);
-      console.error(e);
+      console.log(e + '\n' + e.stack);
     }
   };
 }

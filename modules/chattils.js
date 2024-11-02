@@ -198,6 +198,7 @@ const genImgArtReg = (function() {
         log(e.message);
         log(e.stack);
       }
+      console.log(e + '\n' + e.stack);
     }
   }
   /**
@@ -271,6 +272,7 @@ const genImgArtReg = (function() {
           log(e.message);
           log(e.stack);
         }
+        console.log(e + '\n' + e.stack);
       }
       if (!img) return;
 
@@ -296,6 +298,7 @@ const genImgArtReg = (function() {
           log(e.message);
           log(e.stack);
         }
+        console.log(e + '\n' + e.stack);
         return;
       }
       ChatLib.command('printimageline', true);

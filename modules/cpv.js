@@ -58,6 +58,7 @@ function cpv(user) {
     } catch (e) {
       log('something went wrong');
       if (settings.isDev) log(e.toString(), e.stack);
+      console.log(e + '\n' + e.stack);
     }
   });
 }

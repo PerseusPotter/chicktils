@@ -26,6 +26,7 @@ function tryUpdate(delay = 0) {
     } catch (e) {
       if (settings.isDev) log('failed to download update:', e, e.stack);
       else log('failed to download update');
+      console.log(e + '\n' + e.stack);
       centerMessage(new Message(new TextComponent('&nClick to Manually Update').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
       return 1;
     }
@@ -55,6 +56,7 @@ function tryUpdate(delay = 0) {
   } catch (e) {
     if (settings.isDev) log('failed to fetch update:', e, e.stack);
     else log('failed to fetch update');
+    console.log(e + '\n' + e.stack);
   }
 }
 let silentUpdate = false;
@@ -187,6 +189,7 @@ register('command', ...args => {
   } catch (e) {
     log(e.toString());
     if (settings.isDev) log(e.stack);
+    console.log(e + '\n' + e.stack);
   }
 }).setTabCompletions(tabCompletion({
   help: [],
