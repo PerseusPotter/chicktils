@@ -49,7 +49,6 @@ const createRegister = function(type, shit) {
  */
 let reg;
 reg = function reg(type, shit) {
-  const rr = createRegister(type, shit);
   let isReg = false;
   let isAReg = false;
   let regReq = new StateVar(true);
@@ -74,6 +73,7 @@ reg = function reg(type, shit) {
       );
     }
   });
+  const rr = createRegister(type, wrap(prox, prox, shit));
   const _register = wrap(rr, prox, () => {
     if (isReg) return;
     if (!isAReg && regReq.get()) {
@@ -98,7 +98,7 @@ reg = function reg(type, shit) {
     regReq.listen(_update);
     _update();
   });
-  const _update = wrap({}, prox, () => {
+  const _update = wrap(rr, prox, () => {
     if (!isReg) return;
     if (regReq.get()) {
       if (!isAReg) rr.register();
