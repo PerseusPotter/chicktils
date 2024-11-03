@@ -32,14 +32,16 @@ export function getUpdateVV() {
   return FileLib.read(rel('temp/v.txt')).split(' ').map(v => +v);
 };
 
-export function applyUpdate() {
-  const modFolder = new File(rel('chicktilshelper/build/libs'));
-  const newMod = new File(rel('temp/chicktilshelper/build/libs')).listFiles()[0];
-  const oldMods = modFolder.listFiles();
-  // oldMods.forEach(v => v.deleteOnExit()); // doesn't on crash
-  const newModName = newMod.getName().slice(0, 'chicktilshelper-1.0'.length) + Date.now() + '.jar';
-  newMod.renameTo(new File(modFolder, newModName));
-  runHelper('ChickTilsUpdateHelper', oldMods.map(v => `"${v.getPath()}"`.toString()));
+export function applyUpdate(sev) {
+  if (sev === 0) {
+    const modFolder = new File(rel('chicktilshelper/build/libs'));
+    const newMod = new File(rel('temp/chicktilshelper/build/libs')).listFiles()[0];
+    const oldMods = modFolder.listFiles();
+    // oldMods.forEach(v => v.deleteOnExit()); // doesn't on crash
+    const newModName = newMod.getName().slice(0, 'chicktilshelper-1.0'.length) + Date.now() + '.jar';
+    newMod.renameTo(new File(modFolder, newModName));
+    runHelper('ChickTilsUpdateHelper', oldMods.map(v => `"${v.getPath()}"`.toString()));
+  }
   rimraf(rel('temp/chicktilshelper'));
   copy(new File(rel('temp')), new File(rel('')));
   deleteDownload();
