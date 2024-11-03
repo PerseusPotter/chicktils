@@ -25,7 +25,7 @@ const EventEmitter = require('./events');
  */
 const Font = Java.type('java.awt.Font');
 const fontHeights = [-1, -1, -1];
-const FONT_RENDER_SIZE = 24;
+let FONT_RENDER_SIZE = settings.textGuiFontRenderSize;
 const MC_FONT_SIZE = 10;
 let fonts;
 const ALLOWED_FONTS = new Map(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames().map(v => [v.replace(/\s/g, ''), v]));
@@ -36,6 +36,12 @@ settings._textGuiFont.listen(function(v, o) {
     fonts = null;
     allDisplays.forEach(v => v._mark());
   }
+});
+settings._textGuiFontRenderSize.listen(v => {
+  FONT_RENDER_SIZE = v;
+  fontHeights.forEach((_, i) => fontHeights[i] = -1);
+  fonts = null;
+  allDisplays.forEach(v => v._mark());
 });
 function createFonts() {
   return [
