@@ -41,11 +41,11 @@ function tryUpdate(delay = 0) {
     centerMessage(new Message(new TextComponent('&3&nClick to Print Changelog').setClick('run_command', 'ChickTilsViewChangelog'))).chat();
     ChatLib.chat(centerMessage(`&4v${VERSION} &r-> &2v${v}`));
     ChatLib.chat('')
-    if (sev === 0) ChatLib.chat(centerMessage('&l&cNote: Your game will be restarted.'));
-    else if (sev === 1 || (sev === 2 && !settings.isDev)) ChatLib.chat(centerMessage('&l&cNote: Your CT Modules will be reloaded.'));
+    if (sev === 0) ChatLib.chat(centerMessage('&c&lNote: Your game will be restarted.'));
+    else if (sev === 1 || (sev === 2 && !settings.isDev)) ChatLib.chat(centerMessage('&c&lNote: Your CT Modules will be reloaded.'));
     else {
-      ChatLib.chat(centerMessage('&l&cNote: ChickTils will be reloaded.'));
-      ChatLib.chat(centerMessage('&l&c(but you already knew that)'));
+      ChatLib.chat(centerMessage('&c&lNote: ChickTils will be reloaded.'));
+      ChatLib.chat(centerMessage('&c&l(but you already knew that)'));
     }
     centerMessage(new Message(new TextComponent('&a[YES]').setClick('run_command', '/ChickTilsUpdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/ChickTilsUpdate deny'))).chat();
     return 0;
@@ -83,7 +83,7 @@ register('command', () => {
     const typeSort = ['feat', 'del', 'change', 'fix', 'misc'];
     changelog.forEach(({ version, changes }, i) => {
       if (i > 0) ChatLib.chat('');
-      ChatLib.chat(centerMessage('&l&3v' + version));
+      ChatLib.chat(centerMessage('&3&lv' + version));
       changes.sort((a, b) => typeSort.indexOf(a.type) - typeSort.indexOf(b.type)).forEach(({ type, desc }) => ChatLib.chat(typeColors[type] + desc));
     });
   } catch (e) {

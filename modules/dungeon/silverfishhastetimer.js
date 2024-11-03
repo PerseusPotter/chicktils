@@ -5,7 +5,7 @@ import { colorForNumber } from '../../util/format';
 import createTextGui from '../../util/customtextgui';
 import { StateVar } from '../../util/state';
 
-const hasteTimer = createTextGui(() => data.dungeonSilverfishHasteTimerLoc, () => ['&l&66.9s']);
+const hasteTimer = createTextGui(() => data.dungeonSilverfishHasteTimerLoc, () => ['&6&l6.9s']);
 
 const stateEnableTimer = new StateVar(false);
 

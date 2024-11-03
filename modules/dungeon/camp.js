@@ -19,7 +19,7 @@ let bloodX = -1;
 let bloodZ = -1;
 let bloodMobCount = 0;
 const motionData = new Map();
-const dialogueSkipTimer = createTextGui(() => data.dungeonCampSkipTimerLoc, () => ['§l§23.69s']);
+const dialogueSkipTimer = createTextGui(() => data.dungeonCampSkipTimerLoc, () => ['&2&l3.69s']);
 let lastSpawnedBloodMob;
 let bloodOpenTime = 0;
 

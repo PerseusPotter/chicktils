@@ -23,7 +23,7 @@ let estPrev = null;
 let prevTime = 0;
 let lastY = bearParticleHeightCap;
 const spiritBearGuessDelay = new DelayTimer(settings.dungeonSpiritBearSmoothTime);
-const spiritBearTimer = createTextGui(() => data.dungeonSpiritBearTimerLoc, () => ['§l§26.42s']);
+const spiritBearTimer = createTextGui(() => data.dungeonSpiritBearTimerLoc, () => ['&2&l6.42s']);
 
 const stateInFM4 = new StateVar(false);
 const stateBearSpawning = new StateProp(ticks).equalsmult(0, -1).not().and(stateInFM4);
