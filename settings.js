@@ -546,7 +546,6 @@ export const props = {
   dungeonBoxTeammatesBersColor: new Property('DungeonBoxTeammatesBersColor', page, ++sort, Property.Type.Color, 0xF77C1BFF),
   dungeonBoxTeammatesTankColor: new Property('DungeonBoxTeammatesTankColor', page, ++sort, Property.Type.Color, 0xFF00FFFF),
   dungeonBoxTeammatesHealColor: new Property('DungeonBoxTeammatesHealColor', page, ++sort, Property.Type.Color, 0x47D147FF),
-  dungeonBoxTeammatesBoxSelf: new Property('DungeonBoxTeammatesBoxSelf', page, ++sort, Property.Type.Toggle, false, { desc: 'box yourself' }),
 
   dungeonCamp: new Property('DungeonEnableCamp', page, ++sort, Property.Type.Toggle, true, { desc: 'blood camp helper' }),
   dungeonCampTimer: new Property('DungeonCampShowTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render timer underneath boxes' }),
