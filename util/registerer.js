@@ -10,6 +10,53 @@ function wrap(orig, wrap, prop) {
   };
 }
 
+const PROFILER = false;
+if (PROFILER) {
+  var $rendData = new Map();
+  var $tickData = new Map();
+  var $mainThread;
+  Client.scheduleTask(() => $mainThread = Thread.currentThread());
+  const writer = new java.io.BufferedWriter(new java.io.FileWriter('./config/ChatTriggers/modules/chicktils/ticktimes.log', false));
+  register('gameUnload', () => writer.close());
+  register(net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent, evn => {
+    if (evn.phase.toString() !== 'END') return;
+    writer.write('RENDER TICK START\n');
+    const time = dumpData($rendData);
+    writer.write(`RENDER TICK END ${time}\n`);
+    $rendData.clear();
+  });
+  register(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, evn => {
+    if (evn.phase.toString() !== 'END') return;
+    writer.write('CLIENT TICK START\n');
+    const time = dumpData($tickData);
+    writer.write(`CLIENT TICK END ${time}\n`);
+    $tickData.clear();
+  });
+  function dumpData(map) {
+    let totalTime = 0;
+    map.forEach((v, k) => {
+      if (v.length === 1) {
+        writer.write(`${k}> ${v[0]}\n`);
+        totalTime += v[0];
+      } else {
+        writer.write(`${k}> [${v.join(', ')}]\n`);
+        let min = v[0];
+        let max = v[0];
+        let sum = v[0];
+        for (let i = 1; i < v.length; i++) {
+          let k = v[i];
+          if (k < min) min = k;
+          if (k > max) max = k;
+          sum += k;
+        }
+        totalTime += sum;
+        writer.write(`sum ${sum} | min ${min} | max ${max}\n`);
+      }
+    });
+    return totalTime;
+  }
+}
+
 /**
  * @type {{ type: string, getIsReg: () => boolean, getIsAReg: () => boolean, reg: any }[]}
  */
@@ -24,6 +71,45 @@ const customRegs = {};
  * @type {typeof register & ((triggerType: 'spawnEntity', callback: (entity: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick', callback: () => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick2', callback: () => void) => import('../../@types/IRegister').Trigger)}
  */
 const createRegister = function(type, shit) {
+  if (PROFILER) {
+    const stack = Thread.currentThread().getStackTrace();
+    let fileName = '<unknown>';
+    let lineNum = 0;
+    for (let i = stack.length - 1; i >= 0; i--) {
+      let fn = stack[i].getFileName();
+      if (!fn) continue;
+      if (fn.endsWith('/chicktils/util/registerer.js')) {
+        let fn1 = stack[i + 1].getFileName();
+        let fn2 = stack[i + 2].getFileName();
+        if (fn1 === 'OptRuntime.java') {
+          fileName = fn2.split('modules/chicktils/').pop();
+          lineNum = stack[i + 2].getLineNumber();
+        } else if (fn1 === 'Require.java') {
+          fileName = 'util/registerer.js';
+          lineNum = stack[i - 2].getLineNumber();
+        }
+        else console.error('error parsing stack: ' + fn1);
+        break;
+      }
+    }
+    const typeName = typeof type === 'string' ? type : type.class.getSimpleName();
+    const id = `${fileName}:${lineNum}|${typeName}`;
+    const data = typeName.toLowerCase().includes('render') ? $rendData : $tickData;
+    const orig = shit;
+    const nanoTime = java.lang.System.nanoTime;
+    shit = function(...args) {
+      const start = nanoTime();
+      orig.apply(this, args[0] === undefined && args.length === 1 ? [] : args);
+      const end = nanoTime();
+      if (Thread.currentThread() !== $mainThread) return;
+      let arr = data.get(id);
+      if (!arr) {
+        arr = [];
+        data.set(id, arr);
+      }
+      arr.push(end - start);
+    };
+  }
   if (type in customRegs) return new (customRegs[type])(shit);
   return register(type, shit).unregister();
 };
