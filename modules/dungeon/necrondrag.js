@@ -8,7 +8,7 @@ import { StateProp, StateVar } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
 
 const instaMidProc = new StateVar(undefined);
-const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () => ['§l§26.42s']);
+const necronDragTimer = createTextGui(() => data.dungeonNecronDragTimerLoc, () => ['&2&l6.42s']);
 const necronDragTicks = new StateVar(0);
 
 const tickReg = reg('tick', () => {
