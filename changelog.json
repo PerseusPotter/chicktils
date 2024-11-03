@@ -70,6 +70,35 @@
           "desc": "text guis sometimes infinitely hung, whoops"
         }
       ]
+    },
+    {
+      "version": "0.8.2",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "text gui things"
+        },
+        {
+          "type": "change",
+          "desc": "gui performance"
+        },
+        {
+          "type": "change",
+          "desc": "base font settings"
+        },
+        {
+          "type": "misc",
+          "desc": "dev tools"
+        },
+        {
+          "type": "fix",
+          "desc": "alerts flashing previous text"
+        },
+        {
+          "type": "feat",
+          "desc": "add mojangles as a font"
+        }
+      ]
     }
   ]
 }
