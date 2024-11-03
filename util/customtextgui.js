@@ -137,6 +137,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   let dirty = true;
   /** @type {BufferedImageWrapper} */
   let img;
+  let skipDraw = false;
   let rx = 0;
   let ry = 0;
   let rw = 0;
@@ -321,7 +322,8 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     GlStateManager2.enableBlend();
     GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
     updateLocCache();
-    img?.draw(rx, ry, rw, rh);
+    if (!skipDraw) img?.draw(rx, ry, rw, rh);
+    skipDraw = false;
     GlStateManager2.depthMask(true);
     GlStateManager2.disableBlend();
     if (!dirty) return;
@@ -392,6 +394,10 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   obj._mark = function() {
     dirty = true;
     lines.forEach(v => v.d = true);
+  };
+  obj._rmCache = function() {
+    skipDraw = true;
+    dirty = true;
   };
 
   allDisplays.push(obj);
