@@ -168,7 +168,7 @@ function formatTps(curr, avg, min, max) {
   return lines;
 }
 const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11, 21));
-const tpsLimiter = new FrameTimer(10);
+const tpsLimiter = new FrameTimer(4);
 const rendOvTps = reg('renderOverlay', () => {
   if (tpsLimiter.shouldRender()) {
     ticks.calc();
@@ -206,7 +206,7 @@ function formatFps(curr, avg, min, max) {
   return lines;
 }
 const fpsDisplay = createTextGui(() => data.serverScrutinizerFPSDisplay, () => formatFps(217, 213.1, 180, 240));
-const fpsLimiter = new FrameTimer(10);
+const fpsLimiter = new FrameTimer(4);
 const rendOvFps = reg('renderOverlay', () => {
   if (fpsLimiter.shouldRender()) {
     frames.calc();
