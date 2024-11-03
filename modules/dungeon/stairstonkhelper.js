@@ -10,7 +10,7 @@ let cArr = null;
 let lookPos = null;
 
 const BlockStairs = Java.type('net.minecraft.block.BlockStairs');
-const MovingObjectPosition = Java.type('net.minecraft.util.MovingObjectPosition');
+const MovingObjectTypeBlock = Java.type('net.minecraft.util.MovingObjectPosition').MovingObjectType.BLOCK;
 
 // curved stairs arent a thing :pray:
 const stairBreakReg = reg('blockBreak', b => {
@@ -45,7 +45,7 @@ const tickReg = reg('tick', () => {
 
   lookPos = null;
   const obj = Client.getMinecraft().field_71476_x;
-  if (obj === null || obj.field_72313_a !== MovingObjectPosition.MovingObjectType.BLOCK) return;
+  if (obj === null || obj.field_72313_a !== MovingObjectTypeBlock) return;
   const bPos = obj.func_178782_a();
   if (bPos === null) return;
 
