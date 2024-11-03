@@ -50,7 +50,7 @@ const createAlert = (function() {
      * @type {Alert}
      */
     let obj = Object.create(proto);
-    obj._display = createTextGui(() => ({ a: 4, s: scale, x: Renderer.screen.getWidth() / 2, y: Renderer.screen.getHeight() / 2 - 30, b: true }));
+    obj._display = createTextGui(() => ({ a: 0, c: 3, s: scale, x: Renderer.screen.getWidth() / 2, y: Renderer.screen.getHeight() / 2 - 30, b: true }));
     obj._display.setLine('&c' + txt);
     obj.sound = sound;
     Object.defineProperty(obj, 'text', {
