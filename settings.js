@@ -463,6 +463,8 @@ class Settings {
 
 let page = 0;
 let sort = 0;
+export const $FONTS = new Map(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames().map(v => [v.replace(/\s/g, ''), v]));
+$FONTS.set('Mojangles', 'Mojangles');
 export const props = {
   // 1
   enableGlobal: new Property('Enable', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'toggles mod globally (scuffed, it doesnt really work)' }),
@@ -471,7 +473,7 @@ export const props = {
   pingRefreshDelay: new Property('PingRefreshDelay', page, ++sort, Property.Type.Number, 10, { desc: 'how often (in seconds) to refresh ping. set to 0 to disable ping. requires skytils' }),
   preferUseTracer: new Property('PreferUseTracer', page, ++sort, Property.Type.Toggle, false, { desc: 'when available, prefer to use a tracer rather than an arrow' }),
   useScuffedBeacon: new Property('UseScuffedBeacon', page, ++sort, Property.Type.Toggle, false, { desc: 'render a scuffed beacon beam for fps purposes' }),
-  textGuiFont: new Property('TextGuiFont', page, ++sort, Property.Type.Option, 'SansSerif', { desc: 'font used for text guis', options: java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames().map(v => v.replace(/\s/g, '')) }),
+  textGuiFont: new Property('TextGuiFont', page, ++sort, Property.Type.Option, 'Mojangles', { desc: 'font used for text guis', options: Array.from($FONTS.keys()) }),
   textGuiFontRenderSize: new Property('TextGuiFontRenderSize', page, ++sort, Property.Type.Integer, 15, { desc: 'basically all chicktils font will be rendered at this size\nand then scaled to whatever size necessary\nhigher values = laggier obviously', min: 1 }),
 
   // 2

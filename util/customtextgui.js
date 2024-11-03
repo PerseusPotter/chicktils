@@ -1,4 +1,4 @@
-import settings from '../settings';
+import settings, { $FONTS } from '../settings';
 import { BufferedImageWrapper, drawOutlinedString, rgbaToJavaColor } from './draw';
 import GlStateManager2 from './glStateManager';
 import reg from './registerer';
@@ -28,10 +28,12 @@ const fontHeights = [-1, -1, -1];
 let FONT_RENDER_SIZE = settings.textGuiFontRenderSize;
 const MC_FONT_SIZE = 10;
 let fonts;
-const ALLOWED_FONTS = new Map(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames().map(v => [v.replace(/\s/g, ''), v]));
+let activeFont = $FONTS.get(settings.textGuiFont);
+const MOJANGLES_FONT = Font.createFont(Font.TRUETYPE_FONT, new java.io.File('./config/ChatTriggers/modules/chicktils/assets/Mojangles.ttf'));
 settings._textGuiFont.listen(function(v, o) {
-  if (!ALLOWED_FONTS.has(v)) this.set(o);
+  if (!$FONTS.has(v)) this.set(o);
   else {
+    activeFont = v === 'Mojangles' ? null : $FONTS.get(settings.textGuiFont);
     fontHeights.forEach((_, i) => fontHeights[i] = -1);
     fonts = null;
     allDisplays.forEach(v => v._mark());
@@ -45,7 +47,9 @@ settings._textGuiFontRenderSize.listen(v => {
 });
 function createFonts() {
   return [
-    new Font(ALLOWED_FONTS.get(settings.textGuiFont), Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[0] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[0])),
+    activeFont ?
+      new Font(activeFont, Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[0] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[0])) :
+      MOJANGLES_FONT.deriveFont(Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[0] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[0])),
     new Font(Font.MONOSPACED, Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[1] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[1])),
     new Font(Font.SANS_SERIF, Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[2] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[2]))
   ];
