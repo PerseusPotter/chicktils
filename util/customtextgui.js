@@ -56,11 +56,12 @@ function addAttribute(str, a, v, s, e) {
   str.addAttribute(a, v, s, e);
 }
 function setAttrFont(att, str, s, e) {
+  if (Number.isNaN(s) || Number.isNaN(e)) return;
   if (s >= e) return;
   if (s >= str.length) return;
   const f = fonts[0];
   let i = f.canDisplayUpTo(str.slice(s, e));
-  while (i >= 0) {
+  while (s < str.length && i >= 0) {
     addAttribute(att, TextAttribute.FONT, f, s, i);
     let b = s = i;
     while (s < e && f.canDisplayUpTo(str[s]) !== -1) s++;
