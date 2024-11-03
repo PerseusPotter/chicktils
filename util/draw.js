@@ -840,3 +840,28 @@ export class JavaColorWrapper {
     return this.cache;
   }
 }
+
+register('gameUnload', () => BufferedImageWrapper.ALL_IMAGES.forEach(v => v.destroy()));
+const DynamicTexture = Java.type('net.minecraft.client.renderer.texture.DynamicTexture');
+export class BufferedImageWrapper {
+  static ALL_IMAGES = new Set();
+  img = null;
+  w = 0;
+  h = 0;
+  constructor(img) {
+    this.w = img.getWidth();
+    this.h = img.getHeight();
+    this.img = new DynamicTexture(img);
+    BufferedImageWrapper.ALL_IMAGES.add(this);
+  }
+  destroy() {
+    this.img.func_147631_c();
+    BufferedImageWrapper.ALL_IMAGES.delete(this);
+  }
+  draw(x, y, w, h) {
+    w ??= this.w;
+    h ??= this.h / this.w * w;
+    GlStateManager2.bindTexture(this.img.func_110552_b());
+    return drawTexturedRect(x, y, 0, 0, w, h, w, h, w, h);
+  }
+}
