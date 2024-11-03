@@ -1,3 +1,4 @@
+import settings from '../settings';
 import { drawOutlinedString, rgbaToJavaColor } from './draw';
 import GlStateManager2 from './glStateManager';
 import reg from './registerer';
@@ -23,22 +24,51 @@ const EventEmitter = require('./events');
  * }} CustomTextGui
  */
 const Font = Java.type('java.awt.Font');
-let arialFontHeight = -1;
-let courierFontHeight = -1;
+const fontHeights = [-1, -1, -1];
 const FONT_RENDER_SIZE = 24;
 const MC_FONT_SIZE = 10;
 let fonts;
+const ALLOWED_FONTS = new Map(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames().map(v => [v.replace(/\s/g, ''), v]));
+settings._textGuiFont.listen(function(v, o) {
+  if (!ALLOWED_FONTS.has(v)) this.set(o);
+  else {
+    fontHeights.forEach((_, i) => fontHeights[i] = -1);
+    fonts = null;
+    allDisplays.forEach(v => v._mark());
+  }
+});
 function createFonts() {
   return [
-    new Font('Arial', Font.PLAIN, FONT_RENDER_SIZE * (arialFontHeight === -1 ? 1 : FONT_RENDER_SIZE / arialFontHeight)),
-    new Font('Courier New', Font.PLAIN, FONT_RENDER_SIZE * (courierFontHeight === -1 ? 1 : FONT_RENDER_SIZE / courierFontHeight))
+    new Font(ALLOWED_FONTS.get(settings.textGuiFont), Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[0] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[0])),
+    new Font(Font.MONOSPACED, Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[1] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[1])),
+    new Font(Font.SANS_SERIF, Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[2] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[2]))
   ];
+}
+function addAttribute(str, a, v, s, e) {
+  if (!str) return;
+  if (s >= e) return;
+  str.addAttribute(a, v, s, e);
+}
+function setAttrFont(att, str, s, e) {
+  if (s >= e) return;
+  if (s >= str.length) return;
+  const f = fonts[0];
+  let i = f.canDisplayUpTo(str.slice(s, e));
+  while (i >= 0) {
+    addAttribute(att, TextAttribute.FONT, f, s, i);
+    let b = s = i;
+    while (s < e && f.canDisplayUpTo(str[s]) !== -1) s++;
+    addAttribute(att, TextAttribute.FONT, fonts[2], b, s);
+    i = f.canDisplayUpTo(str.slice(s, e));
+  }
+  addAttribute(att, TextAttribute.FONT, f, s, e);
 }
 const BufferedImage = Java.type('java.awt.image.BufferedImage');
 const AttributedString = Java.type('java.text.AttributedString');
 const TextAttribute = Java.type('java.awt.font.TextAttribute');
 const TextLayout = Java.type('java.awt.font.TextLayout');
 const RenderingHints = Java.type('java.awt.RenderingHints');
+export const allDisplays = [];
 {
   const cols = [
     ['0', 0x000000FF],
@@ -128,10 +158,9 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   const updateLines = () => {
     const tmpI = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
     const tmpG = tmpI.createGraphics();
-    if (arialFontHeight === -1) {
+    if (fontHeights[0] === -1) {
       const f = createFonts();
-      arialFontHeight = tmpG.getFontMetrics(f[0]).getHeight();
-      courierFontHeight = tmpG.getFontMetrics(f[1]).getHeight();
+      f.forEach((v, i) => fontHeights[i] = tmpG.getFontMetrics(v).getHeight());
       fonts = createFonts();
     }
     tmpG.setFont(fonts[0]);
@@ -193,34 +222,42 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       }
       const a = new AttributedString(s);
       const b = cb ? new AttributedString(s) : null;
-      a.addAttribute(TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
-      b?.addAttribute(TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
-      o.forEach(v => a.addAttribute(TextAttribute.FONT, fonts[1], v[0], v[1]));
+      addAttribute(a, TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
+      addAttribute(b, TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
+      let end = 0;
+      for (let i = 0; i < o.length; i++) {
+        setAttrFont(a, s, i === 0 ? 0 : end, o[i][0]);
+        setAttrFont(b, s, i === 0 ? 0 : end, o[i][0]);
+        addAttribute(a, TextAttribute.FONT, fonts[1], o[i][0], o[i][1]);
+        addAttribute(b, TextAttribute.FONT, fonts[1], o[i][0], o[i][1]);
+        end = o[i][1];
+      }
+      setAttrFont(a, s, end, s.length);
+      setAttrFont(b, s, end, s.length);
       atts.forEach(({ t, s, e }) => {
-        if (s === e) return;
         if (t in COLORS) {
-          if (b) b.addAttribute(TextAttribute.FOREGROUND, COLORS_SHADOW[t], s, e);
-          a.addAttribute(TextAttribute.FOREGROUND, COLORS[t], s, e);
+          addAttribute(b, TextAttribute.FOREGROUND, COLORS_SHADOW[t], s, e);
+          addAttribute(a, TextAttribute.FOREGROUND, COLORS[t], s, e);
           return;
         }
         if (t === 'l') {
-          if (b) b.addAttribute(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD, s, e);
-          a.addAttribute(TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD, s, e);
+          addAttribute(b, TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD, s, e);
+          addAttribute(a, TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD, s, e);
           return;
         }
         if (t === 'o') {
-          if (b) b.addAttribute(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE, s, e);
-          a.addAttribute(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE, s, e);
+          addAttribute(b, TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE, s, e);
+          addAttribute(a, TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE, s, e);
           return;
         }
         if (t === 'm') {
-          if (b) b.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, s, e);
-          a.addAttribute(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, s, e);
+          addAttribute(b, TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, s, e);
+          addAttribute(a, TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, s, e);
           return;
         }
         if (t === 'n') {
-          if (b) b.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL, s, e);
-          a.addAttribute(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL, s, e);
+          addAttribute(b, TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL, s, e);
+          addAttribute(a, TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL, s, e);
           return;
         }
         throw 'unknown attribute: ' + t;
@@ -344,7 +381,12 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       s: loc.s
     };
   };
+  obj._mark = function() {
+    dirty = true;
+    lines.forEach(v => v.d = true);
+  };
 
+  allDisplays.push(obj);
   return obj;
 }
 export default createTextGui;

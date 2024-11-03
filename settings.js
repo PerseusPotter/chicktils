@@ -471,6 +471,7 @@ export const props = {
   pingRefreshDelay: new Property('PingRefreshDelay', page, ++sort, Property.Type.Number, 10, { desc: 'how often (in seconds) to refresh ping. set to 0 to disable ping. requires skytils' }),
   preferUseTracer: new Property('PreferUseTracer', page, ++sort, Property.Type.Toggle, false, { desc: 'when available, prefer to use a tracer rather than an arrow' }),
   useScuffedBeacon: new Property('UseScuffedBeacon', page, ++sort, Property.Type.Toggle, false, { desc: 'render a scuffed beacon beam for fps purposes' }),
+  textGuiFont: new Property('TextGuiFont', page, ++sort, Property.Type.Option, 'SansSerif', { desc: 'font used for text guis', options: java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames().map(v => v.replace(/\s/g, '')) }),
 
   // 2
   enablekuudra: new Property('EnableKuudra', ++page, sort = 0, Property.Type.Toggle, true),
