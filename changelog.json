@@ -1,0 +1,62 @@
+{
+  "$schema": "./changelog.schema.json",
+  "data": [
+    {
+      "version": "0.8.0",
+      "changes": [
+        {
+          "type": "misc",
+          "desc": "cleanup"
+        },
+        {
+          "type": "fix",
+          "desc": "allow ping to drop"
+        },
+        {
+          "type": "fix",
+          "desc": "hecatomb score parsing"
+        },
+        {
+          "type": "fix",
+          "desc": "hypixel changed skull ids"
+        },
+        {
+          "type": "misc",
+          "desc": "custom worldLoad/Unload registers"
+        },
+        {
+          "type": "misc",
+          "desc": "log errors to console"
+        },
+        {
+          "type": "change",
+          "desc": "change text gui font rendering"
+        },
+        {
+          "type": "misc",
+          "desc": "use text shadow by default"
+        },
+        {
+          "type": "feat",
+          "desc": "add alignment to text guis"
+        },
+        {
+          "type": "feat",
+          "desc": "add font selector to text guis"
+        },
+        {
+          "type": "feat",
+          "desc": "custom font quality for text guis"
+        },
+        {
+          "type": "fix",
+          "desc": "updater message"
+        },
+        {
+          "type": "feat",
+          "desc": "changelog viewer"
+        }
+      ]
+    }
+  ]
+}
