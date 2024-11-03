@@ -1,5 +1,5 @@
 import settings from '../settings';
-import { drawOutlinedString, rgbaToJavaColor } from './draw';
+import { BufferedImageWrapper, drawOutlinedString, rgbaToJavaColor } from './draw';
 import GlStateManager2 from './glStateManager';
 import reg from './registerer';
 const EventEmitter = require('./events');
@@ -132,7 +132,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   let cb = false;
   let cc = 0;
   let dirty = true;
-  /** @type {import('../../@types/Libs').Image} */
+  /** @type {BufferedImageWrapper} */
   let img;
   let rx = 0;
   let ry = 0;
@@ -154,8 +154,8 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     const tl = obj.getTrueLoc();
     rx = tl.x;
     ry = tl.y;
-    rw = (img?.getTextureWidth() ?? 0) * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
-    rh = (img?.getTextureHeight() ?? 0) * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
+    rw = (img?.w ?? 0) * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
+    rh = (img?.h ?? 0) * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
   };
   /** @type {Line[]} */
   let lines = [];
@@ -325,7 +325,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
 
     img?.destroy();
     updateLines();
-    img = new Image(renderImage());
+    img = new BufferedImageWrapper(renderImage());
     updateLocCache();
 
     // TODO: draw obf
