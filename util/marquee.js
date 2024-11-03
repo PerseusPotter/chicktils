@@ -1,5 +1,4 @@
-import { drawString } from './draw';
-import glStateManager from './glStateManager';
+import createTextGui from './customtextgui';
 import { compareFloat } from './math';
 
 export default class Marquee {
@@ -7,11 +6,15 @@ export default class Marquee {
   pos = 0;
   frozenTime = 0;
   maxLen = 0;
-  textWidth = 0;
   lastRender = 0;
   scrollSpeed = 0.1;
   isEnd = false;
   freezeTime = 1500;
+  px = 0;
+  py = 0;
+  ps = 1;
+  pb = false;
+  textGui = createTextGui(() => ({ x: this.px, y: this.py, s: this.ps, a: 0, b: this.pb, c: 0 }), () => []);
 
   /**
    * @param {string} text
@@ -32,7 +35,7 @@ export default class Marquee {
   setText(text) {
     if (text === this.text) return;
     this.text = text;
-    this.textWidth = Renderer.getStringWidth(text);
+    this.textGui.setLine(text);
     this.reset();
   }
   /**
@@ -48,10 +51,11 @@ export default class Marquee {
    * @param {boolean} shadow
    */
   render(x, y, scale, shadow) {
-    glStateManager.pushMatrix();
-    glStateManager.translate(x, y, 0);
-    glStateManager.scale(scale, scale, 1);
-    if (this.maxLen === 0) drawString(this.text, 0, 0, shadow);
+    this.px = x;
+    this.py = y;
+    this.ps = scale;
+    this.pb = shadow;
+    if (this.maxLen === 0) this.textGui.render();
     else {
       GL11.glEnable(GL11.GL_SCISSOR_TEST);
       const ss = Renderer.screen.getScale();
@@ -77,7 +81,7 @@ export default class Marquee {
           this.frozenTime -= a;
         }
 
-        const maxPos = Math.max(this.textWidth - this.maxLen / scale, 0);
+        const maxPos = Math.max(this.textGui.getVisibleWidth() - this.maxLen, 0);
         a = Math.min(dt, (maxPos - this.pos) / this.scrollSpeed);
         dt -= a;
         this.pos += a * this.scrollSpeed;
@@ -87,10 +91,10 @@ export default class Marquee {
         if (this.isEnd && !oIsEnd) this.frozenTime = this.freezeTime;
       }
 
-      drawString(this.text, -this.pos, 0, shadow);
+      this.px -= this.pos;
+      this.textGui.render();
 
       GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
-    glStateManager.popMatrix();
   }
 }
