@@ -35,6 +35,7 @@ const createAlert = (function() {
       } catch (e) { }
     },
     hide() {
+      this._display?._rmCache();
       if (activeAlert.get() === this) activeAlert.set(null);
       if (this._timeout !== undefined) this._timeout = void (_clearTimeout(this._timeout));
     }
