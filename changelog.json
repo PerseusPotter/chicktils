@@ -57,6 +57,19 @@
           "desc": "changelog viewer"
         }
       ]
+    },
+    {
+      "version": "0.8.1",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "bold text wasn't bold"
+        },
+        {
+          "type": "fix",
+          "desc": "text guis sometimes infinitely hung, whoops"
+        }
+      ]
     }
   ]
 }
