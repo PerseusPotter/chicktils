@@ -364,8 +364,6 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   };
   obj.clearLines = function() {
     lines = [];
-    lineW = 0;
-    lineVW = 0;
     hasObf = false;
     return this;
   };
