@@ -37,7 +37,8 @@ function tryUpdate(delay = 0) {
       return -1;
     }
     ChatLib.chat(centerMessage('&9&lChickTils &r&5Update Found!'));
-    centerMessage(new Message(new TextComponent('&3&nClick To View').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
+    centerMessage(new Message(new TextComponent('&3&nClick to View on GitHub').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
+    centerMessage(new Message(new TextComponent('&3&nClick to Print Changelog').setClick('run_command', 'ChickTilsViewChangelog'))).chat();
     ChatLib.chat(centerMessage(`&4v${VERSION} &r-> &2v${v}`));
     ChatLib.chat('')
     if (sev === 0) ChatLib.chat(centerMessage('&l&cNote: Your game will be restarted.'));
@@ -46,7 +47,7 @@ function tryUpdate(delay = 0) {
       ChatLib.chat(centerMessage('&l&cNote: ChickTils will be reloaded.'));
       ChatLib.chat(centerMessage('&l&c(but you already knew that)'));
     }
-    centerMessage(new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'))).chat();
+    centerMessage(new Message(new TextComponent('&a[YES]').setClick('run_command', '/ChickTilsUpdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/ChickTilsUpdate deny'))).chat();
     return 0;
   } catch (e) {
     if (settings.isDev) log('failed to fetch update:', e, e.stack);
@@ -67,7 +68,29 @@ register('command', res => {
     Updater.deleteDownload();
     loadMod();
   }
-}).setName('csmupdate');
+}).setName('ChickTilsUpdate');
+register('command', () => {
+  try {
+    /** @type {{ version: string, changes: { type: 'feat' | 'fix' | 'misc' | 'del' | 'change', desc: string }[] }[]} */
+    const changelog = Updater.getChangelogDiff().reverse();
+    const typeColors = {
+      'feat': '&a+ feat: ',
+      'fix': '&f= fix: ',
+      'misc': '&7= misc: ',
+      'change': '&6/ change: ',
+      'del': '&4- remove: '
+    };
+    const typeSort = ['feat', 'del', 'change', 'fix', 'misc'];
+    changelog.forEach(({ version, changes }, i) => {
+      if (i > 0) ChatLib.chat('');
+      ChatLib.chat(centerMessage('&l&3v' + version));
+      changes.sort((a, b) => typeSort.indexOf(a.type) - typeSort.indexOf(b.type)).forEach(({ type, desc }) => ChatLib.chat(typeColors[type] + desc));
+    });
+  } catch (e) {
+    log('&4failed to get changelog, is the update downloaded?');
+  }
+}).setName('ChickTilsViewChangelog');
+
 function loadMod() {
   log('&7Loading ChickTils...');
   load();

@@ -3,16 +3,16 @@ import runHelper from './util/runner';
 const File = Java.type('java.io.File');
 export function loadMeta() {
   return JSON.parse(urlToString('https://api.github.com/repos/perseuspotter/chicktils/releases/latest', 1000, 1000));
-};
+}
 
 export function getVersion(meta) {
   return meta.tag_name.slice(1);
-};
+}
 
 export function getAssetURL(meta) {
   return meta.assets.find(v => v.name === 'chicktils.zip').browser_download_url;
   // return meta.zipball_url;
-};
+}
 
 function rel(p) {
   return './config/ChatTriggers/modules/chicktils/' + p;
@@ -23,14 +23,24 @@ export function downloadUpdate(url) {
   urlToFile(url, rel('temp.zip'), 5000, 5000);
   FileLib.unzip(rel('temp.zip'), rel('temp'));
   FileLib.delete(rel('temp.zip'));
-};
+}
 
+function parseVV(v) {
+  return v.split(' ').map(v => +v);
+}
 export function getCurrVV() {
-  return FileLib.read(rel('v.txt')).split(' ').map(v => +v);
-};
+  return parseVV(FileLib.read(rel('v.txt')));
+}
 export function getUpdateVV() {
-  return FileLib.read(rel('temp/v.txt')).split(' ').map(v => +v);
-};
+  return parseVV(FileLib.read(rel('temp/v.txt')));
+}
+export function getChangelogDiff() {
+  const cv = FileLib.read(rel('v.txt'));
+  const changelog = JSON.parse(FileLib.read(rel('temp/changelog.json'))).data;
+  const i = changelog.findIndex(v => v.version === cv);
+  if (i >= 0) return changelog.slice(0, i);
+  return changelog;
+}
 
 export function applyUpdate(sev) {
   if (sev === 0) {
@@ -45,7 +55,7 @@ export function applyUpdate(sev) {
   rimraf(rel('temp/chicktilshelper'));
   copy(new File(rel('temp')), new File(rel('')));
   deleteDownload();
-};
+}
 
 export function deleteDownload() {
   rimraf(rel('temp'));
