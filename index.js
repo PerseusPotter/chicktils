@@ -8,7 +8,6 @@ import { centerMessage, cleanNumber } from './util/format';
 import { getPing, getAveragePing } from './util/ping';
 import { getRegs, simulate } from './util/registerer';
 import { calcMedian } from './util/math';
-import { _setTimeout } from './util/timers';
 setIsMainS();
 setIsMainD();
 const VERSION = '0.7.4';
@@ -48,10 +47,6 @@ function tryUpdate(delay = 0) {
       ChatLib.chat(centerMessage('&l&c(but you already knew that)'));
     }
     centerMessage(new Message(new TextComponent('&a[YES]').setClick('run_command', '/csmupdate accept'), '   ', new TextComponent('&4[NO]').setClick('run_command', '/csmupdate deny'))).chat();
-    _setTimeout(() => {
-      silentUpdate = true;
-      ChatLib.command('csmupdate deny', true);
-    }, 10_000);
     return 0;
   } catch (e) {
     if (settings.isDev) log('failed to fetch update:', e, e.stack);
@@ -59,11 +54,9 @@ function tryUpdate(delay = 0) {
     console.log(e + '\n' + e.stack);
   }
 }
-let silentUpdate = false;
 register('command', res => {
-  if (sev === undefined) {
-    if (!silentUpdate) log('there is not an update pending');
-  } else if (res === 'accept') {
+  if (sev === undefined) log('there is not an update pending');
+  else if (res === 'accept') {
     Updater.applyUpdate();
     if (sev === 0) crashGame('updating !');
     if (sev === 1) Java.type('com.chattriggers.ctjs.Reference').reloadCT();
@@ -74,7 +67,6 @@ register('command', res => {
     Updater.deleteDownload();
     loadMod();
   }
-  silentUpdate = false;
 }).setName('csmupdate');
 function loadMod() {
   log('&7Loading ChickTils...');
