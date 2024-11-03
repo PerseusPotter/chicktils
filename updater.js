@@ -34,8 +34,7 @@ export function getCurrVV() {
 export function getUpdateVV() {
   return parseVV(FileLib.read(rel('temp/v.txt')));
 }
-export function getChangelogDiff() {
-  const cv = FileLib.read(rel('v.txt'));
+export function getChangelogDiff(cv) {
   const changelog = JSON.parse(FileLib.read(rel('temp/changelog.json'))).data;
   const i = changelog.findIndex(v => v.version === cv);
   if (i >= 0) return changelog.slice(0, i);

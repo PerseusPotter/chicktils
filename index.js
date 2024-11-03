@@ -72,7 +72,7 @@ register('command', res => {
 register('command', () => {
   try {
     /** @type {{ version: string, changes: { type: 'feat' | 'fix' | 'misc' | 'del' | 'change', desc: string }[] }[]} */
-    const changelog = Updater.getChangelogDiff().reverse();
+    const changelog = Updater.getChangelogDiff(VERSION).reverse();
     const typeColors = {
       'feat': '&a+ feat: ',
       'fix': '&f= fix: ',
