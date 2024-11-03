@@ -59,9 +59,12 @@ function setAttrFont(att, str, s, e) {
   if (Number.isNaN(s) || Number.isNaN(e)) return;
   if (s >= e) return;
   if (s >= str.length) return;
+  if (!fonts) return;
   const f = fonts[0];
   let i = f.canDisplayUpTo(str.slice(s, e));
+  let maxIters = 10;
   while (s < str.length && i >= 0) {
+    if (--maxIters === 0) return;
     addAttribute(att, TextAttribute.FONT, f, s, i);
     let b = s = i;
     while (s < e && f.canDisplayUpTo(str[s]) !== -1) s++;
