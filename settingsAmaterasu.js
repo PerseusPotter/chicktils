@@ -38,7 +38,7 @@ export default function convert(settings) {
  */
 function propertyToAmaterasu(defaultConf, instance, key, pageName) {
   let { page, name, type, value, defaultValue, desc } = instance;
-  name = name.replace(/([a-z])([A-Z])/g, '$1 $2');
+  name = name.match(/[a-z]+|[A-Z](?:[a-z]+|[A-Z]*(?![a-z]))|[.\d]+/g).join(' ');
   let { min, max, len, options } = instance.opts;
   const amtype = typesToAmat[type];
 
