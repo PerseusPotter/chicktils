@@ -60,7 +60,7 @@ const serverTickReg = reg('serverTick2', () => {
           const ent = new Entity(e);
           bloodX = roundRoomCoords(ent.getX());
           bloodZ = roundRoomCoords(ent.getZ());
-          World.getAllEntitiesOfType(EntityArmorStand).forEach(e => isSkull(e.entity) && addSkull(e));
+          unrun(() => World.getAllEntitiesOfType(EntityArmorStand).forEach(e => isSkull(e.entity) && addSkull(e)));
         }
       } else addSkull(new Entity(e));
     });
