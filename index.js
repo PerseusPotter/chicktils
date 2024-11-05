@@ -58,7 +58,7 @@ function tryUpdate(delay = 0) {
 register('command', res => {
   if (sev === undefined) log('there is not an update pending');
   else if (res === 'accept') {
-    Updater.applyUpdate();
+    Updater.applyUpdate(sev);
     if (sev === 0) crashGame('updating !');
     if (sev === 1) Java.type('com.chattriggers.ctjs.Reference').reloadCT();
     if (sev === 2) settings.isDev ? ChatLib.command('chicktils reload', true) : Java.type('com.chattriggers.ctjs.Reference').reloadCT();
