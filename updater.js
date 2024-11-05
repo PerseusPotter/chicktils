@@ -37,7 +37,7 @@ export function getUpdateVV() {
 export function getChangelogDiff(cv) {
   const changelog = JSON.parse(FileLib.read(rel('temp/changelog.json'))).data;
   const i = changelog.findIndex(v => v.version === cv);
-  if (i >= 0) return changelog.slice(0, i);
+  if (i >= 0) return changelog.slice(i + 1);
   return changelog;
 }
 
