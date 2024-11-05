@@ -8,69 +8,7 @@ import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
 import { run, unrun } from '../util/threading';
-const { gsl_sf_lambert_W0: W, intersectPL, fastDistance } = require('../util/math');
-
-/**
- * t_{heta}=y_{aw}+90
- * p_{hi}=p_{itch}+90
- * v=1.5
- * a=-0.03
- * d=-0.01
- * v_{x}\left(t\right)=\left(1+d\right)^{t}v\sin\left(p_{hi}\right)\cos\left(t_{heta}\right)
- * v_{y}\left(t\right)=\left(1+d\right)^{t}v\cos\left(p_{hi}\right)+a\frac{\left(1+d\right)^{t}-1}{d}
- * v_{z}\left(t\right)=\left(1+d\right)^{t}v\sin\left(p_{hi}\right)\sin\left(t_{heta}\right)
- * p\left(t\right)=\left(\sum_{n=0}^{t-1}v_{x}\left(n\right)+x_{0},\sum_{n=0}^{t-1}v_{z}\left(n\right)+z_{0},\sum_{n=0}^{t-1}v_{y}\left(n\right)+y_{0}\right)
- * p\left(\left[0...100\right]\right)
- *
- * plug solution to y(t) into x, z to obtain new functions for landing point given angle
- * phi and solution to y(t) is same for both function so x is of form Ccos(theta) and z is of form Csin(theta)
- * use arctan to solve for theta
- *
- * pos_x(phi, theta) = (100 - 100 * 0.99 ^ y-1(phi)) * sin(phi) * cos(theta)
- */
-const solvePearl = (function() {
-  const y1 = (vy, y0) => 33.1664 * (1.00503 * vy + 0.00100503 * y0 + 3 * W(-0.122625 * Math.exp(-0.335011 * vy - 0.00335011 * y0) * (vy + 3)) + 3.0151);
-  const m = (p, y) => v * (100 - 100 * (0.99 ** y)) * Math.sin(p);
-  const a = -0.03;
-  const v = 1.5;
-  const v2 = v * v;
-  const pe = (r, y) => {
-    const r2 = r * r;
-    const y2 = y * y;
-    return Math.PI - Math.acos(- Math.sqrt((r2 * Math.sqrt(-a * a * r2 - 2 * a * y * v2 + v2 * v2) + a * r2 * y + r2 * v2 + 2 * y2 * v2) / (v2 * (r2 + y2))) * Math.SQRT1_2);
-  };
-  return function(dx, dy, dz) {
-    const theta = Math.atan2(dz, dx);
-    let dp = 1 / 180 * Math.PI;
-    // const err = 0.001 / 180 * Math.PI;
-    const err = 0.001;
-    const R = Math.hypot(dx, dz);
-    let phi = pe(R, -dy);
-    if (Number.isNaN(phi)) return { theta: NaN, phi: NaN, ticks: NaN };
-    let d = 1;
-    let t, r;
-    let i = 0;
-    let pr = 0;
-    rngcarried:
-    do {
-      let td = 0;
-      do {
-        phi += td * dp;
-        // doesn't update t, rhino = :clown:
-        // const t = ...;
-        t = y1(v * Math.cos(phi), -dy);
-        r = Math.abs(m(phi, t));
-        if (td > 0 && r < pr) return { theta: NaN, phi: NaN, ticks: NaN };
-        td = Math.sign(R - r);
-        pr = r;
-        if (td === 0) break rngcarried;
-      } while (td === d && i++ < 100);
-      d = td;
-      dp /= 2;
-    } while (/*dp > err*/ Math.abs(R - pr) > err && i < 100);
-    return { theta, phi, ticks: t };
-  };
-}());
+const { intersectPL, fastDistance } = require('../util/math');
 
 const dropLocsStatic = [
   { x: -110, y: 79, z: -106 },
@@ -146,12 +84,13 @@ const renderReg = reg('renderWorld', () => {
   if (settings.kuudraBoxKuudra && kuuder) renderOutline(kuuder.getX(), kuuder.getY(), kuuder.getZ(), 15, 15, settings.kuudraBoxKuudraColor, settings.kuudraBoxKuudraEsp);
 }).setEnabled(new StateProp(settings._kuudraRenderPearlTarget).or(settings._kuudraRenderEmptySupplySpot).or(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks).or(settings._kuudraShowCannonAim).or(settings._kuudraBoxKuudra));
 
+const PearlHelper = Java.type('com.perseuspotter.chicktilshelper.PearlHelper');
 const tickReg = reg('tick', () => {
   run(() => {
     const px = Math.floor(Player.getX()) + 0.5;
     const py = Math.ceil(Player.getY() + getEyeHeight());
     const pz = Math.floor(Player.getZ()) + 0.5;
-    pearlLocs = dropLocs.map(({ x, y, z }) => solvePearl(x - px, y - py, z - pz)).filter(v => !Number.isNaN(v.phi));
+    pearlLocs = dropLocs.map(({ x, y, z }) => PearlHelper.solve(x - px, y - py, z - pz, 0.01)).filter(v => !Number.isNaN(v.phi));
   });
 }).setEnabled(settings._kuudraRenderPearlTarget);
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
