@@ -38,7 +38,7 @@ function tryUpdate(delay = 0) {
     }
     ChatLib.chat(centerMessage('&9&lChickTils &r&5Update Found!'));
     centerMessage(new Message(new TextComponent('&3&nClick to View on GitHub').setClick('open_url', 'https://github.com/PerseusPotter/chicktils/releases/latest'))).chat();
-    centerMessage(new Message(new TextComponent('&3&nClick to Print Changelog').setClick('run_command', 'ChickTilsViewChangelog'))).chat();
+    centerMessage(new Message(new TextComponent('&3&nClick to Print Changelog').setClick('run_command', '/ChickTilsViewChangelog'))).chat();
     ChatLib.chat(centerMessage(`&4v${VERSION} &r-> &2v${v}`));
     ChatLib.chat('')
     if (sev === 0) ChatLib.chat(centerMessage('&c&lNote: Your game will be restarted.'));
