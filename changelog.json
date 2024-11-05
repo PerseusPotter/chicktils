@@ -108,16 +108,12 @@
           "desc": "boxteammates performance"
         },
         {
-          "type": "change",
-          "desc": "move textgui parsing to jar"
-        },
-        {
-          "type": "change",
-          "desc": "move pearl calcs to jar"
+          "type": "fix",
+          "desc": "concurrent mod in camp"
         },
         {
           "type": "fix",
-          "desc": "concurrent mod in camp"
+          "desc": "i may have goofed up the updater"
         }
       ]
     }
