@@ -99,6 +99,27 @@
           "desc": "add mojangles as a font"
         }
       ]
+    },
+    {
+      "version": "0.8.3",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "boxteammates performance"
+        },
+        {
+          "type": "change",
+          "desc": "move textgui parsing to jar"
+        },
+        {
+          "type": "change",
+          "desc": "move pearl calcs to jar"
+        },
+        {
+          "type": "fix",
+          "desc": "concurrent mod in camp"
+        }
+      ]
     }
   ]
 }
