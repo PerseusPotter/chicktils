@@ -54,34 +54,9 @@ function createFonts() {
     new Font(Font.SANS_SERIF, Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[2] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[2]))
   ];
 }
-function addAttribute(str, a, v, s, e) {
-  if (!str) return;
-  if (s >= e) return;
-  str.addAttribute(a, v, s, e);
-}
-function setAttrFont(att, str, s, e) {
-  if (Number.isNaN(s) || Number.isNaN(e)) return;
-  if (s >= e) return;
-  if (s >= str.length) return;
-  if (!fonts) return;
-  const f = fonts[0];
-  let i = f.canDisplayUpTo(str.slice(s, e));
-  let maxIters = 10;
-  while (s < str.length && i >= 0) {
-    if (--maxIters === 0) return;
-    addAttribute(att, TextAttribute.FONT, f, s, i);
-    let b = s = i;
-    while (s < e && f.canDisplayUpTo(str[s]) !== -1) s++;
-    addAttribute(att, TextAttribute.FONT, fonts[2], b, s);
-    i = f.canDisplayUpTo(str.slice(s, e));
-  }
-  addAttribute(att, TextAttribute.FONT, f, s, e);
-}
 const BufferedImage = Java.type('java.awt.image.BufferedImage');
-const AttributedString = Java.type('java.text.AttributedString');
-const TextAttribute = Java.type('java.awt.font.TextAttribute');
-const TextLayout = Java.type('java.awt.font.TextLayout');
 const RenderingHints = Java.type('java.awt.RenderingHints');
+const FontHelper = Java.type('com.perseuspotter.chicktilshelper.FontHelper');
 export const allDisplays = [];
 {
   const cols = [
@@ -171,128 +146,39 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   let lineVW = 0;
   let hasObf = false;
   const updateLines = () => {
-    const tmpI = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-    const tmpG = tmpI.createGraphics();
-    if (fontHeights[0] === -1) {
-      const f = createFonts();
-      f.forEach((v, i) => fontHeights[i] = tmpG.getFontMetrics(v).getHeight());
-      fonts = createFonts();
-    }
-    tmpG.setFont(fonts[0]);
-
+    let tmpG;
     lineW = 0;
     lineVW = 0;
     hasObf = false;
     lines.forEach(v => {
-      if (!v.d) {
-        if (v.o.length) hasObf = true;
-        lineW = Math.max(lineW, v.w);
-        lineVW = Math.max(lineVW, v.vw);
-        return;
+      if (v.d) {
+        if (!tmpG) {
+          const tmpI = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+          tmpG = tmpI.createGraphics();
+          if (fontHeights[0] === -1) {
+            const f = createFonts();
+            f.forEach((v, i) => fontHeights[i] = tmpG.getFontMetrics(v).getHeight());
+            fonts = createFonts();
+          }
+          tmpG.setFont(fonts[0]);
+        }
+
+        const data = FontHelper.processString(v.s, cb, tmpG, fonts[0], fonts[1], fonts[2], FONT_RENDER_SIZE);
+
+        v.a = data.a;
+        v.b = data.b;
+        v.o = data.o;
+        v.w = data.w;
+        v.vw = data.vw;
+        v.d = false;
       }
 
-      const l = v.s + '&r';
-      let s = '';
-      const o = [];
-      /** @type {{ t: string, s: number, e: number }[]} */
-      const atts = [];
-      /** @type {{ t: string, i: number }[]} */
-      let cAtts = [];
-      let obfS = -1;
-
-      for (let j = 0; j < l.length; j++) {
-        let c = l[j];
-        if ((c === '&' || c === '§') && j < l.length - 1) {
-          let k = l[j + 1];
-          if (k in COLORS) {
-            cAtts = cAtts.filter(v => {
-              if (!(v.t in COLORS)) return true;
-              atts.push({ t: v.t, s: v.i, e: s.length });
-              return false;
-            });
-            cAtts.push({ t: k, i: s.length });
-            j++;
-            continue;
-          }
-          if (k === 'k') {
-            obfS = s.length;
-            j++;
-            continue;
-          }
-          if (k === 'l' || k === 'o' || k === 'm' || k === 'n') {
-            cAtts.push({ t: k, i: s.length });
-            j++;
-            continue;
-          }
-          if (k === 'r') {
-            cAtts.forEach(v => atts.push({ t: v.t, s: v.i, e: s.length }));
-            cAtts = [];
-            if (obfS >= 0) o.push([obfS, s.length]);
-            obfS = -1;
-            j++;
-            continue;
-          }
-        }
-        s += obfS >= 0 ? ' ' : c;
-      }
-      const a = new AttributedString(s);
-      const b = cb ? new AttributedString(s) : null;
-      addAttribute(a, TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
-      addAttribute(b, TextAttribute.SIZE, FONT_RENDER_SIZE, 0, s.length);
-      let end = 0;
-      for (let i = 0; i < o.length; i++) {
-        setAttrFont(a, s, i === 0 ? 0 : end, o[i][0]);
-        setAttrFont(b, s, i === 0 ? 0 : end, o[i][0]);
-        addAttribute(a, TextAttribute.FONT, fonts[1], o[i][0], o[i][1]);
-        addAttribute(b, TextAttribute.FONT, fonts[1], o[i][0], o[i][1]);
-        end = o[i][1];
-      }
-      setAttrFont(a, s, end, s.length);
-      setAttrFont(b, s, end, s.length);
-      atts.forEach(({ t, s, e }) => {
-        if (t in COLORS) {
-          addAttribute(b, TextAttribute.FOREGROUND, COLORS_SHADOW[t], s, e);
-          addAttribute(a, TextAttribute.FOREGROUND, COLORS[t], s, e);
-          return;
-        }
-        if (t === 'l') {
-          addAttribute(b, TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD, s, e);
-          addAttribute(a, TextAttribute.WEIGHT, TextAttribute.WEIGHT_BOLD, s, e);
-          return;
-        }
-        if (t === 'o') {
-          addAttribute(b, TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE, s, e);
-          addAttribute(a, TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE, s, e);
-          return;
-        }
-        if (t === 'm') {
-          addAttribute(b, TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, s, e);
-          addAttribute(a, TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON, s, e);
-          return;
-        }
-        if (t === 'n') {
-          addAttribute(b, TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL, s, e);
-          addAttribute(a, TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_LOW_ONE_PIXEL, s, e);
-          return;
-        }
-        throw 'unknown attribute: ' + t;
-      });
-
-      v.a = a;
-      v.b = b;
-      if (o.length) {
-        hasObf = true;
-        o.forEach(v => v.unshift(new TextLayout(a.getIterator(null, v[0], v[1]), tmpG.getFontRenderContext()).getAdvance()));
-      }
-      v.o = o;
-      const tly = new TextLayout(a.getIterator(), tmpG.getFontRenderContext());
-      v.w = tly.getAdvance();
+      if (v.o.length) hasObf = true;
       lineW = Math.max(lineW, v.w);
-      v.vw = tly.getVisibleAdvance();
       lineVW = Math.max(lineVW, v.vw);
-      v.d = false;
     });
-    tmpG.dispose();
+
+    tmpG?.dispose();
   };
   const renderImage = () => {
     // extra spacing for hanging characters
