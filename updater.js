@@ -50,6 +50,11 @@ export function applyUpdate(sev) {
     const newModName = newMod.getName().slice(0, 'chicktilshelper-1.0'.length) + Date.now() + '.jar';
     newMod.renameTo(new File(modFolder, newModName));
     runHelper('ChickTilsUpdateHelper', oldMods.map(v => `"${v.getPath()}"`.toString()));
+
+    const JSContextFactory = com.chattriggers.ctjs.engine.langs.js.JSContextFactory;
+    const f = JSContextFactory.class.getDeclaredField('classLoader');
+    f.setAccessible(true);
+    f.get(JSContextFactory.INSTANCE).close();
   }
   rimraf(rel('temp/chicktilshelper'));
   copy(new File(rel('temp')), new File(rel('')));
