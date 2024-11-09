@@ -116,6 +116,39 @@
           "desc": "i may have goofed up the updater"
         }
       ]
+    },
+    {
+      "version": "0.8.4",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "rabbit sniffer"
+        },
+        {
+          "type": "change",
+          "desc": "move cpu intensive things to .jar"
+        },
+        {
+          "type": "change",
+          "desc": "ping discrepencies in timers"
+        },
+        {
+          "type": "change",
+          "desc": "default font size"
+        },
+        {
+          "type": "feat",
+          "desc": "ice spray alert -> rare mob drop alert (now does sm cp)"
+        },
+        {
+          "type": "misc",
+          "desc": "dev tax"
+        },
+        {
+          "type": "feat",
+          "desc": "log damage numbers"
+        }
+      ]
     }
   ]
 }
