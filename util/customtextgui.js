@@ -24,7 +24,6 @@ const EventEmitter = require('./events');
  * }} CustomTextGui
  */
 const Font = Java.type('java.awt.Font');
-const fontHeights = [-1, -1, -1];
 let FONT_RENDER_SIZE = settings.textGuiFontRenderSize;
 const MC_FONT_SIZE = 10;
 let fonts;
@@ -34,26 +33,25 @@ settings._textGuiFont.listen(function(v, o) {
   if (!$FONTS.has(v)) this.set(o);
   else {
     activeFont = v === 'Mojangles' ? null : $FONTS.get(settings.textGuiFont);
-    fontHeights.forEach((_, i) => fontHeights[i] = -1);
-    fonts = null;
+    fonts = createFonts();
     allDisplays.forEach(v => v._mark());
   }
 });
 settings._textGuiFontRenderSize.listen(v => {
   FONT_RENDER_SIZE = v;
-  fontHeights.forEach((_, i) => fontHeights[i] = -1);
-  fonts = null;
+  fonts = createFonts();
   allDisplays.forEach(v => v._mark());
 });
 function createFonts() {
   return [
     activeFont ?
-      new Font(activeFont, Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[0] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[0])) :
-      MOJANGLES_FONT.deriveFont(Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[0] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[0])),
-    new Font(Font.MONOSPACED, Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[1] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[1])),
-    new Font(Font.SANS_SERIF, Font.PLAIN, FONT_RENDER_SIZE * (fontHeights[2] === -1 ? 1 : FONT_RENDER_SIZE / fontHeights[2]))
+      new Font(activeFont, Font.PLAIN, FONT_RENDER_SIZE) :
+      MOJANGLES_FONT.deriveFont(Font.PLAIN, FONT_RENDER_SIZE),
+    new Font(Font.MONOSPACED, Font.PLAIN, FONT_RENDER_SIZE),
+    new Font(Font.SANS_SERIF, Font.PLAIN, FONT_RENDER_SIZE)
   ];
 }
+fonts = createFonts();
 const BufferedImage = Java.type('java.awt.image.BufferedImage');
 const RenderingHints = Java.type('java.awt.RenderingHints');
 const FontHelper = Java.type('com.perseuspotter.chicktilshelper.FontHelper');
@@ -155,11 +153,6 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
         if (!tmpG) {
           const tmpI = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
           tmpG = tmpI.createGraphics();
-          if (fontHeights[0] === -1) {
-            const f = createFonts();
-            f.forEach((v, i) => fontHeights[i] = tmpG.getFontMetrics(v).getHeight());
-            fonts = createFonts();
-          }
           tmpG.setFont(fonts[0]);
         }
 
