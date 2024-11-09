@@ -3,7 +3,6 @@ import data from '../../data';
 import { getPartialServerTick } from '../../util/draw';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
-import { getAveragePing } from '../../util/ping';
 import createTextGui from '../../util/customtextgui';
 import { StateProp, StateVar } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
@@ -18,7 +17,7 @@ const timerHud = createTextGui(() => data.goldorFrenzyTimer, () => {
 let ticksInvul = 60;
 
 const renderReg = reg('renderOverlay', () => {
-  const t = Math.max(0, 50 * (ticksInvul - getPartialServerTick()) - getAveragePing());
+  const t = Math.max(0, 50 * (ticksInvul - getPartialServerTick()));
   timerHud.setLine(colorForNumber(t, 3000) + t.toFixed(0));
   timerHud.render();
 }).setEnabled(stateGoldorTimer.and(stateInGoldor));
