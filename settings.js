@@ -609,9 +609,9 @@ export const props = {
 
   dungeonPlaySoundKey: new Property('DungeonPlaySoundOnKey', page, ++sort, Property.Type.Toggle, false, { desc: 'play dulkir secret sound on pickup key, requires dulkir' }),
 
-  dungeonIceSprayAlert: new Property('DungeonIceSprayAlert', page, ++sort, Property.Type.Toggle, true, { desc: 'alert on ice spray drop' }),
-  dungeonIceSprayAlertTime: new Property('DungeonIceSprayAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
-  dungeonIceSprayAlertSound: new Property('DungeonIceSprayAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
+  dungeonIceSprayAlert: new Property('DungeonRareMobDropAlert', page, ++sort, Property.Type.Toggle, true, { desc: 'alert on ice spray/sm cp' }),
+  dungeonIceSprayAlertTime: new Property('DungeonRareMobDropAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
+  dungeonIceSprayAlertSound: new Property('DungeonRareMobDropAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
 
   dungeonTerminalsHelper: new Property('DungeonTerminalsHelper', page, ++sort, Property.Type.Toggle, false),
   dungeonTerminalsGuiSize: new Property('DungeonTerminalsGuiSize', page, ++sort, Property.Type.Option, 'Unchanged', { desc: 'change gui size while in terminals', options: ['Unchanged', 'Small', 'Normal', 'Large', '4x', '5x', 'Auto'] }),
