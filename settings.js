@@ -912,6 +912,8 @@ export const props = {
   logDamageOctodexterity: new Property('LogDamageOctodexterity', page, ++sort, Property.Type.Toggle, true, { desc: 'octodexterity (tara full set)' }),
   logDamageWitherSkull: new Property('LogDamageWitherSkull', page, ++sort, Property.Type.Toggle, true, { desc: 'withermancer/withers' }),
   logDamageLove: new Property('LogDamageLove', page, ++sort, Property.Type.Toggle, true, { desc: 'ring of love etc. proc' }),
+  logDamageCurse: new Property('LogDamageCurse', page, ++sort, Property.Type.Toggle, true, { desc: 'gaia construct lightning' }),
+  logDamageCombo: new Property('LogDamageCombo', page, ++sort, Property.Type.Toggle, true, { desc: 'blaze dagger repeat' }),
 
   // 18
 
