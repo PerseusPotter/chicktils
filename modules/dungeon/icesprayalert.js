@@ -5,7 +5,7 @@ import { StateProp } from '../../util/state';
 import { unrun } from '../../util/threading';
 import { stateIsInBoss } from '../dungeon.js';
 
-const iceSprayAlert = createAlert('ice spray :O', 10);
+const iceSprayAlert = createAlert('ice spray :O', 5);
 let ents = [];
 
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
