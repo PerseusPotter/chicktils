@@ -896,7 +896,25 @@ export const props = {
   boxAllEntitiesColor: new Property('BoxAllEntitiesColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   boxAllEntitiesEsp: new Property('BoxAllEntitiesEsp', page, ++sort, Property.Type.Toggle, true),
 
-  enableexcavatorsolver: new Property('EnableExcavatorSolver', page, ++sort, Property.Type.Toggle, false, { desc: 'find fossils' }),
+  enablelogdamage: new Property('EnableLogDamage', page, ++sort, Property.Type.Toggle, false, { desc: 'log damage numbers in chat' }),
+  logDamageRange: new Property('LogDamageRange', page, ++sort, Property.Type.Number, 5, { desc: 'ignore damage numbers outside this range\nin blocks', min: 0 }),
+  logDamageNormal: new Property('LogDamageNormal', page, ++sort, Property.Type.Toggle, true, { desc: 'non crit' }),
+  logDamageCrit: new Property('LogDamageCrit', page, ++sort, Property.Type.Toggle, true, { desc: 'crit' }),
+  logDamageWither: new Property('LogDamageWither', page, ++sort, Property.Type.Toggle, true, { desc: 'withering effect' }),
+  logDamageVenomous: new Property('LogDamageVenomous', page, ++sort, Property.Type.Toggle, true, { desc: 'venomous/toxic poison' }),
+  logDamageSuffocation: new Property('LogDamageSuffocation', page, ++sort, Property.Type.Toggle, true, { desc: 'suffocation/drowning' }),
+  logDamageFire: new Property('LogDamageFire', page, ++sort, Property.Type.Toggle, true, { desc: 'fire/fa/flame' }),
+  logDamageLightning: new Property('LogDamageLightning', page, ++sort, Property.Type.Toggle, true, { desc: 'thunderlord/thunderbolt' }),
+  logDamagePet: new Property('LogDamagePet', page, ++sort, Property.Type.Toggle, true, { desc: 'pet e.g. snowman' }),
+  logDamageOverload: new Property('LogDamageOverload', page, ++sort, Property.Type.Toggle, true, { desc: 'overload' }),
+  logDamageExtremeFocus: new Property('LogDamageExtremeFocus', page, ++sort, Property.Type.Toggle, true, { desc: 'extreme focus (endstone sword)' }),
+  logDamageOctodexterity: new Property('LogDamageOctodexterity', page, ++sort, Property.Type.Toggle, true, { desc: 'octodexterity (tara full set)' }),
+  logDamageWitherSkull: new Property('LogDamageWitherSkull', page, ++sort, Property.Type.Toggle, true, { desc: 'withermancer/withers' }),
+  logDamageLove: new Property('LogDamageLove', page, ++sort, Property.Type.Toggle, true, { desc: 'ring of love etc. proc' }),
+
+  // 18
+
+  enableexcavatorsolver: new Property('EnableExcavatorSolver', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'find fossils' }),
   excavatorSolverOnlyShowBest: new Property('ExcavatorSolverOnlyHighlightBest', page, ++sort, Property.Type.Toggle, true, { desc: 'only highlight the best move' }),
   excavatorSolverShowRoute: new Property('ExcavatorSolverHighlightStartPath', page, ++sort, Property.Type.Toggle, false, { desc: 'highlight best starting path (turn off if citrine gemstones)' }),
   excavatorSolverDirtTooltip: new Property('ExcavatorSolverDirtTooltip', page, ++sort, Property.Type.Option, 'Custom', { options: ['Default', 'Hide', 'Custom'] }),
@@ -938,6 +956,7 @@ const pageNames = [
   'HUD',
   'Avarice Addons',
   'Great Spook',
+  'Testing',
   'Misc.'
 ];
 /**
