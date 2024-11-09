@@ -6,8 +6,11 @@ export const log = (function() {
     var Logger = java.util.logging.Logger.getLogger('ChicktilsLogger');
     const FileHandler = new java.util.logging.FileHandler('./config/ChatTriggers/modules/chicktils/log-%u.log');
     Logger.addHandler(FileHandler);
-    const Formatter = new java.util.logging.SimpleFormatter();
-    FileHandler.setFormatter(Formatter);
+    FileHandler.setFormatter(new JavaAdapter(java.util.logging.Formatter, {
+      format(record) {
+        return record.getMessage().replace(/[^\x00-\x7F]/g, c => '\\x' + c.charCodeAt(0).toString(16).padStart(4, '0')) + '\n';
+      }
+    }));
   }
   return function(...args) {
     if (DUMP_TO_FILE) Logger.info(args.join(' '));
