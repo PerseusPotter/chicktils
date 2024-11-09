@@ -27,7 +27,9 @@ function processName(n) {
       settings.logDamageExtremeFocus && data.mods.extremeFocus ||
       settings.logDamageOctodexterity && data.mods.octodexterity ||
       settings.logDamageWitherSkull && data.mods.witherSkull ||
-      settings.logDamageLove && data.mods.love
+      settings.logDamageLove && data.mods.love ||
+      settings.logDamageCurse && data.mods.curse ||
+      settings.logDamageCombo && data.mods.combo
     )
   ) log(n);
 }
@@ -38,10 +40,10 @@ function parseName(n) {
     case '0': // wither
     case '2': // venomous/poison
     case '3': // suffocation/drowning
-    case '6': // fire/flame/fa
     case '9': // thunderlord/bolt
       return { dmg: parseDamage(n.slice(2).replace(/,/g, '')) };
 
+    case '6': // fire/flame/fa/burning vengeance
     case 'd': // pet
     case '7': // normal
       return parseDamageString(n.slice(2));
@@ -71,9 +73,8 @@ function parseModifiers(s) {
     octodexterity: s.includes('+'),
     witherSkull: s.includes('✷'),
     love: s.includes('❤'),
-    // not used i think?
-    // curse: s.includes('☄'),
-    // combo: s.includes('ﬗ')
+    curse: s.includes('☄'),
+    combo: s.includes('ﬗ')
   };
 }
 
