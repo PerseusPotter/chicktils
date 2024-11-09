@@ -10,7 +10,22 @@ let ents = [];
 
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const step2Reg = reg('step', () => {
-  if (ents.some(e => e.getName().includes('Ice Spray Wand'))) iceSprayAlert.show(settings.dungeonIceSprayAlertTime);
+  let s;
+  ents.some(e => {
+    const n = e.getName();
+    if (n.includes('Ice Spray Wand')) {
+      s = 'ice spray :O';
+      return true;
+    }
+    if (n.includes('Skeleton Master Chestplate')) {
+      s = 'sm cp :O';
+      return true;
+    }
+  });
+  if (s) {
+    iceSprayAlert.text = s;
+    iceSprayAlert.show(settings.dungeonIceSprayAlertTime);
+  }
   unrun(() => ents = World.getAllEntitiesOfType(EntityArmorStand));
 }).setFps(2).setOffset(500 / 3 * 2).setEnabled(new StateProp(stateIsInBoss).not().and(settings._dungeonIceSprayAlert));
 
