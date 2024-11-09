@@ -158,6 +158,15 @@
           "desc": "this updater is actually giving me a fucking headache, if you your text hud elements stopped working it's likely because the previous .jar update failed and you may have to manually replace that. if you are updating to 0.8.3 or below directly to this version then after the thing crashes you, make sure there is only 1 .jar at .minecraft/config/ChatTriggers/modules/chicktils/chicktilshelper/build/libs if there is more than one delete the older one, if it fails due to being open in openjdk or something similar, open task manager and close minecraft/the launcher/any stray javaw instances and try again. apologies for the trouble this update should fix this issue in the future. TLDR; surely you have above a middle school reading level and can read a paragraph"
         }
       ]
+    },
+    {
+      "version": "0.8.6",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "more log damage types"
+        }
+      ]
     }
   ]
 }
