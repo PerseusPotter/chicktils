@@ -474,7 +474,7 @@ export const props = {
   preferUseTracer: new Property('PreferUseTracer', page, ++sort, Property.Type.Toggle, false, { desc: 'when available, prefer to use a tracer rather than an arrow' }),
   useScuffedBeacon: new Property('UseScuffedBeacon', page, ++sort, Property.Type.Toggle, false, { desc: 'render a scuffed beacon beam for fps purposes' }),
   textGuiFont: new Property('TextGuiFont', page, ++sort, Property.Type.Option, 'Mojangles', { desc: 'font used for text guis', options: Array.from($FONTS.keys()) }),
-  textGuiFontRenderSize: new Property('TextGuiFontRenderSize', page, ++sort, Property.Type.Integer, 15, { desc: 'basically all chicktils font will be rendered at this size\nand then scaled to whatever size necessary\nhigher values = laggier obviously', min: 1 }),
+  textGuiFontRenderSize: new Property('TextGuiFontRenderSize', page, ++sort, Property.Type.Integer, 24, { desc: 'basically all chicktils font will be rendered at this size\nand then scaled to whatever size necessary\nhigher values = laggier obviously', min: 1 }),
 
   // 2
   enablekuudra: new Property('EnableKuudra', ++page, sort = 0, Property.Type.Toggle, true),
