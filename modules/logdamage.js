@@ -18,6 +18,7 @@ const settingsDict = {
 function processName(n) {
   const data = parseName(n);
   if (!data || Number.isNaN(data.dmg)) return;
+  if (settings.logDamageThreshold > 0 && data.dmg <= settings.logDamageThreshold) return;
 
   if (
     settings[settingsDict[n[1]]] ||

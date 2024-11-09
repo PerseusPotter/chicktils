@@ -898,6 +898,7 @@ export const props = {
 
   enablelogdamage: new Property('EnableLogDamage', page, ++sort, Property.Type.Toggle, false, { desc: 'log damage numbers in chat' }),
   logDamageRange: new Property('LogDamageRange', page, ++sort, Property.Type.Number, 5, { desc: 'ignore damage numbers outside this range\nin blocks', min: 0 }),
+  logDamageThreshold: new Property('LogDamageThreshold', page, ++sort, Property.Type.Integer, 0, { desc: 'only log damage when above this amount\n0 to disable', min: 0 }),
   logDamageNormal: new Property('LogDamageNormal', page, ++sort, Property.Type.Toggle, true, { desc: 'non crit' }),
   logDamageCrit: new Property('LogDamageCrit', page, ++sort, Property.Type.Toggle, true, { desc: 'crit' }),
   logDamageWither: new Property('LogDamageWither', page, ++sort, Property.Type.Toggle, true, { desc: 'withering effect' }),
