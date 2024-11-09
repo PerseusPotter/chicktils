@@ -61,9 +61,9 @@ export default class Marquee {
       const ss = Renderer.screen.getScale();
       GL11.glScissor(
         x * ss,
-        (Renderer.screen.getHeight() - y - 10 * scale) * ss,
+        (Renderer.screen.getHeight() - y - 15 * scale) * ss,
         this.maxLen * ss,
-        10 * scale * ss
+        20 * scale * ss
       );
 
       const d = Date.now();
