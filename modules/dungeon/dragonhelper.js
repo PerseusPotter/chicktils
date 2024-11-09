@@ -4,7 +4,6 @@ import { renderString, getPartialServerTick } from '../../util/draw';
 import createAlert from '../../util/alert';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
-import { getAveragePing } from '../../util/ping';
 import createTextGui from '../../util/customtextgui';
 import { log } from '../../util/log';
 import { StateProp, StateVar } from '../../util/state';
@@ -108,7 +107,7 @@ const renderWorldReg = reg('renderWorld', () => {
   spawnedDrags.forEach((v, k) => {
     if (v < 0) return;
     const drag = DRAGONS[k];
-    const t = (v - getPartialServerTick() - getAveragePing() / 50) * 50;
+    const t = (v - getPartialServerTick()) * 50;
     renderString(`${colorForNumber(t, 5000)}${t.toFixed(0)}`, drag.pos[0], drag.pos[1], drag.pos[2], 0xFFFFFFFF, false, 0.2, false);
   });
 }).setEnabled(stateDragonHelperActive.and(settings._dungeonDragonHelperTimer3D));
@@ -116,7 +115,7 @@ const renderOverlayReg = reg('renderOverlay', () => {
   const ticks = spawnedDrags.values().next().value;
   if (!ticks || ticks < 0) return;
 
-  const t = (ticks - getPartialServerTick() - getAveragePing() / 50) * 50;
+  const t = (ticks - getPartialServerTick()) * 50;
   timerHud.setLine(colorForNumber(t, 5000) + t.toFixed(0));
   timerHud.render();
 }).setEnabled(stateDragonHelperActive.and(settings._dungeonDragonHelperTimer2D));
