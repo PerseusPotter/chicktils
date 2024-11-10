@@ -106,6 +106,11 @@ export class Property extends StateVar {
     }
   }
   parse(str) {
+    const v = this._parse(str);
+    this.validate(v);
+    return v;
+  }
+  _parse(str) {
     str = str.trim();
     const truthy = ['true', 'True', 'TRUE', 't', 'T', 'y', 'Y', '1'];
     const falsy = ['false', 'False', 'FALSE', 'f', 'F', 'n', 'N', '0'];
