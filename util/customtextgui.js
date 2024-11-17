@@ -211,9 +211,9 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     GlStateManager2.disableBlend();
     if (!dirty) return;
 
-    img?.destroy();
     updateLines();
-    img = new BufferedImageWrapper(renderImage());
+    if (img) img = img.update(renderImage());
+    else img = new BufferedImageWrapper(renderImage());
     updateLocCache();
 
     // TODO: draw obf

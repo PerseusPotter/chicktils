@@ -854,6 +854,18 @@ export class BufferedImageWrapper {
     this.img = new DynamicTexture(img);
     BufferedImageWrapper.ALL_IMAGES.add(this);
   }
+  update(img) {
+    const w = img.getWidth();
+    const h = img.getHeight();
+    if (w === this.w && h === this.h) {
+      img.getRGB(0, 0, img.getWidth(), img.getHeight(), this.img.func_110565_c(), 0, img.getWidth());
+      this.img.func_110564_a();
+      return this;
+    } else {
+      this.destroy();
+      return new BufferedImageWrapper(img);
+    }
+  }
   destroy() {
     this.img.func_147631_c();
     BufferedImageWrapper.ALL_IMAGES.delete(this);
