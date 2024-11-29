@@ -944,7 +944,10 @@ export const props = {
 
   enablecake: new Property('EnableCakeHelper', page, ++sort, Property.Type.Toggle, true, { desc: 'i like eat cake.' }),
 
-  enableunfocus: new Property('PreventRenderingWhenUnfocused', page, ++sort, Property.Type.Toggle, false, { desc: 'similar to patcher\'s unfocused fps\nbut instead of capping fps, it completely stops rendering' })
+  enableunfocus: new Property('PreventRenderingWhenUnfocused', page, ++sort, Property.Type.Toggle, false, { desc: 'similar to patcher\'s unfocused fps\nbut instead of capping fps, it completely stops rendering' }),
+
+  enableassfangcheese: new Property('EnableAssfangCheeseHealth', page, ++sort, Property.Type.Toggle, false, { desc: 'show real assfang health' }),
+  moveAssfangCheese: new Property('MoveAssfangCheeseHealth', page, ++sort, Property.Type.Action)
 };
 const pageNames = [
   '',
