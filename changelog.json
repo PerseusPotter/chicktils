@@ -167,6 +167,23 @@
           "desc": "more log damage types"
         }
       ]
+    },
+    {
+      "version": "0.8.7",
+      "changes": [
+        {
+          "type": "feat",
+          "desc": "ashfang health display (for cheese)"
+        },
+        {
+          "type": "fix",
+          "desc": "not validating settings inputs"
+        },
+        {
+          "type": "misc",
+          "desc": "small text hud performance"
+        }
+      ]
     }
   ]
 }
