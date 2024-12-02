@@ -37,6 +37,7 @@ export function setIsMain() {
  *  goldorFrenzyTimer: TextLocation;
  *  serverScrutinizerPingDisplay: TextLocation;
  *  assfangCheeseLoc: TextLocation;
+ *  feroEstimateLoc: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -82,7 +83,8 @@ function verifyTextLocation(value) {
   'dragonHelperTimer',
   'goldorFrenzyTimer',
   'serverScrutinizerPingDisplay',
-  'assfangCheeseLoc'
+  'assfangCheeseLoc',
+  'feroEstimateLoc'
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v);
