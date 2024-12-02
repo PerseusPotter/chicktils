@@ -258,3 +258,21 @@ export function fastDistance(dx, dy) {
 
   return ((approx + 512) >> 10);
 }
+
+/**
+ * index of highest number <= val
+ * @param {number[]} arr sorted ascending
+ * @param {number} val
+ * @returns {number} [-1, arr.length)
+ */
+export function binarySearch(arr, val) {
+  let l = 0;
+  let r = arr.length;
+  let m = 0;
+  while (l < r) {
+    m = (l + r) >> 1;
+    if (arr[m] <= val) l = m + 1;
+    else r = m;
+  }
+  return l - 1;
+}
