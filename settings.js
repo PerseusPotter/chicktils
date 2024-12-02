@@ -864,6 +864,12 @@ export const props = {
   deployableParticlesOwn: new Property('DeployableParticlesOwn', page, ++sort, Property.Type.Option, 'Default', { options: ['Default', 'None', 'Custom'], desc: 'only applies to own deployables' }),
   deployableParticlesOther: new Property('DeployableParticlesOther', page, ++sort, Property.Type.Option, 'Default', { options: ['Default', 'None', 'Custom'] }),
 
+  enableferoestimate: new Property('EnableFeroEstimate', page, ++sort, Property.Type.Toggle, false),
+  moveFeroEstimate: new Property('MoveFeroEstimate', page, ++sort, Property.Type.Action),
+  feroEsimateMaxAge: new Property('FeroEsimateMaxAge', page, ++sort, Property.Type.Integer, 3000, { desc: 'max age in ms for bow/fero hits', min: 0 }),
+  feroEstimateUpdateDelay: new Property('FeroEstimateUpdateDelay', page, ++sort, Property.Type.Integer, 500, { desc: 'delay in ms to update guess', min: 0 }),
+  feroEstimateSmoothingFactor: new Property('FeroEstimateSmoothingFactor', page, ++sort, Property.Type.Number, 0.5, { desc: 'exponential smoothing factor', min: 0, max: 1 }),
+
   // 15
 
   enableavarice: new Property('EnableAvariceAddons', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'things for avarice' }),
