@@ -154,13 +154,27 @@ const serverTickHitReg = reg('serverTick2', () => {
     const d = DRAGONS[currDragPrio];
     let endI = hitTimes.length;
     while (endI > 0 && hitTimes[endI - 1] === 0) endI--;
-    if (settings.dungeonDragonHelperTrackHits === 'Full' || settings.dungeonDragonHelperTrackHits === 'Both') {
-      const sum = hitTimes.reduce((a, v) => a + v, 0);
-      log(`&aHit &b${sum}&a arrows in &d${formatTime(endI)}&a on ${d.color}${d.name}&a.`);
-    }
-    if (settings.dungeonDragonHelperTrackHits === 'Burst' || settings.dungeonDragonHelperTrackHits === 'Both') {
-      const sum = hitTimes.slice(0, 20).reduce((a, v) => a + v, 0);
-      log(`&aHit &b${sum}&a arrows in &d${formatTime(Math.min(20, endI))}&a on ${d.color}${d.name}&a.`);
+    switch (settings.dungeonDragonHelperTrackHits) {
+      case 'Full': {
+        const sum = hitTimes.reduce((a, v) => a + v, 0);
+        log(`&aHit &b${sum}&a arrows in &d${formatTime(endI)}&a on ${d.color}${d.name}&a.`);
+        break;
+      }
+      case 'Burst': {
+        const sum = hitTimes.slice(0, 20).reduce((a, v) => a + v, 0);
+        log(`&aHit &b${sum}&a arrows in &d${formatTime(Math.min(20, endI))}&a on ${d.color}${d.name}&a.`);
+        break;
+      }
+      case 'Both': {
+        let s1 = 0;
+        let s2 = 0;
+        for (let i = 0; i < hitTimes.length; i++) {
+          s1 += hitTimes[i];
+          if (i < 20) s2 += hitTimes[i];
+        }
+        log(`${d.color}${d.name}&7: &b${s1}&a arrows in &d${formatTime(endI)} &7| &b${s2}&a arrows in &d${formatTime(Math.min(20, endI))}`);
+        break;
+      }
     }
 
     stateDragon.set();
