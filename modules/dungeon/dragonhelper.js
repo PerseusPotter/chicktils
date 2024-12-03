@@ -8,10 +8,14 @@ import createTextGui from '../../util/customtextgui';
 import { log } from '../../util/log';
 import { StateProp, StateVar } from '../../util/state';
 import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss } from '../dungeon.js';
+import { fastDistance } from '../../util/math';
 
 const stateDragonHelper = new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonDragonHelper);
 const stateInP5 = new StateVar(false);
 const stateDragonHelperActive = stateDragonHelper.and(stateInP5);
+const stateDragonHelperHits = stateDragonHelperActive.and(new StateProp(settings._dungeonDragonHelperTrackHits).notequals('None'));
+const stateDragon = new StateVar();
+const stateDragonHelperTrackHits = stateDragonHelperHits.and(stateDragon);
 
 const spawnedDrags = new Map();
 const spawnAlert = createAlert('', 5, settings.dungeonDragonHelperAlertSound);
@@ -44,6 +48,9 @@ const DRAGONS = {
     name: 'APEX'
   }
 };
+/** @type {'r' | 'o' | 'b' | 'p' | 'g'} */
+let currDragPrio;
+let hitTimes = [0];
 
 const tickReg = reg('tick', () => stateInP5.set(Player.getY() < 30)).setEnabled(stateDragonHelper);
 function getSplitDrag(d1, d2, bersTeam, prio, role) {
@@ -57,8 +64,8 @@ function addDragon(c) {
   spawnedDrags.set(c, 100);
 
   let dragD = DRAGONS[c];
+  currDragPrio = c;
   if (++dragonCount === 2) {
-    if (settings.dungeonDragonHelperAlert === 'None') return;
     const drags = Array.from(spawnedDrags.keys());
     const role = getPlayers()[0]?.['class'];
     if (!role) return log('&4failed to parse class');
@@ -69,6 +76,8 @@ function addDragon(c) {
       role[0].toLowerCase()
     );
     dragD = DRAGONS[drag];
+    currDragPrio = drag;
+    if (settings.dungeonDragonHelperAlert === 'None') return;
   } else if (settings.dungeonDragonHelperAlert !== 'All') return;
 
   spawnAlert.text = `&l${dragD.color}${dragD.name}`;
@@ -119,6 +128,48 @@ const renderOverlayReg = reg('renderOverlay', () => {
   timerHud.setLine(colorForNumber(t, 5000) + t.toFixed(0));
   timerHud.render();
 }).setEnabled(stateDragonHelperActive.and(settings._dungeonDragonHelperTimer2D));
+const EntityDragon = Java.type('net.minecraft.entity.boss.EntityDragon');
+const dragonSpawnReg = reg('spawnEntity', ent => {
+  if (ent instanceof EntityDragon) {
+    const drag = DRAGONS[currDragPrio];
+    if (fastDistance(
+      drag.pos[0] - ent.field_70165_t,
+      drag.pos[2] - ent.field_70161_v
+    ) > 10) return;
+    stateDragon.set(ent);
+    hitTimes = [0];
+  }
+}).setEnabled(stateDragonHelperHits);
+function formatTime(ticks) {
+  switch (settings.dungeonDragonHelperTrackHitsTimeUnit) {
+    case 'Ticks': return `${ticks} ticks`;
+    case 'Seconds': return `${(ticks / 20).toFixed(2)}s`;
+    case 'Both': return `${(ticks / 20).toFixed(2)}s (${ticks} ticks)`;
+  }
+  return ticks.toString();
+}
+const serverTickHitReg = reg('serverTick2', () => {
+  const drag = stateDragon.get();
+  if (drag.field_70128_L || drag.func_110143_aJ() <= 0 || hitTimes.length >= 4 * 20) {
+    const d = DRAGONS[currDragPrio];
+    let endI = hitTimes.length;
+    while (endI > 0 && hitTimes[endI - 1] === 0) endI--;
+    if (settings.dungeonDragonHelperTrackHits === 'Full' || settings.dungeonDragonHelperTrackHits === 'Both') {
+      const sum = hitTimes.reduce((a, v) => a + v, 0);
+      log(`&aHit &b${sum}&a arrows in &d${formatTime(endI)}&a on ${d.color}${d.name}&a.`);
+    }
+    if (settings.dungeonDragonHelperTrackHits === 'Burst' || settings.dungeonDragonHelperTrackHits === 'Both') {
+      const sum = hitTimes.slice(0, 20).reduce((a, v) => a + v, 0);
+      log(`&aHit &b${sum}&a arrows in &d${formatTime(Math.min(20, endI))}&a on ${d.color}${d.name}&a.`);
+    }
+
+    stateDragon.set();
+    hitTimes = [0];
+    return;
+  }
+  hitTimes.push(0);
+}).setEnabled(stateDragonHelperTrackHits);
+const bowHitReg = reg('soundPlay', () => hitTimes[hitTimes.length - 1]++).setCriteria('random.successful_hit').setEnabled(stateDragonHelperTrackHits);
 
 export function init() {
   registerTrackPlayers(stateDragonHelper);
@@ -142,12 +193,17 @@ export function start() {
   stateInP5.set(false);
   spawnedDrags.clear();
   dragonCount = 0;
+  stateDragon.set();
+  hitTimes = [0];
 
   tickReg.register();
   partSpawnReg.register();
   serverTickReg.register();
   renderWorldReg.register();
   renderOverlayReg.register();
+  dragonSpawnReg.register();
+  serverTickHitReg.register();
+  bowHitReg.register();
 }
 export function reset() {
   tickReg.unregister();
@@ -155,4 +211,7 @@ export function reset() {
   serverTickReg.unregister();
   renderWorldReg.unregister();
   renderOverlayReg.unregister();
+  dragonSpawnReg.unregister();
+  serverTickHitReg.unregister();
+  bowHitReg.unregister();
 }
