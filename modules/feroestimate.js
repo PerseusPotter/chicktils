@@ -21,11 +21,11 @@ const renderOvReg = reg('renderOverlay', () => {
   if (updateDelay.shouldTick()) {
     const d = Date.now();
     const feroOffset = guess * 1000 / 3;
-    bowHits = bowHits.slice(binarySearch(bowHits, d - settings.feroEsimateMaxAge - feroOffset) + 1);
+    bowHits = bowHits.slice(binarySearch(bowHits, d - settings.feroEsimateMaxAge - 5 * 1000 / 3) + 1);
     feroHits = feroHits.slice(binarySearch(feroHits, d - settings.feroEsimateMaxAge) + 1);
 
     const bowHitCount = binarySearch(bowHits, d - feroOffset);
-    const est = bowHitCount === 0 ? 0 : feroHits.length / bowHitCount;
+    const est = bowHitCount === 0 ? 0 : Math.min(5, feroHits.length / bowHitCount);
     guess = settings.feroEstimateSmoothingFactor * est + (1 - settings.feroEstimateSmoothingFactor) * guess;
 
     const roundedFero = ~~(guess * 100);
