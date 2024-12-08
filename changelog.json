@@ -184,6 +184,23 @@
           "desc": "small text hud performance"
         }
       ]
+    },
+    {
+      "version": "0.8.8",
+      "changes": [
+        {
+          "type": "feat",
+          "desc": "fero estimator"
+        },
+        {
+          "type": "feat",
+          "desc": "# arrow hits on dragon (m7)"
+        },
+        {
+          "type": "fix",
+          "desc": "arrow align block clicks"
+        }
+      ]
     }
   ]
 }
