@@ -137,6 +137,12 @@ register('command', ...args => {
         log('ping:', getPing());
         log('avg ping:', getAveragePing());
         break;
+      case 'config_edit':
+        World.playSound('gui.button.press', 1, 1);
+        Client.setCurrentChatMessage(`/${settings.module} config edit ${args.join(' ')}`);
+        break;
+      case 'config_':
+        World.playSound('gui.button.press', 1, 1);
       case 'config':
         if (args.length === 0) args[0] = 'view';
         if (args[0] === 'gui') settings.amaterasu.openGui();
