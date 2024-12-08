@@ -404,7 +404,7 @@ class Settings {
     );
   }
 
-  lastDisplay = { type: 'none', args: [] };
+  lastDisplay = { type: 'none', args: [], time: 0 };
   prevMsgs = [];
   /**
    * @param {number} page
@@ -424,7 +424,8 @@ class Settings {
     this.prevMsgs = msgs;
     this.lastDisplay = {
       type: 'display',
-      args: [page]
+      args: [page],
+      time: Date.now()
     };
   }
 
@@ -450,7 +451,8 @@ class Settings {
     this.prevMsgs = msgs;
     this.lastDisplay = {
       type: 'displaySearch',
-      args: [str]
+      args: [str],
+      time: Date.now()
     };
   }
 
