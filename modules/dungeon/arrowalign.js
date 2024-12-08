@@ -107,14 +107,14 @@ const playerInteractReg = reg('packetSent', (pack, evn) => {
   if (!id) return;
 
   const c = getClicks(id);
-  if (c > (settings.dungeonArrowAlignLeavePD && stateIsPD.get() && id === (stateSolution.get()[0] >> 4))) return clicksQueued.set(id, (clicksQueued.get() ?? 0) + 1);
+  if (c > (settings.dungeonArrowAlignLeavePD && stateIsPD.get() && id === (stateSolution.get()[0] >> 4))) return clicksQueued.set(id, (clicksQueued.get(id) ?? 0) + 1);
   const isSneaking = Player.isSneaking();
   if (
     settings.dungeonArrowAlignBlock === 'Always' ||
     settings.dungeonArrowAlignBlock === 'WhenCrouching' && isSneaking ||
     settings.dungeonArrowAlignBlock === 'ExceptWhenCrouching' && !isSneaking
   ) return cancel(evn);
-  clicksQueued.set(id, (clicksQueued.get() ?? 0) + 1);
+  clicksQueued.set(id, (clicksQueued.get(id) ?? 0) + 1);
 }).setFilteredClass(net.minecraft.network.play.client.C02PacketUseEntity).setEnabled(stateDoArrowAlign.and(stateSolution));
 const renderWorldReg = reg('renderWorld', () => {
   for (let y = 120; y < 125; y++) {
