@@ -327,15 +327,15 @@ export class Property extends StateVar {
   getMessage(parity, module, name = this.name) {
     const c = parity ? ['&7', '&6', '&5', '&4', '&3', '&2', '&8'] : ['&f', '&e', '&d', '&c', '&b', '&a', '&7'];
     const comps = [this.desc ? new TextComponent(`${c[0]}${name}`).setHover('show_text', this.desc) : `${c[0]}${name}`];
-    if (this.type === Property.Type.Action) comps.unshift(new TextComponent(`${c[6]}[  ${c[2]}RUN${c[6]}   ]&r `).setClick('run_command', `/${module} config edit ${this.name}`));
+    if (this.type === Property.Type.Action) comps.unshift(new TextComponent(`${c[6]}[  ${c[2]}RUN${c[6]}   ]&r `).setClick('run_command', `/${module} config_ edit ${this.name}`));
     else {
       comps.unshift(
-        new TextComponent(`${c[6]}[ ${c[3]}RESET${c[6]} ]&r `).setClick('run_command', `/${module} config edit ${this.name}`),
-        new TextComponent(`${c[6]}[  ${c[5]}EDIT${c[6]}  ]&r `).setClick('suggest_command', `/${module} config edit ${this.name} ${this.toString()}`)
+        new TextComponent(`${c[6]}[ ${c[3]}RESET${c[6]} ]&r `).setClick('run_command', `/${module} config_ edit ${this.name}`),
+        new TextComponent(`${c[6]}[  ${c[5]}EDIT${c[6]}  ]&r `).setClick('run_command', `/${module} config_edit ${this.name} ${this.toString()}`)
       );
       comps.push(`${c[6]}:${c[1]} ${this.toString()}`);
     }
-    if (this.type === Property.Type.Toggle) comps[1] = new TextComponent(`${c[6]}[${c[4]}TOGGLE${c[6]}]&r `).setClick('run_command', `/${module} config edit ${this.name} TOGGLE`);
+    if (this.type === Property.Type.Toggle) comps[1] = new TextComponent(`${c[6]}[${c[4]}TOGGLE${c[6]}]&r `).setClick('run_command', `/${module} config_ edit ${this.name} TOGGLE`);
     return new Message(...comps);
   }
 }
@@ -413,7 +413,7 @@ class Settings {
     const props = this.props.filter(v => v.page === page);
     props.sort((a, b) => a.sort - b.sort);
     const msgs = props.map((p, i) => p.getMessage(i & 1, this.module));
-    const pageNav = new Message(page === this.minPage ? '   ' : new TextComponent('&a<- ').setClick('run_command', `/${this.module} config view ${page - 1}`), `&fPage &6${page} &fof &6${this.maxPage}`, page === this.maxPage ? '   ' : new TextComponent('&a ->').setClick('run_command', `/${this.module} config view ${page + 1}`));
+    const pageNav = new Message(page === this.minPage ? '   ' : new TextComponent('&a<- ').setClick('run_command', `/${this.module} config_ view ${page - 1}`), `&fPage &6${page} &fof &6${this.maxPage}`, page === this.maxPage ? '   ' : new TextComponent('&a ->').setClick('run_command', `/${this.module} config_ view ${page + 1}`));
     centerMessage(pageNav);
     // msgs.unshift(pageNav.clone());
     msgs.unshift(new Message(centerMessage(`&d&l${this.module} &b&l${this.pageNames[page]} &d&lSettings`)));
@@ -478,6 +478,9 @@ class Settings {
   }
 
   refresh() {
+    const d = Date.now();
+    if (d - this.lastDisplay.time > 60_000) return;
+    this.lastDisplay.time = d;
     switch (this.lastDisplay.type) {
       case 'display': return this.display(this.lastDisplay.args[0]);
       case 'displaySearch': return this.displaySearch(this.lastDisplay.args[0]);
