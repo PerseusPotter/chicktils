@@ -201,6 +201,15 @@
           "desc": "arrow align block clicks"
         }
       ]
+    },
+    {
+      "version": "0.8.9",
+      "changes": [
+        {
+          "type": "change",
+          "desc": "make text settings more useable"
+        }
+      ]
     }
   ]
 }
