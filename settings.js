@@ -404,6 +404,7 @@ class Settings {
     );
   }
 
+  lastDisplay = { type: 'none', args: [] };
   prevMsgs = [];
   /**
    * @param {number} page
@@ -421,6 +422,10 @@ class Settings {
     deleteMessages(this.prevMsgs.map(v => v.getFormattedText()));
     msgs.forEach(v => v.chat());
     this.prevMsgs = msgs;
+    this.lastDisplay = {
+      type: 'display',
+      args: [page]
+    };
   }
 
   /**
@@ -443,6 +448,10 @@ class Settings {
     deleteMessages(this.prevMsgs.map(v => v.getFormattedText()));
     msgs.forEach(v => v.chat());
     this.prevMsgs = msgs;
+    this.lastDisplay = {
+      type: 'displaySearch',
+      args: [str]
+    };
   }
 
   /**
@@ -458,11 +467,19 @@ class Settings {
       else p.set(p.defaultValue);
       this.save();
       log(`Set ${p.name} to ${p.toString()}`);
+      this.refresh();
     }
   }
 
   triggerAll() {
     this.props.forEach(v => v.trigger(v.value));
+  }
+
+  refresh() {
+    switch (this.lastDisplay.type) {
+      case 'display': return this.display(this.lastDisplay.args[0]);
+      case 'displaySearch': return this.displaySearch(this.lastDisplay.args[0]);
+    }
   }
 }
 
