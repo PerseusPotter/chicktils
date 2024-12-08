@@ -94,7 +94,7 @@ register('command', () => {
 function loadMod() {
   log('&7Loading ChickTils...');
   load();
-  settings.refresh();
+  settings.triggerAll();
   postInit();
   log('&7ChickTils Loaded!');
 }

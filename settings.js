@@ -461,7 +461,7 @@ class Settings {
     }
   }
 
-  refresh() {
+  triggerAll() {
     this.props.forEach(v => v.trigger(v.value));
   }
 }
