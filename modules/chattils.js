@@ -445,7 +445,7 @@ const essRCmdReg = reg('command', essRCmd).setName('re').setEnabled(settings._ch
 const essROCmdReg = reg('command', essRCmd).setName('r', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const essFCmdReg = reg('command', essFCmd).setName('fe').setEnabled(settings._chatTilsEssential);
 const essFOCmdReg = reg('command', ...args => {
-  if (args && ['accept', 'add', 'best', 'deny', 'help', 'list', 'nickname', 'notifications', 'remove', 'removeall', 'requests']) ChatLib.command('f ' + args.join(' '));
+  if (args && ['accept', 'add', 'best', 'deny', 'help', 'list', 'nickname', 'notifications', 'remove', 'removeall', 'requests'].includes(args[0])) ChatLib.command('f ' + args.join(' '));
   else essFCmd(...args);
 }).setName('f', true).setEnabled(new StateProp(settings._chatTilsEssential).and(settings._chatTilsEssentialOverrideCommands));
 const essPCCmdReg = reg('command', ...args => {
