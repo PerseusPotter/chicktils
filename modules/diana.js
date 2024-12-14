@@ -241,6 +241,7 @@ const spawnPartReg = reg('spawnParticle', (part, id, evn) => {
 }).setEnabled(settings._dianaGuessFromParticles);
 
 const startBurrowReg = reg('chat', () => {
+  if (unloadReg.isRegistered()) return;
   numNotStartBurrows = 0;
   numStartBurrows = 0;
   targetLoc = null;
@@ -264,6 +265,7 @@ const unloadReg = reg('worldUnload', () => {
   fixStReg.unregister();
   soundPlayReg.unregister();
   spawnPartReg.unregister();
+  unloadReg.unregister();
   targetLoc = null;
   guessLoc = null;
 });
