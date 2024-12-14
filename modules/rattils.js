@@ -23,12 +23,14 @@ const unloadReg = reg('worldUnload', () => reset());
 const EntityItem = Java.type('net.minecraft.entity.item.EntityItem');
 function scanCheese() {
   run(() => {
-    cheese = World.getAllEntitiesOfType(EntityItem).filter(v => {
-      const nbt = v.entity.func_92059_d().func_77978_p();
-      if (!nbt) return false;
-      const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
-      return id === '9675d9a3-d888-3c30-93b1-8cac5b9be1f4';
-    });
+    try {
+      cheese = World.getAllEntitiesOfType(EntityItem).filter(v => {
+        const nbt = v.entity.func_92059_d().func_77978_p();
+        if (!nbt) return false;
+        const id = nbt.func_74775_l('SkullOwner').func_74779_i('Id');
+        return id === '9675d9a3-d888-3c30-93b1-8cac5b9be1f4';
+      });
+    } catch (_) { }
   });
 }
 const cheeseSpawnReg = reg('chat', () => {
@@ -40,7 +42,7 @@ const cheeseSpawnReg = reg('chat', () => {
   cheeseAlert.show(settings.ratTilsAlertTime);
   if (settings.ratTilsMessage) ChatLib.command('pc [RatTils] ' + settings.ratTilsMessage);
 }).setCriteria('&r&e&lCHEESE! &r&7You smell Cheese nearby!&r');
-const cheeseStepReg = reg('step', () => scanCheese()).setFps(5);
+const cheeseStepReg = reg('step', () => scanCheese()).setFps(1);
 const cheesePickReg = reg('chat', (name, t) => {
   name = getPlayerName(name);
   Client.scheduleTask(() => scanCheese());
