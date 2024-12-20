@@ -317,10 +317,12 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
     x -= w / 2;
     z -= w / 2;
   }
-  let s;
-  ({ x, y, z, s } = rescaleRender(x, y, z));
-  w *= s;
-  h *= s;
+  if (!nt) {
+    let s;
+    ({ x, y, z, s } = rescaleRender(x, y, z));
+    w *= s;
+    h *= s;
+  }
 
   const r = ((color >> 24) & 0xFF) / 255;
   const g = ((color >> 16) & 0xFF) / 255;
