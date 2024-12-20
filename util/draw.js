@@ -507,13 +507,82 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
  * @param {boolean?} renderBlackBox (true)
  * @param {number?} scale (1)
  * @param {boolean?} increase (true)
+ * @param {boolean?} esp (true)
+ * @param {boolean?} shadow (true)
+ * @param {boolean?} nt (false)
  */
-export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = true, scale = 1, increase = true) {
+export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = true, scale = 1, increase = true, esp = true, shadow = true, nt = false) {
   if ((color & 0xFF) === 0) return;
-  let s;
-  ({ x, y, z, s } = rescaleRender(x, y, z));
-  scale *= s;
-  Tessellator.drawString(text, x, y, z, rgbaToARGB(color), renderBlackBox, scale, increase);
+  if (!nt) {
+    let s;
+    ({ x, y, z, s } = rescaleRender(x, y, z));
+    scale *= s;
+  }
+
+  if (increase) {
+    const d = Math.hypot(x - getRenderX(), y - getRenderY(), z - getRenderZ());
+    const m = d / 120;
+    scale *= 0.45 * m;
+  }
+
+  const lines = ChatLib.addColor(text).split('\n');
+  const r = ((color >> 24) & 0xFF) / 255;
+  const g = ((color >> 16) & 0xFF) / 255;
+  const b = ((color >> 8) & 0xFF) / 255;
+  const a = ((color >> 0) & 0xFF) / 255;
+
+  GlStateManager2.pushMatrix();
+  GlStateManager2.translate(x, y, z);
+  if (!nt) GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
+  GlStateManager2.rotate(-rm.field_78735_i, 0, 1, 0);
+  GlStateManager2.rotate(rm.field_78732_j * getXMult(), 1, 0, 0);
+  GlStateManager2.scale(-scale, -scale, -scale);
+  GlStateManager2.enableAlpha();
+  if (esp) GlStateManager2.disableDepth();
+
+  const widths = lines.map(v => Renderer.getStringWidth(v) / 2);
+  const w = Math.max.apply(null, widths);
+
+  if (renderBlackBox) {
+    GlStateManager2.enableBlend();
+    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 0);
+    GlStateManager2.depthMask(false);
+    GlStateManager2.color(0, 0, 0, 0.25);
+    worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
+    worldRen.func_181662_b(-w - 1, -1, 0).func_181675_d();
+    worldRen.func_181662_b(-w - 1, 8 * lines.length + 1, 0).func_181675_d();
+    worldRen.func_181662_b(w + 1, -1, 0).func_181675_d();
+    worldRen.func_181662_b(w + 1, 8 * lines.length + 1, 0).func_181675_d();
+    tess.func_78381_a();
+  }
+
+  if (a === 1) {
+    GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
+  } else {
+    GlStateManager2.depthMask(false);
+    GlStateManager2.enableBlend();
+    GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+  }
+  GlStateManager2.color(r, g, b, a);
+  GlStateManager2.enableTexture2D();
+
+  lines.forEach((v, i) =>
+    Renderer.getFontRenderer().func_175065_a(
+      v,
+      -widths[i],
+      i * 8,
+      0xFFFFFFFF | 0,
+      shadow
+    )
+  );
+
+  GlStateManager2.popMatrix();
+  if (a !== 1) {
+    GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
+  }
+  if (esp) GlStateManager2.enableDepth();
 }
 
 /**
