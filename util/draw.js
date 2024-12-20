@@ -6,7 +6,7 @@ import reg from './registerer';
 const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 const worldRen = tess.func_178180_c();
 const DefaultVertexFormats = Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats');
-const rm = Renderer.getRenderManager();
+export const rm = Renderer.getRenderManager();
 const xa = rm.class.getDeclaredField('field_78725_b'); xa.setAccessible(true);
 const ya = rm.class.getDeclaredField('field_78726_c'); ya.setAccessible(true);
 const za = rm.class.getDeclaredField('field_78723_d'); za.setAccessible(true);
