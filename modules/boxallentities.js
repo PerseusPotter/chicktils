@@ -1,18 +1,44 @@
 import settings from '../settings';
-import { renderOutline } from '../util/draw';
+import { renderOutline, renderString, rm } from '../util/draw';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
 
-const renderReg1 = reg('postRenderEntity', (ent, pos, part) => {
-  renderOutline(pos.getX(), pos.getY(), pos.getZ(), Math.max(ent.getWidth(), 0.1), Math.max(ent.getHeight(), 0.1), settings.boxAllEntitiesColor, settings.boxAllEntitiesEsp, true, undefined, true);
-}).setEnabled(new StateProp(settings._boxAllEntitiesInvis).not());
+const canRenderNameF = Java.type('net.minecraft.client.renderer.entity.Render').class.getDeclaredMethod('func_177070_b', net.minecraft.entity.Entity.class);
+canRenderNameF.setAccessible(true);
+function renderEntity(e, x, y, z, w, h, nt) {
+  renderOutline(
+    x, y, z,
+    Math.max(w, 0.1), Math.max(h, 0.1),
+    settings.boxAllEntitiesColor, settings.boxAllEntitiesEsp,
+    true, 3, nt
+  );
+  if (settings.boxAllEntitiesName) {
+    const rc = rm.func_78713_a(e.entity);
+    if (!canRenderNameF.invoke(rc, e.entity)) renderString(
+      e.getName(),
+      x, y + h + 0.5, z,
+      0xFFFFFFFF, true,
+      0.02, false,
+      settings.boxAllEntitiesEsp, true,
+      nt
+    );
+  }
+}
+
+const renderReg1 = reg('postRenderEntity', (ent, pos, part) => renderEntity(
+  ent,
+  pos.getX(), pos.getY(), pos.getZ(),
+  ent.getWidth(), ent.getHeight(),
+  true
+)).setEnabled(new StateProp(settings._boxAllEntitiesInvis).not());
 let ents = [];
 const tickReg = reg('tick', () => ents = World.getAllEntities()).setEnabled(settings._boxAllEntitiesInvis);
 const renderReg2 = reg('renderWorld', () => {
-  ents.forEach(e => renderOutline(
+  ents.forEach(e => renderEntity(
+    e,
     e.getRenderX(), e.getRenderY(), e.getRenderZ(),
-    Math.max(e.getWidth(), 0.1), Math.max(e.getHeight(), 0.1),
-    settings.boxAllEntitiesColor, settings.boxAllEntitiesEsp
+    e.getWidth(), e.getHeight(),
+    false
   ));
 }).setEnabled(settings._boxAllEntitiesInvis);
 
