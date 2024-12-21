@@ -931,6 +931,9 @@ export const props = {
   boxAllEntitiesColor: new Property('BoxAllEntitiesColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
   boxAllEntitiesEsp: new Property('BoxAllEntitiesEsp', page, ++sort, Property.Type.Toggle, true),
   boxAllEntitiesName: new Property('BoxAllEntitiesName', page, ++sort, Property.Type.Toggle, false, { desc: 'show nametag' }),
+  boxAllEntitiesClassName: new Property('BoxAllEntitiesClassName', page, ++sort, Property.Type.Toggle, false, { desc: 'show class name' }),
+  boxAllEntitiesWhitelist: new Property('BoxAllEntitiesWhitelist', page, ++sort, Property.Type.Text, '', { desc: 'comma separated class names' }),
+  boxAllEntitiesBlacklist: new Property('BoxAllEntitiesBlacklist', page, ++sort, Property.Type.Text, '', { desc: 'comma separated class names' }),
 
   enablelogdamage: new Property('EnableLogDamage', page, ++sort, Property.Type.Toggle, false, { desc: 'log damage numbers in chat' }),
   logDamageRange: new Property('LogDamageRange', page, ++sort, Property.Type.Number, 5, { desc: 'ignore damage numbers outside this range\nin blocks', min: 0 }),

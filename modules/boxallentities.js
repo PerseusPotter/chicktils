@@ -5,7 +5,12 @@ import { StateProp } from '../util/state';
 
 const canRenderNameF = Java.type('net.minecraft.client.renderer.entity.Render').class.getDeclaredMethod('func_177070_b', net.minecraft.entity.Entity.class);
 canRenderNameF.setAccessible(true);
+const whitelist = new Set();
+const blacklist = new Set();
 function renderEntity(e, x, y, z, w, h, nt) {
+  const c = e.getClassName();
+  if (whitelist.size && !whitelist.has(c)) return;
+  if (blacklist.size && blacklist.has(c)) return;
   renderOutline(
     x, y, z,
     Math.max(w, 0.1), Math.max(h, 0.1),
@@ -18,11 +23,19 @@ function renderEntity(e, x, y, z, w, h, nt) {
       e.getName(),
       x, y + h + 0.5, z,
       0xFFFFFFFF, true,
-      0.02, false,
+      0.03, false,
       settings.boxAllEntitiesEsp, true,
       nt
     );
   }
+  if (settings.boxAllEntitiesClassName) renderString(
+    e.getClassName(),
+    x, y + h + 0.2, z,
+    0xFFFFFFFF, true,
+    0.02, false,
+    settings.boxAllEntitiesEsp, true,
+    nt
+  );
 }
 
 const renderReg1 = reg('postRenderEntity', (ent, pos, part) => renderEntity(
@@ -44,6 +57,16 @@ const renderReg2 = reg('renderWorld', () => {
 
 export function init() {
   settings._boxAllEntitiesInvis.listen(() => ents = []);
+  settings._boxAllEntitiesWhitelist.listen(v => {
+    whitelist.clear();
+    if (!v) return;
+    v.split(',').forEach(c => whitelist.add(c));
+  });
+  settings._boxAllEntitiesBlacklist.listen(v => {
+    blacklist.clear();
+    if (!v) return;
+    v.split(',').forEach(c => blacklist.add(c));
+  });
 }
 export function load() {
   renderReg1.register();
