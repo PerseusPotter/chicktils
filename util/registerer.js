@@ -201,7 +201,7 @@ reg = function reg(type, shit) {
 
 {
   function ChickTilsRegister(cb) {
-    this.cb = cb;
+    this.cb = wrapFunc(cb);
     this.id = '' + Date.now() + Math.random();
   }
   ChickTilsRegister.prototype.getList = function getList() {
@@ -239,7 +239,7 @@ reg = function reg(type, shit) {
   // :(
   // [gg.skytils.skytilsmod.features.impl.handlers.NamespacedCommands:registerCommandHelper:81]: WARNING! Command aaa has 0; owners: []
   function ChickTilsCommand(cb) {
-    ChickTilsRegister.call(this, wrapFunc(cb));
+    ChickTilsRegister.call(this, cb);
     this.id = '';
     this.tabCb = null;
     this.tabArr = new ArrayList();
@@ -342,7 +342,7 @@ reg = function reg(type, shit) {
   const Threading = Java.type('gg.essential.api.utils.Multithreading');
   const MILLISECONDS = Java.type('java.util.concurrent.TimeUnit').MILLISECONDS;
   function ChickTilsStep(cb) {
-    ChickTilsRegister.call(this, wrapFunc(cb));
+    ChickTilsRegister.call(this, cb);
     this.offset = 0;
     this.delay = 0;
     this.future = null;
