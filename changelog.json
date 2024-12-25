@@ -231,6 +231,15 @@
           "desc": "custom block highlight"
         }
       ]
+    },
+    {
+      "version": "0.8.11",
+      "changes": [
+        {
+          "type": "change",
+          "desc": "enable aa for crosshair/block highlight"
+        }
+      ]
     }
   ]
 }
