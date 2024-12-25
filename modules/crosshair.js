@@ -12,6 +12,7 @@ const renderReg = reg('renderCrosshair', evn => {
   glStateManager.enableAlpha();
   glStateManager.disableTexture2D();
   GL11.glLineWidth(settings.crosshairBreadth);
+  GL11.glEnable(GL11.GL_LINE_SMOOTH);
 
   if (settings.crosshairInvert) {
     glStateManager.tryBlendFuncSeparate(775, 0, 1, 0);
@@ -73,6 +74,7 @@ const renderReg = reg('renderCrosshair', evn => {
   glStateManager.disableBlend();
   glStateManager.enableTexture2D();
   GL11.glLineWidth(1);
+  GL11.glDisable(GL11.GL_LINE_SMOOTH);
 });
 
 export function init() { }
