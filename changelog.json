@@ -210,6 +210,27 @@
           "desc": "make text settings more useable"
         }
       ]
+    },
+    {
+      "version": "0.8.10",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "misc in diana/rattils/essentialschat/draw"
+        },
+        {
+          "type": "feat",
+          "desc": "boxall name/class/[black/white]list"
+        },
+        {
+          "type": "feat",
+          "desc": "custom crosshair"
+        },
+        {
+          "type": "feat",
+          "desc": "custom block highlight"
+        }
+      ]
     }
   ]
 }
