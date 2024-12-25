@@ -8,9 +8,13 @@ const renderReg = reg('renderCrosshair', evn => {
 
   if (!settings.crosshairRenderInGui && Client.currentGui.get()) return;
 
+  glStateManager.enableBlend();
+  glStateManager.enableAlpha();
+  glStateManager.disableTexture2D();
+  GL11.glLineWidth(settings.crosshairBreadth);
+
   if (settings.crosshairInvert) {
-    glStateManager.enableBlend();
-    glStateManager.tryBlendFuncSeparate(775, 0, 0, 1);
+    glStateManager.tryBlendFuncSeparate(775, 0, 1, 0);
     glStateManager.color(1, 1, 1, 1);
   } else {
     const r = ((settings.crosshairColor >> 24) & 0xFF) / 255;
@@ -18,13 +22,9 @@ const renderReg = reg('renderCrosshair', evn => {
     const b = ((settings.crosshairColor >> 8) & 0xFF) / 255;
     const a = ((settings.crosshairColor >> 0) & 0xFF) / 255;
     glStateManager.color(r, g, b, a);
-    if (a === 1) glStateManager.disableBlend();
-    else {
-      glStateManager.enableBlend();
-      glStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-    }
+    glStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
   }
-  GL11.glLineWidth(settings.crosshairBreadth);
+
   const w = settings.crosshairWidth;
   glStateManager.pushMatrix();
   glStateManager.translate(Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2, 0);
@@ -68,7 +68,10 @@ const renderReg = reg('renderCrosshair', evn => {
       break;
     }
   }
+
   glStateManager.popMatrix();
+  glStateManager.disableBlend();
+  glStateManager.enableTexture2D();
   GL11.glLineWidth(1);
 });
 
