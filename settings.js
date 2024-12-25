@@ -894,6 +894,13 @@ export const props = {
   feroEstimateUpdateDelay: new Property('FeroEstimateUpdateDelay', page, ++sort, Property.Type.Integer, 500, { desc: 'delay in ms to update guess', min: 0 }),
   feroEstimateSmoothingFactor: new Property('FeroEstimateSmoothingFactor', page, ++sort, Property.Type.Number, 0.5, { desc: 'exponential smoothing factor', min: 0, max: 1 }),
 
+  enablecrosshair: new Property('EnableCustomCrosshair', page, ++sort, Property.Type.Toggle, false),
+  crosshairType: new Property('CustomCrosshairType', page, ++sort, Property.Type.Option, '+', { options: ['+', 'X', '/\\', 'O', '.'] }),
+  crosshairColor: new Property('CustomCrosshairColor', page, ++sort, Property.Type.Color, 0xFFFFFFFF),
+  crosshairInvert: new Property('CustomCrosshairInvertColor', page, ++sort, Property.Type.Toggle, false),
+  crosshairWidth: new Property('CustomCrosshairWidth', page, ++sort, Property.Type.Number, 10, { min: 0 }),
+  crosshairBreadth: new Property('CustomCrosshairBreadth', page, ++sort, Property.Type.Number, 1, { min: 0 }),
+
   // 15
 
   enableavarice: new Property('EnableAvariceAddons', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'things for avarice' }),
