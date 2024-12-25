@@ -6,6 +6,8 @@ import reg from '../util/registerer';
 const renderReg = reg('renderCrosshair', evn => {
   cancel(evn);
 
+  if (!settings.crosshairRenderInGui && Client.currentGui.get()) return;
+
   if (settings.crosshairInvert) {
     glStateManager.enableBlend();
     glStateManager.tryBlendFuncSeparate(775, 0, 0, 1);
