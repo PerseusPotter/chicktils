@@ -989,7 +989,12 @@ export const props = {
   enableunfocus: new Property('PreventRenderingWhenUnfocused', page, ++sort, Property.Type.Toggle, false, { desc: 'similar to patcher\'s unfocused fps\nbut instead of capping fps, it completely stops rendering' }),
 
   enableassfangcheese: new Property('EnableAssfangCheeseHealth', page, ++sort, Property.Type.Toggle, false, { desc: 'show real assfang health' }),
-  moveAssfangCheese: new Property('MoveAssfangCheeseHealth', page, ++sort, Property.Type.Action)
+  moveAssfangCheese: new Property('MoveAssfangCheeseHealth', page, ++sort, Property.Type.Action),
+
+  enableblockhighlight: new Property('EnableBlockHighlight', page, ++sort, Property.Type.Toggle, false),
+  blockHighlightWireColor: new Property('BlockHighlightWireColor', page, ++sort, Property.Type.Color, 0x00000066),
+  blockHighlightFillColor: new Property('BlockHighlightFillColor', page, ++sort, Property.Type.Color, 0x00000000),
+  blockHighlightWireWidth: new Property('BlockHighlightWireWidth', page, ++sort, Property.Type.Number, 2, { min: 0 })
 };
 const pageNames = [
   '',
