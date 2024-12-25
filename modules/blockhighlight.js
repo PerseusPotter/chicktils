@@ -73,6 +73,7 @@ const renderReg = reg('drawBlockHighlight', (pos, evn) => {
 
   if (a > 0) {
     glStateManager.color(r, g, b, a);
+    GL11.glEnable(GL11.GL_LINE_SMOOTH);
 
     worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
     worldRen.func_181662_b(x, y, z).func_181675_d();
@@ -96,6 +97,8 @@ const renderReg = reg('drawBlockHighlight', (pos, evn) => {
     worldRen.func_181662_b(x + wx, y, z).func_181675_d();
     worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
     tess.func_78381_a();
+
+    GL11.glDisable(GL11.GL_LINE_SMOOTH);
   }
 
   glStateManager.depthMask(true);
