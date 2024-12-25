@@ -994,7 +994,15 @@ export const props = {
   enableblockhighlight: new Property('EnableBlockHighlight', page, ++sort, Property.Type.Toggle, false),
   blockHighlightWireColor: new Property('BlockHighlightWireColor', page, ++sort, Property.Type.Color, 0x00000066),
   blockHighlightFillColor: new Property('BlockHighlightFillColor', page, ++sort, Property.Type.Color, 0x00000000),
-  blockHighlightWireWidth: new Property('BlockHighlightWireWidth', page, ++sort, Property.Type.Number, 2, { min: 0 })
+  blockHighlightWireWidth: new Property('BlockHighlightWireWidth', page, ++sort, Property.Type.Number, 2, { min: 0 }),
+  blockHighlightCheckEther: new Property('BlockHighlightCheckEther', page, ++sort, Property.Type.Toggle, true),
+  blockHighlightEtherWireColor: new Property('BlockHighlightEtherWireColor', page, ++sort, Property.Type.Color, 0x2EDD17A0),
+  blockHighlightEtherFillColor: new Property('BlockHighlightEtherFillColor', page, ++sort, Property.Type.Color, 0x60DE5560),
+  blockHighlightEtherWireWidth: new Property('BlockHighlightEtherWireWidth', page, ++sort, Property.Type.Number, 3, { min: 0 }),
+  blockHighlightCantEtherWireColor: new Property('BlockHighlightCantEtherWireColor', page, ++sort, Property.Type.Color, 0xCA2207A0),
+  blockHighlightCantEtherFillColor: new Property('BlockHighlightCantEtherFillColor', page, ++sort, Property.Type.Color, 0xBA2B1E60),
+  blockHighlightCantEtherWireWidth: new Property('BlockHighlightCantEtherWireWidth', page, ++sort, Property.Type.Number, 3, { min: 0 }),
+  blockHighlightCantEtherShowReason: new Property('BlockHighlightCantEtherShowReason', page, ++sort, Property.Type.Toggle, true)
 };
 const pageNames = [
   '',
