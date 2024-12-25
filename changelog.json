@@ -240,6 +240,15 @@
           "desc": "enable aa for crosshair/block highlight"
         }
       ]
+    },
+    {
+      "version": "0.8.12",
+      "changes": [
+        {
+          "type": "feat",
+          "desc": "etherwarp helper"
+        }
+      ]
     }
   ]
 }
