@@ -3,9 +3,9 @@ import { getEyeHeight } from './mc';
 import GlStateManager2 from './glStateManager';
 import reg from './registerer';
 
-const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
-const worldRen = tess.func_178180_c();
-const DefaultVertexFormats = Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats');
+export const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
+export const worldRen = tess.func_178180_c();
+export const DefaultVertexFormats = Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats');
 export const rm = Renderer.getRenderManager();
 const xa = rm.class.getDeclaredField('field_78725_b'); xa.setAccessible(true);
 const ya = rm.class.getDeclaredField('field_78726_c'); ya.setAccessible(true);
@@ -652,7 +652,7 @@ export function drawTexturedRect(x, y, u, v, w, h, tw, th, uw, vh) {
  * @param {number} a2 end (radians)
  * @param {number} segments
  */
-function _drawArc(x, y, r, a1, a2, segments) {
+export function _drawArc(x, y, r, a1, a2, segments) {
   if (a2 < a1) return _drawArc(x, y, r, a2, a1, segments);
   const ia = a2 - a1;
   const da = ia / segments;
