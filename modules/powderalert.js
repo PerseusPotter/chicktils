@@ -21,11 +21,13 @@ function reset() {
   rcReg.unregister();
   renderReg.unregister();
   unloadReg.unregister();
+  chatReg.unregister();
 }
 const unloadReg = reg('worldUnload', () => reset());
 const startReg = reg('chat', () => {
   renderReg.register();
   rcReg.register();
+  chatReg.register();
   unloadReg.register();
   Client.scheduleTask(5, () => {
     chests = World.getAllTileEntities()
@@ -47,6 +49,18 @@ const startReg = reg('chat', () => {
 const renderReg = reg('renderWorld', () => {
   chests.forEach(v => renderWaypoint(v.x, v.y, v.z, 1, 1, settings.powderBoxColor, settings.powderBoxEsp, false));
 });
+
+let doBlock = false;
+const chatReg = reg('chat', evn => {
+  const str = evn.str;
+  if (str === '&r&e&l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬&r') {
+    cancel(evn);
+    doBlock = false;
+    return;
+  }
+  if (str === '&r  &r&6&lCHEST LOCKPICKED &r') doBlock = true;
+  if (doBlock) cancel(evn);
+}).setEnabled(settings._powderBlockRewards);
 
 export function init() {
   settings._powderAlertSound.listen(v => chestAlert.sound = v);
