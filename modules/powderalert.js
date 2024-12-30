@@ -5,7 +5,7 @@ import reg from '../util/registerer';
 
 let chests = [];
 const chestAlert = createAlert('chest');
-const PlayerInteractAction = Java.type('com.chattriggers.ctjs.minecraft.listeners.ClientListener').INSTANCE.PlayerInteractAction;
+const PlayerInteractAction = Java.type('com.chattriggers.ctjs.minecraft.listeners.ClientListener').PlayerInteractAction;
 const rcReg = reg('playerInteract', (action, pos) => {
   if (!action.equals(PlayerInteractAction.RIGHT_CLICK_BLOCK)) return;
   let i = chests.findIndex(v => v.x === pos.x && v.y === pos.y && v.z === pos.z);
