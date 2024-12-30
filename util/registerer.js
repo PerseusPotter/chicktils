@@ -472,6 +472,7 @@ reg = function reg(type, shit) {
     const fakeEvn = {
       type,
       message,
+      str,
       isCancelable() { return true; },
       setCanceled(v) { doCancel = v; }
     };
@@ -496,7 +497,7 @@ reg = function reg(type, shit) {
         if ((v.params.size === 0 || v.params.has('END')) && m.index < str.length - m[0].length) return;
         // if (v.params.has('CONTAINS')) {}
         args = m.slice(1).concat(args);
-      } else return;
+      }
       v.cb.apply(v, args);
     });
     return doCancel;
