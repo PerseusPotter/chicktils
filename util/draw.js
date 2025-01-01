@@ -656,7 +656,7 @@ export function _drawArc(x, y, r, a1, a2, segments) {
   if (a2 < a1) return _drawArc(x, y, r, a2, a1, segments);
   const ia = a2 - a1;
   const da = ia / segments;
-  worldRen.func_181668_a(3, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(3, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x + Math.cos(a1) * r, y - Math.sin(a1) * r, 0).func_181675_d();
   for (let i = 1; i <= segments; i++) {
     let aa = a1 + da * i;
@@ -727,7 +727,7 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
   GlStateManager2.color(_r, _g, _b, _a);
 
-  worldRen.func_181668_a(1, Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats').field_181705_e);
+  worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x + r, y, 0).func_181675_d();
   worldRen.func_181662_b(x + w - r, y, 0).func_181675_d();
   worldRen.func_181662_b(x, y + r, 0).func_181675_d();
