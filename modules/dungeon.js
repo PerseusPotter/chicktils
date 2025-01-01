@@ -138,6 +138,7 @@ export function init() {
     require('./dungeon/arrowalign'),
     require('./dungeon/autoarchitect'),
     require('./dungeon/autorefillpearls'),
+    require('./dungeon/blockoverlay'),
     require('./dungeon/boxicesprayed'),
     require('./dungeon/boxmobs'),
     require('./dungeon/boxteammates'),

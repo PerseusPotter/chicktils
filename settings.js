@@ -692,6 +692,8 @@ export const props = {
   dungeonGoldorFrenzyTimer: new Property('DungeonGoldorFrenzyTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'show timer until next goldor frenzy tick' }),
   moveGoldorFrenzyTimer: new Property('MoveGoldorFrenzyTimer', page, ++sort, Property.Type.Action),
 
+  dungeonBlockOverlaySize: new Property('DungeonBlockOverlaySize', page, ++sort, Property.Type.Number, 1, { desc: 'size of overlay when inside an opaque block\nin range [0, 1], 0 = none, 1 = default', min: 0, max: 1 }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
