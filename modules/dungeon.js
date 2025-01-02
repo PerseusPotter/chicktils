@@ -13,6 +13,7 @@ function reset() {
 function start() {
   players = [];
   stateIsInBoss.set(false);
+  statePlayerClass.set('Unknown');
   if (!Scoreboard.getLines(false).some(v => {
     const m = v.getName().match(/^ §7⏣ §cThe Catac..§combs §7\(([MF][1-7]|E)\)$/);
     if (m) stateFloor.set(m[1]);
@@ -35,6 +36,7 @@ let modules = [];
 const bossCbs = [];
 
 export const stateIsInBoss = new StateVar(false);
+export const statePlayerClass = new StateVar('Unknown');
 let stateTrackPlayers = new StateProp(false);
 export function registerTrackPlayers(cond) {
   stateTrackPlayers = stateTrackPlayers.or(cond);
@@ -113,6 +115,7 @@ const getPlayersStep2Reg = reg('step', () => {
     if (player) {
       player.e = Player;
       player.me = Player.getPlayer();
+      statePlayerClass.set(player.class);
     }
     getPlayersStep2Reg.unregister();
   }
