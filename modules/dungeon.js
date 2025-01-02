@@ -154,6 +154,7 @@ export function init() {
     require('./dungeon/goldorfrenzytimer'),
     require('./dungeon/hecatomb'),
     require('./dungeon/hidefallingblocks'),
+    require('./dungeon/hidehealerfairy'),
     require('./dungeon/hidehealerpowerups'),
     require('./dungeon/hidewitherking'),
     require('./dungeon/lbpullprogress'),
