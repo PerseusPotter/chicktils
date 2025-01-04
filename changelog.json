@@ -249,6 +249,31 @@
           "desc": "etherwarp helper"
         }
       ]
+    },
+    {
+      "version": "0.8.13",
+      "changes": [
+        {
+          "type": "misc",
+          "desc": "dev tax"
+        },
+        {
+          "type": "fix",
+          "desc": "powder chest"
+        },
+        {
+          "type": "feat",
+          "desc": "add block powder chest messages"
+        },
+        {
+          "type": "feat",
+          "desc": "dungeon block overlay size"
+        },
+        {
+          "type": "feat",
+          "desc": "hide healer fairy"
+        }
+      ]
     }
   ]
 }
