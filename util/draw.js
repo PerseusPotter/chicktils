@@ -217,6 +217,37 @@ export function renderTracer(color, x, y, z, rel = true, lw = 3) {
 }
 
 /**
+ * @param {number} minX
+ * @param {number} minY
+ * @param {number} minZ
+ * @param {number} maxX
+ * @param {number} maxY
+ * @param {number} maxZ
+ * @param {number} color rgba
+ * @param {boolean?} esp is visible through walls (false)
+ * @param {number?} lw line width (5)
+ */
+export function renderAABBOutline(minX, minY, minZ, maxX, maxY, maxZ, color, esp = false, lw = 5) {
+  const mx = Math.min(minX, maxX);
+  const my = Math.min(minY, maxY);
+  const mz = Math.min(minZ, maxZ);
+  const Mx = Math.max(minX, maxX);
+  const My = Math.max(minY, maxY);
+  const Mz = Math.max(minZ, maxZ);
+  renderOutline(
+    mx, my, mz,
+    Mx - mx,
+    My - my,
+    color,
+    esp,
+    false,
+    lw,
+    false,
+    Mz - mz
+  );
+}
+
+/**
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -227,17 +258,20 @@ export function renderTracer(color, x, y, z, rel = true, lw = 3) {
  * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} lw line width (5)
  * @param {boolean?} nt use if renderentity.pos (false)
+ * @param {number?} wz
  */
-export function renderOutline(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false) {
+export function renderOutline(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false, wz = w) {
   if ((color & 0xFF) === 0) return;
+  let wx = w;
   if (center) {
-    x -= w / 2;
-    z -= w / 2;
+    x -= wx / 2;
+    z -= wz / 2;
   }
   if (!nt) {
     let s;
     ({ x, y, z, s } = rescaleRender(x, y, z));
-    w *= s;
+    wx *= s;
+    wz *= s;
     h *= s;
     lw *= s;
   }
@@ -268,25 +302,25 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
 
   worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
-  worldRen.func_181662_b(x, y, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y, z).func_181675_d();
+  worldRen.func_181662_b(x, y, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
   tess.func_78381_a();
   worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y + h, z).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y + h, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
   tess.func_78381_a();
   worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
   worldRen.func_181662_b(x, y + h, z).func_181675_d();
-  worldRen.func_181662_b(x, y, z + w).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y + h, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y, z).func_181675_d();
-  worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
+  worldRen.func_181662_b(x, y, z + wz).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
+  worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
   tess.func_78381_a();
 
   if (!nt) GlStateManager2.popMatrix();
@@ -301,6 +335,35 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
 }
 
 /**
+ * @param {number} minX
+ * @param {number} minY
+ * @param {number} minZ
+ * @param {number} maxX
+ * @param {number} maxY
+ * @param {number} maxZ
+ * @param {number} color rgba
+ * @param {boolean?} esp is visible through walls (false)
+ */
+export function renderAABBFilled(minX, minY, minZ, maxX, maxY, maxZ, color, esp = false) {
+  const mx = Math.min(minX, maxX);
+  const my = Math.min(minY, maxY);
+  const mz = Math.min(minZ, maxZ);
+  const Mx = Math.max(minX, maxX);
+  const My = Math.max(minY, maxY);
+  const Mz = Math.max(minZ, maxZ);
+  renderFilledBox(
+    mx, my, mz,
+    Mx - mx,
+    My - my,
+    color,
+    esp,
+    false,
+    false,
+    Mz - mz
+  );
+}
+
+/**
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -310,17 +373,20 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
  * @param {boolean?} esp is visible through walls (false)
  * @param {boolean?} center are coordinates already centered (true)
  * @param {boolean?} nt use if renderentity.pos (false)
+ * @param {number?} wz
  */
-export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true, nt = false) {
+export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true, nt = false, wz = w) {
   if ((color & 0xFF) === 0) return;
+  let wx = w;
   if (center) {
-    x -= w / 2;
-    z -= w / 2;
+    x -= wx / 2;
+    z -= wz / 2;
   }
   if (!nt) {
     let s;
     ({ x, y, z, s } = rescaleRender(x, y, z));
-    w *= s;
+    wx *= s;
+    wz *= s;
     h *= s;
   }
 
@@ -350,25 +416,25 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
 
   worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
-  worldRen.func_181662_b(x + w, y, z).func_181675_d();
-  worldRen.func_181662_b(x, y, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y, z + w).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
+  worldRen.func_181662_b(x, y, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
   worldRen.func_181662_b(x, y + h, z).func_181675_d();
-  worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
+  worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
   worldRen.func_181662_b(x, y, z).func_181675_d();
-  worldRen.func_181662_b(x + w, y, z).func_181675_d();
+  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
   tess.func_78381_a();
   worldRen.func_181668_a(7, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x, y, z).func_181675_d();
-  worldRen.func_181662_b(x, y, z + w).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z + w).func_181675_d();
+  worldRen.func_181662_b(x, y, z + wz).func_181675_d();
+  worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
   worldRen.func_181662_b(x, y + h, z).func_181675_d();
-  worldRen.func_181662_b(x + w, y, z).func_181675_d();
-  worldRen.func_181662_b(x + w, y, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y + h, z + w).func_181675_d();
-  worldRen.func_181662_b(x + w, y + h, z).func_181675_d();
+  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
+  worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
+  worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
   tess.func_78381_a();
 
   if (!nt) GlStateManager2.popMatrix();
