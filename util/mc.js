@@ -186,3 +186,70 @@ export function createChestNoInv(chest) {
 
   return gCont;
 }
+
+export function createBlockMapping(orig1, orig2, actual1, actual2) {
+  const dOx = orig1.x - orig2.x;
+  const dOy = orig1.y - orig2.y;
+  const dOz = orig1.z - orig2.z;
+  let dy = 0;
+
+  let rot = 0;
+  const xMult = () => (rot === 1 || rot === 2) ? -1 : 1;
+  const zMult = () => (rot === 2 || rot === 3) ? -1 : 1;
+  let cornerX = 0;
+  let cornerZ = 0;
+
+  const obj = {
+    calibrate(actual1, actual2) {
+      const dAx = actual1.x - actual2.x;
+      const dAy = actual1.y - actual2.y;
+      const dAz = actual1.z - actual2.z;
+      if (dOy !== dAy) return false;
+      dy = orig1.y - actual1.y;
+      if (dOx === dAx && dOz === dAz) {
+        rot = 0;
+        cornerX = actual1.x - orig1.x;
+        cornerZ = actual1.z - orig1.z;
+      } else if (dOx === dAz && -dOz === dAx) {
+        rot = 1;
+        cornerX = actual1.x + orig1.z;
+        cornerZ = actual1.z - orig1.x;
+      } else if (-dOx === dAx && -dOz === dAz) {
+        rot = 2;
+        cornerX = actual1.x + orig1.x;
+        cornerZ = actual1.z + orig1.z;
+      } else if (-dOx === dAz && dOz === dAx) {
+        rot = 3;
+        cornerX = actual1.x - orig1.z;
+        cornerZ = actual1.z + orig1.x;
+      } else return false;
+      return true;
+    },
+    origToActual(orig) {
+      let dx = orig.x;
+      let dz = orig.z;
+      if (rot & 1) {
+        let t = dx;
+        dx = dz;
+        dz = t;
+      }
+      return { x: cornerX + dx * xMult(), y: orig.y - dy, z: cornerZ + dz * zMult() };
+    },
+    actualToOrig(actual) {
+      let dx = actual.x - cornerX;
+      let dz = actual.z - cornerZ;
+      dx *= xMult();
+      dz *= zMult();
+      if (rot & 1) {
+        let t = dx;
+        dx = dz;
+        dz = t;
+      }
+      return { x: dx, y: actual.y + dy, z: dz };
+    }
+  };
+
+  if (actual1 && actual2) obj.calibrate(actual1, actual2);
+
+  return obj;
+}
