@@ -27,3 +27,31 @@ if (typeof Object.create === 'function') {
   }
 }
 export const inherits = _inherits;
+
+/**
+ * @template T
+ * @typedef {{ [K in keyof T]: T[K] extends Array<infer E> ? E : T[K] }} Unarray
+ */
+/**
+ * @template T
+ * @param {T[]} arr
+ * @returns {Unarray<T>[]}
+ */
+export function flat(arr) {
+  return arr.reduce((a, v) => {
+    if (Array.isArray(v)) Array.prototype.push.apply(a, v);
+    else a.push(v);
+    return a;
+  }, []);
+}
+
+/**
+ * @template T
+ * @template U
+ * @param {T[]} arr
+ * @param {(value: T, index: number, array: T[]) => U} callback
+ * @returns {Unarray<U>[]}
+ */
+export function flatMap(arr, callback) {
+  return flat(arr.map(callback));
+}
