@@ -1,6 +1,7 @@
 import settings, { $FONTS } from '../settings';
 import { BufferedImageWrapper, drawOutlinedString, rgbaToJavaColor } from './draw';
 import GlStateManager2 from './glStateManager';
+import { ceilPow2 } from './math';
 import reg from './registerer';
 const EventEmitter = require('./events');
 
@@ -119,6 +120,10 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   let ry = 0;
   let rw = 0;
   let rh = 0;
+  let actW = 0;
+  let actH = 0;
+  let imgW = 0;
+  let imgH = 0;
   const updateLocCache = () => {
     const l = obj.getLoc();
     if (cb !== l.b) {
@@ -135,8 +140,8 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     const tl = obj.getTrueLoc();
     rx = tl.x;
     ry = tl.y;
-    rw = (img?.w ?? 0) * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
-    rh = (img?.h ?? 0) * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
+    rw = imgW * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
+    rh = imgH * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
   };
   /** @type {Line[]} */
   let lines = [];
@@ -175,7 +180,11 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   };
   const renderImage = () => {
     // extra spacing for hanging characters
-    const bimg = new BufferedImage(lineW + (cb ? FONT_RENDER_SIZE / 10 : 0), FONT_RENDER_SIZE * (lines.length + 1) + (cb ? FONT_RENDER_SIZE / 10 : 0), BufferedImage.TYPE_INT_ARGB);
+    actW = lineW + (cb ? FONT_RENDER_SIZE / 10 : 0);
+    actH = FONT_RENDER_SIZE * (lines.length + 1) + (cb ? FONT_RENDER_SIZE / 10 : 0);
+    imgW = ceilPow2(actW, 1);
+    imgH = ceilPow2(actH, 2);
+    const bimg = new BufferedImage(imgW, imgH, BufferedImage.TYPE_INT_ARGB);
     const g = bimg.createGraphics();
     g.setFont(fonts[0]);
     const ascent = g.getFontMetrics().getAscent();
