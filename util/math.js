@@ -276,3 +276,12 @@ export function binarySearch(arr, val) {
   }
   return l - 1;
 }
+
+/**
+ * @param {number} num
+ * @param {number?} bits (0)
+ */
+export function ceilPow2(num, bits = 0) {
+  const mask = (1 << Math.max(0, 31 - Math.clz32(num) - bits)) - 1;
+  return (num + mask) & ~mask;
+}
