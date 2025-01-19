@@ -997,11 +997,13 @@ export class BufferedImageWrapper {
     if (w === this.w && h === this.h) {
       img.getRGB(0, 0, img.getWidth(), img.getHeight(), this.img.func_110565_c(), 0, img.getWidth());
       this.img.func_110564_a();
-      return this;
     } else {
-      this.destroy();
-      return new BufferedImageWrapper(img);
+      this.w = w;
+      this.h = h;
+      this.img.func_147631_c();
+      this.img = new DynamicTexture(img);
     }
+    return this;
   }
   destroy() {
     this.img.func_147631_c();
