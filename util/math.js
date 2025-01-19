@@ -237,7 +237,7 @@ export function calcMedian(arr) {
  *
  * @param {number} dx
  * @param {number} dy
- * @returns number
+ * @returns {number}
  * @link https://www.flipcode.com/archives/Fast_Approximate_Distance_Functions.shtml
  */
 export function fastDistance(dx, dy) {
@@ -280,6 +280,7 @@ export function binarySearch(arr, val) {
 /**
  * @param {number} num
  * @param {number?} bits (0)
+ * @returns {number}
  */
 export function ceilPow2(num, bits = 0) {
   const mask = (1 << Math.max(0, 31 - Math.clz32(num) - bits)) - 1;
