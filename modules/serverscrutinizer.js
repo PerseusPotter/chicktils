@@ -188,7 +188,6 @@ const rendOvLTD = reg('renderOverlay', () => {
 }).setEnabled(settings._serverScrutinizerLastTickDisplay);
 
 const frames = new TickInfo(settings.serverScrutinizerFPSMaxAge, 1_000);
-
 const renderTickReg = reg('renderWorld', () => frames.add(Date.now())).setEnabled(settings._serverScrutinizerFPSDisplay);
 
 function formatFps(curr, avg, min, max) {
@@ -238,6 +237,36 @@ const rendOvPing = reg('renderOverlay', () => {
   pingDisplay.render();
 }).setEnabled(settings._serverScrutinizerPingDisplay);
 
+const packets = new TickInfo(settings.serverScrutinizerPPSMaxAge, 1_000);
+const packetSentReg = reg('packetSent', () => packets.add(Date.now())).setEnabled(settings._serverScrutinizerPPSDisplay);
+
+function ppsColor(n) {
+  return colorForNumber(60 - n, 20);
+}
+function formatPps(curr, avg, min, max) {
+  if (settings.serverScrutinizerPPSDisplayCurr + settings.serverScrutinizerPPSDisplayAvg + settings.serverScrutinizerPPSDisplayMin + settings.serverScrutinizerPPSDisplayMax === 1) {
+    if (settings.serverScrutinizerPPSDisplayCurr) return ['PPS: ' + ppsColor(curr) + curr];
+    if (settings.serverScrutinizerPPSDisplayAvg) return ['PPS: ' + ppsColor(avg) + avg.toFixed(1)];
+    if (settings.serverScrutinizerPPSDisplayMin) return ['PPS: ' + ppsColor(min) + min];
+    if (settings.serverScrutinizerPPSDisplayMax) return ['PPS: ' + ppsColor(max) + max];
+  }
+  const lines = [];
+  if (settings.serverScrutinizerPPSDisplayCurr) lines.push('Current PPS: ' + ppsColor(curr) + curr);
+  if (settings.serverScrutinizerPPSDisplayAvg) lines.push('Average PPS: ' + ppsColor(avg) + avg.toFixed(1));
+  if (settings.serverScrutinizerPPSDisplayMin) lines.push('Minimum PPS: ' + ppsColor(min) + min);
+  if (settings.serverScrutinizerPPSDisplayMax) lines.push('Maximum PPS: ' + ppsColor(max) + max);
+  return lines;
+}
+const ppsDisplay = createTextGui(() => data.serverScrutinizerPPSDisplay, () => formatPps(42, 42.2, 41, 45));
+const ppsLimiter = new FrameTimer(4);
+const rendOvPps = reg('renderOverlay', () => {
+  if (ppsLimiter.shouldRender()) {
+    packets.calc();
+    ppsDisplay.setLines(formatPps(packets.getCur(), packets.getAvg(), packets.getMin(), packets.getMax()));
+  }
+  ppsDisplay.render();
+}).setEnabled(settings._serverScrutinizerPPSDisplay);
+
 export function init() {
   settings._moveTPSDisplay.onAction(() => tpsDisplay.edit());
   settings._moveLastTickDisplay.onAction(() => lastTickDisplay.edit());
@@ -246,6 +275,8 @@ export function init() {
   settings._moveFPSDisplay.onAction(() => fpsDisplay.edit());
   settings._serverScrutinizerFPSMaxAge.listen(v => frames.maxAge = v);
   settings._movePingDisplay.onAction(() => pingDisplay.edit());
+  settings._serverScrutinizerPPSMaxAge.listen(v => packets.maxAge = v);
+  settings._movePPSDisplay.onAction(() => ppsDisplay.edit());
 }
 export function load() {
   ticks.clear();
@@ -259,6 +290,8 @@ export function load() {
   renderTickReg.register();
   rendOvFps.register();
   rendOvPing.register();
+  packetSentReg.register();
+  rendOvPps.register();
 }
 export function unload() {
   serverTickReg.unregister();
@@ -269,4 +302,6 @@ export function unload() {
   renderTickReg.unregister();
   rendOvFps.unregister();
   rendOvPing.unregister();
+  packetSentReg.unregister();
+  rendOvPps.unregister();
 }
