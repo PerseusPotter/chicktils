@@ -877,6 +877,14 @@ export const props = {
   serverScrutinizerPingDisplayAvg: new Property('ServerScrutinizerDisplayAveragePing', page, ++sort, Property.Type.Toggle, true, { desc: 'show average ping' }),
   movePingDisplay: new Property('MovePingDisplay', page, ++sort, Property.Type.Action),
 
+  serverScrutinizerPPSDisplay: new Property('ServerScrutinizerPPSDisplay', page, ++sort, Property.Type.Toggle, false, { desc: 'tracks PPS (packets [send] per second)' }),
+  serverScrutinizerPPSDisplayCurr: new Property('ServerScrutinizerDisplayCurrentPPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show current pps' }),
+  serverScrutinizerPPSDisplayAvg: new Property('ServerScrutinizerDisplayAveragePPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show average pps' }),
+  serverScrutinizerPPSDisplayMin: new Property('ServerScrutinizerDisplayMinimumPPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show minimum pps' }),
+  serverScrutinizerPPSDisplayMax: new Property('ServerScrutinizerDisplayMaximumPPS', page, ++sort, Property.Type.Toggle, true, { desc: 'show maximum pps' }),
+  serverScrutinizerPPSMaxAge: new Property('ServerScrutinizerPPSMaxAge', page, ++sort, Property.Type.Integer, 5000, { desc: 'max age of ticks', min: 1000 }),
+  movePPSDisplay: new Property('MovePPSDisplay', page, ++sort, Property.Type.Action),
+
   enablespotify: new Property('EnableSpotifyDisplay', page, ++sort, Property.Type.Toggle, false, { desc: 'shows current song playing on spotify, only works on windows + app version' }),
   moveSpotifyDisplay: new Property('MoveSpotifyDisplay', page, ++sort, Property.Type.Action),
   spotifyHideNotOpen: new Property('SpotifyHideIfNotOpened', page, ++sort, Property.Type.Toggle, true, { desc: 'hide if spotify is not opened' }),
