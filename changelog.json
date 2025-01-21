@@ -274,6 +274,23 @@
           "desc": "hide healer fairy"
         }
       ]
+    },
+    {
+      "version": "0.8.14",
+      "changes": [
+        {
+          "type": "feat",
+          "desc": "hide divan coating particles"
+        },
+        {
+          "type": "feat",
+          "desc": "add packets (sent) per second display"
+        },
+        {
+          "type": "misc",
+          "desc": "text gui performance thing"
+        }
+      ]
     }
   ]
 }
