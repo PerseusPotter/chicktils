@@ -5,6 +5,7 @@ import { drawArrow3DPos, renderOutline, renderTracer } from '../util/draw';
 import { commaNumber } from '../util/format';
 import { lerp } from '../util/math';
 import { getItemId, getMaxHp } from '../util/mc';
+import { JavaTypeOrNull } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
 import { run, unrun } from '../util/threading';
@@ -143,7 +144,7 @@ const arachnePointReg = reg('renderOverlay', () => {
 
 const stateDoingTara = new StateVar(false);
 const stateTaraStarted = new StateVar(0);
-const SlayerFeatures = Java.type('gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures');
+const SlayerFeatures = JavaTypeOrNull('gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures');
 const taraHitReg = reg('attackEntity', (ent, evn) => {
   const e = ent.entity;
   if (e instanceof EntityCaveSpider) {

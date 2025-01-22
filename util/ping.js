@@ -1,7 +1,8 @@
 import settings from '../settings';
+import { JavaTypeOrNull } from './polyfill';
 
 // lazy stfu
-const Ping = Java.type('gg.skytils.skytilsmod.features.impl.misc.Ping');
+const Ping = JavaTypeOrNull('gg.skytils.skytilsmod.features.impl.misc.Ping');
 let lastPing = 0;
 const PING_WINDOW_TIME = 60;
 let PING_WINDOW_SIZE = Math.max(2, ~~(PING_WINDOW_TIME / settings.pingRefreshDelay));

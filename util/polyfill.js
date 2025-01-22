@@ -55,3 +55,14 @@ export function flat(arr) {
 export function flatMap(arr, callback) {
   return flat(arr.map(callback));
 }
+
+const JavaClass = Java.type('java.lang.Class');
+/**
+ * @template {string} T
+ * @param {T} path
+ * @returns {import('../../@types/External').JavaClass<T>?}
+ */
+export function JavaTypeOrNull(path) {
+  const pkg = Java.type(path);
+  return (pkg?.['class'] instanceof JavaClass) ? pkg : null;
+}

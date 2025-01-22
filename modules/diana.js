@@ -8,6 +8,7 @@ import { dist, fastDistance, linReg, lineRectColl } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
+import { JavaTypeOrNull } from '../util/polyfill';
 
 const warps = [
   {
@@ -78,7 +79,7 @@ const renderWrldReg = reg('renderWorld', () => {
     // renderString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
   }
 }).setEnabled(settings._dianaGuessFromParticles);
-const GriffinBurrows = Java.type('gg.skytils.skytilsmod.features.impl.events.GriffinBurrows');
+const GriffinBurrows = JavaTypeOrNull('gg.skytils.skytilsmod.features.impl.events.GriffinBurrows');
 // 0 repetition, clean code
 const tickReg = reg('tick', () => {
   if (settings.dianaFixSkytils) {
