@@ -1,5 +1,5 @@
 import { removeElementMap, removeElementSet } from './helper';
-import { inherits } from './polyfill';
+import { inherits, setAccessible } from './polyfill';
 import { StateProp, StateVar } from './state';
 import { run, wrap as wrapFunc } from './threading';
 
@@ -232,10 +232,8 @@ reg = function reg(type, shit) {
   }());
 
   const ClientCommandHandler = Java.type('net.minecraftforge.client.ClientCommandHandler').instance;
-  const commandMapF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71562_a');
-  commandMapF.setAccessible(true);
-  const commandSetF = ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71561_b');
-  commandSetF.setAccessible(true);
+  const commandMapF = setAccessible(ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71562_a'));
+  const commandSetF = setAccessible(ClientCommandHandler.getClass().getSuperclass().getDeclaredField('field_71561_b'));
   // :(
   // [gg.skytils.skytilsmod.features.impl.handlers.NamespacedCommands:registerCommandHelper:81]: WARNING! Command aaa has 0; owners: []
   function ChickTilsCommand(cb) {

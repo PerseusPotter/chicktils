@@ -1,4 +1,5 @@
 import { urlToFile, urlToString } from './util/net';
+import { setAccessible } from './util/polyfill';
 import runHelper from './util/runner';
 const File = Java.type('java.io.File');
 export function loadMeta() {
@@ -52,9 +53,8 @@ export function applyUpdate(sev) {
     runHelper('ChickTilsUpdateHelper', oldMods.map(v => `"${v.getPath()}"`.toString()));
 
     const JSContextFactory = com.chattriggers.ctjs.engine.langs.js.JSContextFactory;
-    const f = JSContextFactory.class.getDeclaredField('classLoader');
-    f.setAccessible(true);
-    f.get(JSContextFactory.INSTANCE).close();
+    setAccessible(JSContextFactory.class.getDeclaredField('classLoader'))
+      .get(JSContextFactory.INSTANCE).close();
   }
   rimraf(rel('temp/chicktilshelper'));
   copy(new File(rel('temp')), new File(rel('')));

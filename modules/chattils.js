@@ -10,6 +10,7 @@ import { dither, fromImage, fromURL, grayscale, guassian, resize, sharpen, sobel
 import { getImage } from '../util/clipboard';
 import { _setTimeout } from '../util/timers';
 import { deleteMessages } from '../util/helper';
+import { setAccessible } from '../util/polyfill';
 
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
@@ -345,8 +346,7 @@ const Skin = Java.type('gg.essential.mod.Skin');
 const SkinUtilsKt = Java.type('gg.essential.gui.skin.SkinUtilsKt');
 const SocialMenu = Java.type('gg.essential.gui.friends.SocialMenu');
 const ChannelType = Java.type('com.sparkuniverse.toolbox.chat.enums.ChannelType');
-const NotificationHandlerConstructor = ServerChatChannelMessagePacketHandler.NotificationHandler.class.getDeclaredConstructor([Java.type('com.sparkuniverse.toolbox.chat.model.Channel').class, Java.type('com.sparkuniverse.toolbox.chat.model.Message').class]);
-NotificationHandlerConstructor.setAccessible(true);
+const NotificationHandlerConstructor = setAccessible(ServerChatChannelMessagePacketHandler.NotificationHandler.class.getDeclaredConstructor([Java.type('com.sparkuniverse.toolbox.chat.model.Channel').class, Java.type('com.sparkuniverse.toolbox.chat.model.Message').class]));
 ConnectionManager.registerPacketHandler(Java.type('gg.essential.connectionmanager.common.packet.chat.ServerChatChannelMessagePacket').class, new JavaAdapter(Java.type('gg.essential.network.connectionmanager.handler.PacketHandler'), {
   onHandle(connectionManager, packet) {
     const chatManager = connectionManager.getChatManager();

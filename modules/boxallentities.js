@@ -1,10 +1,10 @@
 import settings from '../settings';
 import { renderOutline, renderString, rm } from '../util/draw';
+import { setAccessible } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
 
-const canRenderNameF = Java.type('net.minecraft.client.renderer.entity.Render').class.getDeclaredMethod('func_177070_b', net.minecraft.entity.Entity.class);
-canRenderNameF.setAccessible(true);
+const canRenderNameF = setAccessible(Java.type('net.minecraft.client.renderer.entity.Render').class.getDeclaredMethod('func_177070_b', net.minecraft.entity.Entity.class));
 const whitelist = new Set();
 const blacklist = new Set();
 function renderEntity(e, x, y, z, w, h, nt) {

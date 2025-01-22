@@ -1,3 +1,5 @@
+import { setAccessible } from './polyfill';
+
 const itemIdDict = Java.type('net.minecraft.item.Item').field_150901_e;
 /**
  * @param {import ('../../@types/External').JavaClass<'net.minecraft.item.ItemStack'>} item
@@ -7,8 +9,7 @@ export function getItemId(item) {
   return itemIdDict.func_177774_c(item.func_77973_b()).toString();
 }
 
-const lowerInvF = Java.type('net.minecraft.client.gui.inventory.GuiChest').class.getDeclaredField('field_147015_w');
-lowerInvF.setAccessible(true);
+const lowerInvF = setAccessible(Java.type('net.minecraft.client.gui.inventory.GuiChest').class.getDeclaredField('field_147015_w'));
 /**
  * @param {import ('../../@types/External').JavaClass<'net.minecraft.client.gui.inventory.GuiChest'>} gui
  * @returns {import ('../../@types/External').JavaClass<'net.minecraft.client.player.inventory.ContainerLocalMenu'>}
@@ -116,8 +117,7 @@ const CHEST_GUI_TEXTURE = new ResourceLocation('textures/gui/container/generic_5
 const Container = Java.type('net.minecraft.inventory.Container');
 const GuiContainer = Java.type('net.minecraft.client.gui.inventory.GuiContainer');
 const JSlot = Java.type('net.minecraft.inventory.Slot');
-const addSlotToContainerM = Container.class.getDeclaredMethod('func_75146_a', [JSlot.class]);
-addSlotToContainerM.setAccessible(true);
+const addSlotToContainerM = setAccessible(Container.class.getDeclaredMethod('func_75146_a', [JSlot.class]));
 /**
  * @param {import ('../../@types/External').JavaClass<'net.minecraft.client.gui.inventory.GuiChest'>} chest
  * @returns {typeof GuiContainer}
