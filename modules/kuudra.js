@@ -18,7 +18,7 @@ const dropLocsStatic = [
   { x: -94, y: 79, z: -106 },
   { x: -98, y: 79, z: -99 },
 
-  { x: -139.5, y: 79, z: -90.5 }
+  { x: -139, y: 79, z: -90 }
 ];
 let dropLocs = dropLocsStatic.slice();
 let pearlLocs = [];
@@ -32,7 +32,7 @@ let lastPickUpdateTime = 0;
 let isOnCannon = false;
 let isT5 = new StateVar(false);
 let kuuder;
-const hpDisplay = createTextGui(() => data.kuudraHpLoc, () => ['&2300M']);
+const hpDisplay = createTextGui(() => data.kuudraHpLoc, () => ['&2240M']);
 const renderReg = reg('renderWorld', () => {
   if (settings.kuudraRenderPearlTarget && pearlLocs.length > 0) {
     const c = settings.kuudraPearlTargetColor;
@@ -153,7 +153,7 @@ const hpOverlayReg = reg('renderOverlay', () => {
   if (kuuder) {
     let h = kuuder.getHP();
     if (isT5.get()) {
-      if (h < 25_000) hpDisplay.setLine(`${colorForNumber(h / 25 * 30 / 100, 300)}${(h / 25 * 30 / 100).toPrecision(3)}M`);
+      if (h < 25_000) hpDisplay.setLine(`${colorForNumber(h / 25 * 24 / 100, 240)}${(h / 25 * 24 / 100).toPrecision(3)}M`);
       else hpDisplay.setLine(`${colorForNumber((h - 25_000) / 3 * 4 / 1000, 100)}${((h - 25_000) / 3 * 4 / 1000).toFixed(settings.kuudraDrawHpDec)}%`);
     } else hpDisplay.setLine(`${colorForNumber(h / 1000, 100)}${(h / 1000).toFixed(settings.kuudraDrawHpDec)}%`);
   } else hpDisplay.setLine('&4where is octo boi');
