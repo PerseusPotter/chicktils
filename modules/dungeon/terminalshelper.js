@@ -3,9 +3,9 @@ import reg from '../../util/registerer';
 import { StateProp, StateVar } from '../../util/state';
 import { createChestNoInv, getLowerContainer } from '../../util/mc';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
+import { setAccessible } from '../../util/polyfill';
 
-const ySizeF = Java.type('net.minecraft.client.gui.inventory.GuiContainer').class.getDeclaredField('field_147000_g');
-ySizeF.setAccessible(true);
+const ySizeF = setAccessible(Java.type('net.minecraft.client.gui.inventory.GuiContainer').class.getDeclaredField('field_147000_g'));
 const newYSizeInt = new (Java.type('java.lang.Integer'))(143);
 
 const origGuiSize = new StateVar(-1);

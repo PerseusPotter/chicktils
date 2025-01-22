@@ -2,14 +2,15 @@ import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
 import { getEyeHeight } from './mc';
 import GlStateManager2 from './glStateManager';
 import reg from './registerer';
+import { setAccessible } from './polyfill';
 
 export const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 export const worldRen = tess.func_178180_c();
 export const DefaultVertexFormats = Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats');
 export const rm = Renderer.getRenderManager();
-const xa = rm.class.getDeclaredField('field_78725_b'); xa.setAccessible(true);
-const ya = rm.class.getDeclaredField('field_78726_c'); ya.setAccessible(true);
-const za = rm.class.getDeclaredField('field_78723_d'); za.setAccessible(true);
+const xa = setAccessible(rm.class.getDeclaredField('field_78725_b'));
+const ya = setAccessible(rm.class.getDeclaredField('field_78726_c'));
+const za = setAccessible(rm.class.getDeclaredField('field_78723_d'));
 /**
  * @type {() => number}
  */

@@ -66,3 +66,13 @@ export function JavaTypeOrNull(path) {
   const pkg = Java.type(path);
   return (pkg?.['class'] instanceof JavaClass) ? pkg : null;
 }
+
+/**
+ * @template {import ('../../@types/External').JavaClass<'java.lang.reflect.AccessibleObject'>} T
+ * @param {T} obj
+ * @returns {T}
+ */
+export function setAccessible(obj) {
+  obj.setAccessible(true);
+  return obj;
+}
