@@ -4,6 +4,7 @@ import settings from '../settings';
 import { log } from '../util/log';
 import * as Party from '../util/party';
 import { run } from '../util/threading';
+import { JavaTypeOrNull } from '../util/polyfill';
 
 const userUUIDC = new Map();
 function _getUUID(user) {
@@ -26,7 +27,7 @@ function getUUID(user) {
   if (uuid) userUUIDC.set(user, uuid);
   return uuid;
 }
-const NotEnoughUpdates = Java.type('io.github.moulberry.notenoughupdates.NotEnoughUpdates');
+const NotEnoughUpdates = JavaTypeOrNull('io.github.moulberry.notenoughupdates.NotEnoughUpdates');
 function cpv(user) {
   if (!NotEnoughUpdates) return log('you need neu silly');
   // if (!user) user = Player.getName();
