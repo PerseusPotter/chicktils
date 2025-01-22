@@ -163,7 +163,7 @@ const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
   if (name !== 'random.orb' || vol !== 1 || pitch !== 1) return;
   cancel(evn);
   stateCancelNextPing.set(false);
-}).setEnabled(new StateProp(stateCancelNextPing).and(new StateProp(settings._chatTilsHideBonzo).notequals('False').or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False'))));
+}).setEnabled(new StateProp(stateCancelNextPing));
 
 // https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/features/FasterMaddoxCalling.java#L24
 let lastFollowTime = 0;
