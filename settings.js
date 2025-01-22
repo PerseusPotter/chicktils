@@ -1017,7 +1017,9 @@ export const props = {
   blockHighlightCantEtherWireWidth: new Property('BlockHighlightCantEtherWireWidth', page, ++sort, Property.Type.Number, 3, { min: 0 }),
   blockHighlightCantEtherShowReason: new Property('BlockHighlightCantEtherShowReason', page, ++sort, Property.Type.Toggle, true),
 
-  enablehidedivanparticles: new Property('HideDivanCoatingParticles', page, ++sort, Property.Type.Toggle, true)
+  enablehidedivanparticles: new Property('HideDivanCoatingParticles', page, ++sort, Property.Type.Toggle, true),
+
+  enablesbaenchant: new Property('UpdateSBAEnchantList', page, ++sort, Property.Type.Toggle, true, { desc: 'need to rs game to unload properly (why would you?)' })
 };
 const pageNames = [
   '',
