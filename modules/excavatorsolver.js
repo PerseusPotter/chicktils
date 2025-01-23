@@ -144,8 +144,8 @@ const guiReg = reg('guiOpened', evn => {
           d = item;
           dc++;
         } else if (dirt[i] && charges === -1) {
-          const tag = item.func_77978_p().func_74775_l('display');
-          const lore = tag.func_150295_c('Lore', 8);
+          let tag = item.func_77978_p().func_74775_l('display');
+          let lore = tag.func_150295_c('Lore', 8);
           for (let i = 0; i < lore.func_74745_c(); i++) {
             let m = lore.func_150307_f(i).match(/^§7Chisel Charges Remaining: §.(\d+)$/);
             if (m) {
