@@ -149,6 +149,7 @@ export function init() {
     require('./dungeon/camp'),
     require('./dungeon/dev4helper'),
     require('./dungeon/dev4highlight'),
+    require('./dungeon/dhubselector'),
     require('./dungeon/dragonhelper'),
     require('./dungeon/goldordpsalert'),
     require('./dungeon/goldorfrenzytimer'),

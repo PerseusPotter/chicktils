@@ -696,6 +696,8 @@ export const props = {
 
   dungeonHideHealerFairy: new Property('DungeonHideHealerFairy', page, ++sort, Property.Type.Option, 'Own', { options: ['Never', 'Own', 'Always'] }),
 
+  dungeonDHubHighlightLow: new Property('DungeonDHubSelectorHighlight', page, ++sort, Property.Type.Toggle, true, { desc: 'green for low players :)' }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
