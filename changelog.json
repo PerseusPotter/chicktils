@@ -291,6 +291,31 @@
           "desc": "text gui performance thing"
         }
       ]
+    },
+    {
+      "version": "0.8.15",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "kuudra max hp is now 240m"
+        },
+        {
+          "type": "misc",
+          "desc": "dev tax"
+        },
+        {
+          "type": "feat",
+          "desc": "update sba enchant list"
+        },
+        {
+          "type": "feat",
+          "desc": "highlight smallest dhub server"
+        },
+        {
+          "type": "change",
+          "desc": "remove font size option, now dynamic"
+        }
+      ]
     }
   ]
 }
