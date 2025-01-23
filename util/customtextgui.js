@@ -3,6 +3,7 @@ import { BufferedImageWrapper, drawOutlinedString, rgbaToJavaColor } from './dra
 import GlStateManager2 from './glStateManager';
 import { ceilPow2 } from './math';
 import reg from './registerer';
+import { StateVar } from './state';
 const EventEmitter = require('./events');
 
 /**
@@ -25,34 +26,25 @@ const EventEmitter = require('./events');
  * }} CustomTextGui
  */
 const Font = Java.type('java.awt.Font');
-let FONT_RENDER_SIZE = settings.textGuiFontRenderSize;
 const MC_FONT_SIZE = 10;
-let fonts;
 let activeFont = $FONTS.get(settings.textGuiFont);
 const MOJANGLES_FONT = Font.createFont(Font.TRUETYPE_FONT, new java.io.File('./config/ChatTriggers/modules/chicktils/assets/Mojangles.ttf'));
 settings._textGuiFont.listen(function(v, o) {
   if (!$FONTS.has(v)) this.set(o);
   else {
     activeFont = v === 'Mojangles' ? null : $FONTS.get(settings.textGuiFont);
-    fonts = createFonts();
-    allDisplays.forEach(v => v._mark());
+    allDisplays.forEach(v => v._markFont());
   }
 });
-settings._textGuiFontRenderSize.listen(v => {
-  FONT_RENDER_SIZE = v;
-  fonts = createFonts();
-  allDisplays.forEach(v => v._mark());
-});
-function createFonts() {
+function createFonts(size) {
   return [
     activeFont ?
-      new Font(activeFont, Font.PLAIN, FONT_RENDER_SIZE) :
-      MOJANGLES_FONT.deriveFont(Font.PLAIN, FONT_RENDER_SIZE),
-    new Font(Font.MONOSPACED, Font.PLAIN, FONT_RENDER_SIZE),
-    new Font(Font.SANS_SERIF, Font.PLAIN, FONT_RENDER_SIZE)
+      new Font(activeFont, Font.PLAIN, size) :
+      MOJANGLES_FONT.deriveFont(Font.PLAIN, size),
+    new Font(Font.MONOSPACED, Font.PLAIN, size),
+    new Font(Font.SANS_SERIF, Font.PLAIN, size)
   ];
 }
-fonts = createFonts();
 const BufferedImage = Java.type('java.awt.image.BufferedImage');
 const RenderingHints = Java.type('java.awt.RenderingHints');
 const FontHelper = Java.type('com.perseuspotter.chicktilshelper.FontHelper');
@@ -124,6 +116,13 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   let actH = 0;
   let imgW = 0;
   let imgH = 0;
+  /** @type {(typeof Font)[]} */
+  let fonts = null;
+  const FONT_RENDER_SIZE = new StateVar(MC_FONT_SIZE);
+  FONT_RENDER_SIZE.listen(v => {
+    fonts = createFonts(v);
+    obj._mark();
+  });
   const updateLocCache = () => {
     const l = obj.getLoc();
     if (cb !== l.b) {
@@ -137,11 +136,13 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       lines.forEach(v => v.d = true);
       cc = l.c;
     }
+    FONT_RENDER_SIZE.set(Math.round(MC_FONT_SIZE * Renderer.screen.getScale() * cs));
+    if (!fonts) fonts = createFonts(FONT_RENDER_SIZE.get());
     const tl = obj.getTrueLoc();
     rx = tl.x;
     ry = tl.y;
-    rw = imgW * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
-    rh = imgH * MC_FONT_SIZE / FONT_RENDER_SIZE * cs;
+    rw = imgW * MC_FONT_SIZE / FONT_RENDER_SIZE.get() * cs;
+    rh = imgH * MC_FONT_SIZE / FONT_RENDER_SIZE.get() * cs;
   };
   /** @type {Line[]} */
   let lines = [];
@@ -161,7 +162,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
           tmpG.setFont(fonts[0]);
         }
 
-        const data = FontHelper.processString(v.s, cb, tmpG, fonts[0], fonts[1], fonts[2], FONT_RENDER_SIZE);
+        const data = FontHelper.processString(v.s, cb, tmpG, fonts[0], fonts[1], fonts[2], FONT_RENDER_SIZE.get());
 
         v.a = data.a;
         v.b = data.b;
@@ -180,8 +181,8 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   };
   const renderImage = () => {
     // extra spacing for hanging characters
-    actW = lineW + (cb ? FONT_RENDER_SIZE / 10 : 0);
-    actH = FONT_RENDER_SIZE * (lines.length + 1) + (cb ? FONT_RENDER_SIZE / 10 : 0);
+    actW = lineW + (cb ? FONT_RENDER_SIZE.get() / 10 : 0);
+    actH = FONT_RENDER_SIZE.get() * (lines.length + 1) + (cb ? FONT_RENDER_SIZE.get() / 10 : 0);
     imgW = ceilPow2(actW, 1);
     imgH = ceilPow2(actH, 2);
     const bimg = new BufferedImage(imgW, imgH, BufferedImage.TYPE_INT_ARGB);
@@ -191,13 +192,13 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     lines.forEach((v, i) => {
-      const y = i * FONT_RENDER_SIZE + ascent;
+      const y = i * FONT_RENDER_SIZE.get() + ascent;
       let x = 0;
       if (cc === 1) x = lineVW - v.vw;
       else if (cc === 2) x = (lineVW - v.vw) / 2;
       if (cb && v.b) {
         g.setColor(COLORS_SHADOW.f);
-        g.drawString(v.b.getIterator(), x + FONT_RENDER_SIZE / 10, y + FONT_RENDER_SIZE / 10);
+        g.drawString(v.b.getIterator(), x + FONT_RENDER_SIZE.get() / 10, y + FONT_RENDER_SIZE.get() / 10);
       }
       g.setColor(COLORS.f);
       g.drawString(v.a.getIterator(), x, y);
@@ -265,10 +266,10 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     return this;
   };
   obj.getVisibleWidth = function() {
-    return MC_FONT_SIZE / FONT_RENDER_SIZE * lineVW * this.getLoc().s;
+    return MC_FONT_SIZE / FONT_RENDER_SIZE.get() * lineVW * this.getLoc().s;
   };
   obj.getWidth = function() {
-    return MC_FONT_SIZE / FONT_RENDER_SIZE * lineW * this.getLoc().s;
+    return MC_FONT_SIZE / FONT_RENDER_SIZE.get() * lineW * this.getLoc().s;
   };
   obj.getHeight = function() {
     return MC_FONT_SIZE * this.getLoc().s;
@@ -290,6 +291,9 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   obj._rmCache = function() {
     skipDraw = true;
     dirty = true;
+  };
+  obj._markFont = function() {
+    fonts = null;
   };
 
   allDisplays.push(obj);
