@@ -26,36 +26,48 @@ export function logMessage(msg) {
   msg.chat();
 }
 
-function format(obj, depth = 3) {
-  let t = 'object';
-  try {
-    t = typeof obj;
-  } catch (e) { }
-  switch (t) {
-    case 'string': return `'${obj}'`;
-    case 'number': return Number.isInteger(obj) ? obj.toString() : obj.toFixed(2);
-    case 'bigint': return obj.toString() + 'n';
-    case 'boolean': return obj.toString();
-    case 'function': return `function ${'name' in obj ? obj.name : obj.class.getSimpleName()}() {}`
-    case 'symbol': return '@@' + obj.description;
-    case 'undefined': return 'undefined';
-    case 'object':
-      if (obj === null) return 'null';
-      if (obj instanceof Date) return obj.toISOString();
-      if (obj instanceof Error) return obj.toString();
-      if (obj instanceof Set) return 'Set' + format(Array.from(obj.keys()), depth);
-      if (obj instanceof Map) return 'Map' + format(Array.from(obj.entries()).reduce((a, [k, v]) => (a[k] = v, a), {}), depth);
-      if (Array.isArray(obj)) {
-        if (depth === 0) return `Array(${obj.length})`;
-        return `[${obj.map(v => format(v, depth - 1)).join(', ')}]`;
-      }
-      if (obj instanceof Java.type('net.minecraft.util.Vec3')) return `<${format(obj.field_72450_a)}, ${format(obj.field_72448_b)}, ${format(obj.field_72449_c)}>`;
-      if (depth === 0) return `[object ${obj.constructor ? obj.constructor.name : 'Object'}]`;
-      const ent = Object.entries(obj);
-      if (ent.length === 0) return '{}';
-      return '{ ' + ent.map(([k, v]) => `${k}: ${format(v, depth - 1)}`).join(', ') + ' }';
-  }
-}
+const format = (function() {
+  const MCVec3 = Java.type('net.minecraft.util.Vec3');
+  const MCVec3i = Java.type('net.minecraft.util.Vec3i');
+  const MCBlockState = Java.type('net.minecraft.block.state.IBlockState');
+  const MCBlock = Java.type('net.minecraft.block.Block');
+
+  return function(obj, depth = 3) {
+    let t = 'object';
+    try {
+      t = typeof obj;
+    } catch (e) { }
+    switch (t) {
+      case 'string': return `'${obj}'`;
+      case 'number': return Number.isInteger(obj) ? obj.toString() : obj.toFixed(2);
+      case 'bigint': return obj.toString() + 'n';
+      case 'boolean': return obj.toString();
+      case 'function': return `function ${'name' in obj ? obj.name : obj.class.getSimpleName()}() {}`
+      case 'symbol': return '@@' + obj.description;
+      case 'undefined': return 'undefined';
+      case 'object':
+        if (obj === null) return 'null';
+        if (obj instanceof Date) return obj.toISOString();
+        if (obj instanceof Error) return obj.toString();
+        if (obj instanceof Set) return 'Set' + format(Array.from(obj.keys()), depth);
+        if (obj instanceof Map) return 'Map' + format(Array.from(obj.entries()).reduce((a, [k, v]) => (a[k] = v, a), {}), depth);
+        if (Array.isArray(obj)) {
+          if (depth === 0) return `Array(${obj.length})`;
+          return `[${obj.map(v => format(v, depth - 1)).join(', ')}]`;
+        }
+
+        if (obj instanceof MCVec3) return `<${format(obj.field_72450_a)}, ${format(obj.field_72448_b)}, ${format(obj.field_72449_c)}>`;
+        if (obj instanceof MCVec3i) return `(${format(obj.func_177958_n())}, ${format(obj.func_177956_o())}, ${format(obj.func_177952_p())})`;
+        if (obj instanceof MCBlockState) return `{BlockState|${format(obj.func_177230_c())}|meta=${obj.func_177230_c().func_176201_c(obj)}}`;
+        if (obj instanceof MCBlock) return `{Block|${obj.func_149732_F()}|${MCBlock.func_149682_b(obj)}}`;
+
+        if (depth === 0) return `[object ${obj.constructor ? obj.constructor.name : 'Object'}]`;
+        const ent = Object.entries(obj);
+        if (ent.length === 0) return '{}';
+        return '{ ' + ent.map(([k, v]) => `${k}: ${format(v, depth - 1)}`).join(', ') + ' }';
+    }
+  };
+}());
 export function logDebug(obj, depth) {
   let str = Object.entries(obj).map(([k, v]) => k + ': ' + format(v, depth)).join('\n');
   log(str);
