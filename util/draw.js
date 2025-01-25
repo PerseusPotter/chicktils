@@ -297,7 +297,7 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
   } else {
     GlStateManager2.depthMask(false);
     GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
   }
   if (esp) GlStateManager2.disableDepth();
 
@@ -411,7 +411,7 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   } else {
     GlStateManager2.depthMask(false);
     GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
   }
   if (esp) GlStateManager2.disableDepth();
 
@@ -483,7 +483,7 @@ export function drawPolygon(color, vertexes) {
   GlStateManager2.disableTexture2D();
   GlStateManager2.disableDepth();
   GlStateManager2.enableBlend();
-  GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
   GlStateManager2.disableCull();
   GlStateManager2.color(r, g, b, a);
 
@@ -545,7 +545,7 @@ export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2)
   } else {
     GlStateManager2.depthMask(false);
     GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
   }
   if (esp) GlStateManager2.disableDepth();
 
@@ -612,7 +612,7 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
 
   if (renderBlackBox) {
     GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 0);
+    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
     GlStateManager2.depthMask(false);
     GlStateManager2.color(0, 0, 0, 0.25);
     worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
@@ -629,7 +629,7 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
   } else {
     GlStateManager2.depthMask(false);
     GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
   }
   GlStateManager2.color(r, g, b, a);
   GlStateManager2.enableTexture2D();
@@ -755,7 +755,7 @@ export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
   GlStateManager2.disableDepth();
   GlStateManager2.disableCull();
   GlStateManager2.enableBlend();
-  GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
 
   GlStateManager2.color(_r, _g, _b, _a);
   _drawArc(x, y, r, a1, a2, segments);
@@ -791,7 +791,7 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   GlStateManager2.disableDepth();
   GlStateManager2.disableCull();
   GlStateManager2.enableBlend();
-  GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
   GlStateManager2.color(_r, _g, _b, _a);
 
   worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
@@ -854,7 +854,7 @@ export function renderBeaconBeam(x, y, z, color, scuffed, esp = false, center = 
   GlStateManager2.disableLighting();
   GlStateManager2.enableCull();
   GlStateManager2.enableTexture2D();
-  GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
   GlStateManager2.enableBlend();
   const time = 0.2 * (World.getWorld().func_82737_E() + Tessellator.partialTicks);
   const d1 = Math.ceil(time) - time;
