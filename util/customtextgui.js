@@ -33,7 +33,10 @@ settings._textGuiFont.listen(function(v, o) {
   if (!$FONTS.has(v)) this.set(o);
   else {
     activeFont = v === 'Mojangles' ? null : $FONTS.get(settings.textGuiFont);
-    allDisplays.forEach(v => v._markFont());
+    allDisplays.forEach(v => {
+      v._markFont();
+      v._mark();
+    });
   }
 });
 function createFonts(size) {
