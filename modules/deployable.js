@@ -439,7 +439,7 @@ const equipmentReg = reg('packetReceived', (pack, doDupe) => {
     range: data.range,
     stats,
     ttl: data.duration,
-    isOwn: ownDeployLoc && !ownDeployLoc.isFlux && dist(ownDeployLoc.x, ent.field_70165_t) < 1 && ownDeployLoc.y < ent.field_70163_u && ownDeployLoc + 10 > ent.field_70163_u && dist(ownDeployLoc.z, ent.field_70161_v) < 1,
+    isOwn: ownDeployLoc && !ownDeployLoc.isFlux && dist(ownDeployLoc.x, ent.field_70165_t) < 1 && ownDeployLoc.y - 2 < ent.field_70163_u && ownDeployLoc + 10 > ent.field_70163_u && dist(ownDeployLoc.z, ent.field_70161_v) < 1,
     y: ent.field_70163_u
   });
 }).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment);
