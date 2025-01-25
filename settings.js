@@ -697,6 +697,11 @@ export const props = {
 
   dungeonDHubHighlightLow: new Property('DungeonDHubSelectorHighlight', page, ++sort, Property.Type.Toggle, true, { desc: 'green for low players :)' }),
 
+  dungeonTerracottaRespawn: new Property('DungeonTerracottaRespawnTimer', page, ++sort, Property.Type.Toggle, false),
+  dungeonTerracottaRespawnType: new Property('DungeonTerracottaRespawnTimerType', page, ++sort, Property.Type.Option, 'Timer', { options: ['Timer', 'Box', 'Both'] }),
+  dungeonTerracottaRespawnOutlineColor: new Property('DungeonTerracottaRespawnOutlineColor', page, ++sort, Property.Type.Color, 0x91553DFF),
+  dungeonTerracottaRespawnFillColor: new Property('DungeonTerracottaRespawnFillColor', page, ++sort, Property.Type.Color, 0xA27157A0),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
