@@ -31,6 +31,7 @@ const format = (function() {
   const MCVec3i = Java.type('net.minecraft.util.Vec3i');
   const MCBlockState = Java.type('net.minecraft.block.state.IBlockState');
   const MCBlock = Java.type('net.minecraft.block.Block');
+  const Vector3f = Java.type('org.lwjgl.util.vector.Vector3f');
 
   return function(obj, depth = 3) {
     let t = 'object';
@@ -39,7 +40,7 @@ const format = (function() {
     } catch (e) { }
     switch (t) {
       case 'string': return `'${obj}'`;
-      case 'number': return Number.isInteger(obj) ? obj.toString() : obj.toFixed(2);
+      case 'number': return Number.isInteger(obj) ? obj.toString() : obj.toFixed(3);
       case 'bigint': return obj.toString() + 'n';
       case 'boolean': return obj.toString();
       case 'function': return `function ${'name' in obj ? obj.name : obj.class.getSimpleName()}() {}`
@@ -56,10 +57,13 @@ const format = (function() {
           return `[${obj.map(v => format(v, depth - 1)).join(', ')}]`;
         }
 
+        if (obj.getClass?.()?.isEnum?.()) return `Enum{${obj.toString()}}`;
+
         if (obj instanceof MCVec3) return `<${format(obj.field_72450_a)}, ${format(obj.field_72448_b)}, ${format(obj.field_72449_c)}>`;
         if (obj instanceof MCVec3i) return `(${format(obj.func_177958_n())}, ${format(obj.func_177956_o())}, ${format(obj.func_177952_p())})`;
         if (obj instanceof MCBlockState) return `{BlockState|${format(obj.func_177230_c())}|meta=${obj.func_177230_c().func_176201_c(obj)}}`;
         if (obj instanceof MCBlock) return `{Block|${obj.func_149732_F()}|${MCBlock.func_149682_b(obj)}}`;
+        if (obj instanceof Vector3f) return `<${format(obj.x)}, ${format(obj.y)}, ${format(obj.z)}>`;
 
         if (depth === 0) return `[object ${obj.constructor ? obj.constructor.name : 'Object'}]`;
         const ent = Object.entries(obj);
