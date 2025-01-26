@@ -3,7 +3,6 @@ import reg from '../../util/registerer';
 import { StateVar } from '../../util/state';
 
 const stateInGui = new StateVar(0);
-settings._dungeonDHubHighlightLow.listen(() => stateInGui.set(0));
 
 const guiOpenReg = reg('packetReceived', pack => {
   stateInGui.set(pack.func_148902_e() === 'minecraft:chest' && pack.func_179840_c().func_150260_c() === 'Dungeon Hub Selector' ? pack.func_148901_c() : 0);
@@ -39,6 +38,8 @@ const windowItemsReg = reg('packetReceived', pack => {
 const guiCloseReg = reg('guiClosed', () => stateInGui.set(0)).setEnabled(stateInGui);
 
 export function init() {
+  settings._dungeonDHubHighlightLow.listen(() => stateInGui.set(0));
+
   guiOpenReg.register();
   windowItemsReg.register();
   guiCloseReg.register();
