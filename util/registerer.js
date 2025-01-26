@@ -66,7 +66,7 @@ export function getRegs() {
   return allRegs;
 }
 
-const customRegs = {};
+export const customRegs = {};
 /**
  * @type {typeof register & ((triggerType: 'spawnEntity', callback: (entity: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick', callback: (tick: number) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick2', callback: (tick: number) => void) => import('../../@types/IRegister').Trigger)}
  */
