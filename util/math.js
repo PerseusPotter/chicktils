@@ -1,3 +1,5 @@
+import { shuffle } from './polyfill';
+
 /**
  * @param {number} dx
  * @param {number} dy
@@ -225,6 +227,21 @@ export function linReg(arr) {
 }
 
 /**
+ * @param {number} d
+ * @param {number[][]} arr
+ * @returns {number[]} coeff, [0] = x_0
+ */
+export function ndRegression(d, arr) {
+  const X = arr.map(v => new Array(d + 1).fill(0).map((_, i) => v[0] ** i));
+  const Y = arr.map(v => [v[1]]);
+
+  const X_T = transposeMatrix(X);
+  const X_T_X = multMatrix(X_T, X);
+  const X_T_Y = multMatrix(X_T, Y);
+  return solveMatrix(X_T_X, X_T_Y).map(v => v[0]);
+}
+
+/**
  * @param {number[]} arr
  * @returns {number}
  */
@@ -285,4 +302,479 @@ export function binarySearch(arr, val) {
 export function ceilPow2(num, bits = 0) {
   const mask = (1 << Math.max(0, 31 - Math.clz32(num) - bits)) - 1;
   return (num + mask) & ~mask;
+}
+
+/**
+ * @param {number[]} coeff [0] = x_0
+ * @returns {(x: number) => number}
+ */
+export function toPolynomial(coeff) {
+  return x => {
+    let v = 0;
+    let m = 1;
+    for (let i = 0; i < coeff.length; i++) {
+      v += coeff[i] * m;
+      m *= x;
+    }
+    return v;
+  };
+}
+
+/**
+ * @param {number} x
+ * @param {number} mean
+ * @param {number} variance
+ * @returns {number}
+ */
+export function pdf(x, mean = 0, variance = 1) {
+  return Math.exp(-0.5 * (x - mean) ** 2 / (variance * variance)) / (variance * Math.sqrt(2 * Math.PI));
+}
+
+// https://stackoverflow.com/a/14873282
+/**
+ * @param {number} x
+ * @param {number} mean
+ * @param {number} variance
+ * @returns {number}
+ */
+export function cdf(x, mean = 0, variance = 1) {
+  return 0.5 * (1 + erf((x - mean) / (Math.sqrt(2 * variance))));
+}
+
+/**
+ * @param {number} x
+ * @returns {number}
+ */
+export function erf(x) {
+  // save the sign of x
+  const sign = (x >= 0) ? 1 : -1;
+  x = Math.abs(x);
+
+  // constants
+  const a1 = 0.254829592;
+  const a2 = -0.284496736;
+  const a3 = 1.421413741;
+  const a4 = -1.453152027;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
+
+  // A&S formula 7.1.26
+  const t = 1.0 / (1.0 + p * x);
+  const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+  return sign * y; // erf(-x) = -erf(x);
+}
+
+/**
+ * @param {number[]} arr
+ * @returns {number}
+ */
+export function calcMAD(arr) {
+  const mean = arr.reduce((a, v) => a + v, 0) / arr.length;
+  return arr.reduce((a, v) => a + Math.abs(v - mean), 0) / arr.length;
+}
+
+/**
+ * A x X = B
+ * @template {number[][]} T
+ * @param {number[][]} A n x n
+ * @param {T} B n x k
+ * @returns {T & { determinantM: number, determinantI: number }} X (n x k)
+ */
+export function solveMatrix(A, B) {
+  const n = A.length;
+  const k = B[0].length;
+  let d = 1;
+  const swapRow = (r1, r2) => {
+    d *= -1;
+    let t = A[r1];
+    A[r1] = A[r2];
+    A[r2] = t;
+    t = B[r1];
+    B[r1] = B[r2];
+    B[r2] = t;
+  };
+  const addRow = (s, d, m) => {
+    for (let i = 0; i < n; i++) {
+      A[d][i] += A[s][i] * m;
+    }
+    for (let i = 0; i < k; i++) {
+      B[d][i] += B[s][i] * m;
+    }
+  };
+  const multRow = (s, m) => {
+    d *= m;
+    for (let i = 0; i < n; i++) {
+      A[s][i] *= m;
+    }
+    for (let i = 0; i < k; i++) {
+      B[s][i] *= m;
+    }
+  };
+  for (let i = 0; i < n; i++) {
+    let maxRow = i;
+    for (let j = i + 1; j < n; j++) {
+      if (A[maxRow][i] < A[j][i]) maxRow = j;
+    }
+    if (maxRow !== i) swapRow(maxRow, i);
+    multRow(i, 1 / A[i][i]);
+    for (let j = 0; j < n; j++) {
+      if (i !== j) addRow(i, j, -A[j][i]);
+    }
+  }
+
+  B.determinantM = 1 / d;
+  B.determinantI = d;
+  return B;
+}
+
+/**
+ * disclaimer: bad
+ * @template {number[][]} T
+ * @param {T} M n x n
+ * @returns {ReturnType<typeof solveMatrix<T>>} n x n
+ */
+export function invertMatrix(M) {
+  const l = M.length;
+  const I = new Array(l).fill(0).map((_, i) => {
+    const a = new Array(l).fill(0);
+    a[i] = 1;
+    return a;
+  });
+
+  return solveMatrix(M, I);
+}
+
+/**
+ * @param {number[][]} M
+ * @returns {number[][]}
+ */
+export function transposeMatrix(M) {
+  const R = [];
+  for (let i = 0; i < M.length; i++) {
+    for (let j = 0; j < M[i].length; j++) {
+      R[j] ??= [];
+      R[j][i] = M[i][j];
+    }
+  }
+  return R;
+}
+
+/**
+ * @param {number[][]} A
+ * @param {number[][]} B
+ * @returns {number[][]}
+ */
+export function multMatrix(A, B) {
+  const rowsA = A.length;
+  const colsA = A[0].length;
+  const rowsB = B.length;
+  const colsB = B[0].length;
+
+  if (colsA !== rowsB) throw `${rowsA}x${colsA} vs ${rowsB}x${colsB}`;
+
+  const result = new Array(rowsA).fill(0).map(() => new Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += A[i][k] * B[k][j];
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * @param {number} n
+ * @param {number[][]} bounds c x 2
+ * @returns {number[][]} n x c
+ */
+export function sampleLHS(n, bounds) {
+  const samples = bounds.map(([min, max]) => {
+    const interval = (max - min) / n;
+    const values = [];
+    for (let i = 0; i < n; i++) values.push(min + interval * (i + Math.random()));
+    return shuffle(values);
+  });
+
+  const result = [];
+  for (let i = 0; i < n; i++) {
+    result.push(samples.map(v => v[i]));
+  }
+
+  return result;
+}
+
+/**
+ * @template {number[]} T
+ * @param {(params: T) => number} func
+ * @param {T} params
+ * @param {number} epsilon
+ * @returns {T}
+ */
+export function computeGradient(func, params, epsilon) {
+  const init = func(params);
+  return params.map((_, i) => {
+    params[i] += epsilon;
+    const g = (func(params) - init) / epsilon;
+    params[i] -= epsilon;
+    return g;
+  });
+}
+
+/**
+ * @template {number[]} T
+ * @param {(params: T) => number} func
+ * @param {T} params
+ * @param {number[][]} bounds [min, max][]
+ * @param {number?} iter (100)
+ * @param {number?} rate (0.01) positive max, negative min
+ * @param {number?} epsilon (1e-5)
+ * @returns {T}
+ */
+export function gradientDescent(func, params, bounds, iter = 100, rate = 0.01, epsilon = 1e-5) {
+  for (let i = 0; i < iter; i++) {
+    computeGradient(func, params, epsilon).forEach((v, i) => params[i] = Math.max(bounds[i][0], Math.min(bounds[i][1], params[i] + v * rate)));
+  }
+  return params;
+}
+
+/**
+ * @template {number[]} T
+ * @param {(params: T) => number} func
+ * @param {number[][]} bounds [min, max][]
+ * @param {number?} restarts (10)
+ * @param {number?} iter (100)
+ * @param {number?} rate (0.01) positive max, negative min
+ * @param {number?} epsilon (1e-5)
+ * @returns {T}
+ */
+export function gradientDescentRestarts(func, bounds, restarts = 10, iter = 100, rate = 0.01, epsilon = 1e-5) {
+  let maxV = Number.NEGATIVE_INFINITY;
+  let maxA = [];
+  const spreadParams = sampleLHS(restarts, bounds);
+  for (let i = 0; i < restarts; i++) {
+    let p = spreadParams[i];
+    gradientDescent(func, p, bounds, iter, rate, epsilon);
+    let v = func(p);
+    if (v > maxV) {
+      maxV = v;
+      maxA = p;
+    }
+  }
+  return maxA;
+}
+
+/**
+ * @param {number[]} xa
+ * @param {number[]} xb
+ * @param {number} l
+ * @param {number} a
+ * @returns {number}
+ */
+export function rbfKernel(xa, xb, l, a) {
+  const d = xa.reduce((a, v, i) => a + (v - xb[i]) ** 2, 0);
+  return a * Math.exp(-0.5 * d / l);
+}
+
+/**
+ * @template {number[]} T
+ */
+export class GaussianProcess {
+  /**
+   * @param {[number, number]} lengthScaleOptions [min, max]
+   * @param {[number, number]} amplitudeOptions [min, max]
+   * @param {number} noiseVariance
+   */
+  constructor(lengthScaleOptions, amplitudeOptions, noiseVariance) {
+    /** @type {[number, number]} */
+    this.lengthScaleOptions = lengthScaleOptions;
+    /** @type {[number, number]} */
+    this.amplitudeOptions = amplitudeOptions;
+    /** @type {number} */
+    this.noiseVariance = noiseVariance;
+  }
+
+  /**
+   * @param {T[]} X1
+   * @param {T[]} X2
+   * @param {number} l
+   * @param {number} a
+   * @param {number} sY
+   * @returns {number[][]}
+   */
+  _computeK(X1, X2, l, a, sY) {
+    const K = [];
+
+    for (let i = 0; i < X1.length; i++) {
+      K[i] = [];
+      for (let j = 0; j < X2.length; j++) {
+        K[i][j] = rbfKernel(X1[i], X2[j], l, a) + (i === j ? sY : 0);
+      }
+    }
+
+    return K;
+  }
+
+  /**
+   * @param {T[]} X
+   * @param {number[]} y
+   * @param {number} l
+   * @param {number} a
+   * @returns {number}
+   */
+  _computeNLML(X, y, l, a) {
+    const K = this._computeK(X, X, l, a, this.noiseVariance);
+    const Kinv = invertMatrix(K);
+    const M = multMatrix(Kinv, y.map(v => [v]));
+
+    return 0.5 * (
+      y.reduce((a, v, i) => a + v * M[i][0], 0) +
+      Math.log(Kinv.determinantM) +
+      X.length * Math.log(2 * Math.PI)
+    );
+  }
+
+  /**
+   * @param {T[]} X
+   * @param {number[]} y
+   */
+  fit(X, y) {
+    const params = gradientDescentRestarts(
+      ([l, a]) => this._computeNLML(X, y, l, a),
+      [this.lengthScaleOptions, this.amplitudeOptions]
+    );
+    this.lengthScale = params[0];
+    this.amplitude = params[1];
+
+    this.XTrain = X;
+    this.yTrain = y;
+    const K = this._computeK(X, X, this.lengthScale, this.amplitude, this.noiseVariance);
+    this.Kinv = invertMatrix(K);
+  }
+
+  /**
+   * @param {T[]} X
+   * @param {boolean?} includeCov {true}
+   * @returns {{ mu: number[], cov?: number[] }}
+   */
+  predict(X, includeCov = true) {
+    const Ks = this._computeK(this.XTrain, X, this.lengthScale, this.amplitude, 0);
+    const KsT = transposeMatrix(Ks);
+    const mu = multMatrix(multMatrix(KsT, this.Kinv), this.yTrain.map(v => [v])).map(v => v[0]);
+    if (!includeCov) return { mu };
+    const Kss = this._computeK(X, X, this.lengthScale, this.amplitude, 1e-8);
+    const M = multMatrix(multMatrix(KsT, this.Kinv), Ks);
+    return {
+      mu: mu,
+      cov: Kss.map((v, i) => v[0] - M[i][0])
+    };
+  }
+}
+
+/**
+ * @template {number[]} T
+ */
+export class BayesianOptimizer {
+  /**
+   * @param {(params: T) => number} func
+   * @param {GaussianProcess<T>} gp
+   * @param {number} xi
+   */
+  constructor(func, gp, xi) {
+    /** @type {(params: T) => number} */
+    this.func = func;
+    /** @type {GaussianProcess<T>} */
+    this.gp = gp;
+    /** @type {number} */
+    this.xi = xi;
+    /** @type {T[]} */
+    this.X = [];
+    /** @type {number[]} */
+    this.y = [];
+    /** @type {T} */
+    this.maxX = [];
+    /** @type {number} */
+    this.maxY = Number.NEGATIVE_INFINITY;
+    this._y1;
+    this._y2;
+  }
+
+  _normFunc() {
+    return rescale(this.func.apply(null, arguments), this._y1, this._y2, -1, 1);
+  }
+
+  /**
+   * @param {T} x
+   */
+  addPoint(x) {
+    this.X.push(x);
+    const v = this.func(x);
+    if (v > this.maxY) {
+      this.maxX = x;
+      this.maxY = v;
+    }
+    this.y.push(v);
+    const y = this.y.reduce((a, v) => a + v, 0) / this.y.length;
+    const MAD = calcMAD(this.y);
+    this._y1 = y - MAD * 1.5;
+    this._y2 = y + MAD * 1.5;
+  }
+
+  /**
+   * @param {T} XS
+   * @param {number} maxMu
+   * @returns {number}
+   */
+  _computeEI(XS, maxMu) {
+    const { mu, cov } = this.gp.predict([XS]);
+    const num = mu[0] - maxMu - this.xi;
+    const Z = num / cov[0];
+    return (num * cdf(Z) + cov[0] * pdf(Z)) || 0;
+  }
+
+  /**
+   * @param {T} XS
+   * @param {number} bestMu
+   * @returns {number}
+   */
+  _computePOI(XS, bestMu) {
+    const { mu, cov } = this.gp.predict([XS]);
+    return cdf((bestMu - mu[0]) / cov[0]);
+  }
+
+  /**
+   * @param {number[][]} bounds [min, max][]
+   * @param {number?} restarts
+   * @param {number?} iter
+   * @returns {T}
+   */
+  _proposeLocation(bounds, restarts, iter) {
+    const { mu: muS } = this.gp.predict(this.X, false);
+    const maxMu = Math.max.apply(null, muS);
+    return gradientDescentRestarts(
+      newX => this._computeEI(newX, maxMu),
+      // newX => this._computePOI(newX, rescale(this.maxY, this._y1, this._y2, -1, 1)),
+      bounds,
+      restarts,
+      iter
+    );
+  }
+
+  /**
+   * @param {number[][]} bounds [min, max][]
+   * @param {number} iter
+   * @param {number} initCount (5)
+   * @param {number?} restarts
+   * @param {number?} subIter
+   */
+  optimize(bounds, iter, initCount = 5, restarts, subIter) {
+    if (initCount > 0) sampleLHS(initCount, bounds).forEach(x => this.addPoint(x));
+    for (let i = 0; i < iter; i++) {
+      this.gp.fit(this.X, this.y.map(v => rescale(v, this._y1, this._y2, -1, 1)));
+      let next = this._proposeLocation(bounds, restarts, subIter);
+      this.addPoint(next);
+    }
+  }
 }
