@@ -76,3 +76,18 @@ export function setAccessible(obj) {
   obj.setAccessible(true);
   return obj;
 }
+
+/**
+ * @template {any[]} T
+ * @param {T} arr
+ * @returns {T}
+ */
+export function shuffle(arr) {
+  for (let i = arr.length - 1; i >= 1; i--) {
+    let j = ~~(Math.random() * (i + 1));
+    let t = arr[i];
+    arr[i] = arr[j];
+    arr[j] = t;
+  }
+  return arr;
+}
