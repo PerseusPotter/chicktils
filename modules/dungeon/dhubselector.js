@@ -33,7 +33,10 @@ const windowItemsReg = reg('packetReceived', pack => {
     }
   }
 
-  if (minI >= 0) items[minI].func_150996_a(net.minecraft.item.Item.func_150899_d(133));
+  if (minI >= 0) {
+    items[minI].func_150996_a(net.minecraft.item.Item.func_150899_d(133));
+    items[minI].func_77964_b(0);
+  }
 }).setFilteredClass(net.minecraft.network.play.server.S30PacketWindowItems).setEnabled(stateInGui);
 const guiCloseReg = reg('guiClosed', () => stateInGui.set(0)).setEnabled(stateInGui);
 
