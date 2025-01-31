@@ -341,6 +341,23 @@
           "desc": "blend functions (rendering will look different)"
         }
       ]
+    },
+    {
+      "version": "0.8.17",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "gfs not recognizing \"2k\" etc as an amount"
+        },
+        {
+          "type": "fix",
+          "desc": "rare race condition :("
+        },
+        {
+          "type": "fix",
+          "desc": "rhino has bad parsing"
+        }
+      ]
     }
   ]
 }
