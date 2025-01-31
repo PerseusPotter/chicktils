@@ -164,7 +164,6 @@ export function init() {
     require('./dungeon/m7lbwaypoints'),
     require('./dungeon/map'),
     require('./dungeon/necrondrag'),
-    require('./dungeon/oneflow'),
     require('./dungeon/playsoundkey'),
     require('./dungeon/silverfishhastetimer'),
     require('./dungeon/simonsays'),
