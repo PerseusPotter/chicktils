@@ -316,6 +316,31 @@
           "desc": "remove font size option, now dynamic"
         }
       ]
+    },
+    {
+      "version": "0.8.16",
+      "changes": [
+        {
+          "type": "change",
+          "desc": "dev tax"
+        },
+        {
+          "type": "fix",
+          "desc": "some flare detection in low ceilings"
+        },
+        {
+          "type": "feat",
+          "desc": "terracotta respawn timer"
+        },
+        {
+          "type": "fix",
+          "desc": "dungeons not loading (no one told me :sob:)"
+        },
+        {
+          "type": "change",
+          "desc": "blend functions (rendering will look different)"
+        }
+      ]
     }
   ]
 }
