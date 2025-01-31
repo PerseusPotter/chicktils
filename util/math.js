@@ -327,7 +327,7 @@ export function toPolynomial(coeff) {
  * @returns {number}
  */
 export function pdf(x, mean = 0, variance = 1) {
-  return Math.exp(-0.5 * (x - mean) ** 2 / (variance * variance)) / (variance * Math.sqrt(2 * Math.PI));
+  return Math.exp(-0.5 * ((x - mean) ** 2) / (variance * variance)) / (variance * Math.sqrt(2 * Math.PI));
 }
 
 // https://stackoverflow.com/a/14873282
