@@ -529,13 +529,12 @@ export function computeGradient(func, params, epsilon) {
  * @param {T} params
  * @param {number[][]} bounds [min, max][]
  * @param {number?} iter (100)
- * @param {number?} rate (0.01) positive max, negative min
  * @param {number?} epsilon (1e-5)
  * @returns {T}
  */
-export function gradientDescent(func, params, bounds, iter = 100, rate = 0.01, epsilon = 1e-5) {
-  for (let i = 0; i < iter; i++) {
-    computeGradient(func, params, epsilon).forEach((v, i) => params[i] = Math.max(bounds[i][0], Math.min(bounds[i][1], params[i] + v * rate)));
+export function gradientDescent(func, params, bounds, iter = 100, epsilon = 1e-5) {
+  for (let c = 1; c <= iter; c++) {
+    computeGradient(func, params, epsilon).forEach((v, i) => params[i] = Math.max(bounds[i][0], Math.min(bounds[i][1], params[i] + v / c)));
   }
   return params;
 }
@@ -546,17 +545,16 @@ export function gradientDescent(func, params, bounds, iter = 100, rate = 0.01, e
  * @param {number[][]} bounds [min, max][]
  * @param {number?} restarts (10)
  * @param {number?} iter (100)
- * @param {number?} rate (0.01) positive max, negative min
  * @param {number?} epsilon (1e-5)
  * @returns {T}
  */
-export function gradientDescentRestarts(func, bounds, restarts = 10, iter = 100, rate = 0.01, epsilon = 1e-5) {
+export function gradientDescentRestarts(func, bounds, restarts = 10, iter = 100, epsilon = 1e-5) {
   let maxV = Number.NEGATIVE_INFINITY;
   let maxA = [];
   const spreadParams = sampleLHS(restarts, bounds);
   for (let i = 0; i < restarts; i++) {
     let p = spreadParams[i];
-    gradientDescent(func, p, bounds, iter, rate, epsilon);
+    gradientDescent(func, p, bounds, iter, epsilon);
     let v = func(p);
     if (v > maxV) {
       maxV = v;
@@ -626,12 +624,11 @@ export class GaussianProcess {
    */
   _computeNLML(X, y, l, a) {
     const K = this._computeK(X, X, l, a, this.noiseVariance);
-    const Kinv = invertMatrix(K);
-    const M = multMatrix(Kinv, y.map(v => [v]));
+    const M = solveMatrix(K, y.map(v => [v]));
 
-    return 0.5 * (
+    return -0.5 * (
       y.reduce((a, v, i) => a + v * M[i][0], 0) +
-      Math.log(Kinv.determinantM) +
+      Math.log(M.determinantM) +
       X.length * Math.log(2 * Math.PI)
     );
   }
@@ -660,15 +657,18 @@ export class GaussianProcess {
    * @returns {{ mu: number[], cov?: number[] }}
    */
   predict(X, includeCov = true) {
-    const Ks = this._computeK(this.XTrain, X, this.lengthScale, this.amplitude, 0);
-    const KsT = transposeMatrix(Ks);
+    const KsT = this._computeK(X, this.XTrain, this.lengthScale, this.amplitude, 0);
     const mu = multMatrix(multMatrix(KsT, this.Kinv), this.yTrain.map(v => [v])).map(v => v[0]);
     if (!includeCov) return { mu };
+    const Ks = transposeMatrix(KsT);
     const Kss = this._computeK(X, X, this.lengthScale, this.amplitude, 1e-8);
     const M = multMatrix(multMatrix(KsT, this.Kinv), Ks);
+    // covariance matrix
+    // const cov = Kss.map((v, i) => v.map((v, j) => v - M[i][j]));
     return {
       mu: mu,
-      cov: Kss.map((v, i) => v[0] - M[i][0])
+      // std dev
+      cov: Kss.map((v, i) => Math.sqrt(v[i] - M[i][i]))
     };
   }
 }
@@ -701,8 +701,12 @@ export class BayesianOptimizer {
     this._y2;
   }
 
+  _rescale(v) {
+    return rescale(v, this._y1, this._y2, -2, 2);
+  }
+
   _normFunc() {
-    return rescale(this.func.apply(null, arguments), this._y1, this._y2, -1, 1);
+    return this._rescale(this.func.apply(null, arguments));
   }
 
   /**
@@ -755,7 +759,7 @@ export class BayesianOptimizer {
     const maxMu = Math.max.apply(null, muS);
     return gradientDescentRestarts(
       newX => this._computeEI(newX, maxMu),
-      // newX => this._computePOI(newX, rescale(this.maxY, this._y1, this._y2, -1, 1)),
+      // newX => this._computePOI(newX, this._rescale(this.maxY)),
       bounds,
       restarts,
       iter
@@ -772,9 +776,58 @@ export class BayesianOptimizer {
   optimize(bounds, iter, initCount = 5, restarts, subIter) {
     if (initCount > 0) sampleLHS(initCount, bounds).forEach(x => this.addPoint(x));
     for (let i = 0; i < iter; i++) {
-      this.gp.fit(this.X, this.y.map(v => rescale(v, this._y1, this._y2, -1, 1)));
+      this.gp.fit(this.X, this.y.map(v => this._rescale(v)));
       let next = this._proposeLocation(bounds, restarts, subIter);
       this.addPoint(next);
     }
+    this.gp.fit(this.X, this.y.map(v => this._rescale(v)));
   }
+}
+
+/**
+ * minimizes g(x) = |func(x)|^2
+ * @template {number[]} T
+ * @param {(params: T) => number} func
+ * @param {T} guess
+ * @param {number} epsilon
+ * @returns {T}
+ */
+export function gaussNewtonIteration(func, guess, epsilon) {
+  const g = computeGradient(func, guess, epsilon);
+  const J = [g];
+  const JT = g.map(v => [v]);
+  const Jp = solveMatrix(multMatrix(JT, J), JT);
+  const f = func(guess);
+  return guess.map((v, i) => v - Jp[i][0] * f);
+}
+
+/**
+ * minimizes g(x) = |func(x)|^2
+ * @template {number[]} T
+ * @param {(params: T) => number} func
+ * @param {number[][]} bounds [min, max][]
+ * @param {number} restarts
+ * @param {number} maxIter
+ * @param {number} epsilon
+ * @param {number} gradientEpsilon
+ * @returns {T}
+ */
+export function gaussNewtonRestarts(func, bounds, restarts, maxIter, epsilon, gradientEpsilon) {
+  const guesses = sampleLHS(restarts, bounds);
+  let minV = Number.POSITIVE_INFINITY;
+  let minG = [];
+  for (let i = 0; i < restarts; i++) {
+    let g = guesses[i];
+    let v = Math.abs(func(g));
+    for (let j = 0; j < maxIter; j++) {
+      if (v < epsilon) return g;
+      g = gaussNewtonIteration(func, g, gradientEpsilon);
+      v = Math.abs(func(g));
+    }
+    if (v < minV) {
+      minV = v;
+      minG = g;
+    }
+  }
+  return minG;
 }
