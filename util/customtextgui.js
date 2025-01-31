@@ -121,6 +121,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   let imgH = 0;
   /** @type {(typeof Font)[]} */
   let fonts = null;
+  let fDirty = false;
   const FONT_RENDER_SIZE = new StateVar(MC_FONT_SIZE);
   FONT_RENDER_SIZE.listen(v => {
     fonts = createFonts(v);
@@ -140,8 +141,10 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       cc = l.c;
     }
     FONT_RENDER_SIZE.set(Math.round(MC_FONT_SIZE * Renderer.screen.getScale() * cs));
-    if (!fonts) fonts = createFonts(FONT_RENDER_SIZE.get());
-    const tl = obj.getTrueLoc();
+    if (!fonts || fDirty) {
+      fonts = createFonts(FONT_RENDER_SIZE.get());
+      fDirty = false;
+    } const tl = obj.getTrueLoc();
     rx = tl.x;
     ry = tl.y;
     rw = imgW * MC_FONT_SIZE / FONT_RENDER_SIZE.get() * cs;
@@ -296,7 +299,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     dirty = true;
   };
   obj._markFont = function() {
-    fonts = null;
+    fDirty = true;
   };
 
   allDisplays.push(obj);
