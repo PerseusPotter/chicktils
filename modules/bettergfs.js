@@ -48,7 +48,7 @@ function fix(args, multiple = true) {
   if (!args || args.length === 0) return arr;
   args = args.map(v => String(v));
   let amt = settings.betterGFSBlankAmount.toString();
-  if (/^\d+$/.test(args[args.length - 1])) amt = args.pop();
+  if (/^\d+k?$/.test(args[args.length - 1])) amt = args.pop();
   const possIds = new Set();
   if (args.length === 1) {
     const n = sanitizeId(args[0]);
