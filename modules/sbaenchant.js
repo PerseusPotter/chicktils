@@ -138,6 +138,13 @@ const ENCHANT_DICT = [
     loreName: 'Experience',
     goodLevel: 3,
     maxLevel: 5
+  },
+  {
+    type: 'Normal',
+    nbtName: 'small_brain',
+    loreName: 'Small Brain',
+    goodLevel: 3,
+    maxLevel: 5
   }
 ];
 
