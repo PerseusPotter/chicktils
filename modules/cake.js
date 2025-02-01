@@ -16,13 +16,15 @@ const cakes = [
   '&6+5☘ Mining Fortune',
   '&4+1♨ Vitality',
   '&f+1❂ True Defense',
-  '&b+1✯ Magic Find'
+  '&b+1✯ Magic Find',
+  '&a+10ф Rift Time',
+  '&b+1❄ Cold Resistance'
 ];
 const colors = [
   '&5purple',
   '&alime',
   '&dpink',
-  '&blight blue',
+  '&bcyan (bright)',
   '&4red',
   '&1blue',
   '&6brown',
@@ -32,7 +34,9 @@ const colors = [
   '&3teal',
   '&2green',
   '&8gray',
-  '&0black'
+  '&0black',
+  '&5dark purple &7and &2green',
+  '&blight blue (dull)'
 ];
 
 let lastEatTime = 0;
@@ -47,7 +51,7 @@ function onEat(cake) {
   lastEat.delete(cake);
   if (lastEat.size === 0) prevMsg = new Message('&aAll cakes eaten!');
   else prevMsg = new Message(
-    new TextComponent(`&bEaten ${14 - lastEat.size}/14 cakes.`)
+    new TextComponent(`&bEaten ${cakes.length - lastEat.size}/${cakes.length} cakes.`)
       .setHover('show_text', [
         '&aMissing:',
         ...Array.from(lastEat.values()).map(v => `${v} &r&7(${colors[cakes.indexOf(v)]}&7)`)
