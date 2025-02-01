@@ -45,7 +45,7 @@ const arachneStartReg1 = reg('chat', () => stateIsArachne.set(1)).setCriteria('&
 const arachneStartReg2 = reg('chat', () => stateIsArachne.set(2)).setCriteria('&r&c[BOSS] Arachne&r&f: So it is time.&r').setEnabled(settings._avariceArachne);
 function arachneLeech() {
   stateIsArachne.set(3);
-  World.getAllEntities().forEach(v => arachneSpawnReg.forceTrigger(v.entity));
+  Client.scheduleTask(() => World.getAllEntities().forEach(v => arachneSpawnReg.forceTrigger(v.entity)));
 }
 const arachneLeechReg1 = reg('chat', arachneLeech).setCriteria('&r&c[BOSS] Arachne&r&f: ').setStart().setEnabled(stateArachneLeech);
 const arachneLeechReg2 = reg('chat', arachneLeech).setCriteria('&r&cThe boss is already spawning!&r').setEnabled(stateArachneLeech);
