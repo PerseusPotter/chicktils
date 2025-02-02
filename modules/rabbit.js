@@ -46,13 +46,13 @@ function scanEgg() {
   run(() => {
     const l = eggs.length;
     const { year, month, day, hour } = getSbDate();
-    const dayHash = year * 631 * 631 + month * 631 + day;
+    const timeHash = year * 631 + month * 53 + day * 47 + hour;
     eggs = list.filter(v => {
       const nbt = v.entity.func_71124_b(4)?.func_77978_p();
       if (!nbt) return false;
       const tex = nbt.func_74775_l('SkullOwner')?.func_74775_l('Properties')?.func_150295_c('textures', 10)?.func_150305_b(0)?.func_74779_i('Value');
       const pos = `${~~v.getX()},${~~v.getY()},${~~v.getZ()}`;
-      return eggTextures.find((v, i) => activeEggs[i] === 2 && v === tex && foundPos.get(`${pos}|${i % 3}`) !== dayHash);
+      return eggTextures.find((v, i) => activeEggs[i] === 2 && v === tex && (foundPos.get(pos) || 0) <= timeHash);
     }).sort((a, b) => Player.asPlayerMP().distanceTo(a) - Player.asPlayerMP().distanceTo(b));
     if (settings.rabbitAlertEggFound && eggs.length > l) unrun(() => eggFoundAlert.show(settings.rabbitAlertFoundTime));
   });
@@ -62,7 +62,7 @@ const eggSpawnReg = reg('step', () => {
     const { year, month, day, hour } = getSbDate();
     stateIsSpring.set(month <= 3);
     if (month > 3) return;
-    const dayHash = year * 631 * 631 + month * 631 + day;
+    const timeHash = year * 631 + month * 53 + day * 47 + hour;
     let type;
     if (hour === 7) type = 0;
     else if (hour === 14) type = 1;
@@ -70,8 +70,8 @@ const eggSpawnReg = reg('step', () => {
     else return;
     if (day & 1 === 0) type += 3;
 
-    if (lastSpawnDays[type] === dayHash) return;
-    lastSpawnDays[type] = dayHash;
+    if (lastSpawnDays[type] === timeHash) return;
+    lastSpawnDays[type] = timeHash;
     activeEggs[type] = 2;
 
     if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertFoundTime);
@@ -86,9 +86,14 @@ function onCollect(type) {
     const tex = e.entity.func_71124_b(4)?.func_77978_p()?.func_74775_l('SkullOwner')?.func_74775_l('Properties')?.func_150295_c('textures', 10)?.func_150305_b(0)?.func_74779_i('Value');
     const i = eggTextures.indexOf(tex);
     if (i >= 0 && i === t % 3) {
-      const { year, month, day, hour } = getSbDate();
-      const dayHash = year * 631 * 631 + month * 631 + day;
-      foundPos.set(`${~~e.getX()},${~~e.getY()},${~~e.getZ()}|${t % 3}`, dayHash);
+      let { year, month, day, hour } = getSbDate();
+      day = (day & ~1) + 1 + (t >= 3) + 2;
+      if (day > 31) {
+        day -= 31;
+        month++;
+      }
+      hour = ((t % 3) + 1) * 7;
+      foundPos.set(`${~~e.getX()},${~~e.getY()},${~~e.getZ()}`, year * 631 + month * 53 + day * 47 + hour);
     }
   }
   Client.scheduleTask(() => scanEgg());
