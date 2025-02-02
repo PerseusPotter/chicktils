@@ -909,9 +909,7 @@ export const props = {
 
   enableferoestimate: new Property('EnableFeroEstimate', page, ++sort, Property.Type.Toggle, false),
   moveFeroEstimate: new Property('MoveFeroEstimate', page, ++sort, Property.Type.Action),
-  feroEsimateMaxAge: new Property('FeroEsimateMaxAge', page, ++sort, Property.Type.Integer, 3000, { desc: 'max age in ms for bow/fero hits', min: 0 }),
   feroEstimateUpdateDelay: new Property('FeroEstimateUpdateDelay', page, ++sort, Property.Type.Integer, 500, { desc: 'delay in ms to update guess', min: 0 }),
-  feroEstimateSmoothingFactor: new Property('FeroEstimateSmoothingFactor', page, ++sort, Property.Type.Number, 0.5, { desc: 'exponential smoothing factor', min: 0, max: 1 }),
 
   enablecrosshair: new Property('EnableCustomCrosshair', page, ++sort, Property.Type.Toggle, false),
   crosshairType: new Property('CustomCrosshairType', page, ++sort, Property.Type.Option, '+', { options: ['+', 'X', '/\\', 'O', '.'] }),
