@@ -29,7 +29,7 @@ function start() {
 }
 
 /**
- * @type {{ ign: string, class: 'Archer' | 'Bers' | 'Healer' | 'Mage' | 'Tank', e: EntityLivingBase | null, me: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'> | null }[]}
+ * @type {{ ign: string, class: 'Archer' | 'Berserk' | 'Healer' | 'Mage' | 'Tank', e: EntityLivingBase | null, me: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'> | null }[]}
  */
 let players = [];
 let modules = [];
