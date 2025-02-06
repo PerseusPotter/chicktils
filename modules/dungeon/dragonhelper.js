@@ -152,29 +152,32 @@ const serverTickHitReg = reg('serverTick2', () => {
   const drag = stateDragon.get();
   if (drag.field_70128_L || drag.func_110143_aJ() <= 0 || hitTimes.length >= 4 * 20) {
     const d = DRAGONS[currDragPrio];
-    let endI = hitTimes.length;
-    while (endI > 0 && hitTimes[endI - 1] === 0) endI--;
+    let endI = 0;
+    let sum = 0;
+    let stack = 0;
+    const isDB = ['Healer', 'Tank', 'Mage'].includes(getPlayers()[0]?.['class']);
+    hitTimes.forEach((v, i) => {
+      if (v) endI = i;
+      sum += v;
+      if (isDB) {
+        if (sum >= 5 && !stack) stack = i;
+      } else {
+        if (i < 20) stack += v;
+      }
+    });
+    if (isDB && !stack) stack = hitTimes.length - 1;
     switch (settings.dungeonDragonHelperTrackHits) {
-      case 'Full': {
-        const sum = hitTimes.reduce((a, v) => a + v, 0);
+      case 'Full':
         log(`&aHit &b${sum}&a arrows in &d${formatTime(endI)}&a on ${d.color}${d.name}&a.`);
         break;
-      }
-      case 'Burst': {
-        const sum = hitTimes.slice(0, 20).reduce((a, v) => a + v, 0);
-        log(`&aHit &b${sum}&a arrows in &d${formatTime(Math.min(20, endI))}&a on ${d.color}${d.name}&a.`);
+      case 'Burst':
+        if (isDB) log(`&aHit &b${Math.min(sum, 5)}&a arrows in &d${formatTime(stack)}&a on ${d.color}${d.name}&a.`);
+        else log(`&aHit &b${stack}&a arrows in &d${formatTime(Math.min(20, endI))}&a on ${d.color}${d.name}&a.`);
         break;
-      }
-      case 'Both': {
-        let s1 = 0;
-        let s2 = 0;
-        for (let i = 0; i < hitTimes.length; i++) {
-          s1 += hitTimes[i];
-          if (i < 20) s2 += hitTimes[i];
-        }
-        log(`${d.color}${d.name}&7: &b${s1}&a arrows in &d${formatTime(endI)} &7| &b${s2}&a arrows in &d${formatTime(Math.min(20, endI))}`);
+      case 'Both':
+        if (isDB) log(`${d.color}${d.name}&7: &b${sum}&a arrows in &d${formatTime(endI)} &7| &b${Math.min(sum, 5)}&a arrows in &d${formatTime(stack)}`);
+        else log(`${d.color}${d.name}&7: &b${sum}&a arrows in &d${formatTime(endI)} &7| &b${stack}&a arrows in &d${formatTime(Math.min(20, endI))}`);
         break;
-      }
     }
 
     stateDragon.set();
