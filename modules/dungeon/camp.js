@@ -1,7 +1,7 @@
 import settings from '../../settings';
 import data from '../../data';
 import { renderOutline, renderFilledBox, renderString, getPartialServerTick } from '../../util/draw';
-import reg from '../../util/registerer';
+import reg, { customRegs } from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import { getAveragePing } from '../../util/ping';
 import createTextGui from '../../util/customtextgui';
@@ -20,7 +20,7 @@ let bloodZ = -1;
 let bloodMobCount = 0;
 const motionData = new Map();
 const dialogueSkipTimer = createTextGui(() => data.dungeonCampSkipTimerLoc, () => ['&2&l3.69s']);
-let lastSpawnedBloodMob;
+let skipKillTime = 0;
 let bloodOpenTime = 0;
 
 const stateBloodClosed = new StateVar(false);
@@ -46,7 +46,8 @@ const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand')
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) possibleSkulls.push(e);
 }).setEnabled(stateCamp);
-const serverTickReg = reg('serverTick2', () => {
+const serverTickReg = reg('serverTick2', tick => {
+  if (skipKillTime > 0) skipKillTime--;
   if (bloodOpenTime === 0 || (possibleSkulls.length === 0 && bloodMobs.length === 0)) return;
   const arr = possibleSkulls;
   possibleSkulls = [];
@@ -78,7 +79,7 @@ const serverTickReg = reg('serverTick2', () => {
         const dz = dist(z, e.getLastZ());
         if (y > 71 && (dx > 0.01 || dz > 0.01) && dx < 0.5 && dz < 0.5) {
           bloodMobCount++;
-          const ttl = t - bloodOpenTime < 32000 && (bloodMobCount <= 4 || t - bloodOpenTime < 24000) ? 80 : 40;
+          const ttl = tick - bloodOpenTime < 32 * 20 && (bloodMobCount <= 4 || tick - bloodOpenTime < 24 * 20) ? 80 : 40;
           data = {
             posX: [e.getLastX()],
             posY: [e.getLastY()],
@@ -91,12 +92,11 @@ const serverTickReg = reg('serverTick2', () => {
             lastEstZ: z,
             ttl,
             maxTtl: ttl,
-            startT: t,
             lastUpdate: t,
             timer: new DelayTimer(settings.dungeonCampSmoothTime)
           };
           motionBuff.push([uuid, data]);
-          if (ttl === 80 && bloodMobCount >= 4) lastSpawnedBloodMob = data;
+          if (ttl === 80 && bloodMobCount >= 4) skipKillTime = Math.ceil((tick - bloodOpenTime) / 40) * 40 + bloodOpenTime - tick + 80;
         }
       }
       if (data) {
@@ -151,13 +151,13 @@ const renderWorldReg = reg('renderWorld', () => {
   });
 }).setEnabled(stateCampFinal);
 const renderOverlayReg = reg('renderOverlay', () => {
-  if (lastSpawnedBloodMob && lastSpawnedBloodMob.ttl) {
-    const d = (lastSpawnedBloodMob.ttl - getPartialServerTick() - getAveragePing() / 50) * 50;
+  if (skipKillTime > 0) {
+    const d = (skipKillTime - getPartialServerTick() - getAveragePing() / 50) * 50;
     dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
     dialogueSkipTimer.render();
   }
 }).setEnabled(stateCamp.and(settings._dungeonCampSkipTimer));
-const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = Date.now())).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r').setEnabled(stateCamp);
+const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = customRegs.serverTick2.tick)).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r').setEnabled(stateCamp);
 
 export function init() {
   listenBossMessages((name, msg) => {
@@ -165,7 +165,7 @@ export function init() {
     if (msg === 'That will be enough for now.') stateBloodClosed.set(true);
     if (msg === 'You have proven yourself. You may pass.') stateBloodClosed.set(true);
     if (msg === 'Let\'s see how you can handle this.') bloodMobCount = 4;
-    if (!bloodOpenTime) bloodOpenTime = Date.now();
+    if (!bloodOpenTime) bloodOpenTime = customRegs.serverTick2.tick;
   });
   settings._moveDungeonCampSkipTimer.onAction(() => dialogueSkipTimer.edit());
 }
@@ -177,7 +177,7 @@ export function start() {
   bloodZ = -1;
   bloodMobCount = 0;
   motionData.clear();
-  lastSpawnedBloodMob = null;
+  skipKillTime = 0;
   bloodOpenTime = 0;
   stateBloodClosed.set(false);
 
