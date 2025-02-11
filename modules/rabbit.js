@@ -46,7 +46,7 @@ function scanEgg() {
   run(() => {
     const l = eggs.length;
     const { year, month, day, hour } = getSbDate();
-    const timeHash = year * 631 + month * 53 + day * 47 + hour;
+    const timeHash = year * 9857 + month * 821 + day * 29 + hour;
     eggs = list.filter(v => {
       const nbt = v.entity.func_71124_b(4)?.func_77978_p();
       if (!nbt) return false;
@@ -62,7 +62,7 @@ const eggSpawnReg = reg('step', () => {
     const { year, month, day, hour } = getSbDate();
     stateIsSpring.set(month <= 3);
     if (month > 3) return;
-    const timeHash = year * 631 + month * 53 + day * 47 + hour;
+    const timeHash = year * 9857 + month * 821 + day * 29 + hour;
     let type;
     if (hour === 7) type = 0;
     else if (hour === 14) type = 1;
@@ -93,7 +93,7 @@ function onCollect(type) {
         month++;
       }
       hour = ((t % 3) + 1) * 7;
-      foundPos.set(`${~~e.getX()},${~~e.getY()},${~~e.getZ()}`, year * 631 + month * 53 + day * 47 + hour);
+      foundPos.set(`${~~e.getX()},${~~e.getY()},${~~e.getZ()}`, year * 9857 + month * 821 + day * 29 + hour);
     }
   }
   Client.scheduleTask(() => scanEgg());
