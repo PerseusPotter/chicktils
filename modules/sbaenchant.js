@@ -145,6 +145,13 @@ const ENCHANT_DICT = [
     loreName: 'Small Brain',
     goodLevel: 3,
     maxLevel: 5
+  },
+  {
+    type: 'Normal',
+    nbtName: 'tidal',
+    loreName: 'Tidal',
+    goodLevel: 2,
+    maxLevel: 3
   }
 ];
 
