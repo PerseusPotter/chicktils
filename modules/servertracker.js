@@ -77,7 +77,8 @@ const warpLocs = {
   'dragontail': 12,
   'scarleton': 12,
   'garden': 13,
-  'jerry': 14
+  'jerry': 14,
+  'rift': 15
 };
 const tabComplete = tabCompletion(Object.keys(warpLocs));
 const regs = [
