@@ -566,14 +566,12 @@ export function gradientDescentRestarts(func, bounds, restarts = 10, iter = 100,
 }
 
 /**
- * @param {number[]} xa
- * @param {number[]} xb
+ * @param {number} d
  * @param {number} l
  * @param {number} a
  * @returns {number}
  */
-export function rbfKernel(xa, xb, l, a) {
-  const d = xa.reduce((a, v, i) => a + (v - xb[i]) ** 2, 0);
+export function rbfKernel(d, l, a) {
   return a * Math.exp(-0.5 * d / l);
 }
 
@@ -595,21 +593,13 @@ export class GaussianProcess {
     this.noiseVariance = noiseVariance;
   }
 
-  /**
-   * @param {T[]} X1
-   * @param {T[]} X2
-   * @param {number} l
-   * @param {number} a
-   * @param {number} sY
-   * @returns {number[][]}
-   */
-  _computeK(X1, X2, l, a, sY) {
+  _computePartialK(X1, X2) {
     const K = [];
 
     for (let i = 0; i < X1.length; i++) {
       K[i] = [];
       for (let j = 0; j < X2.length; j++) {
-        K[i][j] = rbfKernel(X1[i], X2[j], l, a) + (i === j ? sY : 0);
+        K[i][j] = X1[i].reduce((a, v, i) => a + (v - X2[j][i]) ** 2, 0);
       }
     }
 
@@ -617,14 +607,26 @@ export class GaussianProcess {
   }
 
   /**
+   * @param {number[][]} KP
+   * @param {number} l
+   * @param {number} a
+   * @param {number} sY
+   * @returns {number[][]}
+   */
+  _computeK(KP, l, a, sY) {
+    return KP.map((r, i) => r.map((v, j) => rbfKernel(v, l, a) + (i === j) ? sY : 0));
+  }
+
+  /**
+   * @param {number[][]} KP
    * @param {T[]} X
    * @param {number[]} y
    * @param {number} l
    * @param {number} a
    * @returns {number}
    */
-  _computeNLML(X, y, l, a) {
-    const K = this._computeK(X, X, l, a, this.noiseVariance);
+  _computeNLML(KP, X, y, l, a) {
+    const K = this._computeK(KP, l, a, this.noiseVariance);
     const M = solveMatrix(K, y.map(v => [v]));
 
     return -0.5 * (
@@ -639,8 +641,9 @@ export class GaussianProcess {
    * @param {number[]} y
    */
   fit(X, y) {
+    const KP = this._computePartialK(X, X);
     const params = gradientDescentRestarts(
-      ([l, a]) => this._computeNLML(X, y, l, a),
+      ([l, a]) => this._computeNLML(KP, X, y, l, a),
       [this.lengthScaleOptions, this.amplitudeOptions]
     );
     this.lengthScale = params[0];
@@ -648,7 +651,7 @@ export class GaussianProcess {
 
     this.XTrain = X;
     this.yTrain = y;
-    const K = this._computeK(X, X, this.lengthScale, this.amplitude, this.noiseVariance);
+    const K = this._computeK(KP, this.lengthScale, this.amplitude, this.noiseVariance);
     this.Kinv = invertMatrix(K);
   }
 
@@ -658,11 +661,11 @@ export class GaussianProcess {
    * @returns {{ mu: number[], cov?: number[] }}
    */
   predict(X, includeCov = true) {
-    const KsT = this._computeK(X, this.XTrain, this.lengthScale, this.amplitude, 0);
+    const KsT = this._computeK(this._computePartialK(X, this.XTrain), this.lengthScale, this.amplitude, 0);
     const mu = multMatrix(multMatrix(KsT, this.Kinv), this.yTrain.map(v => [v])).map(v => v[0]);
     if (!includeCov) return { mu };
     const Ks = transposeMatrix(KsT);
-    const Kss = this._computeK(X, X, this.lengthScale, this.amplitude, 1e-8);
+    const Kss = this._computeK(this._computePartialK(X, X), this.lengthScale, this.amplitude, 1e-8);
     const M = multMatrix(multMatrix(KsT, this.Kinv), Ks);
     // covariance matrix
     // const cov = Kss.map((v, i) => v.map((v, j) => v - M[i][j]));
