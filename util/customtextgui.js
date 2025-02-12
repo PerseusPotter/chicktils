@@ -179,6 +179,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       }
 
       if (v.o.length) hasObf = true;
+      v.r = true;
       lineW = Math.max(lineW, v.w);
       lineVW = Math.max(lineVW, v.vw);
     });
@@ -198,6 +199,8 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     lines.forEach((v, i) => {
+      if (!v.r) return;
+      v.r = false;
       const y = i * FONT_RENDER_SIZE.get() + ascent;
       let x = 0;
       if (cc === 1) x = lineVW - v.vw;
