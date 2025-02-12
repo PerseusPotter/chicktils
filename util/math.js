@@ -213,7 +213,7 @@ export function lineLineColl(x1, y1, x2, y2, x3, y3, x4, y4) {
 
 /**
  * @param {number[][]} arr
- * @returns {{ r: number, b: number }}
+ * @returns {{ r: number, b: number, a: number }}
  */
 export function linReg(arr) {
   const xMean = arr.reduce((a, v) => a + v[0], 0) / arr.length;
@@ -221,9 +221,10 @@ export function linReg(arr) {
   const xStd = Math.sqrt(arr.reduce((a, v) => a + (v[0] - xMean) ** 2, 0)); // should be / (n - 1)
   const yStd = Math.sqrt(arr.reduce((a, v) => a + (v[1] - yMean) ** 2, 0)); // should be / (n - 1)
   const r = arr.reduce((a, v) => a + (v[0] - xMean) * (v[1] - yMean), 0) / (xStd * yStd);
-  if (Number.isNaN(r)) return { r: 0, b: 0 };
+  if (Number.isNaN(r)) return { r: 0, b: 0, a: 0 };
   const b = r * yStd / xStd;
-  return { r, b };
+  const a = yMean - b * xMean;
+  return { r, b, a };
 }
 
 /**
