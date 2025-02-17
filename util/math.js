@@ -102,6 +102,7 @@ export function rescale(n, oldMin, oldMax, newMin, newMax) {
  * @param {number} oldValue
  * @param {number} newValue
  * @param {number} mult
+ * @returns {number}
  */
 export function lerp(oldValue, newValue, mult) {
   return oldValue + (newValue - oldValue) * mult;
@@ -614,7 +615,7 @@ export class GaussianProcess {
    * @returns {number[][]}
    */
   _computeK(KP, l, a, sY) {
-    return KP.map((r, i) => r.map((v, j) => rbfKernel(v, l, a) + (i === j) ? sY : 0));
+    return KP.map((r, i) => r.map((v, j) => rbfKernel(v, l, a) + (i === j ? sY : 0)));
   }
 
   /**
