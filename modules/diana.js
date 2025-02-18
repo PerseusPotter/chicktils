@@ -329,7 +329,7 @@ const renderWrldReg = reg('renderWorld', () => {
     renderParaCurve(
       settings.dianaGuessFromParticlesPathColor,
       t => splinePoly.map(v => v(t)),
-      19, 500,
+      20, 500,
       40,
       true
     );
