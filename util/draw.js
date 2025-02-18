@@ -601,8 +601,8 @@ export function renderParaCurve(color, func, t0, te, segments, esp = false, lw =
   worldRen.func_181668_a(3, DefaultVertexFormats.field_181705_e);
   const step = (te - t0) / segments;
   let plw = 1;
-  for (let t = t0; t < te; t += step) {
-    let pos = func(t);
+  for (let i = 0; i <= segments; i++) {
+    let pos = func(t0 + i * step);
     let { x, y, z, s } = rescaleRender(pos[0], pos[1], pos[2]);
     let l = lw * s;
     if (compareFloat(plw, l) !== 0) {
