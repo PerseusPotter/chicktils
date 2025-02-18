@@ -647,8 +647,7 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
 
   if (increase) {
     const d = Math.hypot(x - getRenderX(), y - getRenderY(), z - getRenderZ());
-    const m = d / 120;
-    scale *= 0.45 * m;
+    scale *= d / 150 * Math.sqrt(d / 200) + 0.02;
   }
 
   const lines = ChatLib.addColor(text).split('\n');
