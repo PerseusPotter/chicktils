@@ -852,3 +852,35 @@ export function newtonRaphson(func, guess, iters = 100, epsilon = 1e-7) {
   }
   return guess;
 }
+
+/**
+ * @template {number[]} T
+ * @param {T[]} points
+ * @param {number?} epsilon
+ * @param {number?} iters
+ * @param {?(a: T, b: T) => number} distance
+ * @returns {T}
+ */
+export function geoMedian(points, iters = 100, epsilon = 1e-5, distance = (a, b) => Math.hypot.apply(null, a.map((v, i) => v - b[i]))) {
+  let guess = points.reduce((a, v) => (v.forEach((n, i) => a[i] += n), a), new Array(points[0].length).fill(0)).map(v => v / points.length);
+
+  let diff = 0;
+  do {
+    let newGuess = new Array(points[0].length).fill(0);
+    let denom = 0;
+    points.forEach(v => {
+      const d = distance(v, guess);
+      if (d === 0) return;
+
+      const f = 1 / d;
+      v.forEach((v, i) => newGuess[i] += v * f);
+      denom += f;
+    });
+
+    newGuess = newGuess.map(v => v / denom);
+    diff = distance(newGuess, guess);
+    guess = newGuess;
+  } while (--iters > 0 && diff > epsilon);
+
+  return guess;
+}
