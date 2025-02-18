@@ -371,10 +371,10 @@ const renderGuessReg = reg('renderWorld', () => {
       settings[`dianaGuessFromParticles${k}Color`] ?? 0,
       true, true
     );
-    renderString(
+    if (settings.dianaGuessFromParticlesRenderName) renderString(
       k,
       v[0], v[1] + 1.5, v[2],
-      0xFFFFFFFF,
+      settings[`dianaGuessFromParticles${k}Color`] ?? 0,
       true, 1, true, true, true
     );
   });
