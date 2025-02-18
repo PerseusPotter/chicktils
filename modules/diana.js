@@ -4,7 +4,7 @@ import reg, { customRegs } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
 import { drawArrow3DPos, renderBeaconBeam, renderParaCurve, renderString, renderTracer, renderWaypoint } from '../util/draw';
-import { dist, fastDistance, gradientDescent, gradientDescentRestarts, linReg, lineRectColl, ndRegression, toPolynomial } from '../util/math';
+import { dist, fastDistance, geoMedian, gradientDescent, gradientDescentRestarts, linReg, lineRectColl, ndRegression, toPolynomial } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
 import { getItemId, getLowerContainer } from '../util/mc';
@@ -161,8 +161,8 @@ let spadeUseTime = 0;
 let prevSounds = [];
 /** @type {{ t: number, x: number, y: number, z: number }[]} */
 let prevParticles = [];
-/** @type {Record<'SplineDist1' | 'SplineDist2' | 'MLATDist1' | 'MLATDist2', [number, number, number]?>} */
-let guessPos = {};
+/** @type {Map<'Average' | 'SplineDist1' | 'SplineDist2' | 'MLATDist1' | 'MLATDist2', [number, number, number]?>} */
+let guessPos = new Map();
 /** @type {[(t: number) => number, (t: number) => number, (t: number) => number]?} */
 let splinePoly;
 let prevGuessL = 0;
@@ -176,7 +176,7 @@ function resetGuess() {
 
   prevGuessL = 0;
   unrun(() => {
-    guessPos = {};
+    guessPos.clear();
     splinePoly = null;
   });
 }
@@ -185,7 +185,8 @@ function updateGuesses() {
   if (l === prevGuessL) return;
   prevGuessL = l;
 
-  const guesses = {};
+  /** @type {typeof guessPos} */
+  const guesses = new Map();
   const particles = prevParticles.slice(0, l);
   const pitches = prevSounds.slice(0, l);
 
@@ -227,8 +228,8 @@ function updateGuesses() {
   // const splineIntPoly2 = createSplineIntersectPoly(dist2);
   const splineIntTime1 = gradientDescentRestarts(([t]) => -dist(dist1, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
   const splineIntTime2 = gradientDescentRestarts(([t]) => -dist(dist2, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
-  guesses.SplineDist1 = _splinePoly.map(v => v(splineIntTime1));
-  guesses.SplineDist2 = _splinePoly.map(v => v(splineIntTime2));
+  guesses.set('SplineDist1', _splinePoly.map(v => v(splineIntTime1)));
+  guesses.set('SplineDist2', _splinePoly.map(v => v(splineIntTime2)));
 
   {
     const poly = createPitchDistPoly(dist1);
@@ -248,20 +249,22 @@ function updateGuesses() {
     //     ),
     //     pitchB
     //   );
-    guesses.MLATDist1 = gradientDescent(
+    guesses.set('MLATDist1', gradientDescent(
       ([x, y, z]) => -particles.reduce((a, v, i) => a + Math.abs(dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB))), 0),
-      guesses.SplineDist1.slice(),
+      guesses.get('SplineDist1').slice(),
       [[-500, 500], [-500, 500], [-500, 500]]
-    );
+    ));
   }
   {
     const poly = createPitchDistPoly(dist2);
-    guesses.MLATDist2 = gradientDescent(
+    guesses.set('MLATDist2', gradientDescent(
       ([x, y, z]) => -particles.reduce((a, v, i) => a + Math.abs(dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB))), 0),
-      guesses.SplineDist2.slice(),
+      guesses.get('SplineDist2').slice(),
       [[-500, 500], [-500, 500], [-500, 500]]
-    );
+    ));
   }
+
+  guesses.set('Average', geoMedian(Array.from(guesses.values())));
 
   unrun(() => {
     splinePoly = _splinePoly;
@@ -334,7 +337,7 @@ const renderWrldReg = reg('renderWorld', () => {
       true
     );
   }
-  Object.entries(guessPos).forEach(([k, v]) => {
+  guessPos.forEach((v, k) => {
     if (!v) return;
     renderWaypoint(
       v[0], v[1], v[2],
