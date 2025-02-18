@@ -836,3 +836,19 @@ export function gaussNewtonRestarts(func, bounds, restarts, maxIter, epsilon, gr
   }
   return minG;
 }
+
+/**
+ * @param {(x: number) => number} func
+ * @param {number} guess
+ * @param {number?} iters
+ * @param {number?} epsilon
+ * @returns {number}
+ */
+export function newtonRaphson(func, guess, iters = 100, epsilon = 1e-7) {
+  let y = func(guess);
+  while (Math.abs(y) > epsilon && --iters > 0) {
+    guess -= y * 2 * epsilon / (func(guess + epsilon) - func(guess - epsilon));
+    y = func(guess);
+  }
+  return guess;
+}
