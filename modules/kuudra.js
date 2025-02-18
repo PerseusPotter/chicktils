@@ -1,4 +1,4 @@
-import { renderOutline, drawArrow2D, getRenderX, getRenderY, getRenderZ, renderBeaconBeam, renderLine3D, renderString, renderWaypoint } from '../util/draw';
+import { renderOutline, drawArrow2D, getRenderX, getRenderY, getRenderZ, renderBeaconBeam, renderLine, renderString, renderWaypoint } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
@@ -48,8 +48,8 @@ const renderReg = reg('renderWorld', () => {
         0, 1, 0,
         0, 140, 0
       );
-      renderLine3D(c, x - 1, y, z - 1, x + 1, y, z + 1, true, 2);
-      renderLine3D(c, x - 1, y, z + 1, x + 1, y, z - 1, true, 2);
+      renderLine(c, x - 1, y, z - 1, x + 1, y, z + 1, true, 2);
+      renderLine(c, x - 1, y, z + 1, x + 1, y, z - 1, true, 2);
       renderString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x, y + 1, z, c);
     });
   }
