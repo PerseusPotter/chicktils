@@ -22,6 +22,7 @@ export const log = (function() {
  * @param {Message} msg
  */
 export function logMessage(msg) {
+  if (DUMP_TO_FILE) return log(msg.getFormattedText());
   msg.addTextComponent(0, prefix);
   msg.chat();
 }
