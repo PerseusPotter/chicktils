@@ -664,32 +664,24 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
   GlStateManager2.rotate(rm.field_78732_j * getXMult(), 1, 0, 0);
   GlStateManager2.scale(-scale, -scale, -scale);
   GlStateManager2.enableAlpha();
+  GlStateManager2.enableBlend();
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
+  GlStateManager2.depthMask(false);
   if (esp) GlStateManager2.disableDepth();
 
   const widths = lines.map(v => Renderer.getStringWidth(v) / 2);
   const w = Math.max.apply(null, widths);
 
   if (renderBlackBox) {
-    GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
-    GlStateManager2.depthMask(false);
     GlStateManager2.color(0, 0, 0, 0.25);
     worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
-    worldRen.func_181662_b(-w - 1, -1, 0).func_181675_d();
-    worldRen.func_181662_b(-w - 1, 8 * lines.length + 1, 0).func_181675_d();
-    worldRen.func_181662_b(w + 1, -1, 0).func_181675_d();
-    worldRen.func_181662_b(w + 1, 8 * lines.length + 1, 0).func_181675_d();
+    worldRen.func_181662_b(-w - 1, -1, -1).func_181675_d();
+    worldRen.func_181662_b(-w - 1, 8 * lines.length + 1, -1).func_181675_d();
+    worldRen.func_181662_b(w + 1, -1, -1).func_181675_d();
+    worldRen.func_181662_b(w + 1, 8 * lines.length + 1, -1).func_181675_d();
     tess.func_78381_a();
   }
 
-  if (a === 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  } else {
-    GlStateManager2.depthMask(false);
-    GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
-  }
   GlStateManager2.color(r, g, b, a);
   GlStateManager2.enableTexture2D();
 
@@ -704,10 +696,8 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
   );
 
   GlStateManager2.popMatrix();
-  if (a !== 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  }
+  GlStateManager2.disableBlend();
+  GlStateManager2.depthMask(true);
   if (esp) GlStateManager2.enableDepth();
 }
 
