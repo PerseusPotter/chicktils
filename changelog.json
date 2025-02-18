@@ -358,6 +358,63 @@
           "desc": "rhino has bad parsing"
         }
       ]
+    },
+    {
+      "version": "0.9.0",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "null heads in dhub selector when already in smallest"
+        },
+        {
+          "type": "fix",
+          "desc": "random conc mod in avarice"
+        },
+        {
+          "type": "fix",
+          "desc": "add more cakes"
+        },
+        {
+          "type": "fix",
+          "desc": "add small brain"
+        },
+        {
+          "type": "fix",
+          "desc": "egg sniffer (but not really)"
+        },
+        {
+          "type": "change",
+          "desc": "better fero estimate"
+        },
+        {
+          "type": "fix",
+          "desc": "more /warp aliases"
+        },
+        {
+          "type": "change",
+          "desc": "arrow stack for dragons now counts time until 5 hits for t/h/m"
+        },
+        {
+          "type": "change",
+          "desc": "better camp skip timer (actually a yap skip timer now)"
+        },
+        {
+          "type": "misc",
+          "desc": "dev tax"
+        },
+        {
+          "type": "fix",
+          "desc": "add tidal enchant"
+        },
+        {
+          "type": "fix",
+          "desc": "random race cond in textgui"
+        },
+        {
+          "type": "feat",
+          "desc": "new diana solver"
+        }
+      ]
     }
   ]
 }
