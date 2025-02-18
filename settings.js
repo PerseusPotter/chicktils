@@ -3,7 +3,7 @@
 import convertToAmaterasu from './settingsAmaterasu';
 import { centerMessage } from './util/format';
 import { deleteMessages } from './util/helper';
-import { log } from './util/log';
+import { log, logMessage } from './util/log';
 import { StateVar } from './util/state';
 import { run } from './util/threading';
 
@@ -465,10 +465,14 @@ class Settings {
     if (!p) throw 'Invalid Property: ' + prop;
     if (p.type === Property.Type.Action) p.actionListeners.forEach(v => v());
     else {
+      const old = p.toString();
       if (val) p.set(p.parse(val));
       else p.set(p.defaultValue);
       this.save();
-      log(`Set ${p.name} to ${p.toString()}`);
+      logMessage(new Message(
+        `Set ${p.name} to ${p.toString()} `,
+        new TextComponent('&7[REVERT]').setClick('run_command', `/${this.module} config_ edit ${p.name} ${old}`)
+      ));
       this.refresh();
     }
   }
