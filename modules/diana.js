@@ -1,14 +1,15 @@
 import settings from '../settings';
 import data from '../data';
-import reg from '../util/registerer';
+import reg, { customRegs } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { drawArrow3DPos, renderBeaconBeam, renderString, renderTracer, renderWaypoint } from '../util/draw';
-import { dist, fastDistance, linReg, lineRectColl } from '../util/math';
+import { drawArrow3DPos, renderBeaconBeam, renderParaCurve, renderString, renderTracer, renderWaypoint } from '../util/draw';
+import { dist, fastDistance, gradientDescent, gradientDescentRestarts, linReg, lineRectColl, ndRegression, toPolynomial } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
-import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
+import { getItemId, getLowerContainer } from '../util/mc';
 import { JavaTypeOrNull } from '../util/polyfill';
+import { unrun } from '../util/threading';
 
 const warps = [
   {
@@ -62,23 +63,15 @@ const warpOpenReg = reg('guiOpened', evn => {
 const burrowFoundAlert = createAlert('Burrow Found');
 let numNotStartBurrows = 0;
 let numStartBurrows = 0;
+/** @type {[number, number, number]?} */
 let targetLoc = null;
-let guessLoc = null;
 const renderArrowOvReg = reg('renderOverlay', () => {
-  const l = targetLoc || guessLoc;
-  if (l) drawArrow3DPos(settings.dianaArrowToBurrowColor, l[0], l[1] + 1, l[2], false);
+  if (targetLoc) drawArrow3DPos(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], false);
 }).setEnabled(new StateProp(settings._preferUseTracer).not().and(settings._dianaArrowToBurrow));
 const renderArrowWrldReg = reg('renderWorld', () => {
-  const l = targetLoc || guessLoc;
-  if (l) renderTracer(settings.dianaArrowToBurrowColor, l[0], l[1] + 1, l[2], false);
+  if (targetLoc) renderTracer(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], false);
 }).setEnabled(new StateProp(settings._preferUseTracer).and(settings._dianaArrowToBurrow));
-const renderWrldReg = reg('renderWorld', () => {
-  if (guessLoc) {
-    renderWaypoint(guessLoc[0], guessLoc[1], guessLoc[2], 1, 1, settings.dianaGuessFromParticlesColor, true, true);
-    renderBeaconBeam(guessLoc[0], guessLoc[1] + 1, guessLoc[2], settings.dianaGuessFromParticlesColor, settings.useScuffedBeacon, true, true);
-    // renderString('GUESS', guessLoc[0], guessLoc[1] + 1.5, guessLoc[2]);
-  }
-}).setEnabled(settings._dianaGuessFromParticles);
+
 const GriffinBurrows = JavaTypeOrNull('gg.skytils.skytilsmod.features.impl.events.GriffinBurrows');
 // 0 repetition, clean code
 const tickReg = reg('tick', () => {
@@ -163,127 +156,249 @@ const tickReg = reg('tick', () => {
   else targetLoc = null;
 }).setEnabled(new StateVar(Boolean(GriffinBurrows)));
 
+let spadeUseTime = 0;
+/** @type {{ t: number, p: number }[]} */
 let prevSounds = [];
+/** @type {{ t: number, x: number, y: number, z: number }[]} */
 let prevParticles = [];
-const guessDir = [];
-let lastGuessTime = 0;
-let guessD = 0;
-function updateGuess() {
-  if (prevParticles.length === 0) return;
-  let gx = prevParticles[0].getX() + guessDir[0] * guessD;
-  let gz = prevParticles[0].getZ() + guessDir[1] * guessD;
-  let gy = 100;
-  let topBlock;
-  while (gy >= 60) {
-    let i = World.getBlockAt(Math.floor(gx), gy, Math.floor(gz)).type.getID();
-    if (!topBlock && i !== 0) topBlock = gy;
-    if (i === 2) break;
-    gy--;
-  }
-  guessLoc = [gx + 0.5, (gy < 60 ? (topBlock || 70) : gy), gz + 0.5];
+/** @type {Record<'SplineDist1' | 'SplineDist2' | 'MLATDist1' | 'MLATDist2', [number, number, number]?>} */
+let guessPos = {};
+/** @type {[(t: number) => number, (t: number) => number, (t: number) => number]?} */
+let splinePoly;
+let prevGuessL = 0;
+function getTickCount() {
+  return customRegs.serverTick2.tick;
 }
-const soundPlayReg = reg('soundPlay', (pos, name, vol, pit, cat, evn) => {
-  if (vol !== 1 || name !== 'note.harp') return;
-  const t = Date.now();
-  if (t - lastGuessTime > 3_000) {
-    prevSounds = [];
-    prevParticles = [];
+function resetGuess() {
+  spadeUseTime = getTickCount();
+  prevSounds = [];
+  prevParticles = [];
+
+  prevGuessL = 0;
+  unrun(() => {
+    guessPos = {};
+    splinePoly = null;
+  });
+}
+function updateGuesses() {
+  const l = Math.min(prevParticles.length, prevSounds.length);
+  if (l === prevGuessL) return;
+  prevGuessL = l;
+
+  const guesses = {};
+  const particles = prevParticles.slice(0, l);
+  const pitches = prevSounds.slice(0, l);
+
+  const splineCoeff = [
+    ndRegression(2, particles.map((v, i) => [i, v.x])),
+    ndRegression(2, particles.map((v, i) => [i, v.y])),
+    ndRegression(2, particles.map((v, i) => [i, v.z]))
+  ];
+  const _splinePoly = [
+    toPolynomial(splineCoeff[0]),
+    toPolynomial(splineCoeff[1]),
+    toPolynomial(splineCoeff[2])
+  ];
+  const { b: pitchB, a: pitchA } = linReg(pitches.map((v, i) => [i, v.p]));
+  const dist1 = 2836.3513351166325 * pitchA + -1395.7763277125964;
+  const dist2 = Math.E / pitchB;
+
+  // const createSplineIntersectPoly = (function() {
+  //   const a1 = splineCoeff[0][2];
+  //   const a2 = splineCoeff[1][2];
+  //   const a3 = splineCoeff[2][2];
+  //   const b1 = splineCoeff[0][1];
+  //   const b2 = splineCoeff[1][1];
+  //   const b3 = splineCoeff[2][1];
+  //   const c1 = splineCoeff[0][0];
+  //   const c2 = splineCoeff[1][0];
+  //   const c3 = splineCoeff[2][0];
+  //   return function(dist) {
+  //     return toPolynomial([
+  //       c1 * c1 + c2 * c2 + c3 * c3 - dist * dist,
+  //       2 * (b1 * c1 + b2 * c2 + b3 * c3),
+  //       2 * (a1 * c1 + a2 * c2 + a3 * c3) + b1 * b1 + b2 * b2 + b3 * b3,
+  //       2 * (a1 * b1 + a2 * b2 + a3 * b3),
+  //       a1 * a1 + a2 * a2 + a3 * a3
+  //     ]);
+  //   };
+  // }());
+  // const splineIntPoly1 = createSplineIntersectPoly(dist1);
+  // const splineIntPoly2 = createSplineIntersectPoly(dist2);
+  const splineIntTime1 = gradientDescentRestarts(([t]) => -dist(dist1, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
+  const splineIntTime2 = gradientDescentRestarts(([t]) => -dist(dist2, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
+  guesses.SplineDist1 = _splinePoly.map(v => v(splineIntTime1));
+  guesses.SplineDist2 = _splinePoly.map(v => v(splineIntTime2));
+
+  {
+    const poly = createPitchDistPoly(dist1);
+    // doesn't work well with large errors + ill fitted
+    // const A = particles.map(v => [1, -2 * v.x, -2 * v.y, -2 * v.z]);
+    // const b = new Array(l).fill(0).map((_, i) => [poly(pitchA + i * pitchB) ** 2 - particles[i].x ** 2 - particles[i].y ** 2 - particles[i].z ** 2]);
+    // const p =
+    //   multMatrix(
+    //     multMatrix(
+    //       invertMatrix(
+    //         multMatrix(
+    //           transposeMatrix(A),
+    //           A
+    //         )
+    //       ),
+    //       transposeMatrix(A)
+    //     ),
+    //     pitchB
+    //   );
+    guesses.MLATDist1 = gradientDescent(
+      ([x, y, z]) => -particles.reduce((a, v, i) => a + Math.abs(dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB))), 0),
+      guesses.SplineDist1.slice(),
+      [[-500, 500], [-500, 500], [-500, 500]]
+    );
+  }
+  {
+    const poly = createPitchDistPoly(dist2);
+    guesses.MLATDist2 = gradientDescent(
+      ([x, y, z]) => -particles.reduce((a, v, i) => a + Math.abs(dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB))), 0),
+      guesses.SplineDist2.slice(),
+      [[-500, 500], [-500, 500], [-500, 500]]
+    );
   }
 
-  let pX;
-  let pY;
-  let pZ;
-  if (prevSounds.length === 0) {
-    const lastBurrow = GriffinBurrows.INSTANCE.getLastDugParticleBurrow();
-    if (lastBurrow) ({ x: pX, y: pY, z: pY } = getBlockPos(lastBurrow));
+  unrun(() => {
+    splinePoly = _splinePoly;
+    guessPos = guesses;
+  });
+}
+function createPitchDistPoly(dist) {
+  return toPolynomial([
+    0.34672856180294437 * dist + 16.075158197019384,
+    2.49969541740811 * dist + -46.744667774875325,
+    -2.7801642926160226 * dist + 35.819136056204,
+    0.721661786664227 * dist + -8.207684155501738,
+  ]);
+}
 
-    if (pX === undefined || ((Player.getX() - pX) ** 2 + (Player.getY() - pY) ** 2 + (Player.getZ() - pZ) ** 2) > 25) {
-      pX = Player.getX();
-      pY = Player.getY();
-      pZ = Player.getZ();
-    }
-  } else {
-    pX = prevSounds[prevSounds.length - 1][0][0];
-    pY = prevSounds[prevSounds.length - 1][0][1];
-    pZ = prevSounds[prevSounds.length - 1][0][2];
-  }
-  if (dist(pX, pos.getX()) > (prevSounds.length ? 1 : 5) || dist(pY, pos.getY()) > (prevSounds.length ? 1.5 : 5) || dist(pZ, pos.getZ()) > (prevSounds.length ? 1 : 5)) return;
+const soundPlayReg = reg('packetReceived', pack => {
+  if (pack.func_149212_c() !== 'note.harp') return;
+  if (pack.func_149208_g() !== 1) return;
+  const pitch = pack.func_149209_h();
 
-  if (prevParticles.length === 0) lastGuessTime = t;
-  prevSounds.push([[pos.getX(), pos.getY(), pos.getZ()], pit]);
-  if (prevSounds.length < 2) return;
-
-  // https://github.com/Skytils/SkytilsMod/blob/d4c47a33db18187fd94cf7ecd297606500d4145e/src/main/kotlin/gg/skytils/skytilsmod/features/impl/events/GriffinBurrows.kt#L105
-  const { r, b } = linReg(prevSounds.map((v, i) => [i, v[1]]));
-  guessD = Math.E / b;
-  updateGuess();
-}).setEnabled(settings._dianaGuessFromParticles);
+  const t = getTickCount();
+  if (
+    t - spadeUseTime >= 70 ||
+    (
+      prevSounds.length &&
+      prevSounds[prevSounds.length - 1].p > pitch
+    )
+  ) resetGuess();
+  prevSounds.push({
+    t: t - spadeUseTime,
+    p: pitch
+  });
+  updateGuesses();
+}).setFilteredClass(net.minecraft.network.play.server.S29PacketSoundEffect).setEnabled(settings._dianaGuessFromParticles);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
-const spawnPartReg = reg('spawnParticle', (part, id, evn) => {
-  if (!id.equals(EnumParticleTypes.DRIP_LAVA)) return;
-  const t = Date.now();
-  if (t - lastGuessTime > 3_000) {
-    prevSounds = [];
-    prevParticles = [];
-    lastGuessTime = t;
+const spawnPartReg = reg('packetReceived', pack => {
+  if (!(
+    pack.func_179749_a().equals(EnumParticleTypes.DRIP_LAVA) &&
+    pack.func_149222_k() === 2 &&
+    pack.func_149227_j() === -0.5 &&
+    pack.func_179750_b() &&
+    pack.func_149221_g() === 0 &&
+    pack.func_149224_h() === 0 &&
+    pack.func_149223_i() === 0
+  )) return;
+
+  prevParticles.push({
+    t: getTickCount() - spadeUseTime,
+    x: pack.func_149220_d(),
+    y: pack.func_149226_e(),
+    z: pack.func_149225_f()
+  });
+  updateGuesses();
+}).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._dianaGuessFromParticles);
+
+const renderWrldReg = reg('renderWorld', () => {
+  if (splinePoly) {
+    renderParaCurve(
+      settings.dianaGuessFromParticlesPathColor,
+      t => splinePoly.map(v => v(t)),
+      0, 20,
+      60,
+      true
+    );
+    renderParaCurve(
+      settings.dianaGuessFromParticlesPathColor,
+      t => splinePoly.map(v => v(t)),
+      19, 500,
+      40,
+      true
+    );
   }
-  const prev = prevParticles[prevParticles.length - 1] || Player;
-  if (dist(part.getX(), prev.getX()) > 2 || dist(part.getY(), prev.getY()) > 2 || dist(part.getZ(), prev.getZ()) > 2) return;
-
-  if (prevParticles.length && prevParticles[prevParticles.length - 1].getX() - part.getX() === 0) return;
-  prevParticles.push(part);
-  if (prevParticles.length < 2) return;
-
-  const { r, b } = linReg(prevParticles.slice(-5).map(v => [v.getX(), v.getZ()]));
-  const m = Math.sign((prevParticles[prevParticles.length - 1].getX() - prevParticles[0].getX())) / Math.sqrt(1 + b * b);
-  guessDir[0] = m;
-  guessDir[1] = b * m;
-  updateGuess();
+  Object.entries(guessPos).forEach(([k, v]) => {
+    if (!v) return;
+    renderWaypoint(
+      v[0], v[1], v[2],
+      1, 1,
+      settings[`dianaGuessFromParticles${k}Color`] ?? 0,
+      true, true
+    );
+    renderBeaconBeam(
+      v[0], v[1] + 1, v[2],
+      settings[`dianaGuessFromParticles${k}Color`] ?? 0,
+      settings.useScuffedBeacon,
+      true, true
+    );
+    renderString(
+      k,
+      v[0], v[1] + 1, v[2],
+      0xFFFFFFFF,
+      true, 1, true, true, true
+    );
+  });
 }).setEnabled(settings._dianaGuessFromParticles);
 
 const startBurrowReg = reg('chat', () => {
   if (unloadReg.isRegistered()) return;
-  numNotStartBurrows = 0;
-  numStartBurrows = 0;
-  targetLoc = null;
-  guessLoc = null;
-  prevSounds = [];
-  prevParticles = [];
+
   renderArrowOvReg.register();
   renderArrowWrldReg.register();
-  renderWrldReg.register();
   tickReg.register();
   fixStReg.register();
   soundPlayReg.register();
   spawnPartReg.register();
+  renderWrldReg.register();
   unloadReg.register();
 }).setCriteria('&r&eYou dug out a Griffin Burrow! &r&7(1/4)&r');
 const unloadReg = reg('worldUnload', () => {
   renderArrowOvReg.unregister();
   renderArrowWrldReg.unregister();
-  renderWrldReg.unregister();
   tickReg.unregister();
   fixStReg.unregister();
   soundPlayReg.unregister();
   spawnPartReg.unregister();
+  renderWrldReg.unregister();
   unloadReg.unregister();
+
+  numNotStartBurrows = 0;
+  numStartBurrows = 0;
   targetLoc = null;
-  guessLoc = null;
+  prevSounds = [];
+  prevParticles = [];
+  recentDugPos.clear();
 });
 
 const warpKey = new KeyBind('Diana Warp', data.dianaWarpKey, 'ChickTils');
 warpKey.registerKeyRelease(() => {
   data.dianaWarpKey = warpKey.getKeyCode();
-  const l = targetLoc || guessLoc;
-  if (!l) return;
+  if (!targetLoc) return;
   if (data.unlockedHubWarps.filter(Boolean).length === 0) return log('open warps menu pweese (turn on paper icons, will look for heads later thx)');
   let best = null;
-  let bestD = Math.hypot(Player.getX() - l[0], Player.getY() - l[1], Player.getZ() - l[2]);
-  if (lineRectColl(Player.getX(), Player.getZ(), l[0], l[2], -60, 0, 90, 70)) bestD += 50;
+  let bestD = Math.hypot(Player.getX() - targetLoc[0], Player.getY() - targetLoc[1], Player.getZ() - targetLoc[2]);
+  if (lineRectColl(Player.getX(), Player.getZ(), targetLoc[0], targetLoc[2], -60, 0, 90, 70)) bestD += 50;
   warps.forEach((v, i) => {
     if (!data.unlockedHubWarps[i]) return;
-    let d = Math.hypot(l[0] - v.loc[0], l[1] - v.loc[1], l[2] - v.loc[2]) + v.cost;
-    if (lineRectColl(v.loc[0], v.loc[1], l[0], l[2], -60, 0, 90, 70)) d += 50;
+    let d = Math.hypot(targetLoc[0] - v.loc[0], targetLoc[1] - v.loc[1], targetLoc[2] - v.loc[2]) + v.cost;
+    if (lineRectColl(v.loc[0], v.loc[1], targetLoc[0], targetLoc[2], -60, 0, 90, 70)) d += 50;
     if (d < bestD) {
       bestD = d;
       best = v.name;
