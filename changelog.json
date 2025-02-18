@@ -415,6 +415,15 @@
           "desc": "new diana solver"
         }
       ]
+    },
+    {
+      "version": "0.9.1",
+      "changes": [
+        {
+          "type": "feat",
+          "desc": "average guess for diana"
+        }
+      ]
     }
   ]
 }
