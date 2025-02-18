@@ -4,7 +4,7 @@ import reg, { customRegs } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
 import { drawArrow3DPos, renderBeaconBeam, renderOutline, renderParaCurve, renderString, renderTracer } from '../util/draw';
-import { compareFloat, dist, geoMedian, gradientDescent, gradientDescentRestarts, linReg, lineRectColl, ndRegression, newtonRaphson, toPolynomial } from '../util/math';
+import { compareFloat, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, toPolynomial } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
