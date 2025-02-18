@@ -102,7 +102,7 @@ const burrowSpawnReg = reg('packetReceived', pack => {
   const y = Math.floor(pack.func_149226_e()) - 1;
   const z = Math.floor(pack.func_149225_f()) + 0.5;
   if (burrows.some(v => v[0] === x && v[1] === y && v[2] === z)) return;
-  if (recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z && getTickCount() - v[3] < 5)) return;
+  if (recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z && getTickCount() - v[3] < 10)) return;
 
   unrun(() => {
     if (settings.dianaAlertFoundBurrow && (!settings.dianaAlertFoundBurrowNoStart || type !== 'Start') && !recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z)) burrowFoundAlert.show(settings.dianaAlertFoundBurrowTime);
@@ -188,6 +188,7 @@ let guessPos = new Map();
 /** @type {[(t: number) => number, (t: number) => number, (t: number) => number]?} */
 let splinePoly;
 let prevGuessL = 0;
+const RESET_THRESH = 58;
 function resetGuess() {
   spadeUseTime = getTickCount();
   prevSounds = [];
@@ -312,14 +313,16 @@ const soundPlayReg = reg('packetReceived', pack => {
   const pitch = pack.func_149209_h();
 
   const t = getTickCount();
-  if (
-    t - spadeUseTime >= 60 &&
-    (
-      prevSounds.length &&
-      prevSounds[prevSounds.length - 1].p > pitch
-    ) ||
-    t - spadeUseTime >= 70
-  ) resetGuess();
+  if (prevSounds.length) {
+    if (t - spadeUseTime === prevSounds[prevSounds.length - 1].t) return;
+    const estA = prevSounds[0].p;
+    const estB = Math.E / (2836.3513351166325 * estA + -1395.7763277125964);
+    if (dist((pitch - estA) / (prevSounds.length + 1), estB) / estB > 1) {
+      if (t - spadeUseTime > RESET_THRESH) resetGuess();
+      else return;
+    }
+  }
+
   prevSounds.push({
     t: t - spadeUseTime,
     p: pitch
@@ -337,11 +340,34 @@ const spawnPartReg = reg('packetReceived', pack => {
     pack.func_149223_i() === 0
   )) return;
 
+  const x = pack.func_149220_d();
+  const y = pack.func_149226_e();
+  const z = pack.func_149225_f();
+  const t = getTickCount();
+  if (prevParticles.length) {
+    if (t - spadeUseTime === prevParticles[prevParticles.length - 1].t) return;
+    if (prevParticles.length > 2 && splinePoly) {
+      const estPX = splinePoly[0](prevParticles.length);
+      const estPY = splinePoly[1](prevParticles.length);
+      const estPZ = splinePoly[2](prevParticles.length);
+      if ((estPX - x) ** 2 + (estPY - y) ** 2 + (estPZ - z) ** 2 > 16) {
+        if (t - spadeUseTime >= RESET_THRESH) resetGuess();
+        else return;
+      }
+    } else {
+      const pp = prevParticles[prevParticles.length - 1];
+      if ((pp.x - x) ** 2 + (pp.y - y) ** 2 + (pp.z - z) ** 2 > 25) {
+        if (t - spadeUseTime >= RESET_THRESH) resetGuess();
+        else return;
+      }
+    }
+  }
+
   prevParticles.push({
-    t: getTickCount() - spadeUseTime,
-    x: pack.func_149220_d(),
-    y: pack.func_149226_e(),
-    z: pack.func_149225_f()
+    t: t - spadeUseTime,
+    x,
+    y,
+    z
   });
   updateGuesses();
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._dianaGuessFromParticles);
