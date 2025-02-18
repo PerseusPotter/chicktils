@@ -174,7 +174,7 @@ const renderTargetsReg = reg('renderWorld', () => {
     targetLoc[0], targetLoc[1] + 1, targetLoc[2],
     settings.dianaArrowToBurrowColor,
     settings.useScuffedBeacon,
-    true, true
+    true, true, 50
   );
 });
 
