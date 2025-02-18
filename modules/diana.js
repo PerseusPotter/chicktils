@@ -204,6 +204,7 @@ function updateGuesses() {
   const dist1 = 2836.3513351166325 * pitchA + -1395.7763277125964;
   const dist2 = Math.E / pitchB;
 
+  // newton-raphson dies for some reason, idk worked with node but tbh cba
   // const createSplineIntersectPoly = (function() {
   //   const a1 = splineCoeff[0][2];
   //   const a2 = splineCoeff[1][2];
@@ -226,6 +227,8 @@ function updateGuesses() {
   // }());
   // const splineIntPoly1 = createSplineIntersectPoly(dist1);
   // const splineIntPoly2 = createSplineIntersectPoly(dist2);
+  // const splineIntTime1 = newtonRaphson(splineIntPoly1, 20);
+  // const splineIntTime2 = newtonRaphson(splineIntPoly2, 20);
   const splineIntTime1 = gradientDescentRestarts(([t]) => -dist(dist1, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
   const splineIntTime2 = gradientDescentRestarts(([t]) => -dist(dist2, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
   guesses.set('SplineDist1', _splinePoly.map(v => v(splineIntTime1)));
@@ -250,7 +253,7 @@ function updateGuesses() {
     //     pitchB
     //   );
     guesses.set('MLATDist1', gradientDescent(
-      ([x, y, z]) => -particles.reduce((a, v, i) => a + Math.abs(dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB))), 0),
+      ([x, y, z]) => -particles.reduce((a, v, i) => a + dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB)), 0),
       guesses.get('SplineDist1').slice(),
       [[-500, 500], [-500, 500], [-500, 500]]
     ));
@@ -258,7 +261,7 @@ function updateGuesses() {
   {
     const poly = createPitchDistPoly(dist2);
     guesses.set('MLATDist2', gradientDescent(
-      ([x, y, z]) => -particles.reduce((a, v, i) => a + Math.abs(dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB))), 0),
+      ([x, y, z]) => -particles.reduce((a, v, i) => a + dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB)), 0),
       guesses.get('SplineDist2').slice(),
       [[-500, 500], [-500, 500], [-500, 500]]
     ));
