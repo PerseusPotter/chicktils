@@ -603,11 +603,12 @@ reg = function reg(type, shit) {
   ChickTilsWorldLoad.prototype.getList = function getList() {
     return ChickTilsWorldLoad.list;
   };
-  const stateWorldLoaded = new StateVar(false);
+  let isWorldLoaded = false;
   ChickTilsWorldLoad.worldLoadReg = reg('worldLoad', () => {
+    if (isWorldLoaded) return;
     ChickTilsWorldLoad.list.forEach(v => v.cb());
-    stateWorldLoaded.set(true);
-  }).setEnabled(new StateProp(stateWorldLoaded).not());
+    isWorldLoaded = true;
+  });
   ChickTilsWorldLoad.prototype.update = function update() {
     if (ChickTilsWorldLoad.list.size || ChickTilsWorldUnload.list.size) {
       ChickTilsWorldLoad.worldLoadReg.register();
@@ -627,9 +628,10 @@ reg = function reg(type, shit) {
     return ChickTilsWorldUnload.list;
   };
   ChickTilsWorldUnload.worldUnloadReg = reg('worldUnload', () => {
+    if (!isWorldLoaded) return;
     ChickTilsWorldUnload.list.forEach(v => v.cb());
-    stateWorldLoaded.set(false);
-  }).setEnabled(stateWorldLoaded);
+    isWorldLoaded = false;
+  });
   ChickTilsWorldUnload.prototype.update = ChickTilsWorldLoad.prototype.update;
 
   customRegs['command'] = ChickTilsCommand;
