@@ -858,6 +858,7 @@ export const props = {
   dianaGuessFromParticles: new Property('DianaGuessFromParticles', page, ++sort, Property.Type.Toggle, false, { desc: '/togglesound must be on' }),
   dianaGuessRememberPrevious: new Property('DianaRememberPreviousGuesses', page, ++sort, Property.Type.Toggle, true, { desc: 'guesses only removed when nearby burrow is found i.e. DianaScanBurrows must be on\nor use /ctsremoveclosestdiana' }),
   dianaGuessFromParticlesPathColor: new Property('DianaGuessFromParticlesPathColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color of path of particles' }),
+  dianaGuessFromParticlesRenderName: new Property('DianaGuessFromParticlesRenderName', page, ++sort, Property.Type.Toggle, false),
   dianaGuessFromParticlesAverageColor: new Property('DianaGuessFromParticlesAverageColor', page, ++sort, Property.Type.Color, 0xB000B5FF, { desc: 'color of geometric median of all guesses' }),
   dianaGuessFromParticlesSplineDist1Color: new Property('DianaGuessFromParticlesSplineDist1Color', page, ++sort, Property.Type.Color, 0x138686FF, { desc: 'color of guess from spline estimation using distance from pitch intercept' }),
   dianaGuessFromParticlesSplineDist2Color: new Property('DianaGuessFromParticlesSplineDist2Color', page, ++sort, Property.Type.Color, 0x79ECECFF, { desc: 'color of guess from spline estimation using distance from pitch slope' }),
