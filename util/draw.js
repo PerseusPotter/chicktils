@@ -566,6 +566,65 @@ export function renderLine(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
 }
 
 /**
+ * @param {number} color rgba
+ * @param {(t: number) => [number, number, number]} func
+ * @param {number} t0
+ * @param {number} te
+ * @param {number} segments
+ * @param {number} esp (false)
+ * @param {number?} lw (2)
+ */
+export function renderParaCurve(color, func, t0, te, segments, esp = false, lw = 2) {
+  if ((color & 0xFF) === 0) return;
+
+  const r = ((color >> 24) & 0xFF) / 255;
+  const g = ((color >> 16) & 0xFF) / 255;
+  const b = ((color >> 8) & 0xFF) / 255;
+  const a = ((color >> 0) & 0xFF) / 255;
+
+  GlStateManager2.pushMatrix();
+  GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
+  GlStateManager2.disableTexture2D();
+  GlStateManager2.disableLighting();
+  GlStateManager2.disableAlpha();
+  GlStateManager2.color(r, g, b, a);
+  if (a === 1) {
+    GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
+  } else {
+    GlStateManager2.depthMask(false);
+    GlStateManager2.enableBlend();
+    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
+  }
+  if (esp) GlStateManager2.disableDepth();
+
+  worldRen.func_181668_a(3, DefaultVertexFormats.field_181705_e);
+  const step = (te - t0) / segments;
+  let plw = 1;
+  for (let t = t0; t < te; t += step) {
+    let pos = func(t);
+    let { x, y, z, s } = rescaleRender(pos[0], pos[1], pos[2]);
+    let l = lw * s;
+    if (compareFloat(plw, l) !== 0) {
+      GL11.glLineWidth(l);
+      plw = l;
+    }
+    worldRen.func_181662_b(x, y, z).func_181675_d();
+  }
+  tess.func_78381_a();
+
+  GlStateManager2.popMatrix();
+  GlStateManager2.enableTexture2D();
+  GlStateManager2.enableAlpha();
+  GL11.glLineWidth(1);
+  if (a !== 1) {
+    GlStateManager2.depthMask(true);
+    GlStateManager2.disableBlend();
+  }
+  if (esp) GlStateManager2.enableDepth();
+}
+
+/**
  * @param {string} text
  * @param {number} x
  * @param {number} y
