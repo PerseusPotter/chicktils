@@ -214,7 +214,7 @@ export function renderTracer(color, x, y, z, rel = true, lw = 3) {
     z += getRenderZ();
   }
   const look = p.func_70676_i(Tessellator.partialTicks);
-  renderLine3D(color, x, y, z, getRenderX() + look.field_72450_a, getRenderY() + look.field_72448_b + getEyeHeight(p), getRenderZ() + look.field_72449_c, true, lw);
+  renderLine(color, x, y, z, getRenderX() + look.field_72450_a, getRenderY() + look.field_72448_b + getEyeHeight(p), getRenderZ() + look.field_72449_c, true, lw);
 }
 
 /**
@@ -522,7 +522,7 @@ function applyTint(c, a) {
  * @param {number} esp (false)
  * @param {number?} lw (2)
  */
-export function renderLine3D(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
+export function renderLine(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
   if ((color & 0xFF) === 0) return;
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
   ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));

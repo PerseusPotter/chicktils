@@ -1,5 +1,5 @@
 import settings from '../../settings';
-import { renderFilledBox, renderLine3D } from '../../util/draw';
+import { renderFilledBox, renderLine } from '../../util/draw';
 import reg from '../../util/registerer';
 import Grid from '../../util/grid';
 import { getBlockPos } from '../../util/mc';
@@ -66,7 +66,7 @@ const renderWorldReg = reg('renderWorld', () => {
     // average rhino L
     // java.lang.ClassCastException: java.lang.Boolean cannot be cast to [Ljava.lang.Object;
     // drawLine(settings.dungeonStairStonkHelperColor, ...v[1], ...v[2], 2);
-    renderLine3D(
+    renderLine(
       settings.dungeonStairStonkHelperColor,
       v[1][0], v[1][1], v[1][2],
       v[2][0], v[2][1], v[2][2],

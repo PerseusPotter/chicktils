@@ -1,7 +1,7 @@
 import settings from '../../settings';
 import data from '../../data';
 import createGui from '../../util/customgui';
-import { renderOutline, renderFilledBox, renderLine3D, renderString, renderBeaconBeam } from '../../util/draw';
+import { renderOutline, renderFilledBox, renderLine, renderString, renderBeaconBeam } from '../../util/draw';
 import createAlert from '../../util/alert';
 import reg from '../../util/registerer';
 import { colorForNumber, execCmd, getPlayerName } from '../../util/format';
