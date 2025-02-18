@@ -384,7 +384,6 @@ const unloadReg = reg('worldUnload', () => {
   targetLoc = null;
   prevSounds = [];
   prevParticles = [];
-  recentDugPos.clear();
 });
 
 const warpKey = new KeyBind('Diana Warp', data.dianaWarpKey, 'ChickTils');
