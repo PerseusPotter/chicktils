@@ -424,6 +424,23 @@
           "desc": "average guess for diana"
         }
       ]
+    },
+    {
+      "version": "0.9.2",
+      "changes": [
+        {
+          "type": "change",
+          "desc": "diana remove skytils dependency"
+        },
+        {
+          "type": "change",
+          "desc": "random diana changes"
+        },
+        {
+          "type": "feat",
+          "desc": "add revert button when settings changed"
+        }
+      ]
     }
   ]
 }
