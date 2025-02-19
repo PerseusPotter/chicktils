@@ -102,7 +102,7 @@ const burrowSpawnReg = reg('packetReceived', pack => {
   const y = Math.floor(pack.func_149226_e()) - 1;
   const z = Math.floor(pack.func_149225_f()) + 0.5;
   if (burrows.some(v => v[0] === x && v[1] === y && v[2] === z)) return;
-  if (recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z && getTickCount() - v[3] < 10)) return;
+  if (recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z && getTickCount() - v[3] < 20)) return;
 
   unrun(() => {
     if (settings.dianaAlertFoundBurrow && (!settings.dianaAlertFoundBurrowNoStart || type !== 'Start') && !recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z)) burrowFoundAlert.show(settings.dianaAlertFoundBurrowTime);
@@ -290,7 +290,7 @@ function updateGuesses() {
   }
 
   const allGuesses = Array.from(guesses.values());
-  if (l <= 5) guesses.forEach((v, k) => k.includes('Dist1') && allGuesses.push(v));
+  if (l <= 10) guesses.forEach((v, k) => k.includes('Dist1') && allGuesses.push(v));
   guesses.set('Average', geoMedian(allGuesses));
 
   unrun(() => {
