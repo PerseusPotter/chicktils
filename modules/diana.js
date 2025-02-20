@@ -3,7 +3,7 @@ import data from '../data';
 import reg, { customRegs } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { drawArrow3DPos, renderBeaconBeam, renderOutline, renderParaCurve, renderString, renderTracer } from '../util/draw';
+import { drawArrow3DPos, renderBeaconBeam, renderLine, renderOutline, renderParaCurve, renderString, renderTracer } from '../util/draw';
 import { compareFloat, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, toPolynomial } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp } from '../util/state';
@@ -187,6 +187,8 @@ let prevParticles = [];
 let guessPos = new Map();
 /** @type {[(t: number) => number, (t: number) => number, (t: number) => number]?} */
 let splinePoly;
+/** @type {[[number, number], [number, number], number]?} */
+let arrowVec;
 let prevGuessL = 0;
 const RESET_THRESH = 58;
 function resetGuess() {
@@ -289,18 +291,30 @@ function updateGuesses() {
       [[-500, 500], [-500, 500], [-500, 500]]
     ));
   }
-  {
-    const poly = createPitchDistPoly(dist2);
-    guesses.set('MLATDist2', gradientDescent(
-      ([x, y, z]) => -particles.reduce((a, v, i) => a + dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB)), 0),
-      guesses.get('SplineDist2').slice(),
-      [[-500, 500], [-500, 500], [-500, 500]]
-    ));
+
+  if (arrowVec) {
+    // const AVERAGE_BURROW_Y = 75;
+    const BURROW_Y = guesses.get('Spline')[1];
+    const xl = arrowVec[0][0];
+    const zl = arrowVec[0][1];
+    const xc = particles[0].x;
+    const yc = particles[0].y;
+    const zc = particles[0].z;
+    const cx = xl - xc;
+    const cz = zl - zc;
+    if (cx ** 2 + cz ** 2 < 225) {
+      const dx = arrowVec[1][0];
+      const dz = arrowVec[1][1];
+      const A = dx + dz;
+      const B = 2 * (cx * dx + cz * dz);
+      const D2 = distance * distance - (yc - BURROW_Y) ** 2;
+      const C = cx * cx + cz * cz - D2;
+      const t = (-B + Math.sign(A) * Math.sqrt(B * B - 4 * A * C)) / 2 / A;
+      guesses.set('Arrow', [xl + t * dx, BURROW_Y, zl + t * dz]);
+    }
   }
 
-  const allGuesses = Array.from(guesses.values());
-  if (l <= 10) guesses.forEach((v, k) => k.includes('Dist1') && allGuesses.push(v));
-  guesses.set('Average', geoMedian(allGuesses));
+  guesses.set('Average', geoMedian(Array.from(guesses.values())));
 
   unrun(() => {
     splinePoly = _splinePoly;
@@ -380,6 +394,37 @@ const spawnPartReg = reg('packetReceived', pack => {
   });
   updateGuesses();
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._dianaGuessFromParticles);
+const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
+const armorStandReg = reg('packetReceived', (pack, doDupe) => {
+  if (pack.func_149388_e() !== 0) return;
+  const ent = World.getWorld().func_73045_a(pack.func_149389_d());
+  if (!ent) {
+    if (doDupe) Client.scheduleTask(2, () => armorStandReg.forceTrigger(pack, Number.isInteger(doDupe) ? doDupe - 1 : 10));
+    return;
+  }
+  if (!(ent instanceof EntityArmorStand)) return;
+  if (getItemId(pack.func_149390_c()) !== 'minecraft:arrow') return;
+
+  const yaw = ent.field_70177_z * Math.PI / 180;
+  const x = ent.field_70165_t - Math.sin(yaw + Math.PI / 2) * 0.9;
+  const y = ent.field_70163_u;
+  const z = ent.field_70161_v + Math.cos(yaw + Math.PI / 2) * 0.9;
+
+  if (!recentDugBurrows.some(v =>
+    Math.floor(x) === Math.floor(v[0]) &&
+    Math.floor(y) === v[1] &&
+    Math.floor(z) === Math.floor(v[2])
+  )) return;
+
+  arrowVec = [
+    [x, z],
+    [
+      -Math.sin(yaw),
+      +Math.cos(yaw)
+    ],
+    y
+  ];
+}).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment).setEnabled(settings._dianaGuessFromParticles);
 
 const renderGuessReg = reg('renderWorld', () => {
   if (splinePoly) {
@@ -413,6 +458,28 @@ const renderGuessReg = reg('renderWorld', () => {
       true, 1, true, true, true
     );
   });
+  if (arrowVec) {
+    renderLine(
+      settings.dianaGuessFromParticlesArrowColor,
+      arrowVec[0][0],
+      arrowVec[2],
+      arrowVec[0][1],
+      arrowVec[0][0] + arrowVec[1][0] * 500,
+      arrowVec[2],
+      arrowVec[0][1] + arrowVec[1][1] * 500,
+      true
+    );
+    renderParaCurve(
+      settings.dianaGuessFromParticlesArrowColor,
+      t => [
+        15 * Math.sin(t) + arrowVec[0][0],
+        arrowVec[2],
+        15 * Math.cos(t) + arrowVec[0][1]
+      ],
+      0, Math.PI * 2,
+      20, true
+    );
+  }
 }).setEnabled(settings._dianaGuessFromParticles);
 
 const tickReg = reg('tick', () => {
@@ -461,6 +528,7 @@ const startBurrowReg = reg('chat', () => {
   renderTargetsReg.register();
   soundPlayReg.register();
   spawnPartReg.register();
+  armorStandReg.register();
   renderGuessReg.register();
   tickReg.register();
   renderArrowOvReg.register();
@@ -475,6 +543,7 @@ const unloadReg = reg('worldUnload', () => {
   renderTargetsReg.unregister();
   soundPlayReg.unregister();
   spawnPartReg.unregister();
+  armorStandReg.unregister();
   renderGuessReg.unregister();
   tickReg.unregister();
   renderArrowOvReg.unregister();
