@@ -198,7 +198,18 @@ function resetGuess() {
   unrun(() => {
     if (settings.dianaGuessRememberPrevious && !foundGuessBurrow && guessPos.has('Average')) {
       const v = guessPos.get('Average');
-      prevGuesses.push([v[0], v[1], v[2], getTickCount()]);
+      if (
+        (
+          v[2] < -30 ?
+            v[0] > -230 :
+            v[0] > -300
+        ) &&
+        v[0] < 210 &&
+        v[2] > -240 &&
+        v[2] < 210 &&
+        v[1] > 50 &&
+        v[1] < 120
+      ) prevGuesses.push([v[0], v[1], v[2], getTickCount()]);
     }
     guessPos.clear();
     splinePoly = null;
