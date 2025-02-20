@@ -6,7 +6,9 @@ const itemIdDict = Java.type('net.minecraft.item.Item').field_150901_e;
  * @returns {string}
  */
 export function getItemId(item) {
-  return itemIdDict.func_177774_c(item.func_77973_b()).toString();
+  const i = item?.func_77973_b();
+  if (!i) return '';
+  return itemIdDict.func_177774_c(i).toString();
 }
 
 const lowerInvF = setAccessible(Java.type('net.minecraft.client.gui.inventory.GuiChest').class.getDeclaredField('field_147015_w'));
