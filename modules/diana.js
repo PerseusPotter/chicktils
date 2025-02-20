@@ -434,16 +434,15 @@ const tickReg = reg('tick', () => {
   });
   if (i > 0) burrows = burrows.slice(i);
 
-  i = 0;
-  prevGuesses.forEach(v => {
-    if (t - v[3] > 5 * 60 * 20) return i++;
+  prevGuesses = prevGuesses.filter(v => {
+    if (t - v[3] > 5 * 60 * 20) return false;
     const d = (Player.getX() - v[0]) ** 2 + (Player.getY() - v[1]) ** 2 + (Player.getZ() - v[2]) ** 2;
     if (!closest || d < closestD) {
       closest = v;
       closestD = d;
     }
+    return d > 100;
   });
-  if (i > 0) prevGuesses = prevGuesses.slice(i);
 
   targetLoc = closest;
 });
