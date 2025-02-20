@@ -856,14 +856,13 @@ export const props = {
   dianaAlertFoundBurrowTime: new Property('DianaAlertFoundBurrowTime', page, ++sort, Property.Type.Integer, 500, { desc: 'in ms' }),
   dianaAlertFoundBurrowSound: new Property('DianaAlertFoundBurrowSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   dianaGuessFromParticles: new Property('DianaGuessFromParticles', page, ++sort, Property.Type.Toggle, false, { desc: '/togglesound must be on' }),
+  dianaGuessDistanceEstimator: new Property('DianaGuessDistanceEstimator', page, ++sort, Property.Type.Option, 'Slope', { options: ['Slope', 'Intercept'], desc: 'what to use to guess distance\nSlope: of sound pitch (most accurate if you wait long)\nIntercept: uses (estimate) of the first pitch' }),
   dianaGuessRememberPrevious: new Property('DianaRememberPreviousGuesses', page, ++sort, Property.Type.Toggle, true, { desc: 'guesses only removed when nearby burrow is found i.e. DianaScanBurrows must be on\nor use /ctsremoveclosestdiana' }),
   dianaGuessFromParticlesPathColor: new Property('DianaGuessFromParticlesPathColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color of path of particles' }),
   dianaGuessFromParticlesRenderName: new Property('DianaGuessFromParticlesRenderName', page, ++sort, Property.Type.Toggle, false),
   dianaGuessFromParticlesAverageColor: new Property('DianaGuessFromParticlesAverageColor', page, ++sort, Property.Type.Color, 0xB000B5FF, { desc: 'color of geometric median of all guesses' }),
-  dianaGuessFromParticlesSplineDist1Color: new Property('DianaGuessFromParticlesSplineDist1Color', page, ++sort, Property.Type.Color, 0x138686FF, { desc: 'color of guess from spline estimation using distance from pitch intercept' }),
-  dianaGuessFromParticlesSplineDist2Color: new Property('DianaGuessFromParticlesSplineDist2Color', page, ++sort, Property.Type.Color, 0x79ECECFF, { desc: 'color of guess from spline estimation using distance from pitch slope' }),
-  dianaGuessFromParticlesMLATDist1Color: new Property('DianaGuessFromParticlesMLATDist1Color', page, ++sort, Property.Type.Color, 0xB31919FF, { desc: 'color of guess from multilateration using distance from pitch intercept' }),
-  dianaGuessFromParticlesMLATDist2Color: new Property('DianaGuessFromParticlesMLATDist2Color', page, ++sort, Property.Type.Color, 0xEC7979FF, { desc: 'color of guess from multilateration using distance from pitch slope' }),
+  dianaGuessFromParticlesSplineColor: new Property('DianaGuessFromParticlesSplineColor', page, ++sort, Property.Type.Color, 0x138686FF, { desc: 'color of guess from spline estimation' }),
+  dianaGuessFromParticlesMLATColor: new Property('DianaGuessFromParticlesMLATColor', page, ++sort, Property.Type.Color, 0xB31919FF, { desc: 'color of guess from multilateration' }),
 
   // 14
   enableabsorption: new Property('EnableCustomAbsorption', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'custom absorption renderer to more accurately portray total hp' }),

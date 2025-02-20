@@ -183,7 +183,7 @@ let spadeUseTime = 0;
 let prevSounds = [];
 /** @type {{ t: number, x: number, y: number, z: number }[]} */
 let prevParticles = [];
-/** @type {Map<'Average' | 'SplineDist1' | 'SplineDist2' | 'MLATDist1' | 'MLATDist2', [number, number, number]?>} */
+/** @type {Map<'Average' | 'Spline' | 'MLAT' | 'Arrow', [number, number, number]?>} */
 let guessPos = new Map();
 /** @type {[(t: number) => number, (t: number) => number, (t: number) => number]?} */
 let splinePoly;
@@ -237,9 +237,11 @@ function updateGuesses() {
     toPolynomial(splineCoeff[2])
   ];
   const { b: pitchB, a: pitchA } = linReg(pitches.map((v, i) => [i, v.p]));
-  const dist1 = 2836.3513351166325 * pitchA + -1395.7763277125964;
-  const dist2 = Math.E / pitchB;
-  if (dist(dist1 - dist2) * 2 / (dist1 + dist2) > 0.2) return;
+  const distance =
+    settings.dianaGuessDistanceEstimator === 'Slope' ?
+      Math.E / pitchB :
+      2836.3513351166325 * pitchA + -1395.7763277125964;
+  // const dist3 = 2924.6641104450428 * pitches[0].p + -1442.1515587278568;
 
   const createSplineIntersectPoly = (function() {
     const a1 = splineCoeff[0][2];
@@ -258,17 +260,13 @@ function updateGuesses() {
       ]);
     };
   }());
-  const splineIntPoly1 = createSplineIntersectPoly(dist1);
-  const splineIntPoly2 = createSplineIntersectPoly(dist2);
-  const splineIntTime1 = newtonRaphson(splineIntPoly1, 1);
-  const splineIntTime2 = newtonRaphson(splineIntPoly2, 1);
-  // const splineIntTime1 = gradientDescentRestarts(([t]) => -dist(dist1, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
-  // const splineIntTime2 = gradientDescentRestarts(([t]) => -dist(dist2, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
-  guesses.set('SplineDist1', _splinePoly.map(v => v(splineIntTime1)));
-  guesses.set('SplineDist2', _splinePoly.map(v => v(splineIntTime2)));
+  const splineIntPoly = createSplineIntersectPoly(distance);
+  const splineIntTime = newtonRaphson(splineIntPoly, 1);
+  // const splineIntTime = gradientDescentRestarts(([t]) => -dist(distance, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
+  guesses.set('Spline', _splinePoly.map(v => v(splineIntTime)));
 
   {
-    const poly = createPitchDistPoly(dist1);
+    const poly = createPitchDistPoly(distance);
     // doesn't work well with large errors + ill fitted
     // const A = particles.map(v => [1, -2 * v.x, -2 * v.y, -2 * v.z]);
     // const b = new Array(l).fill(0).map((_, i) => [poly(pitchA + i * pitchB) ** 2 - particles[i].x ** 2 - particles[i].y ** 2 - particles[i].z ** 2]);
@@ -285,9 +283,9 @@ function updateGuesses() {
     //     ),
     //     pitchB
     //   );
-    guesses.set('MLATDist1', gradientDescent(
+    guesses.set('MLAT', gradientDescent(
       ([x, y, z]) => -particles.reduce((a, v, i) => a + dist(Math.hypot(v.x - x, v.y - y, v.z - z), poly(pitchA + i * pitchB)), 0),
-      guesses.get('SplineDist1').slice(),
+      guesses.get('Spline').slice(),
       [[-500, 500], [-500, 500], [-500, 500]]
     ));
   }
