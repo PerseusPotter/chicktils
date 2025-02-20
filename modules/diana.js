@@ -112,11 +112,11 @@ const burrowSpawnReg = reg('packetReceived', pack => {
       type
     ]);
 
-    prevGuesses = prevGuesses.filter(v => (x - v[0]) ** 2 + (y - v[1]) ** 2 + (z - v[2]) ** 2 > 400);
+    prevGuesses = prevGuesses.filter(v => (x - v[0]) ** 2 + (z - v[2]) ** 2 > 400);
 
     if (guessPos.has('Average')) {
       const p = guessPos.get('Average');
-      const d = (x - p[0]) ** 2 + (y - p[1]) ** 2 + (z - p[2]) ** 2;
+      const d = (x - p[0]) ** 2 + (z - p[2]) ** 2;
       if (d < 400) foundGuessBurrow = true;
       if (d < 100) resetGuess();
     }
