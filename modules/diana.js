@@ -305,7 +305,7 @@ function updateGuesses() {
     if (cx ** 2 + cz ** 2 < 225) {
       const dx = arrowVec[1][0];
       const dz = arrowVec[1][1];
-      const A = dx + dz;
+      const A = dx * dx + dz * dz;
       const B = 2 * (cx * dx + cz * dz);
       const D2 = distance * distance - (yc - BURROW_Y) ** 2;
       const C = cx * cx + cz * cz - D2;
