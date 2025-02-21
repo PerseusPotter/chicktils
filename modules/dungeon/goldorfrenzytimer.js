@@ -21,7 +21,7 @@ const renderReg = reg('renderOverlay', () => {
   timerHud.setLine(colorForNumber(t, 3000) + t.toFixed(0));
   timerHud.render();
 }).setEnabled(stateGoldorTimer.and(stateInGoldor));
-const serverTickReg = reg('serverTick2', () => ticksInvul = ticksInvul > 0 ? ticksInvul - 1 : 60).setEnabled(stateGoldorTimer.and(stateInGoldor));
+const serverTickReg = reg('serverTick2', () => ticksInvul = ticksInvul > 1 ? ticksInvul - 1 : 60).setEnabled(stateGoldorTimer.and(stateInGoldor));
 const goldorStartReg = reg('chat', () => stateInGoldor.set(true)).setCriteria('&r&4[BOSS] Goldor&r&c: &r&cWho dares trespass into my domain?&r').setEnabled(stateGoldorTimer);
 const goldorEndReg = reg('chat', () => stateInGoldor.set(false)).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(stateGoldorTimer);
 
