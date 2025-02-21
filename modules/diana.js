@@ -51,7 +51,7 @@ function getTickCount() {
 const burrowFoundAlert = createAlert('Burrow Found');
 /** @type {[number, number, number]?} */
 let targetLoc = null;
-/** @type {[number, number, number, number][]} */
+/** @type {[number, number, number, number, number][]} */
 let prevGuesses = [];
 /** @type {[number, number, number, number, 'Start' | 'Mob' | 'Treasure'][]} */
 let burrows = [];
@@ -211,7 +211,7 @@ function resetGuess() {
         v[2] < 210 &&
         v[1] > 50 &&
         v[1] < 120
-      ) prevGuesses.push([v[0], v[1], v[2], getTickCount()]);
+      ) prevGuesses.push([v[0], v[1], v[2], getTickCount(), 40]);
     }
     guessPos.clear();
     splinePoly = null;
@@ -506,7 +506,8 @@ const tickReg = reg('tick', () => {
       closest = v;
       closestD = d;
     }
-    return d > 100;
+    if (d <= 100) return --v[4] > 0;
+    return true;
   });
 
   targetLoc = closest;
