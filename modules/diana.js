@@ -131,6 +131,7 @@ const burrowDigReg = reg('packetSent', pack => {
   const { x, y, z } = getBlockPos(bp);
   if (x === -1 && y === -1 && z === -1) return;
 
+  prevStand = null;
   unrun(() => {
     const burrowI = burrows.findIndex(v => v[0] === x + 0.5 && v[1] === y && v[2] === z + 0.5);
     if (burrowI >= 0) {
@@ -189,6 +190,10 @@ let guessPos = new Map();
 let splinePoly;
 /** @type {[[number, number], [number, number], number]?} */
 let arrowVec;
+/** @type {string[]} */
+let recentStands = [];
+/** @type {string?} */
+let prevStand;
 let prevGuessL = 0;
 const RESET_THRESH = 58;
 function resetGuess() {
@@ -292,7 +297,7 @@ function updateGuesses() {
     ));
   }
 
-  if (arrowVec) {
+  if (arrowVec && prevStand) {
     // const AVERAGE_BURROW_Y = 75;
     const BURROW_Y = guesses.get('Spline')[1];
     const xl = arrowVec[0][0];
@@ -302,16 +307,14 @@ function updateGuesses() {
     const zc = particles[0].z;
     const cx = xl - xc;
     const cz = zl - zc;
-    if (cx ** 2 + cz ** 2 < 225) {
-      const dx = arrowVec[1][0];
-      const dz = arrowVec[1][1];
-      const A = dx * dx + dz * dz;
-      const B = 2 * (cx * dx + cz * dz);
-      const D2 = distance * distance - (yc - BURROW_Y) ** 2;
-      const C = cx * cx + cz * cz - D2;
-      const t = (-B + Math.sign(A) * Math.sqrt(B * B - 4 * A * C)) / 2 / A;
-      guesses.set('Arrow', [xl + t * dx, BURROW_Y, zl + t * dz]);
-    }
+    const dx = arrowVec[1][0];
+    const dz = arrowVec[1][1];
+    const A = dx * dx + dz * dz;
+    const B = 2 * (cx * dx + cz * dz);
+    const D2 = distance * distance - (yc - BURROW_Y) ** 2;
+    const C = cx * cx + cz * cz - D2;
+    const t = (-B + Math.sign(A) * Math.sqrt(B * B - 4 * A * C)) / 2 / A;
+    guesses.set('Arrow', [xl + t * dx, BURROW_Y, zl + t * dz]);
   }
 
   guesses.set('Average', geoMedian(Array.from(guesses.values())));
@@ -416,6 +419,11 @@ const armorStandReg = reg('packetReceived', (pack, doDupe) => {
     Math.floor(z) === Math.floor(v[2])
   )) return;
 
+  const id = `${Math.floor(x)},${Math.floor(y)},${Math.floor(z)}`;
+  if (recentStands.includes(id)) return;
+  recentStands.push(id);
+  if (recentStands.length > 5) recentStands.shift();
+
   arrowVec = [
     [x, z],
     [
@@ -424,6 +432,7 @@ const armorStandReg = reg('packetReceived', (pack, doDupe) => {
     ],
     y
   ];
+  prevStand = id;
 }).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment).setEnabled(settings._dianaGuessFromParticles);
 
 const renderGuessReg = reg('renderWorld', () => {
@@ -458,28 +467,16 @@ const renderGuessReg = reg('renderWorld', () => {
       true, 1, true, true, true
     );
   });
-  if (arrowVec) {
-    renderLine(
-      settings.dianaGuessFromParticlesArrowColor,
-      arrowVec[0][0],
-      arrowVec[2],
-      arrowVec[0][1],
-      arrowVec[0][0] + arrowVec[1][0] * 500,
-      arrowVec[2],
-      arrowVec[0][1] + arrowVec[1][1] * 500,
-      true
-    );
-    renderParaCurve(
-      settings.dianaGuessFromParticlesArrowColor,
-      t => [
-        15 * Math.sin(t) + arrowVec[0][0],
-        arrowVec[2],
-        15 * Math.cos(t) + arrowVec[0][1]
-      ],
-      0, Math.PI * 2,
-      20, true
-    );
-  }
+  if (arrowVec) renderLine(
+    settings.dianaGuessFromParticlesArrowColor,
+    arrowVec[0][0],
+    arrowVec[2],
+    arrowVec[0][1],
+    arrowVec[0][0] + arrowVec[1][0] * 500,
+    arrowVec[2],
+    arrowVec[0][1] + arrowVec[1][1] * 500,
+    true
+  );
 }).setEnabled(settings._dianaGuessFromParticles);
 
 const tickReg = reg('tick', () => {
