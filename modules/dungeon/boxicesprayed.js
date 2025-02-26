@@ -106,7 +106,13 @@ const serverTickReg = reg('serverTick2', () => {
         if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) frozenBuff.push([e, 5 * 20]);
       });
     });
-    if (frozenBuff.length) unrun(() => frozenMobs = frozenMobs.concat(frozenBuff));
+    if (frozenBuff.length) unrun(() => {
+      frozenBuff.forEach(([e, t]) => {
+        const i = frozenMobs.findIndex(v => v[0] === e);
+        if (i >= 0) frozenMobs.splice(i, 1);
+        frozenMobs.push([e, t]);
+      });
+    });
   });
 }).setEnabled(settings._dungeonBoxIceSprayed);
 const renderWorldReg = reg('renderWorld', partial => {
