@@ -865,6 +865,7 @@ export const props = {
   dianaGuessFromParticlesSplineColor: new Property('DianaGuessFromParticlesSplineColor', page, ++sort, Property.Type.Color, 0x138686FF, { desc: 'color of guess from spline estimation' }),
   dianaGuessFromParticlesMLATColor: new Property('DianaGuessFromParticlesMLATColor', page, ++sort, Property.Type.Color, 0xB31919FF, { desc: 'color of guess from multilateration' }),
   dianaGuessFromParticlesArrowColor: new Property('DianaGuessFromParticlesArrowColor', page, ++sort, Property.Type.Color, 0x14B814FF, { desc: 'color of guess from armor stand arrow' }),
+  dianaGuessFromParticlesBezierColor: new Property('DianaGuessFromParticlesBezierColor', page, ++sort, Property.Type.Color, 0xFF8000FF, { desc: 'color of guess from bezier + control point' }),
 
   // 14
   enableabsorption: new Property('EnableCustomAbsorption', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'custom absorption renderer to more accurately portray total hp' }),

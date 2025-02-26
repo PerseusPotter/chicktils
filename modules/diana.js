@@ -4,7 +4,7 @@ import reg, { customRegs } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
 import { drawArrow3DPos, renderBeaconBeam, renderLine, renderOutline, renderParaCurve, renderString, renderTracer } from '../util/draw';
-import { compareFloat, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, toPolynomial } from '../util/math';
+import { compareFloat, convergeHalfInterval, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, toPolynomial } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
@@ -184,7 +184,7 @@ let spadeUseTime = 0;
 let prevSounds = [];
 /** @type {{ t: number, x: number, y: number, z: number }[]} */
 let prevParticles = [];
-/** @type {Map<'Average' | 'Spline' | 'MLAT' | 'Arrow', [number, number, number]?>} */
+/** @type {Map<'Average' | 'Spline' | 'MLAT' | 'Arrow' | 'Bezier', [number, number, number]?>} */
 let guessPos = new Map();
 /** @type {[(t: number) => number, (t: number) => number, (t: number) => number]?} */
 let splinePoly;
@@ -315,6 +315,33 @@ function updateGuesses() {
     const C = cx * cx + cz * cz - D2;
     const t = (-B + Math.sign(A) * Math.sqrt(B * B - 4 * A * C)) / 2 / A;
     guesses.set('Arrow', [xl + t * dx, BURROW_Y, zl + t * dz]);
+  }
+
+  {
+    // from https://github.com/hannibal002/SkyHanni/blob/08e5cf831e3e22401d1de830ee522aadcff6634d/src/main/java/at/hannibal2/skyhanni/utils/PolynomialFitter.kt
+    const spline3X = ndRegression(3, particles.map((v, i) => [i, v.x]));
+    const spline3Y = ndRegression(3, particles.map((v, i) => [i, v.y]));
+    const spline3Z = ndRegression(3, particles.map((v, i) => [i, v.z]));
+    const dx0 = spline3X[1];
+    const dy0 = spline3Y[1];
+    const dz0 = spline3Z[1];
+    const xz = Math.hypot(dx0, dz0);
+
+    const weight = Math.sqrt(-24 * Math.sin(
+      convergeHalfInterval(
+        x => Math.atan2(Math.sin(x) - 0.75, Math.cos(x)),
+        -Math.atan2(dy0, xz),
+        -Math.PI / 2,
+        Math.PI / 2,
+        true
+      )
+    ) + 25);
+    const t = 3 * weight / Math.hypot(dx0, dy0, dz0);
+    guesses.set('Bezier', [
+      toPolynomial(spline3X)(t) + 0.5,
+      toPolynomial(spline3Y)(t),
+      toPolynomial(spline3Z)(t) + 0.5
+    ]);
   }
 
   guesses.set('Average', geoMedian(Array.from(guesses.values())));
