@@ -29,7 +29,7 @@ function start() {
 }
 
 /**
- * @type {{ ign: string, class: 'Archer' | 'Berserk' | 'Healer' | 'Mage' | 'Tank', e: EntityLivingBase | null, me: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'> | null }[]}
+ * @type {{ ign: string, class: 'Archer' | 'Berserk' | 'Healer' | 'Mage' | 'Tank', e: EntityLivingBase | null, me: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'> | null, items: { id: string, t: number}[] }[]}
  */
 let players = [];
 let modules = [];
@@ -40,6 +40,10 @@ export const statePlayerClass = new StateVar('Unknown');
 let stateTrackPlayers = new StateProp(false);
 export function registerTrackPlayers(cond) {
   stateTrackPlayers = stateTrackPlayers.or(cond);
+}
+let stateTrackHeldItem = new StateProp(false);
+export function registerTrackHeldItem(cond) {
+  stateTrackHeldItem = stateTrackHeldItem.or(cond);
 }
 export function getPlayers() {
   return players;
@@ -101,7 +105,7 @@ const getPlayersStep2Reg = reg('step', () => {
     if (s.startsWith('§r Ultimate:') || s.startsWith('§r         §r§a§lPlayers')) continue;
     let m = s.match(/§r§f\(§r§d(\w+) \w+?§r§f\)§r$/);
     if (!m) break; // "EMPTY"
-    players.push({ ign: getPlayerName(s), class: m[1], e: null });
+    players.push({ ign: getPlayerName(s), class: m[1], e: null, me: null, items: [{ id: '', t: 0 }] });
   }
   if (players.length) {
     World.getAllPlayers().forEach(v => {
@@ -120,6 +124,17 @@ const getPlayersStep2Reg = reg('step', () => {
     getPlayersStep2Reg.unregister();
   }
 }).setFps(2);
+const playerItemReg = reg('serverTick2', t => {
+  players.forEach(v => {
+    const e = v.e;
+    const id = getSbId(e ? e === Player ? e.getHeldItem() : e.getItemInSlot(0) : null);
+
+    const p = v.items[0];
+    if (p.id === id) p.t = t;
+    else v.items.unshift({ id, t: t });
+    if (t - v.items[v.items.length - 1].t > 20) v.items.pop();
+  });
+});
 
 // const dungeonJoinReq = reg('chat', () => dungeon.emit('dungeonJoin'))setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}');
 const dungeonStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
@@ -177,6 +192,7 @@ export function init() {
 
   entSpawnReg.setEnabled(stateTrackPlayers);
   getPlayersStep2Reg.setEnabled(stateTrackPlayers);
+  playerItemReg.setEnabled(stateTrackHeldItem);
 }
 export function load() {
   dungeonStartReg.register();
