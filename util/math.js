@@ -854,6 +854,28 @@ export function newtonRaphson(func, guess, iters = 100, epsilon = 1e-7) {
 }
 
 /**
+ * only works on monotonic functions
+ * @param {(x: number) => number} func
+ * @param {number} target
+ * @param {number} min
+ * @param {number} max
+ * @param {boolean} increasing
+ * @param {number?} iters
+ * @param {number?} epsilon
+ */
+export function convergeHalfInterval(func, target, min, max, increasing, iters = 100, epsilon = 1e-8) {
+  let val;
+  let guess;
+  do {
+    guess = (min + max) / 2;
+    val = func(guess);
+    if (increasing === (val < target)) min = guess;
+    else max = guess;
+  } while (dist(target, val) > epsilon && --iters > 0);
+  return guess;
+}
+
+/**
  * @template {number[]} T
  * @param {T[]} points
  * @param {number?} epsilon
