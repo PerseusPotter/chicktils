@@ -4,8 +4,7 @@ import reg from '../../util/registerer';
 import { cross, lerp, normalize, rotate } from '../../util/math';
 import Grid from '../../util/grid';
 import { fromVec3, getItemId, toVec3 } from '../../util/mc';
-import { getSbId } from '../../util/skyblock';
-import { getPlayers, isMob, registerTrackPlayers } from '../dungeon.js';
+import { getPlayers, isMob, registerTrackHeldItem, registerTrackPlayers } from '../dungeon.js';
 import { run, unrun } from '../../util/threading';
 
 let allMobs = [];
@@ -42,13 +41,7 @@ const serverTickReg = reg('serverTick2', () => {
     const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');
     itemCand = [];
     if (!hasIce) return;
-    const icers = getPlayers().filter(({ e }) => {
-      if (!e) return;
-      const heldItem = e === Player ? e.getHeldItem() : e.getItemInSlot(0);
-      if (!heldItem) return;
-      const id = getSbId(heldItem);
-      return id === 'ICE_SPRAY_WAND' || id === 'STARRED_ICE_SPRAY_WAND';
-    });
+    const icers = getPlayers().filter(({ items }) => items.some(v => v.id === 'ICE_SPRAY_WAND' || v.id === 'STARRED_ICE_SPRAY_WAND'));
     const wS = 1;
     const l = 8;
     const ls = l * l;
@@ -132,6 +125,7 @@ const renderWorldReg = reg('renderWorld', partial => {
 
 export function init() {
   registerTrackPlayers(settings._dungeonBoxIceSprayed);
+  registerTrackHeldItem(settings._dungeonBoxIceSprayed);
 }
 export function start() {
   allMobs = [];
