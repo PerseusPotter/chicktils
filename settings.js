@@ -1040,7 +1040,16 @@ export const props = {
 
   enablehidedivanparticles: new Property('HideDivanCoatingParticles', page, ++sort, Property.Type.Toggle, true),
 
-  enablesbaenchant: new Property('UpdateSBAEnchantList', page, ++sort, Property.Type.Toggle, true, { desc: 'need to rs game to unload properly (why would you?)' })
+  enablesbaenchant: new Property('UpdateSBAEnchantList', page, ++sort, Property.Type.Toggle, true, { desc: 'need to rs game to unload properly (why would you?)' }),
+
+  enablepearlpath: new Property('EnablePearlPath', page, ++sort, Property.Type.Toggle, false),
+  pearlPathEsp: new Property('PearlPathEsp', page, ++sort, Property.Type.Toggle, false),
+  pearlPathPathColor: new Property('PearlPathColor', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: 'color of path of pearl' }),
+  pearlPathDestColorOutline: new Property('PearlPathDestinationColorOutline', page, ++sort, Property.Type.Color, 0x0000FFFF, { desc: 'outline color of player hitbox on teleport' }),
+  pearlPathDestColorFill: new Property('PearlPathDestinationColorFill', page, ++sort, Property.Type.Color, 0x00000000, { desc: 'fill color of player hitbox on teleport' }),
+  pearlPathCollideEntity: new Property('PearlPathCollideWithEntities', page, ++sort, Property.Type.Toggle, false, { desc: 'whether to check for collisions with entities' }),
+  pearlPathCollidedEntityColor: new Property('PearlPathCollidedEntityColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color to box entity that was collided with' }),
+  pearlPathCheeto: new Property('PearlPathCheeto', page, ++sort, Property.Type.Toggle, false, { desc: 'shame shame shame\ndoesn\'t disable when looking at a block' })
 };
 const pageNames = [
   '',
