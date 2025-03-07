@@ -27,17 +27,29 @@ export function unload() {
 }
 export function load() {
   const list = JSON.parse(FileLib.read('chicktils', 'modules/modules.json'));
-  list.forEach(v => settings['enable' + v] && loadModule(v));
+  list.forEach(v => {
+    initModule(v);
+    if (settings['enable' + v]) loadModule(v);
+  });
+}
+export function initModule(name) {
+  try {
+    if (modules.has(name)) return;
+    const m = RequireNoCache(name);
+    modules.set(name, m);
+    m.init();
+  } catch (e) {
+    log('error preloading module', name);
+    if (settings.isDev) {
+      log(e.message);
+      log(e.stack);
+    }
+    console.log(e + '\n' + e.stack);
+  }
 }
 export function loadModule(name) {
   try {
-    if (modules.has(name)) modules.get(name).load();
-    else {
-      const m = RequireNoCache(name);
-      modules.set(name, m);
-      m.init();
-      m.load();
-    }
+    modules.get(name)?.load();
   } catch (e) {
     log('error loading module', name);
     if (settings.isDev) {
@@ -48,8 +60,7 @@ export function loadModule(name) {
   }
 }
 export function unloadModule(name) {
-  if (!modules.has(name)) return;
-  modules.get(name).unload();
+  modules.get(name)?.unload();
 }
 
 export function postInit() {
