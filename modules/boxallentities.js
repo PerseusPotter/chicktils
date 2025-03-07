@@ -36,6 +36,14 @@ function renderEntity(e, x, y, z, w, h, nt) {
     settings.boxAllEntitiesEsp, true,
     nt
   );
+  if (settings.boxAllEntitiesEntityId) renderString(
+    e.entity.func_145782_y(),
+    x, y + h - 0.1, z,
+    0xFFFFFFFF, true,
+    0.02, false,
+    settings.boxAllEntitiesEsp, true,
+    nt
+  );
 }
 
 const renderReg1 = reg('postRenderEntity', (ent, pos, part) => renderEntity(
