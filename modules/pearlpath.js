@@ -10,6 +10,7 @@ const stateHoldingPearl = new StateVar(false);
 
 /** @type {[number, number, number][]} */
 let pearlPos = [];
+let collidedBp;
 let collidedEntity;
 
 const v = 1.5;
@@ -64,7 +65,7 @@ const tickReg = reg('tick', () => {
       if (collidedEntity) break;
     }
 
-    if (World.getWorld().func_72933_a(curr, next)) break;
+    if (collidedBp = World.getWorld().func_72933_a(curr, next)?.func_178782_a()) break;
 
     curr = next;
     ix += vx;
@@ -76,6 +77,11 @@ const tickReg = reg('tick', () => {
     vy += g;
   }
 });
+const BlockSlab = Java.type('net.minecraft.block.BlockSlab');
+const BlocksAir = Java.type('net.minecraft.init.Blocks').field_150350_a;
+const BlocksCarpet = Java.type('net.minecraft.init.Blocks').field_150404_cg;
+const BlocksSkull = Java.type('net.minecraft.init.Blocks').field_150465_bP;
+const BlocksFlowerPot = Java.type('net.minecraft.init.Blocks').field_150457_bL;
 const renderReg = reg('renderWorld', pt => {
   if (pearlPos.length === 0) return;
 
@@ -105,18 +111,25 @@ const renderReg = reg('renderWorld', pt => {
   );
 
   const ex = Math.floor(rx + pearlPos[pearlPos.length - 1][0]) + 0.5;
-  const ey = Math.floor(ry + pearlPos[pearlPos.length - 1][1]);
+  let ey = Math.floor(ry + pearlPos[pearlPos.length - 1][1]);
   const ez = Math.floor(rz + pearlPos[pearlPos.length - 1][2]) + 0.5;
+  if (collidedBp) {
+    const w = World.getWorld();
+    const collidedState = w.func_180495_p(collidedBp);
+    const collidedBlock = collidedState.func_177230_c();
+    if (collidedBlock instanceof BlockSlab && collidedState.func_177229_b(BlockSlab.field_176554_a) === BlockSlab.EnumBlockHalf.BOTTOM) ey += 0.5;
+    else if (collidedBlock !== BlocksAir && collidedBlock !== BlocksCarpet && collidedBlock !== BlocksSkull && collidedBlock !== BlocksFlowerPot) ey++;
+  }
   renderFilledBox(
     ex, ey, ez,
-    0.6, 1.8,
+    0.6, Player.isSneaking() ? 1.5 : 1.8,
     settings.pearlPathDestColorFill,
     settings.pearlPathEsp,
     true
   );
   renderOutline(
     ex, ey, ez,
-    0.6, 1.8,
+    0.6, Player.isSneaking() ? 1.5 : 1.8,
     settings.pearlPathDestColorOutline,
     settings.pearlPathEsp,
     true
@@ -132,6 +145,7 @@ export function load() {
 }
 export function unload() {
   pearlPos = [];
+  collidedBp = null;
   collidedEntity = null;
 
   tickReg.unregister();
