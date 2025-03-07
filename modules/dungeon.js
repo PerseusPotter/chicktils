@@ -1,12 +1,14 @@
 import reg from '../util/registerer';
 import { getPlayerName } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
+import { getSbId } from '../util/skyblock';
 
 function reset() {
   dungeonLeaveReg.unregister();
   bossMessageReg.unregister();
   entSpawnReg.unregister();
   getPlayersStep2Reg.unregister();
+  playerItemReg.unregister();
 
   modules.forEach(v => v.reset());
 }
@@ -24,6 +26,7 @@ function start() {
   bossMessageReg.register();
   entSpawnReg.register();
   getPlayersStep2Reg.register();
+  playerItemReg.register();
 
   modules.forEach(v => v.start());
 }
