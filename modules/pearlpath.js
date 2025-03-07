@@ -25,7 +25,7 @@ const tickReg = reg('tick', () => {
 
   pearlPos = [];
   collidedEntity = null;
-  if (!settings.pearlPathCheeto && Client.getMinecraft().field_71476_x && Client.getMinecraft().field_71476_x.field_72313_a.toString() !== 'MISS') return;
+  if (!settings.pearlPathCheeto && Client.getMinecraft().field_71476_x && Client.getMinecraft().field_71476_x.field_72313_a.toString() === 'BLOCK') return;
 
   let yaw = Player.getRawYaw() / 180 * Math.PI;
   let pitch = Player.getPitch() / 180 * Math.PI;
