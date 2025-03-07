@@ -45,6 +45,7 @@ const MaterialAir = Java.type('net.minecraft.block.material.Material').field_151
 const BlocksAir = Java.type('net.minecraft.init.Blocks').field_150350_a;
 const BlocksCarpet = Java.type('net.minecraft.init.Blocks').field_150404_cg;
 const BlocksSkull = Java.type('net.minecraft.init.Blocks').field_150465_bP;
+const BlocksFlowerPot = Java.type('net.minecraft.init.Blocks').field_150457_bL;
 const BlocksWallSign = Java.type('net.minecraft.init.Blocks').field_150444_as;
 const BlocksStandingSign = Java.type('net.minecraft.init.Blocks').field_150472_an;
 const BlocksDoublePlant = Java.type('net.minecraft.init.Blocks').field_150398_cm;
@@ -63,7 +64,7 @@ const highlightReg = reg('drawBlockHighlight', (pos, evn) => {
       const w = World.getWorld();
       if (
         !block.func_149703_v() ||
-        block === BlocksCarpet || block === BlocksSkull ||
+        block === BlocksCarpet || block === BlocksSkull || block === BlocksFlowerPot ||
         (
           block.func_180640_a(w, blockPos, state) === null &&
           block !== BlocksWallSign && block !== BlocksStandingSign
@@ -78,12 +79,12 @@ const highlightReg = reg('drawBlockHighlight', (pos, evn) => {
         const twoBlockAbove = w.func_180495_p(blockPos.func_177982_a(0, 2, 0)).func_177230_c();
         if (
           (
-            blockAbove !== BlocksAir && blockAbove !== BlocksCarpet && blockAbove !== BlocksSkull &&
+            blockAbove !== BlocksAir && blockAbove !== BlocksCarpet && blockAbove !== BlocksSkull && blockAbove !== BlocksFlowerPot &&
             blockAbove.func_149703_v() &&
             blockAbove.func_180640_a(w, blockPosAbove, stateAbove) !== null
           ) ||
           blockAbove === BlocksWallSign || block === BlocksStandingSign ||
-          (twoBlockAbove !== BlocksAir && twoBlockAbove !== BlocksDoublePlant && twoBlockAbove !== BlocksCarpet && blockAbove !== BlocksSkull)
+          (twoBlockAbove !== BlocksAir && twoBlockAbove !== BlocksDoublePlant && twoBlockAbove !== BlocksCarpet && twoBlockAbove !== BlocksSkull && twoBlockAbove !== BlocksFlowerPot)
         ) {
           stateCanEther.set(false);
           etherReasonDisplay.setLine('&4Can\'t TP: No air above!');
