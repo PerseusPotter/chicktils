@@ -87,9 +87,10 @@ const renderReg = reg('renderWorld', () => {
 const PearlHelper = Java.type('com.perseuspotter.chicktilshelper.PearlHelper');
 const tickReg = reg('tick', () => {
   run(() => {
-    const px = Math.floor(Player.getX()) + 0.5;
-    const py = Math.ceil(Player.getY() + getEyeHeight());
-    const pz = Math.floor(Player.getZ()) + 0.5;
+    const yaw = Player.getRawYaw() / 180 * Math.PI;
+    const px = Player.getX() - Math.cos(yaw) * 0.16;
+    const py = Player.getY() + getEyeHeight() - 0.1;
+    const pz = Player.getZ() - Math.sin(yaw) * 0.16;
     pearlLocs = dropLocs.map(({ x, y, z }) => PearlHelper.solve(x - px, y - py, z - pz, 0.01)).filter(v => !Number.isNaN(v.phi));
   });
 }).setEnabled(settings._kuudraRenderPearlTarget);
