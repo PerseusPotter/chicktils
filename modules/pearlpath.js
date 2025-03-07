@@ -117,7 +117,12 @@ const renderReg = reg('renderWorld', pt => {
     const w = World.getWorld();
     const collidedState = w.func_180495_p(collidedBp);
     const collidedBlock = collidedState.func_177230_c();
-    if (collidedBlock instanceof BlockSlab && collidedState.func_177229_b(BlockSlab.field_176554_a) === BlockSlab.EnumBlockHalf.BOTTOM) ey += 0.5;
+    let isBottomSlab = false;
+    try {
+      // too lazy to fix double smooth stone slab
+      isBottomSlab = collidedBlock instanceof BlockSlab && collidedState.func_177229_b(BlockSlab.field_176554_a) === BlockSlab.EnumBlockHalf.BOTTOM;
+    } catch (_) { }
+    if (isBottomSlab) ey += 0.5;
     else if (collidedBlock !== BlocksAir && collidedBlock !== BlocksCarpet && collidedBlock !== BlocksSkull && collidedBlock !== BlocksFlowerPot) ey++;
   }
   renderFilledBox(
