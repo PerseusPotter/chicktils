@@ -9,7 +9,6 @@ import { setAccessible } from '../../util/polyfill';
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(stateIsInBoss).not()));
 const boxMobs = new Map();
 const nameCand = new Set();
-const mobCand = new Set();
 
 const boxColors = [
   'dungeonBoxKeyColor',
@@ -68,7 +67,6 @@ function onNameChange(name, id) {
 const playerInfoMapF = setAccessible(Java.type('net.minecraft.client.network.NetHandlerPlayClient').class.getDeclaredField('field_147310_i'));
 const entSpawnReg = reg('packetReceived', pack => {
   if (pack.func_148943_d) {
-    mobCand.add(pack.func_148943_d());
     const name = playerInfoMapF.get(Player.getPlayer().field_71174_a).get(pack.func_179819_c())?.func_178845_a()?.getName();
     if (name) onMobName(name, pack.func_148943_d());
   } else if (!stateIsInBoss.get() && (pack?.func_149025_e() === 30 || pack?.func_148993_l() === 78)) {
@@ -80,17 +78,13 @@ const entSpawnReg = reg('packetReceived', pack => {
 }).setFilteredClasses([net.minecraft.network.play.server.S0CPacketSpawnPlayer, net.minecraft.network.play.server.S0FPacketSpawnMob, net.minecraft.network.play.server.S0EPacketSpawnObject]).setEnabled(stateBoxMob);
 const nameChangeReg = reg('packetReceived', pack => {
   const id = pack.func_149375_d();
-
-  const isName = nameCand.has(id);
-  const isMob = !isName && mobCand.has(id);
-  if (!isName && !isMob) return;
+  if (!nameCand.has(id)) return;
 
   const name = pack.func_149376_c()?.find(v => v.func_75672_a() === 2)?.func_75669_b();
   if (!name) return;
 
-  if (isMob) onMobName(name, id);
-  if (isName) onNameChange(name, id);
-}).setFilteredClass(net.minecraft.network.play.server.S1CPacketEntityMetadata).setEnabled(stateBoxMob);
+  onNameChange(name, id);
+}).setFilteredClass(net.minecraft.network.play.server.S1CPacketEntityMetadata).setEnabled(stateBoxMob.and(new StateProp(stateIsInBoss).not()));
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity.func_145782_y());
   if (data) renderOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, settings[boxColors[data.c]], settings.dungeonBoxMobEsp, true, undefined, true);
@@ -100,7 +94,6 @@ export function init() { }
 export function start() {
   boxMobs.clear();
   nameCand.clear();
-  mobCand.clear();
 
   entSpawnReg.register();
   nameChangeReg.register();
