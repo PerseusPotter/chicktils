@@ -17,7 +17,7 @@ const activeAlert = new StateVar(null);
 const renderReg = reg('renderOverlay', () => activeAlert.get()?._display?.render()).setEnabled(new StateProp(activeAlert).notequals(null));
 
 const createAlert = (function() {
-  const alertSound = new Sound({ source: 'orb.ogg', priority: true, attenuation: 0, pitch: 0.5, volume: 1 });
+  let alertSound;
   const proto = {
     text: '',
     _timeout: undefined,
@@ -31,7 +31,10 @@ const createAlert = (function() {
         this._timeout = _setTimeout(() => this.hide(), time, this);
       }
       try {
-        if (this.sound) alertSound.play();
+        if (this.sound) {
+          if (!alertSound) alertSound = new Sound({ source: 'orb.ogg', priority: true, attenuation: 0, pitch: 0.5, volume: 1 });
+          alertSound.play();
+        }
       } catch (e) { }
     },
     hide() {
