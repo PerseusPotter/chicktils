@@ -637,7 +637,8 @@ export const props = {
 
   dungeonTerminalBreakdown: new Property('DungeonTerminalBreakdown', page, ++sort, Property.Type.Toggle, false, { desc: 'displays terminals done by each person' }),
 
-  dungeonPlaySoundKey: new Property('DungeonPlaySoundOnKey', page, ++sort, Property.Type.Toggle, false, { desc: 'play dulkir secret sound on pickup key, requires dulkir' }),
+  dungeonPlaySoundKey: new Property('DungeonPlaySoundOnKey', page, ++sort, Property.Type.Toggle, false, { desc: 'play dulkir secret sound on pickup key' }),
+  dungeonPlaySoundBat: new Property('DungeonPlaySoundOnBatDeath', page, ++sort, Property.Type.Toggle, false, { desc: 'play dulkir secret sound on bat death' }),
 
   dungeonIceSprayAlert: new Property('DungeonRareMobDropAlert', page, ++sort, Property.Type.Toggle, true, { desc: 'alert on ice spray/sm cp' }),
   dungeonIceSprayAlertTime: new Property('DungeonRareMobDropAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
