@@ -33,6 +33,7 @@ const format = (function() {
   const MCBlockState = Java.type('net.minecraft.block.state.IBlockState');
   const MCBlock = Java.type('net.minecraft.block.Block');
   const Vector3f = Java.type('org.lwjgl.util.vector.Vector3f');
+  const UUID = Java.type('java.util.UUID');
 
   return function(obj, depth = 3, options = {}) {
     let t = 'object';
@@ -66,6 +67,7 @@ const format = (function() {
         if (obj instanceof MCBlockState) return `{BlockState|${format(obj.func_177230_c(), depth, options)}|meta=${format(obj.func_177230_c().func_176201_c(obj), depth, options)}}`;
         if (obj instanceof MCBlock) return `{Block|${format(obj.func_149732_F(), depth, options)}|${format(MCBlock.func_149682_b(obj), depth, options)}}`;
         if (obj instanceof Vector3f) return `<${format(obj.x, depth, options)}, ${format(obj.y, depth, options)}, ${format(obj.z, depth, options)}>`;
+        if (obj instanceof UUID) return `UUID{${obj.toString()}}`;
 
         if (depth === 0) return `[object ${obj.constructor ? obj.constructor.name : 'Object'}]`;
         const ent = Object.entries(obj);
