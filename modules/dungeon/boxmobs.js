@@ -67,8 +67,10 @@ function onNameChange(name, id) {
 const playerInfoMapF = setAccessible(Java.type('net.minecraft.client.network.NetHandlerPlayClient').class.getDeclaredField('field_147310_i'));
 const entSpawnReg = reg('packetReceived', pack => {
   if (pack.func_148943_d) {
-    const name = playerInfoMapF.get(Player.getPlayer().field_71174_a).get(pack.func_179819_c())?.func_178845_a()?.getName();
-    if (name) onMobName(name, pack.func_148943_d());
+    Client.scheduleTask(2, () => {
+      const name = playerInfoMapF.get(Player.getPlayer().field_71174_a).get(pack.func_179819_c())?.func_178845_a()?.getName();
+      if (name) onMobName(name, pack.func_148943_d());
+    });
   } else if (!stateIsInBoss.get() && (pack?.func_149025_e() === 30 || pack?.func_148993_l() === 78)) {
     const id = pack?.func_149024_d() || pack?.func_149001_c();
     nameCand.add(id);
