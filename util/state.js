@@ -33,7 +33,7 @@ export class StateVar {
   trigger(o) {
     this.hooks.forEach(v => v.call(this, this.value, o));
   }
-};
+}
 
 export class StateProp extends StateVar {
   left;
