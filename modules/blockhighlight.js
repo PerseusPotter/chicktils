@@ -41,6 +41,7 @@ const tickReg = reg('tick', () => {
 }).setEnabled(settings._blockHighlightCheckEther);
 
 const MovingObjectTypeBLOCK = Java.type('net.minecraft.util.MovingObjectPosition').MovingObjectType.BLOCK;
+const MovingObjectTypeENTITY = Java.type('net.minecraft.util.MovingObjectPosition').MovingObjectType.ENTITY;
 const MaterialAir = Java.type('net.minecraft.block.material.Material').field_151579_a;
 const BlocksAir = Java.type('net.minecraft.init.Blocks').field_150350_a;
 const BlocksCarpet = Java.type('net.minecraft.init.Blocks').field_150404_cg;
@@ -49,8 +50,28 @@ const BlocksFlowerPot = Java.type('net.minecraft.init.Blocks').field_150457_bL;
 const BlocksWallSign = Java.type('net.minecraft.init.Blocks').field_150444_as;
 const BlocksStandingSign = Java.type('net.minecraft.init.Blocks').field_150472_an;
 const BlocksDoublePlant = Java.type('net.minecraft.init.Blocks').field_150398_cm;
-const highlightReg = reg('drawBlockHighlight', (pos, evn) => {
+const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent, evn => {
   cancel(evn);
+
+  if (evn.target.field_72313_a === MovingObjectTypeENTITY) {
+    if (!settings.blockHighlightBoxEntity) return;
+    const ent = evn.target.field_72308_g;
+    renderBlockHighlight(
+      ent.func_174813_aQ()
+        .func_72317_d(
+          (ent.field_70165_t - ent.field_70169_q) * evn.partialTicks,
+          (ent.field_70163_u - ent.field_70167_r) * evn.partialTicks,
+          (ent.field_70161_v - ent.field_70166_s) * evn.partialTicks
+        )
+        .func_72314_b(0.002, 0.002, 0.002)
+        .func_72317_d(-getRenderX(), -getRenderY(), -getRenderZ()),
+      settings.blockHighlightWireColor,
+      settings.blockHighlightFillColor,
+      settings.blockHighlightWireWidth,
+      false
+    );
+    return;
+  }
 
   if (settings.blockHighlightCheckEther && etherDistance > 0 && Player.isSneaking()) {
     let result = raycast(Player.getPlayer(), 1, 0, etherDistance, 0.1);
@@ -92,14 +113,32 @@ const highlightReg = reg('drawBlockHighlight', (pos, evn) => {
       }
     }
 
-    if (stateCanEther.get()) tryHighlightBlock(result[0], settings.blockHighlightEtherWireColor, settings.blockHighlightEtherFillColor, settings.blockHighlightEtherWireWidth, true);
-    else if (result) tryHighlightBlock(result[0], settings.blockHighlightCantEtherWireColor, settings.blockHighlightCantEtherFillColor, settings.blockHighlightCantEtherWireWidth, true);
+    if (stateCanEther.get()) tryHighlightBlock(
+      result[0],
+      settings.blockHighlightEtherWireColor,
+      settings.blockHighlightEtherFillColor,
+      settings.blockHighlightEtherWireWidth,
+      true
+    );
+    else if (result) tryHighlightBlock(
+      result[0],
+      settings.blockHighlightCantEtherWireColor,
+      settings.blockHighlightCantEtherFillColor,
+      settings.blockHighlightCantEtherWireWidth,
+      true
+    );
 
     return;
   } else stateCanEther.set(true);
 
   if (evn.target.field_72313_a !== MovingObjectTypeBLOCK) return;
-  tryHighlightBlock(evn.target.func_178782_a(), settings.blockHighlightWireColor, settings.blockHighlightFillColor, settings.blockHighlightWireWidth, false);
+  tryHighlightBlock(
+    evn.target.func_178782_a(),
+    settings.blockHighlightWireColor,
+    settings.blockHighlightFillColor,
+    settings.blockHighlightWireWidth,
+    false
+  );
 });
 
 const renderReg = reg('renderOverlay', () => etherReasonDisplay.render()).setEnabled(new StateProp(stateCanEther).not().and(settings._blockHighlightCantEtherShowReason).and(settings._blockHighlightCheckEther));
@@ -147,7 +186,9 @@ function tryHighlightBlock(blockPos, cw, cf, lw, isEther) {
   if (!w.func_175723_af().func_177746_a(blockPos)) return;
 
   block.func_180654_a(w, blockPos);
-  const aabb = block.func_180646_a(w, blockPos).func_72314_b(0.002, 0.002, 0.002).func_72317_d(-getRenderX(), -getRenderY(), -getRenderZ());
+  const aabb = block.func_180646_a(w, blockPos)
+    .func_72314_b(0.002, 0.002, 0.002)
+    .func_72317_d(-getRenderX(), -getRenderY(), -getRenderZ());
   renderBlockHighlight(aabb, cw, cf, lw, isEther);
 }
 
