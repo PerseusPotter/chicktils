@@ -2,14 +2,20 @@ package com.perseuspotter.chicktilshelper;
 
 import java.awt.Font;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.swing.*;
 
 public class InstaMidHelper {
 
-  public static long lastBeat = System.currentTimeMillis();
+  public static AtomicLong lastBeat = new AtomicLong(System.currentTimeMillis());
+  public static AtomicLong lastTick = new AtomicLong(System.currentTimeMillis());
   public static final long startTime = System.currentTimeMillis();
+  public static AtomicInteger ticksRemaining;
 
   public static void main(String[] args) throws Exception {
+    ticksRemaining = new AtomicInteger(Integer.parseInt(args[0]));
+
     KeepAlive heartbeat = new KeepAlive();
     Thread t = new Thread(heartbeat);
     t.start();
@@ -17,8 +23,9 @@ public class InstaMidHelper {
     while (true) {
       Thread.sleep(100);
       long d = System.currentTimeMillis();
-      if (d - startTime > 6000) break;
-      if (d - lastBeat > 500) {
+      if (d - startTime > 10000L) break;
+      if (ticksRemaining.get() <= 0) break;
+      if (d - lastBeat.get() > 500L) {
         if (f) showGui();
         f = false;
       } else if (!f) break;
@@ -43,8 +50,8 @@ public class InstaMidHelper {
       new Runnable() {
         public void run() {
           while (true) {
-            long t = 6000 - System.currentTimeMillis() + startTime;
-            label.setText(String.format("%d.%02d", t / 1000, (t % 1000) / 10));
+            long t = ticksRemaining.get() * 50L - Math.min(50L, System.currentTimeMillis() - lastTick.get());
+            label.setText(String.format("%d.%02d", t / 1000L, (t % 1000L) / 10L));
             frame.pack();
             try {
               Thread.sleep(10);
@@ -64,8 +71,12 @@ class KeepAlive implements Runnable {
   public void run() {
     sc = new Scanner(System.in);
     while (!Thread.interrupted()) {
-      sc.nextLine();
-      InstaMidHelper.lastBeat = System.currentTimeMillis();
+      String s = sc.nextLine();
+      if (s.equals("A")) InstaMidHelper.lastBeat.set(System.currentTimeMillis());
+      else {
+        InstaMidHelper.lastTick.set(System.currentTimeMillis());
+        InstaMidHelper.ticksRemaining.set(InstaMidHelper.ticksRemaining.get() - 1);
+      }
     }
   }
 
