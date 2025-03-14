@@ -4,7 +4,7 @@ import { compareFloat } from '../../util/math';
 import { StateProp, StateVar } from '../../util/state';
 import { getBlockPos } from '../../util/mc';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
-import { renderFilledBox } from '../../util/draw';
+import { renderAABBFilled } from '../../util/draw';
 
 const stateSimonSays = new StateProp(stateFloor).equalsmult('F7', 'M7').and(stateIsInBoss).and(settings._dungeonSimonSays);
 const stateAtSS = new StateVar(false);
@@ -61,7 +61,18 @@ const renderWorldReg = reg('renderWorld', () => {
   solution.forEach((v, i) => {
     const c = i === 0 ? settings.dungeonSimonSaysColor1 : i === 1 ? settings.dungeonSimonSaysColor2 : settings.dungeonSimonSaysColor3;
     const [y, z] = getButtonPos(v);
-    renderFilledBox(111.05, y + 0.371, z + 0.5, 0.4, 0.26, c, true);
+    const x = 110;
+    const e = 0.002;
+    renderAABBFilled(
+      x + 1 - 2 / 16 - e,
+      y + 0.375 - e,
+      z + 0.3125 - e,
+      x + 1 + e,
+      y + 0.625 + e,
+      z + 0.6875 + e,
+      c,
+      false
+    );
   });
 }).setEnabled(stateDoSimonSays);
 const PlayerInteractAction = Java.type('com.chattriggers.ctjs.minecraft.listeners.ClientListener').PlayerInteractAction;
