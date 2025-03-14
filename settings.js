@@ -1038,6 +1038,7 @@ export const props = {
   blockHighlightCantEtherFillColor: new Property('BlockHighlightCantEtherFillColor', page, ++sort, Property.Type.Color, 0xBA2B1E60),
   blockHighlightCantEtherWireWidth: new Property('BlockHighlightCantEtherWireWidth', page, ++sort, Property.Type.Number, 3, { min: 0 }),
   blockHighlightCantEtherShowReason: new Property('BlockHighlightCantEtherShowReason', page, ++sort, Property.Type.Toggle, true),
+  blockHighlightBoxEntity: new Property('BlockHighlightBoxEntity', page, ++sort, Property.Type.Toggle, false, { desc: 'box the entity you are looking at' }),
 
   enablehidedivanparticles: new Property('HideDivanCoatingParticles', page, ++sort, Property.Type.Toggle, true),
 
