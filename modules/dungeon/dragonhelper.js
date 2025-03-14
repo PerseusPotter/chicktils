@@ -165,7 +165,7 @@ const serverTickHitReg = reg('serverTick2', () => {
         if (i < 20) stack += v;
       }
     });
-    if (isDB && !stack) stack = hitTimes.length - 1;
+    if (isDB && !stack) stack = endI;
     switch (settings.dungeonDragonHelperTrackHits) {
       case 'Full':
         log(`&aHit &b${sum}&a arrows in &d${formatTime(endI)}&a on ${d.color}${d.name}&a.`);
