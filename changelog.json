@@ -441,6 +441,87 @@
           "desc": "add revert button when settings changed"
         }
       ]
+    },
+    {
+      "version": "0.10.0",
+      "changes": [
+        {
+          "type": "misc",
+          "desc": "dev tax"
+        },
+        {
+          "type": "change",
+          "desc": "diana stuff"
+        },
+        {
+          "type": "fix",
+          "desc": "goldor frenzy timer was off by 1"
+        },
+        {
+          "type": "fix",
+          "desc": "not boxing ice sprayed mobs when swapping off spray quickly"
+        },
+        {
+          "type": "change",
+          "desc": "not boxing the same ice sprayed mob multiple times"
+        },
+        {
+          "type": "change",
+          "desc": "box mobs scans off entity id"
+        },
+        {
+          "type": "feat",
+          "desc": "pearl path predictor"
+        },
+        {
+          "type": "fix",
+          "desc": "etherwarp display on flower pots"
+        },
+        {
+          "type": "feat",
+          "desc": "boxallentities add entity id"
+        },
+        {
+          "type": "fix",
+          "desc": "no alert sound on first game load"
+        },
+        {
+          "type": "change",
+          "desc": "m7 lb waypoints"
+        },
+        {
+          "type": "change",
+          "desc": "play key sound remove dulkir dependency"
+        },
+        {
+          "type": "change",
+          "desc": "instamid timer now uses server ticks"
+        },
+        {
+          "type": "feat",
+          "desc": "add option to highlight targetted entity"
+        },
+        {
+          "type": "change",
+          "desc": "button size for ss solver"
+        },
+        {
+          "type": "fix",
+          "desc": "lb stack in dragons sometimes having incorrect time"
+        },
+        {
+          "type": "feat",
+          "desc": "add healing pot and architect to dulkir secret sounds"
+        },
+        {
+          "type": "fix",
+          "desc": "update gfs item list"
+        },
+        {
+          "type": "del",
+          "desc": "extra settings from diana"
+        }
+      ]
     }
   ]
 }
