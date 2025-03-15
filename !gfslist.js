@@ -16,14 +16,19 @@ function curl(path) {
 
   const names = [];
   const ids = [];
-  function add(n, i) {
-    names.push(n);
+  async function add(n, i) {
+    if (!n) n = JSON.parse(await curl(`https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/refs/heads/master/items/${i}.json`)).displayname;
+    names.push(n.replace(/%%\w+%%/g, '').replace(/§\w/g, ''));
     ids.push(i);
   }
 
-  Object.values(sacks).forEach(({ contents }) => {
-    contents.forEach(id => add(items.get(id), id));
-  });
+  await Promise.allSettled(
+    Object.values(sacks).map(({ contents }) =>
+      Promise.allSettled(
+        contents.map(id => add(items.get(id), id))
+      )
+    )
+  );
 
   console.log(
     `let ids = ${JSON.stringify(ids)};\n` +
