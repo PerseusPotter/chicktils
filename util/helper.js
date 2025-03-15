@@ -57,3 +57,12 @@ export function removeElementMap(f, o, r) {
   if (!hasHelper) return;
   return helper.removeElementMap(f, o, r);
 }
+
+/**
+ * @param {import('../../@types/External').JavaClass<'java.lang.reflect.Field'>} f
+ * @returns {boolean}
+ **/
+export function addElementList(f, o, v) {
+  if (!hasHelper) return;
+  return helper.addElementList(f, o, v);
+}
