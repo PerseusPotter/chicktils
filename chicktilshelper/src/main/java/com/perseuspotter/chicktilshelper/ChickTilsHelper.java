@@ -161,4 +161,14 @@ public class ChickTilsHelper {
       return false;
     }
   }
+
+  public static <T> boolean addElementList(Field f, Object o, T v) {
+    try {
+      List<T> arr = (List<T>) f.get(o);
+      arr.add(v);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
 }
