@@ -2,6 +2,7 @@ import reg from '../util/registerer';
 import { getPlayerName } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
 import { getSbId } from '../util/skyblock';
+import { JavaTypeOrNull, setAccessible } from '../util/polyfill';
 
 function reset() {
   dungeonLeaveReg.unregister();
@@ -196,6 +197,24 @@ export function init() {
   entSpawnReg.setEnabled(stateTrackPlayers);
   getPlayersStep2Reg.setEnabled(stateTrackPlayers);
   playerItemReg.setEnabled(stateTrackHeldItem);
+
+  {
+    const SecretSounds = JavaTypeOrNull('dulkirmod.features.dungeons.SecretSounds');
+    if (SecretSounds) {
+      const f = setAccessible(SecretSounds.class.getDeclaredField('drops'));
+      const old = f.get(SecretSounds);
+      if (old.length === 12) {
+        const list = new java.util.ArrayList();
+        old.forEach(v => list.add(v));
+        list.add('Healing VIII Splash Potion');
+        list.add('Healing 8 Splash Potion');
+        list.add('Health VIII Splash Potion');
+        list.add('Health 8 Splash Potion');
+        list.add('Architect\'s First Draft');
+        f.set(SecretSounds, list);
+      }
+    }
+  }
 }
 export function load() {
   dungeonStartReg.register();
