@@ -7,7 +7,7 @@ const ENCHANT_DICT = [
     nbtName: 'piscary',
     loreName: 'Piscary',
     goodLevel: 5,
-    maxLevel: 6
+    maxLevel: 7
   },
   {
     type: 'Normal',
@@ -152,6 +152,41 @@ const ENCHANT_DICT = [
     loreName: 'Tidal',
     goodLevel: 2,
     maxLevel: 3
+  },
+  {
+    type: 'Normal',
+    nbtName: 'quick_bite',
+    loreName: 'Quick Bite',
+    goodLevel: 0,
+    maxLevel: 5
+  },
+  {
+    type: 'Normal',
+    nbtName: 'luck_of_the_sea',
+    loreName: 'Luck Of The Sea',
+    goodLevel: 5,
+    maxLevel: 7
+  },
+  {
+    type: 'Normal',
+    nbtName: 'charm',
+    loreName: 'Charm',
+    goodLevel: 4,
+    maxLevel: 6
+  },
+  {
+    type: 'Normal',
+    nbtName: 'frail',
+    loreName: 'Frail',
+    goodLevel: 5,
+    maxLevel: 7
+  },
+  {
+    type: 'Normal',
+    nbtName: 'spiked_hook',
+    loreName: 'Spiked Hook',
+    goodLevel: 5,
+    maxLevel: 7
   }
 ];
 
