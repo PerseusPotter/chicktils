@@ -33,12 +33,25 @@ export class StateVar {
   trigger(o) {
     this.hooks.forEach(v => v.call(this, this.value, o));
   }
+  static coerce(v) {
+    return v instanceof StateVar ? v : new StateVar(v);
+  }
 }
 
+/**
+ * @template {1|3|2|4|5|7|9|11|6} [O = 1]
+ * @template L
+ * @template R
+ * @template [T = L]
+ * @extends {StateVar<T>}
+ */
 export class StateProp extends StateVar {
+  /** @type {StateVar<L>?} */
   left;
+  /** @type {StateVar<R>?} */
   right;
   tmp;
+  /** @type {O extends 5 ? L : O extends 7 ? L : O extends 9 ? any[] : O extends 11 ? (a: L) => boolean : O extends 6 ? (a: L, b: R) => boolean : null} */
   op;
   static Operator = {
     IDENTITY: 1,
@@ -51,30 +64,33 @@ export class StateProp extends StateVar {
     CUSTOMUNARY: 11,
     CUSTOMBINARY: 6
   };
+  /**
+   * @param {StateVar<L> | L} val
+   */
   constructor(val) {
     super();
     this.left = val instanceof StateVar ? val : new StateVar(val);
-    this.add(this.left);
+    this._add(this.left);
     this.op = StateProp.Operator.IDENTITY;
     this.dirt = true;
   }
-  add(p) {
-    p.listen(() => this.dirty().get());
+  _add(p) {
+    p.listen(() => this._dirty().get());
   }
-  dirty() {
+  _dirty() {
     this.dirt = true;
     return this;
   }
   get() {
     if (this.dirt) {
       this.dirt = false;
-      this.set(this.evaluate());
+      this.set(this._evaluate());
     }
     return super.get();
   }
-  evaluate() {
+  _evaluate() {
     switch (this.op) {
-      case StateProp.Operator.IDENTITY: return Boolean(this.left.get());
+      case StateProp.Operator.IDENTITY: return this.left.get();
       case StateProp.Operator.NOT: return !this.left.get();
       case StateProp.Operator.AND: return this.left.get() && this.right.get();
       case StateProp.Operator.OR: return this.left.get() || this.right.get();
@@ -88,7 +104,7 @@ export class StateProp extends StateVar {
   }
 
   /**
-   * @returns {this}
+   * @returns {StateProp<3, O extends 1 ? L : T, R, boolean>}
    */
   not() {
     if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).not();
@@ -96,59 +112,86 @@ export class StateProp extends StateVar {
     return this;
   }
   /**
-   * @returns {this}
+   * @template r
+   * @param {StateVar<r> | r} v
+   * @returns {StateProp<2, O extends 1 ? L : T, r, boolean>}
    */
   and(v) {
     if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).and(v);
-    const n = new StateProp(v);
-    n.right = this;
-    n.add(this);
-    n.op = StateProp.Operator.AND;
-    return n;
+    v = StateVar.coerce(v);
+    this.right = v;
+    this._add(v);
+    this.op = StateProp.Operator.AND;
+    return this;
   }
   /**
-   * @returns {this}
+   * @template r
+   * @param {StateVar<r> | r} v
+   * @returns {StateProp<4, O extends 1 ? L : T, r, boolean>}
    */
   or(v) {
     if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).or(v);
     const n = new StateProp(v);
-    n.right = this;
-    n.add(this);
-    n.op = StateProp.Operator.OR;
-    return n;
+    this.right = v;
+    this._add(v);
+    this.op = StateProp.Operator.OR;
+    return this;
   }
-
+  /**
+   * @param {O extends 1 ? L : T} t
+   * @returns {StateProp<5, O extends 1 ? L : T, any, boolean>}
+   */
   equals(t) {
+    if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).equals();
     this.op = StateProp.Operator.EQUALS;
     this.tmp = t;
     return this;
   }
+  /**
+   * @param {O extends 1 ? L : T} t
+   * @returns {StateProp<7, O extends 1 ? L : T, any, boolean>}
+   */
   notequals(t) {
+    if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).notequals();
     this.op = StateProp.Operator.NOTEQUALS;
     this.tmp = t;
     return this;
   }
+  /**
+   * @param {...any} t
+   * @returns {StateProp<9, O extends 1 ? L : T, any, boolean>}
+   */
   equalsmult(...t) {
+    if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).equalsmult();
     this.op = StateProp.Operator.EQUALSMULT;
     this.tmp = t;
     return this;
   }
-
+  /**
+   * @template t
+   * @param {(a: O extends 1 ? L : T) => t} cb
+   * @returns {StateProp<11, O extends 1 ? L : T, any, t>}
+   */
   customUnary(cb) {
+    if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).customUnary(cb);
     this.op = StateProp.Operator.CUSTOMUNARY;
     this.tmp = cb;
     return this;
   }
   /**
-   * @returns {this}
+   * @template r
+   * @template t
+   * @param {StateVar<r> | r} v
+   * @param {(a: O extends 1 ? L : T, b: r) => t} cb
+   * @returns {StateProp<6, O extends 1 ? L : T, r, t>}
    */
   customBinary(v, cb) {
     if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).customBinary(v, cb);
-    const n = new StateProp(v);
-    n.right = this;
-    n.add(this);
-    n.op = StateProp.Operator.CUSTOMBINARY;
-    n.tmp = cb;
-    return n;
+    v = StateVar.coerce(v);
+    this.right = v;
+    this._add(v);
+    this.op = StateProp.Operator.CUSTOMBINARY;
+    this.tmp = cb;
+    return this;
   }
 }
