@@ -13,7 +13,7 @@ const hotspotUpdateReg = reg('step', () => {
   try {
     const a = newHotspots;
     newHotspots = [];
-    const hotspotGrid = new Grid({ size: 2, addNeighbors: 2 });
+    const hotspotGrid = new Grid({ size: 3, addNeighbors: 2 });
     const hotspotLocs = [];
     a.forEach(v => {
       const neighbors = hotspotGrid.get(v[0], v[2]);
