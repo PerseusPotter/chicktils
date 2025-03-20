@@ -32,13 +32,20 @@ const hotspotUpdateReg = reg('step', () => {
 }).setEnabled(settings._fishingTilsHotspotWaypoint).setFps(5);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const hotspotPartReg = reg('packetReceived', pack => {
-  if (!pack.func_179749_a().equals(EnumParticleTypes.REDSTONE)) return;
-  if (pack.func_149222_k() !== 0) return;
-  if (pack.func_149227_j() !== 1) return;
-  if (!pack.func_179750_b()) return;
-  if (pack.func_149221_g() !== 1) return;
-  if (compareFloat(pack.func_149224_h(), 0.4117647409439087) !== 0) return;
-  if (compareFloat(pack.func_149223_i(), 0.7058823704719543) !== 0) return;
+  if (pack.func_179749_a().equals(EnumParticleTypes.REDSTONE)) {
+    if (pack.func_149222_k() !== 0) return;
+    if (pack.func_149227_j() !== 1) return;
+    if (!pack.func_179750_b()) return;
+    if (pack.func_149221_g() !== 1) return;
+    if (compareFloat(pack.func_149224_h(), 0.4117647409439087) !== 0) return;
+    if (compareFloat(pack.func_149223_i(), 0.7058823704719543) !== 0) return;
+  } else if (pack.func_179749_a().equals(EnumParticleTypes.SMOKE_NORMAL)) {
+    if (pack.func_149227_j() !== 0) return;
+    if (!pack.func_179750_b()) return;
+    if (pack.func_149221_g() !== 0) return;
+    if (pack.func_149224_h() !== 0) return;
+    if (pack.func_149223_i() !== 0) return;
+  } else return;
 
   const x = pack.func_149220_d();
   const y = pack.func_149226_e();
