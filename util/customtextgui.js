@@ -144,7 +144,8 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     if (!fonts || fDirty) {
       fonts = createFonts(FONT_RENDER_SIZE.get());
       fDirty = false;
-    } const tl = obj.getTrueLoc();
+    }
+    const tl = obj.getTrueLoc();
     rx = tl.x;
     ry = tl.y;
     rw = imgW * MC_FONT_SIZE / FONT_RENDER_SIZE.get() * cs;
@@ -204,7 +205,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       const y = i * FONT_RENDER_SIZE.get() + ascent;
       let x = 0;
       if (cc === 1) x = lineVW - v.vw;
-      else if (cc === 2) x = (lineVW - v.vw) / 2;
+      else if (cc >= 2) x = (lineVW - v.vw) / 2;
       if (cb && v.b) {
         g.setColor(COLORS_SHADOW.f);
         g.drawString(v.b.getIterator(), x + FONT_RENDER_SIZE.get() / 10, y + FONT_RENDER_SIZE.get() / 10);
