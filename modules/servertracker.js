@@ -78,7 +78,8 @@ const warpLocs = {
   'scarleton': 12,
   'garden': 13,
   'jerry': 14,
-  'rift': 15
+  'rift': 15,
+  'bayou': 16
 };
 const tabComplete = tabCompletion(Object.keys(warpLocs));
 const regs = [
