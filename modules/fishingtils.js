@@ -1,5 +1,5 @@
 import settings from '../settings';
-import { renderBeaconBeam } from '../util/draw';
+import { drawArrow3DPos, renderBeaconBeam, renderTracer } from '../util/draw';
 import Grid from '../util/grid';
 import { compareFloat } from '../util/math';
 import reg from '../util/registerer';
@@ -7,6 +7,7 @@ import { StateProp, StateVar } from '../util/state';
 
 let hotspots = [];
 let newHotspots = [];
+const stateNearestHotspot = new StateVar();
 const stateHotspotDist = new StateVar(0);
 
 const hotspotUpdateReg = reg('step', () => {
@@ -27,7 +28,13 @@ const hotspotUpdateReg = reg('step', () => {
       hotspotLocs[idx][3]++;
     });
     hotspots = hotspotLocs.map(v => [v[0] / v[3], v[1] / v[3], v[2] / v[3]]);
-    stateHotspotDist.set(hotspots.reduce((a, v) => Math.min(Math.hypot(Player.getX() - v[0], Player.getZ() - v[2]), a), Number.POSITIVE_INFINITY));
+    const [nearest, dist] = hotspots.reduce((a, v) => {
+      const d = Math.hypot(Player.getX() - v[0], Player.getZ() - v[2]);
+      if (d < a[1]) return [v, d];
+      return a;
+    }, [[NaN, NaN, NaN], Number.POSITIVE_INFINITY]);
+    stateNearestHotspot.set(nearest);
+    stateHotspotDist.set(dist);
   } catch (_) { }
 }).setEnabled(settings._fishingTilsHotspotWaypoint).setFps(5);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
@@ -52,7 +59,8 @@ const hotspotPartReg = reg('packetReceived', pack => {
   const z = pack.func_149225_f();
   newHotspots.push([x, y, z]);
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._fishingTilsHotspotWaypoint);
-const stateInRange = new StateProp(stateHotspotDist).customBinary(settings._fishingTilsHotspotWaypointDisableRange, (d, s) => d > s);
+
+const stateInHotspotRange = new StateProp(stateHotspotDist).customBinary(settings._fishingTilsHotspotWaypointDisableRange, (d, s) => d > s).and(settings._fishingTilsHotspotWaypoint);
 const hotspotRenderReg = reg('renderWorld', () => {
   hotspots.forEach(v => {
     renderBeaconBeam(
@@ -62,16 +70,34 @@ const hotspotRenderReg = reg('renderWorld', () => {
       true
     );
   })
-}).setEnabled(stateInRange.and(settings._fishingTilsHotspotWaypoint));
+}).setEnabled(stateInHotspotRange);
+const hotspotArrowOvlReg = reg('renderOverlay', () => {
+  drawArrow3DPos(
+    settings.fishingTilsHotspotWaypointColor,
+    stateNearestHotspot.get()[0], stateNearestHotspot.get()[1], stateNearestHotspot.get()[2],
+    false
+  );
+}).setEnabled(stateInHotspotRange.and(stateNearestHotspot).and(new StateProp(settings._preferUseTracer).not()));
+const hotspotArrowWrdReg = reg('renderWorld', () => {
+  renderTracer(
+    settings.fishingTilsHotspotWaypointColor,
+    stateNearestHotspot.get()[0], stateNearestHotspot.get()[1], stateNearestHotspot.get()[2],
+    false
+  );
+}).setEnabled(stateInHotspotRange.and(stateNearestHotspot).and(settings._preferUseTracer));
 
 export function init() { }
 export function load() {
   hotspotUpdateReg.register();
   hotspotPartReg.register();
   hotspotRenderReg.register();
+  hotspotArrowOvlReg.register();
+  hotspotArrowWrdReg.register();
 }
 export function unload() {
   hotspotUpdateReg.unregister();
   hotspotPartReg.unregister();
   hotspotRenderReg.unregister();
+  hotspotArrowOvlReg.unregister();
+  hotspotArrowWrdReg.unregister();
 }

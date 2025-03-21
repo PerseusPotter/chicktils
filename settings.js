@@ -966,10 +966,11 @@ export const props = {
   greatSpookPrimalAlertTime: new Property('GreatSpookPrimalAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
   greatSpookPrimalAlertSound: new Property('GreatSpookPrimalAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
 
-  enablefishingtils: new Property('EnableFishingTils', ++page, sort = 0, Property.Type.Toggle, false),
+  enablefishingtils: new Property('EnableFishingTils', ++page, sort = 0, Property.Type.Toggle, true),
   fishingTilsHotspotWaypoint: new Property('FishingTilsHotspotWaypoint', page, ++sort, Property.Type.Toggle, false),
   fishingTilsHotspotWaypointColor: new Property('FishingTilsHotspotWaypointColor', page, ++sort, Property.Type.Color, 0xFA771EFF),
   fishingTilsHotspotWaypointDisableRange: new Property('FishingTilsHotspotWaypointDisableRange', page, ++sort, Property.Type.Integer, 10, { desc: 'disable when this many blocks (not including height) from hotspot', min: 0 }),
+  fishingTilsHotspotWaypointArrow: new Property('FishingTilsHotspotWaypointArrow', page, ++sort, Property.Type.Toggle, true),
 
   // 17
 
