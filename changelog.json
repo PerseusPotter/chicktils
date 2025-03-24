@@ -522,6 +522,47 @@
           "desc": "extra settings from diana"
         }
       ]
+    },
+    {
+      "version": "0.10.1",
+      "changes": [
+        {
+          "type": "feat",
+          "desc": "add bayou to warp list"
+        },
+        {
+          "type": "feat",
+          "desc": "add new enchants to sba"
+        },
+        {
+          "type": "misc",
+          "desc": "dev tax :("
+        },
+        {
+          "type": "feat",
+          "desc": "add hotspot scanner (off particles, not radar)"
+        },
+        {
+          "type": "fix",
+          "desc": "center lines in textgui when centered on anchor"
+        },
+        {
+          "type": "fix",
+          "desc": "mem leak when /ct reload"
+        },
+        {
+          "type": "change",
+          "desc": "/fe (floor entrance) -> /fent (to fix the mem leak trust)"
+        },
+        {
+          "type": "feat",
+          "desc": "update sba sc list"
+        },
+        {
+          "type": "feat",
+          "desc": "add bayou to stat gui"
+        }
+      ]
     }
   ]
 }
