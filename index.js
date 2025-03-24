@@ -54,6 +54,7 @@ function tryUpdate(delay = 0) {
     else log('failed to fetch update');
     console.log(e + '\n' + e.stack);
   }
+  return -1;
 }
 register('command', res => {
   if (sev === undefined) log('there is not an update pending');
