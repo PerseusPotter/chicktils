@@ -93,10 +93,10 @@ function verifyTextLocation(value) {
 });
 
 if (!data.statLocs || !Array.isArray(data.statLocs)) {
-  data.statLocs = new Array(17).fill(0).map(() => ({ x: 50, y: 50, s: 1, a: 0, b: true, c: 0 }));
+  data.statLocs = new Array(18).fill(0).map(() => ({ x: 50, y: 50, s: 1, a: 0, b: true, c: 0 }));
   reset('statLocs');
 }
-data.statLocs.forEach((_, i) => {
+for (let i = 0; i < 18; i++) {
   if (!verifyLocation(data.statLocs[i])) {
     data.statLocs[i] = { x: 50, y: 50, s: 1, a: 0, b: true, c: 0 };
     reset(`statLocs[${i}]`);
@@ -107,7 +107,7 @@ data.statLocs.forEach((_, i) => {
     data.statLocs[i].c = 0;
     reset(`statLocs[${i}]`);
   }
-});
+}
 
 if (!data.unlockedHubWarps || !Array.isArray(data.unlockedHubWarps) || !data.unlockedHubWarps.every(v => typeof v === 'boolean')) {
   data.unlockedHubWarps = [];

@@ -743,6 +743,8 @@ export const props = {
   moveLoc15: new Property('MoveJerrysWorkshopGUI', page, ++sort, Property.Type.Action),
   loc16: new Property('EnableCatacombsGUI', page, ++sort, Property.Type.Toggle, true),
   moveLoc16: new Property('MoveCatacombsGUI', page, ++sort, Property.Type.Action),
+  loc17: new Property('EnableBackwaterBayouGUI', page, ++sort, Property.Type.Toggle, true),
+  moveLoc17: new Property('MoveBackwaterBayouGUI', page, ++sort, Property.Type.Action),
 
   // 5
   enableservertracker: new Property('EnableServerTracker', ++page, sort = 0, Property.Type.Toggle, true, { desc: 'tracks servers you\'ve been to, also /warp tab complete' }),

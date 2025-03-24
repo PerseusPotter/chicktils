@@ -22,7 +22,8 @@ const locs = [
   'Kuudra',
   'The Rift',
   'Jerry\'s Workshop',
-  'Catacombs'
+  'Catacombs',
+  'Backwater Bayou'
 ];
 
 let currLoc = -1;
