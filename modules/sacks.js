@@ -11,7 +11,7 @@ const sackMsgReg = reg('chat', (time, evn) => {
   for (let i = 0; i < itemLog.length - 1; i += 4) {
     // '  +23 '
     let amnt = itemLog[i + 0].func_150261_e().slice(3, -1);
-    amnt = parseInt(amnt);
+    amnt = parseInt(amnt.replace(/,/g, ''));
     // 'Blaze Rod'
     let name = itemLog[i + 1].func_150261_e();
     // ' (Combat Sack, Nether Sack)'
