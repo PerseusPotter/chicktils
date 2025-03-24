@@ -1,43 +1,63 @@
 import settings from '../settings';
 import { drawArrow3DPos, renderBeaconBeam, renderTracer } from '../util/draw';
-import Grid from '../util/grid';
 import { compareFloat } from '../util/math';
-import { JavaTypeOrNull, setAccessible } from '../util/polyfill';
+import { DSU, JavaTypeOrNull, setAccessible } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
+import { unrun } from '../util/threading';
 
+/** @type {[number, number, number][]} */
 let hotspots = [];
-let newHotspots = [];
+/** @type {[number, number, number][][]} */
+let hotspotParts = [];
 const stateNearestHotspot = new StateVar();
 const stateHotspotDist = new StateVar(0);
 
 const hotspotUpdateReg = reg('step', () => {
   try {
-    const a = newHotspots;
-    newHotspots = [];
-    const hotspotGrid = new Grid({ size: 3, addNeighbors: 2 });
+    const a = hotspotParts;
+    hotspotParts = [];
+
     const hotspotLocs = [];
-    a.forEach(v => {
-      const neighbors = hotspotGrid.get(v[0], v[2]);
-      let idx = neighbors[0] ?? (
-        hotspotGrid.add(v[0], v[2], hotspotLocs.length),
-        hotspotLocs.push([0, 0, 0, 0]) - 1
-      );
-      hotspotLocs[idx][0] += v[0];
-      hotspotLocs[idx][1] += v[1];
-      hotspotLocs[idx][2] += v[2];
-      hotspotLocs[idx][3]++;
+    a.forEach((v, y) => {
+      const dists = [];
+      for (let i = 0; i < v.length; i++) {
+        for (let j = i + 1; j < v.length; j++) {
+          let d = (v[i][0] - v[j][0]) ** 2 + (v[i][2] - v[j][2]) ** 2;
+          if (d < 4.269) dists.push([i, j, d]);
+        }
+      }
+      const clusters = new DSU(v.length);
+      dists.sort((a, b) => a[2] - b[2]).forEach(([i, j]) => {
+        if (clusters.find(i) !== clusters.find(j)) clusters.union(i, j);
+      });
+
+      const locs = [];
+      for (let i = 0; i < v.length; i++) {
+        let r = clusters.find(i);
+        if (!locs[r]) locs[r] = [0, 0, 0];
+        locs[r][0] += v[i][0];
+        locs[r][1] += v[i][2];
+        locs[r][2]++;
+      }
+
+      locs.forEach(([x, z, c]) => {
+        if (c > 10) hotspotLocs.push([x / c, y, z / c]);
+      });
     });
-    hotspots = hotspotLocs.map(v => [v[0] / v[3], v[1] / v[3], v[2] / v[3]]);
-    const [nearest, dist] = hotspots.reduce((a, v) => {
-      const d = Math.hypot(Player.getX() - v[0], Player.getZ() - v[2]);
-      if (d < a[1]) return [v, d];
-      return a;
-    }, [[NaN, NaN, NaN], Number.POSITIVE_INFINITY]);
-    stateNearestHotspot.set(nearest);
-    stateHotspotDist.set(dist);
+
+    unrun(() => {
+      hotspots = hotspotLocs;
+      const [nearest, dist] = hotspots.reduce((a, v) => {
+        const d = Math.hypot(Player.getX() - v[0], Player.getZ() - v[2]);
+        if (d < a[1]) return [v, d];
+        return a;
+      }, [[NaN, NaN, NaN], Number.POSITIVE_INFINITY]);
+      stateNearestHotspot.set(nearest);
+      stateHotspotDist.set(dist);
+    });
   } catch (_) { }
-}).setEnabled(settings._fishingTilsHotspotWaypoint).setFps(5);
+}).setEnabled(settings._fishingTilsHotspotWaypoint).setFps(1);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const hotspotPartReg = reg('packetReceived', pack => {
   if (pack.func_179749_a().equals(EnumParticleTypes.REDSTONE)) {
@@ -58,7 +78,9 @@ const hotspotPartReg = reg('packetReceived', pack => {
   const x = pack.func_149220_d();
   const y = pack.func_149226_e();
   const z = pack.func_149225_f();
-  newHotspots.push([x, y, z]);
+  const yFloor = ~~y;
+  if (!hotspotParts[yFloor]) hotspotParts[yFloor] = [];
+  hotspotParts[yFloor].push([x, y, z]);
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._fishingTilsHotspotWaypoint);
 
 const stateInHotspotRange = new StateProp(stateHotspotDist).customBinary(settings._fishingTilsHotspotWaypointDisableRange, (d, s) => d > s).and(settings._fishingTilsHotspotWaypoint);
