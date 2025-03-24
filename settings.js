@@ -971,6 +971,7 @@ export const props = {
   fishingTilsHotspotWaypointColor: new Property('FishingTilsHotspotWaypointColor', page, ++sort, Property.Type.Color, 0xFA771EFF),
   fishingTilsHotspotWaypointDisableRange: new Property('FishingTilsHotspotWaypointDisableRange', page, ++sort, Property.Type.Integer, 10, { desc: 'disable when this many blocks (not including height) from hotspot', min: 0 }),
   fishingTilsHotspotWaypointArrow: new Property('FishingTilsHotspotWaypointArrow', page, ++sort, Property.Type.Toggle, true),
+  fishingTilsUpdateSBAList: new Property('FishingTilsUpdateSBAList', page, ++sort, Property.Type.Toggle, true, { desc: 'update the sba sea creature list\nrequires game restart to fully disable (why though)' }),
 
   // 17
 
