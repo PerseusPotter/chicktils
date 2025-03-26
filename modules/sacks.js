@@ -113,6 +113,7 @@ function updateItemGui(items, time) {
   if (!settings.sacksDisplay) return;
   /** @type {[string, Difference][]} */
   const itemsA = Array.from(items.entries()).map(([n, d]) => {
+    n = n.replace(/§\w/g, '');
     /** @type {string} */
     const id = ITEMS_NAME_MAP.get(n)?.id ?? getOrPut(
       warnedItems, n,
@@ -163,7 +164,7 @@ function updateItemGui(items, time) {
  * @returns {string}
  */
 function stripName(str) {
-  return str.removeFormatting().toLowerCase().replace(/[^\w\s]+/g, '');
+  return str.replace(/§\w/g, '').toLowerCase().replace(/[^\w\s]+/g, '');
 }
 /**
  * @param {string} id
