@@ -4,20 +4,18 @@ import { getPlayerName } from '../../util/format';
 import { log } from '../../util/log';
 import { StateProp } from '../../util/state';
 import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss } from '../dungeon.js';
+import { getOrPut } from '../../util/polyfill';
 
 const teamTerms = new Map();
 
 const stateTermBreakdown = new StateProp(stateFloor).equalsmult('F7', 'M7').and(settings._dungeonTerminalBreakdown).and(stateIsInBoss);
 
 const termCompleteReg = reg('chat', (name, type) => {
-  const ign = getPlayerName(name);
-  let data = teamTerms.get(ign);
-  if (!data) teamTerms.set(ign, data = {
+  getOrPut(teamTerms, getPlayerName(name), () => ({
     terminal: 0,
     lever: 0,
     device: 0
-  });
-  data[type]++;
+  }))[type]++;
 }).setCriteria(/^&r(.+?)&a (?:completed|activated) a (.+?)! \(&r&c\d&r&a\/(?:7|8)\)&r$/).setEnabled(stateTermBreakdown);
 const terminalsEndReg = reg('chat', () => {
   getPlayers().forEach(v => !teamTerms.has(v.ign) && teamTerms.set(v.ign, {

@@ -1,6 +1,6 @@
 import { removeElementMap, removeElementSet } from './helper';
-import { inherits, setAccessible } from './polyfill';
-import { StateProp, StateVar } from './state';
+import { getOrPut, inherits, setAccessible } from './polyfill';
+import { StateVar } from './state';
 import { run, wrap as wrapFunc } from './threading';
 
 function wrap(orig, wrap, prop) {
@@ -102,12 +102,7 @@ const createRegister = function(type, shit) {
       orig.apply(this, args[0] === undefined && args.length === 1 ? [] : args);
       const end = nanoTime();
       if (Thread.currentThread() !== $mainThread) return;
-      let arr = data.get(id);
-      if (!arr) {
-        arr = [];
-        data.set(id, arr);
-      }
-      arr.push(end - start);
+      getOrPut(data, id, () => []).push(end - start);
     };
   }
   if (type in customRegs) return new (customRegs[type])(shit);
@@ -152,12 +147,7 @@ reg = function reg(type, shit) {
         case 'forceTrigger': return shit;
       }
       if (!rr[p]) return void 0;
-      let w;
-      return props.get(p) || (
-        (w = wrap(rr, prox, rr[p])),
-        props.set(p, w),
-        w
-      );
+      return getOrPut(props, p, () => wrap(rr, prox, rr[p]));
     }
   });
   const rr = createRegister(type, wrap(prox, prox, shit));
