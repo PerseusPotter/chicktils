@@ -96,3 +96,12 @@ export function getPlayerName(name) {
   if (!match) return '';
   return match[1];
 }
+
+/**
+ * @param {number} amnt
+ * @param {string?} name
+ * @returns {string}
+ */
+export function formatQuantity(amnt, name = '') {
+  return `${amnt > 0 ? '&a+' : amnt < 0 ? '&c-' : '&e±'} ${Math.abs(amnt)}x${name ? ' &r' + name : ''}`;
+}
