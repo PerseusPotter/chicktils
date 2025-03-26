@@ -39,6 +39,7 @@ export function setIsMain() {
  *  assfangCheeseLoc: TextLocation;
  *  feroEstimateLoc: TextLocation;
  *  serverScrutinizerPPSDisplay: TextLocation;
+ *  sackTilsItemDisplay: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -86,7 +87,8 @@ function verifyTextLocation(value) {
   'serverScrutinizerPingDisplay',
   'assfangCheeseLoc',
   'feroEstimateLoc',
-  'serverScrutinizerPPSDisplay'
+  'serverScrutinizerPPSDisplay',
+  'sackTilsItemDisplay'
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v);

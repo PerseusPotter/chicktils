@@ -917,6 +917,14 @@ export const props = {
 
   enablesacks: new Property('EnableSackTils', page, ++sort, Property.Type.Toggle, false, { desc: 'does things with the sacks message\nto turn on settings -> personal -> chat feedback -> sack notifs' }),
   sacksDisableMessage: new Property('SackTilsDisableMessage', page, ++sort, Property.Type.Toggle, true, { desc: 'hide the message' }),
+  sacksDisplay: new Property('SackTilsDisplay', page, ++sort, Property.Type.Toggle, true, { desc: 'gui showing change in items' }),
+  moveSacksDisplay: new Property('MoveSacktilsDisplay', page, ++sort, Property.Type.Action),
+  sacksDisplayTimeout: new Property('SackTilsDisplayTimeout', page, ++sort, Property.Type.Number, 5000, { desc: 'how long to show changes for in ms' }),
+  sacksDisplayCombineQuantities: new Property('SackTilsDisplayCombineQuantities', page, ++sort, Property.Type.Toggle, false, { desc: 'combine +16 Ender Pearl and -3 Ender Pearl into +13 Ender Pearl' }),
+  sacksDisplayTrackAggregateQuantities: new Property('SackTilsDisplayTrackAggregateQuantities', page, ++sort, Property.Type.Toggle, false, { desc: 'remember previous transactions (reset on restart/reload or manually)' }),
+  sacksDisplayResetAggregate: new Property('SackTilsDisplayResetAggregate', page, ++sort, Property.Type.Action),
+  sacksDisplayItemWhitelist: new Property('SackTilsDisplayItemWhitelist', page, ++sort, Property.Type.Text, '', { desc: 'case insensitive comma separated values\ndo not use quotes, they will not be parsed\nall formatting codes and non alphanumeric characters will be stripped\nwill first attempt to match by id, then strict name, then a check without spaces\nall the following will match the item "Jack o\' Lantern"\nJACK_O_LANTERN,Jack o\' Lantern,jack o lantern,jackolantern\nthe following will NOT match:\njack lantern,ack o lanter,poisonous potato' }),
+  sacksDisplayItemBlacklist: new Property('SackTilsDisplayItemBlacklist', page, ++sort, Property.Type.Text, '', { desc: 'case insensitive comma separated values\ndo not use quotes, they will not be parsed\nall formatting codes and non alphanumeric characters will be stripped\nwill first attempt to match by id, then strict name, then a check without spaces\nall the following will match the item "Jack o\' Lantern"\nJACK_O_LANTERN,Jack o\' Lantern,jack o lantern,jackolantern\nthe following will NOT match:\njack lantern,ack o lanter,poisonous potato' }),
 
   enabledeployable: new Property('EnableDeployableTils', page, ++sort, Property.Type.Toggle, false),
   deployableHUD: new Property('DeployableHUD', page, ++sort, Property.Type.Option, 'Compact', { desc: 'show current deployable\nwhat is bubblegum?', options: ['Compact', 'Full', 'None'] }),
