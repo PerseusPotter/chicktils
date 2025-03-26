@@ -172,7 +172,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
           tmpG.setFont(fonts[0]);
         }
 
-        const data = FontHelper.processString(v.s.replace(/(&|§)k/g, ''), cb, tmpG, fonts[0], fonts[1], fonts[2], FONT_RENDER_SIZE.get());
+        const data = FontHelper.processString(v.s.replace(/(&|§)k/g, '').replace(/§[^0-9a-fk-or]/g, ''), cb, tmpG, fonts[0], fonts[1], fonts[2], FONT_RENDER_SIZE.get());
 
         v.a = data.a;
         v.b = data.b;
