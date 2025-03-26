@@ -128,3 +128,20 @@ export class DSU {
     }
   }
 }
+
+/**
+ * @template K
+ * @template R
+ * @param {Map<K, R>} m
+ * @param {K} k
+ * @param {() => R} d
+ * @returns {R}
+ */
+export function getOrPut(m, k, d) {
+  let v;
+  return m.get(k) ?? (
+    (v = d()),
+    m.set(k, v),
+    v
+  );
+}
