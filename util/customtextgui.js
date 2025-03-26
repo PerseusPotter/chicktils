@@ -19,6 +19,9 @@ const EventEmitter = require('./events');
  *  addLine(str: string): CustomTextGui;
  *  addLines(strs: string[]): CustomTextGui;
  *  clearLines(): CustomTextGui;
+ *  removeLine(i: number): CustomTextGui;
+ *  insertLine(str: string, i: number): CustomTextGui;
+ *  replaceLine(str: string, i: number): CustomTextGui;
  *  getVisibleWidth(): number;
  *  getWidth(): number;
  *  getHeight(): number;
@@ -273,6 +276,24 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   obj.clearLines = function() {
     lines = [];
     hasObf = false;
+    return this;
+  };
+  obj.removeLine = function(i) {
+    dirty = true;
+    lines.splice(i, 1);
+    return this;
+  };
+  obj.insertLine = function(str, i) {
+    dirty = true;
+    lines.splice(i, 0, { s: str, a: null, b: null, o: [], w: -1, vw: -1, d: true });
+    return this;
+  };
+  obj.replaceLine = function(str, i) {
+    if (!lines[i]) return this.addLine(str);
+    if (lines[i].s !== str) {
+      dirty = true;
+      lines[i] = { s: str, a: null, b: null, o: [], w: -1, vw: -1, d: true };
+    }
     return this;
   };
   obj.getVisibleWidth = function() {
