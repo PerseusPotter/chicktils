@@ -103,5 +103,5 @@ export function getPlayerName(name) {
  * @returns {string}
  */
 export function formatQuantity(amnt, name = '') {
-  return `${amnt > 0 ? '&a+' : amnt < 0 ? '&c-' : '&e±'} ${Math.abs(amnt)}x${name ? ' &r' + name : ''}`;
+  return `${amnt > 0 ? '&a+' : amnt < 0 ? '&c-' : '&e±'} ${commaNumber(Math.abs(amnt))}x${name ? ' &r' + name : ''}`;
 }
