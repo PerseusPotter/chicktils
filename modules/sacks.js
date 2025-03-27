@@ -43,6 +43,7 @@ function parseLog(itemLog, items) {
     amnt = parseInt(amnt.replace(/,/g, ''));
     // 'Blaze Rod'
     let name = itemLog[i + 1].func_150261_e();
+    if (name === ' other items.') break; // ran out of space :(, no other items, and no sack (i + 2)
     // ' (Combat Sack, Nether Sack)'
     // let sack = itemLog[i + 2].func_150261_e();
     // '\n'
