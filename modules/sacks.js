@@ -5,7 +5,7 @@ import { formatQuantity } from '../util/format';
 import { log } from '../util/log';
 import { getOrPut } from '../util/polyfill';
 import reg from '../util/registerer';
-import { ITEMS_ID_MAP, ITEMS_NAME_MAP } from '../util/sackitems';
+import { ITEMS_ID_MAP, ITEMS_NAME_MAP, stripName } from '../util/sackitems';
 import { unrun } from '../util/threading';
 import { FrameTimer } from '../util/timers';
 
@@ -113,9 +113,8 @@ function updateItemGui(items, time) {
   if (!settings.sacksDisplay) return;
   /** @type {[string, Difference][]} */
   const itemsA = Array.from(items.entries()).map(([n, d]) => {
-    n = n.replace(/§\w/g, '');
     /** @type {string} */
-    const id = ITEMS_NAME_MAP.get(n)?.id ?? getOrPut(
+    const id = ITEMS_NAME_MAP.get(stripName(n))?.id ?? getOrPut(
       warnedItems, n,
       () => {
         const i = stripName(n).replace(/\s+/g, '_').toUpperCase();
@@ -158,13 +157,6 @@ function updateItemGui(items, time) {
       }
     });
   });
-}
-/**
- * @param {string} str
- * @returns {string}
- */
-function stripName(str) {
-  return str.replace(/§\w/g, '').toLowerCase().replace(/[^\w\s]+/g, '');
 }
 /**
  * @param {string} id

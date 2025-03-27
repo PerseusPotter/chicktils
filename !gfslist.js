@@ -75,6 +75,12 @@ function format(name, tier) {
     `/** @type {{ nameF: string, nameUF: string, id: string }[]} */\n` +
     `export const ITEMS = ${JSON.stringify(output.sort((a, b) => a.id.localeCompare(b.id)), null, 2)};\n` +
     `export const ITEMS_ID_MAP = new Map(ITEMS.map(v => [v.id, v]));\n` +
-    `export const ITEMS_NAME_MAP = new Map(ITEMS.map(v => [v.nameUF, v]));`
+    `/**\n` +
+    ` * @param {string} str\n` +
+    ` */\n` +
+    `export function stripName(str) {\n` +
+    `  return str.toLowerCase().replace(/[^\s'-.a-z0-9]/g, '').trim();\n` +
+    `};\n` +
+    `export const ITEMS_NAME_MAP = new Map(ITEMS.map(v => [stripName(v.nameUF), v]));`
   );
 }());
