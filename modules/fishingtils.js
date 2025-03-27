@@ -92,7 +92,7 @@ const hotspotRenderReg = reg('renderWorld', () => {
       settings.useScuffedBeacon,
       true
     );
-  })
+  });
 }).setEnabled(stateInHotspotRange);
 const hotspotArrowOvlReg = reg('renderOverlay', () => {
   drawArrow3DPos(

@@ -2,7 +2,6 @@ import settings from '../../settings';
 import { worldRen, DefaultVertexFormats, tess } from '../../util/draw';
 import reg from '../../util/registerer';
 import { rescale } from '../../util/math';
-import { log } from '../../util/log';
 import { StateProp } from '../../util/state';
 import glStateManager from '../../util/glStateManager';
 
