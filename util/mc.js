@@ -255,3 +255,12 @@ export function createBlockMapping(orig1, orig2, actual1, actual2) {
 
   return obj;
 }
+
+const MCBlock = Java.type('net.minecraft.block.Block');
+/**
+ * @param {import('../../@types/External').JavaClass<'net.minecraft.block.Block'>} block
+ * @returns {number}
+ */
+export function getBlockId(block) {
+  return MCBlock.func_149682_b(block);
+}

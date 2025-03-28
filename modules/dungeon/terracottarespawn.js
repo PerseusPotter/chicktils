@@ -1,7 +1,7 @@
 import settings from '../../settings';
 import { getPartialServerTick, renderFilledBox, renderOutline, renderString } from '../../util/draw';
 import { colorForNumber } from '../../util/format';
-import { getBlockPos } from '../../util/mc';
+import { getBlockId, getBlockPos } from '../../util/mc';
 import reg from '../../util/registerer';
 import { StateProp, StateVar } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
@@ -12,10 +12,8 @@ const stateMaxTicks = new StateProp(stateFloor).customUnary(f => f === 'F6' ? 30
 const stateTerraPhase = new StateVar(false);
 const stateTerraRespawn = new StateProp(stateFloor).equalsmult('F6', 'M6').and(settings._dungeonTerracottaRespawn).and(stateIsInBoss).and(stateTerraPhase);
 
-const MCBlock = Java.type('net.minecraft.block.Block');
 function onBlockUpdate(bp, bs) {
-  const block = bs.func_177230_c();
-  if (MCBlock.func_149682_b(block) === 140) {
+  if (getBlockId(bs.func_177230_c()) === 140) {
     const pos = getBlockPos(bp);
     deathPos.push([
       stateMaxTicks.get(),
