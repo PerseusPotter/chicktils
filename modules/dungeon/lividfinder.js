@@ -46,14 +46,10 @@ function processBlockState(bs) {
     return false;
   }
 }
-const blockChangeReg = reg('packetReceived', pack => {
-  pack.func_179844_a().some(change => {
-    const bp = getBlockPos(change.func_180090_a());
-    if (bp.x !== 13 || bp.y !== 107 || bp.z !== 25) return;
-    processBlockState(change.func_180088_c());
-    return true;
-  });
-}).setFilteredClass(Java.type('net.minecraft.network.play.server.S22PacketMultiBlockChange')).setEnabled(stateFindLivid);
+const blockChangeReg = reg('blockChange', (pos, bs) => {
+  if (pos.x !== 13 || pos.y !== 107 || pos.z !== 25) return;
+  processBlockState(bs);
+}).setEnabled(stateFindLivid);
 const lividBP = new BlockPos(13, 107, 25);
 const tickReg = reg('tick', () => {
   if (processBlockState(World.getBlockStateAt(lividBP))) return;
