@@ -1,7 +1,7 @@
 import settings from '../../settings';
 import { getPartialServerTick, renderFilledBox, renderOutline, renderString } from '../../util/draw';
 import { colorForNumber } from '../../util/format';
-import { getBlockId, getBlockPos } from '../../util/mc';
+import { getBlockId } from '../../util/mc';
 import reg from '../../util/registerer';
 import { StateProp, StateVar } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
@@ -12,26 +12,13 @@ const stateMaxTicks = new StateProp(stateFloor).customUnary(f => f === 'F6' ? 30
 const stateTerraPhase = new StateVar(false);
 const stateTerraRespawn = new StateProp(stateFloor).equalsmult('F6', 'M6').and(settings._dungeonTerracottaRespawn).and(stateIsInBoss).and(stateTerraPhase);
 
-function onBlockUpdate(bp, bs) {
-  if (getBlockId(bs.func_177230_c()) === 140) {
-    const pos = getBlockPos(bp);
-    deathPos.push([
-      stateMaxTicks.get(),
-      pos.x + 0.5, 69, pos.z + 0.5
-    ]);
-  }
-}
-const blockUpdateReg = reg('packetReceived', pack => {
-  if (pack.func_179827_b) {
-    const bp = pack.func_179827_b();
-    const bs = pack.func_180728_a();
-    onBlockUpdate(bp, bs);
-  } else pack.func_179844_a().forEach(v => {
-    const bp = v.func_180090_a();
-    const bs = v.func_180088_c();
-    onBlockUpdate(bp, bs);
-  });
-}).setFilteredClasses([net.minecraft.network.play.server.S22PacketMultiBlockChange, net.minecraft.network.play.server.S23PacketBlockChange]).setEnabled(stateTerraRespawn);
+const blockUpdateReg = reg('blockChange', (pos, bs) => {
+  if (getBlockId(bs.func_177230_c()) !== 140) return;
+  deathPos.push([
+    stateMaxTicks.get(),
+    pos.x + 0.5, 69, pos.z + 0.5
+  ]);
+}).setEnabled(stateTerraRespawn);
 const stickReg = reg('serverTick2', () => {
   if (deathPos.length === 0) return;
   let m = 0;
