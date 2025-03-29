@@ -1086,3 +1086,91 @@ export function packColor(color) {
     (color[3] * 255)
   ) >>> 0;
 }
+
+/**
+ * D65 reference, sRGB working space
+ * @param {number} r [0, 1] in linear RGB
+ * @param {number} g [0, 1] in linear RGB
+ * @param {number} b [0, 1] in linear RGB
+ * @returns {[number, number, number]} [X, Y, Z] all [0, 1]
+ */
+export function rgbToXyz(r, g, b) {
+  return [
+    0.412390799265960 * r + 0.357584339383878 * g + 0.180480788401834 * b,
+    0.212639005871510 * r + 0.715168678767756 * g + 0.072192315360734 * b,
+    0.019330818715592 * r + 0.119194779794626 * g + 0.950532152249661 * b
+  ];
+}
+
+/**
+ * D65 reference, sRGB working space
+ * @param {number} X [0, 1]
+ * @param {number} Y [0, 1]
+ * @param {number} Z [0, 1]
+ * @returns {[number, number, number]} [r, g, b] all [0, 1]
+ */
+export function xyzToRgb(X, Y, Z) {
+  return [
+    +3.2404542 * X + -1.5371385 * Y + -0.4985314 * Z,
+    -0.9692660 * X + +1.8760108 * Y + +0.0415560 * Z,
+    +0.0556434 * X + -0.2040259 * Y + +1.0572252 * Z
+  ];
+}
+
+/**
+ * D65 reference, Y=1 white
+ * @param {number} X [0, 1]
+ * @param {number} Y [0, 1]
+ * @param {number} Z [0, 1]
+ * @returns {[number, number, number]} [L, a, b] [[0, 1], [-0.4, 0.4], [-0.4, 0.4]]
+ */
+export function xyzToOklab(X, Y, Z) {
+  const l = Math.cbrt(+0.8189330101 * X + +0.3618667424 * Y + -0.1288597137 * Z);
+  const m = Math.cbrt(+0.0329845436 * X + +0.9293118715 * Y + +0.0361456387 * Z);
+  const s = Math.cbrt(+0.0482003018 * X + +0.2643662691 * Y + +0.6338517070 * Z);
+  return [
+    +0.2104542553 * l + +0.7936177850 * m + -0.0040720468 * s,
+    +1.9779984951 * l + -2.4285922050 * m + +0.4505937099 * s,
+    +0.0259040371 * l + +0.7827717662 * m + -0.8086757660 * s
+  ];
+}
+
+/**
+ * D65 reference, Y=1 white
+ * @param {number} L [0, 1]
+ * @param {number} a [-0.4, 0.4]
+ * @param {number} b [-0.4, 0.4]
+ * @returns {[number, number, number]} [X, Y, Z] all [0, 1]
+ */
+export function oklabToXyz(L, a, b) {
+  const l = (L + +0.3963377921737678 * a + +0.2158037580607587 * b) ** 3;
+  const m = (L + -0.1055613423236563 * a + -0.0638541747717058 * b) ** 3;
+  const s = (L + -0.0894841820949657 * a + -1.2914855378640917 * b) ** 3;
+  return [
+    +1.2270138511035211 * l + -0.5577999806518222 * m + +0.2812561489664678 * s,
+    -0.0405801784232805 * l + +1.1122568696168375 * m + -0.0716766786656012 * s,
+    -0.0763812845057069 * l + -0.4214819784180126 * m + +1.5861632204407947 * s
+  ];
+}
+
+/**
+ * @param {number} r [0, 1]
+ * @param {number} g [0, 1]
+ * @param {number} b [0, 1]
+ * @returns {[number, number, number]} [L, a, b] [[0, 1], [-0.4, 0.4], [-0.4, 0.4]]
+ */
+export function rgbToOklab(r, g, b) {
+  const XYZ = rgbToXyz(r, g, b);
+  return xyzToOklab(XYZ[0], XYZ[1], XYZ[2]);
+}
+
+/**
+ * @param {number} L [0, 1]
+ * @param {number} a [-0.4, 0.4]
+ * @param {number} b [-0.4, 0.4]
+ * @returns {[number, number, number]} [r, g, b] all [0, 1]
+ */
+export function oklabToRgb(L, a, b) {
+  const XYZ = oklabToXyz(L, a, b);
+  return xyzToRgb(XYZ[0], XYZ[1], XYZ[2]);
+}
