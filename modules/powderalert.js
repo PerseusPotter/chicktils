@@ -1,54 +1,79 @@
 import createAlert from '../util/alert';
-import { renderWaypoint } from '../util/draw';
+import { normColor, oklabToRgb, renderWaypoint, rgbToOklab } from '../util/draw';
 import settings from '../settings';
-import reg from '../util/registerer';
+import reg, { customRegs } from '../util/registerer';
+import { getBlockId } from '../util/mc';
+import { unrun } from '../util/threading';
+import { lerp } from '../util/math';
 
-let chests = [];
-const recent = [];
+const chests = new Map();
+const recent = new Set();
 const chestAlert = createAlert('chest');
+
 const PlayerInteractAction = Java.type('com.chattriggers.ctjs.minecraft.listeners.ClientListener').PlayerInteractAction;
 const rcReg = reg('playerInteract', (action, pos) => {
   if (!action.equals(PlayerInteractAction.RIGHT_CLICK_BLOCK)) return;
-  let i = chests.findIndex(v => v.x === pos.x && v.y === pos.y && v.z === pos.z);
-  if (i >= 0) {
-    const removed = chests.splice(i, 1);
-    recent.push(removed[0]);
-    if (recent.length > 3) recent.shift();
-  }
+  const id = `${pos.x},${pos.y},${pos.z}`;
+  if (chests.delete(id)) recent.add(id);
 });
+const blockReg = reg('blockChange', (pos, bs) => {
+  if (getBlockId(bs.func_177230_c()) !== 54) return;
+  const id = `${pos.x},${pos.y},${pos.z}`;
+  if (recent.has(id)) return;
+  if (chests.has(id)) return;
+  unrun(() => {
+    if (
+      (Player.getX() - pos.x) ** 2 +
+      (Player.getY() - pos.y) ** 2 +
+      (Player.getZ() - pos.z) ** 2
+      > settings.powderScanRange ** 2
+    ) return;
+    chests.set(id, { x: pos.x, y: pos.y, z: pos.z, t: customRegs.serverTick2.tick });
+    chestAlert.text = 'Chest x' + chests.size;
+    chestAlert.show(settings.powderAlertTime);
+  });
+});
+const MAX_CHEST_LIFE = 20 * 60;
+const renderReg = reg('renderWorld', () => {
+  const t = customRegs.serverTick2.tick;
+  const c1 = normColor(settings.powderBoxColor);
+  const [L1, a1, b1] = rgbToOklab(...c1);
+  const c2 = normColor(settings.powderBoxColor2);
+  const [L2, a2, b2] = rgbToOklab(...c2);
+  Array.from(chests.entries()).forEach(([k, v]) => {
+    const dt = t - v.t;
+    const m = dt / MAX_CHEST_LIFE;
+    const c = oklabToRgb(
+      lerp(L1, L2, m),
+      lerp(a1, a2, m),
+      lerp(b1, b2, m)
+    );
+    renderWaypoint(v.x, v.y, v.z, 1, 1, [
+      c[0], c[1], c[2],
+      lerp(c1[3], c2[3], m)
+    ], settings.powderBoxEsp, false);
+    if (dt > MAX_CHEST_LIFE) chests.delete(k);
+  });
+});
+
 function reset() {
-  chests = [];
+  chests.clear();
+  recent.clear();
+
   rcReg.unregister();
+  blockReg.unregister();
   renderReg.unregister();
   unloadReg.unregister();
   chatReg.unregister();
 }
 const unloadReg = reg('worldUnload', () => reset());
 const startReg = reg('chat', () => {
-  renderReg.register();
   rcReg.register();
-  chatReg.register();
+  blockReg.register();
+  renderReg.register();
   unloadReg.register();
-  Client.scheduleTask(5, () => {
-    chests = World.getAllTileEntities()
-      .filter(v =>
-        v.getBlockType().getRegistryName() === 'minecraft:chest' &&
-        Math.hypot(
-          Player.getX() - v.getX(),
-          Player.getY() - v.getY(),
-          Player.getZ() - v.getZ()
-        ) < settings.powderScanRange &&
-        !recent.some(r => r.x === v.getX() && r.y === v.getY() && r.z === v.getZ())
-      ).map(v => ({ x: v.getX(), y: v.getY(), z: v.getZ() }));
-
-    chestAlert.text = 'Chest x' + chests.length;
-    chestAlert.show(settings.powderAlertTime);
-  });
+  chatReg.register();
 }).setCriteria('&r&aYou uncovered a treasure chest!&r');
-
-const renderReg = reg('renderWorld', () => {
-  chests.forEach(v => renderWaypoint(v.x, v.y, v.z, 1, 1, settings.powderBoxColor, settings.powderBoxEsp, false));
-});
 
 let doBlock = false;
 const chatReg = reg('chat', evn => {

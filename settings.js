@@ -763,6 +763,7 @@ export const props = {
   // 7
   enablepowderalert: new Property('EnablePowderAlert', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'alerts when powder chest spawns' }),
   powderBoxColor: new Property('PowderBoxColor', page, ++sort, Property.Type.Color, 0x00FF00FF),
+  powderBoxColor2: new Property('PowderBoxColorDead', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: '2nd color of gradient  between 1st and 2nd based on when chest will despawn' }),
   powderBoxEsp: new Property('PowderBoxEsp', page, ++sort, Property.Type.Toggle, true),
   powderAlertTime: new Property('PowderAlertTime', page, ++sort, Property.Type.Integer, 1000, { desc: 'in ms', min: 0 }),
   powderAlertSound: new Property('PowderAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
