@@ -2596,6 +2596,6 @@ export const ITEMS_ID_MAP = new Map(ITEMS.map(v => [v.id, v]));
  * @param {string} str
  */
 export function stripName(str) {
-  return str.toLowerCase().replace(/[^s'-.a-z0-9]/g, '').trim();
+  return str.toLowerCase().replace(/§\w/g, '').replace(/[^s'-.a-z0-9]/g, '').trim();
 };
 export const ITEMS_NAME_MAP = new Map(ITEMS.map(v => [stripName(v.nameUF), v]));
