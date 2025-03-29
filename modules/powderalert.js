@@ -84,7 +84,7 @@ const chatReg = reg('chat', evn => {
     return;
   }
   if (str === '&r  &r&6&lCHEST LOCKPICKED &r') doBlock = true;
-  if (doBlock) cancel(evn);
+  if (doBlock && !(settings.powderShowPowder && str.startsWith('&r    &r&dGemstone Powder'))) cancel(evn);
 }).setEnabled(settings._powderBlockRewards);
 
 export function init() {

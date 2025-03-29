@@ -768,7 +768,8 @@ export const props = {
   powderAlertTime: new Property('PowderAlertTime', page, ++sort, Property.Type.Integer, 1000, { desc: 'in ms', min: 0 }),
   powderAlertSound: new Property('PowderAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   powderScanRange: new Property('PowderScanRange', page, ++sort, Property.Type.Integer, 10, { min: 0 }),
-  powderBlockRewards: new Property('PowderBlockRewards', page, ++sort, Property.Type.Toggle, true, { desc: 'hides chest rewards message' }),
+  powderBlockRewards: new Property('PowderHideMessage', page, ++sort, Property.Type.Toggle, true, { desc: 'hides chest rewards message' }),
+  powderShowPowder: new Property('PowderHideMessageShowPowder', page, ++sort, Property.Type.Toggle, true, { desc: 'keep the powder gain message' }),
 
   // 8
   enablecrystalalert: new Property('EnableCrystalAlert', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'alerts when end crystals spawn' }),
