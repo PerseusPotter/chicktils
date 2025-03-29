@@ -52,7 +52,9 @@ export function getPartialServerTick() {
  * @param {number?} yaw degrees
  */
 export function drawArrow2D(color, theta, length = 20, yaw) {
-  if ((color & 0xFF) === 0) return;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
+  color = packColor(rgba);
   if (yaw === undefined) yaw = getYaw();
   const dt = theta - yaw / 180 * Math.PI - Math.PI/* + (getXMult() === 1 ? -Math.PI : 0)*/;
   const x1 = Renderer.screen.getWidth() / 2;
@@ -75,7 +77,9 @@ export function drawArrow2D(color, theta, length = 20, yaw) {
  * @param {number?} pitch degrees
  */
 export function drawArrow3D(color, theta, phi, scale = 3, yaw, pitch) {
-  if ((color & 0xFF) === 0) return;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
+  color = packColor(rgba);
   if (yaw === undefined) yaw = getYaw();
   if (pitch === undefined) pitch = getPitch();
   const dt = theta - yaw / 180 * Math.PI - Math.PI / 2 + (getXMult() === 1 ? 0 : Math.PI);
@@ -205,7 +209,8 @@ export function drawArrow3DPos(color, dx, dy, dz, rel = true, scale = 3) {
  * @param {number?} lw (3)
  */
 export function renderTracer(color, x, y, z, rel = true, lw = 3) {
-  if ((color & 0xFF) === 0) return;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
   const p = Player.getPlayer();
   if (!p) return;
   if (rel) {
@@ -214,7 +219,7 @@ export function renderTracer(color, x, y, z, rel = true, lw = 3) {
     z += getRenderZ();
   }
   const look = p.func_70676_i(Tessellator.partialTicks);
-  renderLine(color, x, y, z, getRenderX() + look.field_72450_a, getRenderY() + look.field_72448_b + getEyeHeight(p), getRenderZ() + look.field_72449_c, true, lw);
+  renderLine(rgba, x, y, z, getRenderX() + look.field_72450_a, getRenderY() + look.field_72448_b + getEyeHeight(p), getRenderZ() + look.field_72449_c, true, lw);
 }
 
 /**
@@ -262,7 +267,8 @@ export function renderAABBOutline(minX, minY, minZ, maxX, maxY, maxZ, color, esp
  * @param {number?} wz
  */
 export function renderOutline(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false, wz = w) {
-  if ((color & 0xFF) === 0) return;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
   let wx = w;
   if (center) {
     x -= wx / 2;
@@ -277,21 +283,16 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
     lw *= s;
   }
 
-  const r = ((color >> 24) & 0xFF) / 255;
-  const g = ((color >> 16) & 0xFF) / 255;
-  const b = ((color >> 8) & 0xFF) / 255;
-  const a = ((color >> 0) & 0xFF) / 255;
-
   GlStateManager2.disableTexture2D();
   GlStateManager2.disableLighting();
   GlStateManager2.disableAlpha();
   GL11.glLineWidth(lw);
-  GlStateManager2.color(r, g, b, a);
+  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
   if (!nt) {
     GlStateManager2.pushMatrix();
     GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
   }
-  if (a === 1) {
+  if (rgba[3] === 1) {
     GlStateManager2.depthMask(true);
     GlStateManager2.disableBlend();
   } else {
@@ -328,7 +329,7 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
   GlStateManager2.enableTexture2D();
   GlStateManager2.enableAlpha();
   GL11.glLineWidth(1);
-  if (a !== 1) {
+  if (rgba[3] !== 1) {
     GlStateManager2.depthMask(true);
     GlStateManager2.disableBlend();
   }
@@ -377,7 +378,8 @@ export function renderAABBFilled(minX, minY, minZ, maxX, maxY, maxZ, color, esp 
  * @param {number?} wz
  */
 export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true, nt = false, wz = w) {
-  if ((color & 0xFF) === 0) return;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
   let wx = w;
   if (center) {
     x -= wx / 2;
@@ -391,21 +393,16 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
     h *= s;
   }
 
-  const r = ((color >> 24) & 0xFF) / 255;
-  const g = ((color >> 16) & 0xFF) / 255;
-  const b = ((color >> 8) & 0xFF) / 255;
-  const a = ((color >> 0) & 0xFF) / 255;
-
   GlStateManager2.disableTexture2D();
   GlStateManager2.disableLighting();
   GlStateManager2.disableAlpha();
   GlStateManager2.disableCull();
-  GlStateManager2.color(r, g, b, a);
+  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
   if (!nt) {
     GlStateManager2.pushMatrix();
     GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
   }
-  if (a === 1) {
+  if (rgba[3] === 1) {
     GlStateManager2.depthMask(true);
     GlStateManager2.disableBlend();
   } else {
@@ -442,7 +439,7 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
   GlStateManager2.enableTexture2D();
   GlStateManager2.enableAlpha();
   GlStateManager2.enableCull();
-  if (a !== 1) {
+  if (rgba[3] !== 1) {
     GlStateManager2.depthMask(true);
     GlStateManager2.disableBlend();
   }
@@ -461,10 +458,12 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
  * @param {number?} lw line width (5)
  */
 export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5) {
-  if ((color & 0xFF) === 0) return;
-  const c = (color & ~0xFF) | ((color & 0xFF) >> 2);
-  renderFilledBox(x, y, z, w, h, c, esp, center);
-  renderOutline(x, y, z, w, h, color, esp, center, lw);
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
+  rgba[3] /= 4;
+  renderFilledBox(x, y, z, w, h, rgba, esp, center);
+  rgba[3] *= 4;
+  renderOutline(x, y, z, w, h, rgba, esp, center, lw);
 }
 
 /**
@@ -473,19 +472,15 @@ export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true,
  * @link https://github.com/ChatTriggers/ChatTriggers/blob/3aac68d7aa6c3276ae79000306895130c291d85b/src/main/kotlin/com/chattriggers/ctjs/minecraft/libs/renderer/Renderer.kt#L225
  */
 export function drawPolygon(color, vertexes) {
-  if ((color & 0xFF) === 0) return;
-
-  const r = ((color >> 24) & 0xFF) / 255;
-  const g = ((color >> 16) & 0xFF) / 255;
-  const b = ((color >> 8) & 0xFF) / 255;
-  const a = ((color >> 0) & 0xFF) / 255;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
 
   GlStateManager2.disableTexture2D();
   GlStateManager2.disableDepth();
   GlStateManager2.enableBlend();
   GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
   GlStateManager2.disableCull();
-  GlStateManager2.color(r, g, b, a);
+  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
 
   worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
   vertexes.forEach(v => worldRen.func_181662_b(v[0], v[1], v[2] || 0).func_181675_d());
@@ -523,14 +518,10 @@ function applyTint(c, a) {
  * @param {number?} lw (2)
  */
 export function renderLine(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
-  if ((color & 0xFF) === 0) return;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
   ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
   ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));
-
-  const r = ((color >> 24) & 0xFF) / 255;
-  const g = ((color >> 16) & 0xFF) / 255;
-  const b = ((color >> 8) & 0xFF) / 255;
-  const a = ((color >> 0) & 0xFF) / 255;
 
   GlStateManager2.pushMatrix();
   GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
@@ -538,8 +529,8 @@ export function renderLine(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
   GlStateManager2.disableLighting();
   GlStateManager2.disableAlpha();
   GL11.glLineWidth(lw);
-  GlStateManager2.color(r, g, b, a);
-  if (a === 1) {
+  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
+  if (rgba[3] === 1) {
     GlStateManager2.depthMask(true);
     GlStateManager2.disableBlend();
   } else {
@@ -558,7 +549,7 @@ export function renderLine(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
   GlStateManager2.enableTexture2D();
   GlStateManager2.enableAlpha();
   GL11.glLineWidth(1);
-  if (a !== 1) {
+  if (rgba[3] !== 1) {
     GlStateManager2.depthMask(true);
     GlStateManager2.disableBlend();
   }
@@ -575,20 +566,16 @@ export function renderLine(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
  * @param {number?} lw (2)
  */
 export function renderParaCurve(color, func, t0, te, segments, esp = false, lw = 2) {
-  if ((color & 0xFF) === 0) return;
-
-  const r = ((color >> 24) & 0xFF) / 255;
-  const g = ((color >> 16) & 0xFF) / 255;
-  const b = ((color >> 8) & 0xFF) / 255;
-  const a = ((color >> 0) & 0xFF) / 255;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
 
   GlStateManager2.pushMatrix();
   GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
   GlStateManager2.disableTexture2D();
   GlStateManager2.disableLighting();
   GlStateManager2.disableAlpha();
-  GlStateManager2.color(r, g, b, a);
-  if (a === 1) {
+  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
+  if (rgba[3] === 1) {
     GlStateManager2.depthMask(true);
     GlStateManager2.disableBlend();
   } else {
@@ -617,7 +604,7 @@ export function renderParaCurve(color, func, t0, te, segments, esp = false, lw =
   GlStateManager2.enableTexture2D();
   GlStateManager2.enableAlpha();
   GL11.glLineWidth(1);
-  if (a !== 1) {
+  if (rgba[3] !== 1) {
     GlStateManager2.depthMask(true);
     GlStateManager2.disableBlend();
   }
@@ -638,7 +625,8 @@ export function renderParaCurve(color, func, t0, te, segments, esp = false, lw =
  * @param {boolean?} nt (false)
  */
 export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox = true, scale = 1, increase = true, esp = true, shadow = true, nt = false) {
-  if ((color & 0xFF) === 0) return;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
   if (!nt) {
     let s;
     ({ x, y, z, s } = rescaleRender(x, y, z));
@@ -651,10 +639,6 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
   }
 
   const lines = ChatLib.addColor(text).split('\n');
-  const r = ((color >> 24) & 0xFF) / 255;
-  const g = ((color >> 16) & 0xFF) / 255;
-  const b = ((color >> 8) & 0xFF) / 255;
-  const a = ((color >> 0) & 0xFF) / 255;
 
   GlStateManager2.pushMatrix();
   GlStateManager2.translate(x, y, z);
@@ -681,7 +665,7 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
     tess.func_78381_a();
   }
 
-  GlStateManager2.color(r, g, b, a);
+  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
   GlStateManager2.enableTexture2D();
 
   lines.forEach((v, i) =>
@@ -791,10 +775,8 @@ export function _drawArc(x, y, r, a1, a2, segments) {
  * @param {number?} lw (2)
  */
 export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
-  const _r = ((color >> 24) & 0xFF) / 255;
-  const _g = ((color >> 16) & 0xFF) / 255;
-  const _b = ((color >> 8) & 0xFF) / 255;
-  const _a = ((color >> 0) & 0xFF) / 255;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
 
   GL11.glLineWidth(lw);
   GL11.glEnable(GL11.GL_LINE_SMOOTH);
@@ -805,7 +787,7 @@ export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
   GlStateManager2.enableBlend();
   GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
 
-  GlStateManager2.color(_r, _g, _b, _a);
+  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
   _drawArc(x, y, r, a1, a2, segments);
 
   GlStateManager2.enableTexture2D();
@@ -826,12 +808,9 @@ export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
  * @param {number?} lw (2)
  */
 export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
   r = Math.min(w / 2, h / 2, r);
-
-  const _r = ((color >> 24) & 0xFF) / 255;
-  const _g = ((color >> 16) & 0xFF) / 255;
-  const _b = ((color >> 8) & 0xFF) / 255;
-  const _a = ((color >> 0) & 0xFF) / 255;
 
   GL11.glLineWidth(lw);
   GlStateManager2.disableLighting();
@@ -840,7 +819,7 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   GlStateManager2.disableCull();
   GlStateManager2.enableBlend();
   GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
-  GlStateManager2.color(_r, _g, _b, _a);
+  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
 
   worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
   worldRen.func_181662_b(x + r, y, 0).func_181675_d();
@@ -879,7 +858,8 @@ const beaconBeamText = new ResourceLocation('textures/entity/beacon_beam.png');
  * @link https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/98f4f6140ab8371f1fd18846f5489318af2b2252/src/main/java/io/github/moulberry/notenoughupdates/core/util/render/RenderUtils.java#L220
  */
 export function renderBeaconBeam(x, y, z, color, scuffed, esp = false, center = true, height = 300) {
-  if ((color & 0xFF) === 0) return;
+  const rgba = normColor(color);
+  if (rgba[3] === 0) return;
   if (!center) {
     x += 0.5;
     z += 0.5;
@@ -906,10 +886,10 @@ export function renderBeaconBeam(x, y, z, color, scuffed, esp = false, center = 
   GlStateManager2.enableBlend();
   const time = 0.2 * (World.getWorld().func_82737_E() + Tessellator.partialTicks);
   const d1 = Math.ceil(time) - time;
-  const r = ((color >> 24) & 0xFF) / 255;
-  const g = ((color >> 16) & 0xFF) / 255;
-  const b = ((color >> 8) & 0xFF) / 255;
-  const a = ((color >> 0) & 0xFF) / 255;
+  const r = rgba[0];
+  const g = rgba[1];
+  const b = rgba[2];
+  const a = rgba[3];
   const d2 = time * -0.1875;
   const d4 = Math.cos(d2 + 2.356194490192345) * 0.2 * s;
   const d5 = Math.sin(d2 + 2.356194490192345) * 0.2 * s;
@@ -1064,4 +1044,45 @@ export class BufferedImageWrapper {
     GlStateManager2.bindTexture(this.img.func_110552_b());
     return drawTexturedRect(x, y, 0, 0, w, h, w, h, w, h);
   }
+}
+
+/**
+ * @overload
+ * @param {number} color RGBA
+ * @returns {[number, number, number, number]} [0, 1] RGBA
+ *
+ * @overload
+ * @param {{ r: number, g: number, b: number, a: number }} color
+ * @returns {[number, number, number, number]} [0, 1] RGBA
+ *
+ * @overload
+ * @param {[number, number, number, number]} color RGBA
+ * @returns {[number, number, number, number]} [0, 1] RGBA
+ */
+export function normColor(color) {
+  if (typeof color === 'number') return [
+    (color >>> 24) / 255,
+    ((color >> 16) & 0xFF) / 255,
+    ((color >> 8) & 0xFF) / 255,
+    (color & 0xFF) / 255
+  ];
+  if (Array.isArray(color)) return color;
+  return [
+    color.r,
+    color.g,
+    color.b,
+    color.a
+  ];
+}
+/**
+ * @param {[number, number, number, number]} color RGBA
+ * @returns {number} RGBA
+ */
+export function packColor(color) {
+  return (
+    ((color[0] * 255) << 24) |
+    ((color[1] * 255) << 16) |
+    ((color[2] * 255) << 8) |
+    (color[3] * 255)
+  ) >>> 0;
 }
