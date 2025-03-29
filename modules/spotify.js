@@ -26,9 +26,11 @@ function formatSong(song) {
 const stateSpotifyOpen = new StateVar(false);
 const spotifyPrefix = '&2Spotify &7>&r ';
 let spotifyPrefixDisplay = '';
-// Renderer.getStringWidth(' ') === 4
 function updatePrefix() {
-  spotifyPrefixDisplay = spotifyPrefix + ' '.repeat(settings.spotifyMaxSongLength / 4 / spotifyGui.getLoc().s);
+  spotifyGui.setLine(' ');
+  spotifyGui._forceUpdate();
+  const spaceWidth = spotifyGui.getWidth();
+  spotifyPrefixDisplay = spotifyPrefix + ' '.repeat(settings.spotifyMaxSongLength / spaceWidth);
   spotifyGui.setLine(spotifyPrefixDisplay);
 }
 const spotifyGui = createTextGui(() => data.spotifyDisplayLoc, () => [spotifyPrefixDisplay]);
