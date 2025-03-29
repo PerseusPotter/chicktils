@@ -326,6 +326,10 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   obj._markFont = function() {
     fDirty = true;
   };
+  obj._forceUpdate = function() {
+    updateLocCache();
+    updateLines();
+  };
 
   allDisplays.push(obj);
   return obj;
