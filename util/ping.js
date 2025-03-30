@@ -1,12 +1,12 @@
 import settings from '../settings';
-import { JavaTypeOrNull } from './polyfill';
+import { Deque, JavaTypeOrNull } from './polyfill';
 
 // lazy stfu
 const Ping = JavaTypeOrNull('gg.skytils.skytilsmod.features.impl.misc.Ping');
 let lastPing = 0;
 const PING_WINDOW_TIME = 60;
 let PING_WINDOW_SIZE = Math.max(2, ~~(PING_WINDOW_TIME / settings.pingRefreshDelay));
-const pingWindow = [];
+const pingWindow = new Deque();
 let pingSum = 0;
 export function getPing() {
   if (!Ping || settings.pingRefreshDelay === 0) return 0;
@@ -24,7 +24,7 @@ export function getAveragePing() {
     pingSum += p;
     return p;
   }
-  if (p === pingWindow[0]) return pingSum / pingWindow.length;
+  if (p === pingWindow.getFirst()) return pingSum / pingWindow.length;
   if (pingWindow.length === PING_WINDOW_SIZE) {
     const m = pingSum / pingWindow.length;
     const stddev = Math.sqrt(pingWindow.reduce((a, v) => a + (v - m) ** 2, 0)) / (PING_WINDOW_SIZE - 1);

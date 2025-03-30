@@ -1,3 +1,4 @@
+import { Deque } from './polyfill';
 import { wrap } from './threading';
 
 const Threading = Java.type('gg.essential.api.utils.Multithreading');
@@ -14,7 +15,7 @@ export const _clearTimeout = function(index) {
 };
 
 export class FrameTimer {
-  fps = [];
+  fps = new Deque();
   target = 0;
   lastRender = 0;
   constructor(targetFps) {
@@ -22,7 +23,7 @@ export class FrameTimer {
   }
   shouldRender() {
     const t = Date.now();
-    while (this.fps.length > 0 && this.fps[0] < t - 1000) this.fps.shift();
+    while (this.fps.length > 0 && this.fps.getFirst() < t - 1000) this.fps.shift();
     this.fps.push(t);
     if (this.fps.length === 1) {
       this.lastRender = t;

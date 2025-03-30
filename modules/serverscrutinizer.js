@@ -4,17 +4,21 @@ import createTextGui from '../util/customtextgui';
 import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
 import { getAveragePing, getPing } from '../util/ping';
+import { Deque } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
 import { DelayTimer, FrameTimer } from '../util/timers';
 
 class TickInfo {
-  arr = [];
+  /** @type {Deque<number>} */
+  arr = new Deque();
   min = [];
   max = [];
   // rhino is bad with sparse arrays
-  idxmin = [];
-  idxmax = [];
+  /** @type {Deque<number>} */
+  idxmin = new Deque();
+  /** @type {Deque<number>} */
+  idxmax = new Deque();
   maxAge = 0;
   maxSpan = 0;
   dirty = true;
@@ -50,10 +54,10 @@ class TickInfo {
   calc() {
     const d = Date.now();
     // WHY ARE THERE UNDEFINEDS IN MY ARRAY HOLY SHIT GONNA LOSE MY MIND FUCK YOU RHINO
-    while (this.arr.length > 0 && (!this.arr[this.arr.length - 1] || d - this.arr[this.arr.length - 1] > this.maxAge)) this._mark().arr.pop();
+    while (this.arr.length > 0 && (!this.arr.getLast() || d - this.arr.getLast() > this.maxAge)) this._mark().arr.pop();
     if (!this.dirty) return;
     this.dirty = false;
-    if (this.arr.length === 0) return void (this.cspan = this.avg = this.minspan = 0);
+    if (this.arr.length === 0) return void (this.cspan = this.avg = this.minspan = this.maxspan = 0);
 
     // this.cspan = 0;
     // while (this.arr.length > this.cspan && d - this.arr[this.cspan] <= this.maxSpan) this.cspan++;
@@ -65,22 +69,21 @@ class TickInfo {
 
     this.avg = this.arr.length / this.maxAge * this.maxSpan;
 
-    this.idxmin = this.idxmin.slice(0, (function(arr, v) {
-      let l = 0;
-      let r = arr.length;
-      while (l !== r) {
-        let m = (l + r) >> 1;
-        if (arr[m] === v) return m;
-        if (arr[m] < v) l = m + 1;
-        else r = m;
-      }
-      return r;
-    }(this.idxmin, this.cspan)));
+    {
+      // this.idxmin = this.idxmin.slice(0, this.idxmin.findIndex(v => v >= this.cspan));
+      const i = this.idxmin;
+      this.idxmin = new Deque();
+      i.some(v => {
+        if (v >= this.cspan) return false;
+        this.idxmin.add(v);
+        return true;
+      });
+    }
     this.idxmin.push(this.cspan);
-    this.min[this.cspan] = this.arr[0];
+    this.min[this.cspan] = this.arr.getFirst();
 
     while (true) {
-      let i = this.idxmin[0];
+      let i = this.idxmin.getFirst();
       if (d - this.min[i] > this.maxAge) this.idxmin.shift();
       else {
         this.minspan = i;
@@ -88,22 +91,21 @@ class TickInfo {
       }
     }
 
-    this.idxmax = this.idxmax.slice(0, (function(arr, v) {
-      let l = 0;
-      let r = arr.length;
-      while (l !== r) {
-        let m = (l + r) >> 1;
-        if (arr[m] === v) return m;
-        if (arr[m] > v) l = m + 1;
-        else r = m;
-      }
-      return r;
-    }(this.idxmax, this.cspan)));
+    {
+      // this.idxmax = this.idxmax.slice(0, this.idxmax.findIndex(v => v <= this.cspan));
+      const i = this.idxmax;
+      this.idxmax = new Deque();
+      i.some(v => {
+        if (v <= this.cspan) return false;
+        this.idxmax.add(v);
+        return true;
+      });
+    }
     this.idxmax.push(this.cspan);
-    this.max[this.cspan] = this.arr[0];
+    this.max[this.cspan] = this.arr.getFirst();
 
     while (true) {
-      let i = this.idxmax[0];
+      let i = this.idxmax.getFirst();
       if (d - this.max[i] > this.maxAge) this.idxmax.shift();
       else {
         this.maxspan = i;
