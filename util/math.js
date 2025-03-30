@@ -75,6 +75,17 @@ export function dist(n1, n2) {
 }
 
 /**
+ * in degrees
+ * @param {number} a1
+ * @param {number} a2
+ * @returns {number}
+ */
+export function distAngle(a1, a2) {
+  const d = dist(a1, a2);
+  return Math.min(d, 360 - d);
+}
+
+/**
  * @param {number} f1
  * @param {number} f2
  * @param {number?} e
