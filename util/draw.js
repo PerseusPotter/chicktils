@@ -456,14 +456,16 @@ export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true
  * @param {boolean?} esp is visible through walls (false)
  * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} lw line width (5)
+ * @param {boolean?} nt use if renderentity.pos (false)
+ * @param {number?} wz
  */
-export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5) {
+export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false, wz = w) {
   const rgba = normColor(color);
   if (rgba[3] === 0) return;
   rgba[3] /= 4;
-  renderFilledBox(x, y, z, w, h, rgba, esp, center);
+  renderFilledBox(x, y, z, w, h, rgba, esp, center, nt, wz);
   rgba[3] *= 4;
-  renderOutline(x, y, z, w, h, rgba, esp, center, lw);
+  renderOutline(x, y, z, w, h, rgba, esp, center, lw, nt, wz);
 }
 
 /**
