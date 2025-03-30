@@ -1,18 +1,28 @@
+import { Deque } from './polyfill';
+
+/**
+ * @template T
+ */
 export default class Grid {
   size = 0;
   key = 0;
   addNeighbors = 0;
   hm = new (Java.type('java.util.HashMap'))();
+  /** @type {Deque<T>[]} */
   arrs = [];
   oldHm;
   oldArrs;
   locked = false;
   _lock = new (Java.type('java.util.concurrent.locks.ReentrantLock'))();
   queue = [];
-  constructor({ size = 1, key = 631, addNeighbors = 0 } = {}) {
+  /** @type {Deque<number>} */
+  age;
+  constructor({ size = 1, key = 631, addNeighbors = 0, maxSize = Number.POSITIVE_INFINITY } = {}) {
     this.size = size;
     this.key = key;
     this.addNeighbors = addNeighbors;
+    this.maxSize = maxSize;
+    this.age = new Deque();
   }
 
   _getId(x, z) {
@@ -21,10 +31,12 @@ export default class Grid {
   _addWithId(id, item) {
     this._lock.lock();
     const key = this.hm.computeIfAbsent(id, k => {
-      this.arrs.push([]);
+      this.arrs.push(new Deque());
       return this.arrs.length - 1;
     });
     this.arrs[key].push(item);
+    this.age.push(key);
+    if (this.age.length > this.maxSize) this.arrs[this.age.shift()].shift();
     this._lock.unlock();
   }
   _getById(id, tries = 1) {
@@ -38,6 +50,11 @@ export default class Grid {
     }
   }
 
+  /**
+   * @param {number} x
+   * @param {number} z
+   * @param {T} item
+   */
   add(x, z, item) {
     if (this._lock.isLocked()) {
       this.queue.push([x, z, item]);
@@ -58,6 +75,11 @@ export default class Grid {
       this._addWithId(id + this.key + 1, item);
     }
   }
+  /**
+   * @param {number} x
+   * @param {number} z
+   * @returns {Deque<T>}
+   */
   get(x, z) {
     return this._getById(this._getId(x, z));
   }
@@ -65,6 +87,7 @@ export default class Grid {
     if (this.locked) this.hm = new (Java.type('java.util.HashMap'))();
     else this.hm.clear();
     this.arrs = [];
+    this.age = new Deque();
   }
   freeze() {
     if (this.locked) return;
