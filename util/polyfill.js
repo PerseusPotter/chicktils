@@ -853,6 +853,25 @@ export class Deque {
     };
   }
 
+  /**
+   * @param {number?} i
+   */
+  iter(i = 0) {
+    let c = this.$get(i);
+    const o = {
+      value() { return c.v; },
+      next() {
+        c = c.r;
+        return o;
+      },
+      prev() {
+        c = c.l;
+        return o;
+      }
+    };
+    return o;
+  }
+
   [Symbol.iterator]() {
     return this.values();
   }
