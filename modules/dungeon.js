@@ -2,7 +2,7 @@ import reg from '../util/registerer';
 import { getPlayerName } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
 import { getSbId } from '../util/skyblock';
-import { JavaTypeOrNull, setAccessible } from '../util/polyfill';
+import { Deque, JavaTypeOrNull, setAccessible } from '../util/polyfill';
 
 function reset() {
   dungeonLeaveReg.unregister();
@@ -33,7 +33,7 @@ function start() {
 }
 
 /**
- * @type {{ ign: string, class: 'Archer' | 'Berserk' | 'Healer' | 'Mage' | 'Tank', e: EntityLivingBase | null, me: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'> | null, items: { id: string, t: number}[] }[]}
+ * @type {{ ign: string, class: 'Archer' | 'Berserk' | 'Healer' | 'Mage' | 'Tank', e: EntityLivingBase | null, me: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'> | null, items: Deque<{ id: string, t: number}> }[]}
  */
 let players = [];
 let modules = [];
@@ -109,7 +109,7 @@ const getPlayersStep2Reg = reg('step', () => {
     if (s.startsWith('§r Ultimate:') || s.startsWith('§r         §r§a§lPlayers')) continue;
     let m = s.match(/§r§f\(§r§d(\w+) \w+?§r§f\)§r$/);
     if (!m) break; // "EMPTY"
-    players.push({ ign: getPlayerName(s), class: m[1], e: null, me: null, items: [{ id: '', t: 0 }] });
+    players.push({ ign: getPlayerName(s), class: m[1], e: null, me: null, items: new Deque([{ id: '', t: 0 }]) });
   }
   if (players.length) {
     World.getAllPlayers().forEach(v => {
@@ -133,10 +133,10 @@ const playerItemReg = reg('serverTick2', t => {
     const e = v.e;
     const id = getSbId(e ? e === Player ? e.getHeldItem() : e.getItemInSlot(0) : null);
 
-    const p = v.items[0];
+    const p = v.items.getFirst();
     if (p.id === id) p.t = t;
     else v.items.unshift({ id, t: t });
-    if (t - v.items[v.items.length - 1].t > 20) v.items.pop();
+    if (t - v.items.getLast().t > 20) v.items.pop();
   });
 });
 
