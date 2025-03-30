@@ -650,6 +650,7 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
   GlStateManager2.enableBlend();
   GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
   GlStateManager2.depthMask(false);
+  GlStateManager2.disableLighting();
   if (esp) GlStateManager2.disableDepth();
 
   const widths = lines.map(v => Renderer.getStringWidth(v) / 2);
