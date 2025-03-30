@@ -1,10 +1,9 @@
 import createAlert from '../util/alert';
-import { normColor, oklabToRgb, renderWaypoint, rgbToOklab } from '../util/draw';
+import { Gradient, renderWaypoint } from '../util/draw';
 import settings from '../settings';
 import reg, { customRegs } from '../util/registerer';
 import { getBlockId } from '../util/mc';
 import { unrun } from '../util/threading';
-import { lerp } from '../util/math';
 
 const chests = new Map();
 const recent = new Set();
@@ -34,24 +33,16 @@ const blockReg = reg('blockChange', (pos, bs) => {
   });
 });
 const MAX_CHEST_LIFE = 20 * 60;
+const chestGradient = new Gradient(settings._powderBoxColor, settings._powderBoxColor2);
 const renderReg = reg('renderWorld', () => {
   const t = customRegs.serverTick2.tick;
-  const c1 = normColor(settings.powderBoxColor);
-  const [L1, a1, b1] = rgbToOklab(...c1);
-  const c2 = normColor(settings.powderBoxColor2);
-  const [L2, a2, b2] = rgbToOklab(...c2);
   Array.from(chests.entries()).forEach(([k, v]) => {
     const dt = t - v.t;
-    const m = dt / MAX_CHEST_LIFE;
-    const c = oklabToRgb(
-      lerp(L1, L2, m),
-      lerp(a1, a2, m),
-      lerp(b1, b2, m)
+    renderWaypoint(
+      v.x, v.y, v.z, 1, 1,
+      chestGradient.get(dt / MAX_CHEST_LIFE),
+      settings.powderBoxEsp, false
     );
-    renderWaypoint(v.x, v.y, v.z, 1, 1, [
-      c[0], c[1], c[2],
-      lerp(c1[3], c2[3], m)
-    ], settings.powderBoxEsp, false);
     if (dt > MAX_CHEST_LIFE) chests.delete(k);
   });
 });
