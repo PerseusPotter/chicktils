@@ -215,6 +215,12 @@ export class Deque {
     else for (let i = this.$length - v; i > 0; i--) this.pop();
   }
 
+  clear() {
+    this.$head = null;
+    this.$tail = null;
+    this.$length = 0;
+  }
+
   $get(i) {
     if (i < 0) i += this.$length;
     if (!Number.isInteger(i) || i < 0 || i >= this.$length) return undefined;
