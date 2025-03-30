@@ -199,7 +199,9 @@ export class Deque {
     this.$head = null;
     this.$tail = null;
     this.$length = 0;
-    initial?.forEach(v => this.add(v));
+    if (initial) {
+      for (let i = 0; i < initial.length; i++) this.add(v);
+    }
   }
 
   get length() {
@@ -471,7 +473,7 @@ export class Deque {
         this.$tail = arr.$tail;
       }
       this.$length += arr.$length;
-    } else arr.forEach(v => this.add(v));
+    } else for (let i = 0; i < arr.length; i++) this.add(arr[i]);
     return this;
   }
 
@@ -731,7 +733,7 @@ export class Deque {
    * @returns {number}
    */
   push(...elems) {
-    elems.forEach(v => this.add(v));
+    for (let i = 0; i < elems.length; i++) this.add(elems[i]);
     return this.$length;
   }
 
@@ -747,7 +749,7 @@ export class Deque {
    * @returns {number}
    */
   unshift(...elems) {
-    elems.reverse().forEach(v => this.addFirst(v));
+    for (let i = elems.length - 1; i >= 0; i--) this.addFirst(elems[i]);
     return this.$length;
   }
 
@@ -773,7 +775,7 @@ export class Deque {
     if (i === 0) this.unshift.apply(this, a);
     else {
       let n;
-      a.reverse().forEach(v => p.l.insert(n = new DQNode(v)));
+      for (let i = a.length - 1; i >= 0; i--) p.l.insert(n = new DQNode(v));
       this.$length += a.length;
       if (p.l === this.$tail) this.$tail = n;
     }
