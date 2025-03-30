@@ -4,7 +4,6 @@ import Grid from '../util/grid';
 import { dist, distAngle } from '../util/math';
 import { Deque } from '../util/polyfill';
 import reg, { customRegs } from '../util/registerer';
-import { unrun } from '../util/threading';
 
 /** @type {Grid<{ name: string, x: number, y: number, z: number, yaw: number }} */
 const deadMobs = new Grid({ size: 1, key: 2017, addNeighbors: 2, maxSize: 10 });
@@ -13,6 +12,8 @@ const recentSpawnIds = new Map();
 const recentSpawnEvicting = new Deque();
 /** @type {Map<number, { name: string, t: number }>} */
 const droppedSouls = new Map();
+let soulWhitelist = [];
+let soulBlacklist = [];
 
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
 const mobDieReg = reg('entityDeath', ent => {
@@ -60,8 +61,11 @@ const soulSpawnReg = reg('packetReceived', pack => {
     if (!mob) return;
 
     const i = mob.name.search(/§r §\w\d/);
+    const name = mob.name.slice(0, i >= 0 ? i : mob.name.length);
+    if (soulWhitelist.length && !soulWhitelist.some(v => name.includes(v))) return;
+    if (soulBlacklist.some(v => name.includes(v))) return;
     droppedSouls.set(id, {
-      name: mob.name.slice(0, i >= 0 ? i : mob.name.length),
+      name,
       t: customRegs.serverTick2.tick
     });
   });
@@ -94,7 +98,10 @@ const worldUnloadReg = reg('worldUnload', () => {
   droppedSouls.clear();
 }).setEnabled(settings._necromancyTrackSouls);
 
-export function init() { }
+export function init() {
+  settings._necromancySoulWhitelist.listen(v => soulWhitelist = v.split(','));
+  settings._necromancySoulBlacklist.listen(v => soulBlacklist = v.split(','));
+}
 export function load() {
   mobDieReg.register();
   armorStandSpawnReg.register();
