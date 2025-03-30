@@ -15,11 +15,12 @@ export const _clearTimeout = function(index) {
 };
 
 export class FrameTimer {
-  fps = new Deque();
+  fps;
   target = 0;
   lastRender = 0;
   constructor(targetFps) {
     this.target = 1000 / targetFps;
+    this.fps = new Deque();
   }
   shouldRender() {
     const t = Date.now();
