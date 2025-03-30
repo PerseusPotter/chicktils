@@ -200,7 +200,7 @@ export class Deque {
     this.$tail = null;
     this.$length = 0;
     if (initial) {
-      for (let i = 0; i < initial.length; i++) this.add(v);
+      for (let i = 0; i < initial.length; i++) this.add(initial[i]);
     }
   }
 
