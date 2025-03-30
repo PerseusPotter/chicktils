@@ -87,6 +87,12 @@ const soulRenderReg = reg('postRenderEntity', (ent, pos) => {
     3, true
   );
 }).setEnabled(settings._necromancyTrackSouls);
+const worldUnloadReg = reg('worldUnload', () => {
+  deadMobs.clear();
+  recentSpawnIds.clear();
+  recentSpawnEvicting.clear();
+  droppedSouls.clear();
+}).setEnabled(settings._necromancyTrackSouls);
 
 export function init() { }
 export function load() {
@@ -94,15 +100,14 @@ export function load() {
   armorStandSpawnReg.register();
   soulSpawnReg.register();
   soulRenderReg.register();
+  worldUnloadReg.register();
 }
 export function unload() {
-  deadMobs.clear();
-  recentSpawnIds.clear();
-  recentSpawnEvicting.clear();
-  droppedSouls.clear();
+  worldUnloadReg.forceTrigger();
 
   mobDieReg.unregister();
   armorStandSpawnReg.unregister();
   soulSpawnReg.unregister();
   soulRenderReg.unregister();
+  worldUnloadReg.unregister();
 }
