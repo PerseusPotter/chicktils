@@ -48,7 +48,7 @@ class TickInfo {
     this._mark();
   }
   clear() {
-    this.arr = [];
+    this.arr = new Deque();
     this._mark();
   }
   calc() {
@@ -65,7 +65,11 @@ class TickInfo {
     // this.cspan++;
     // in the unlikely case of a .clear() or spike followed by a .add() before a .calc()
     this.cspan = Math.min(this.cspan, this.arr.length - 1);
-    while (this.cspan > 0 && d - this.arr[this.cspan - 1] > this.maxSpan) this.cspan--;
+    const aIter = this.arr.iter(this.cspan - 1);
+    while (this.cspan > 0 && d - aIter.value() > this.maxSpan) {
+      this.cspan--;
+      aIter.prev();
+    }
 
     this.avg = this.arr.length / this.maxAge * this.maxSpan;
 
