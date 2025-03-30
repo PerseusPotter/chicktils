@@ -145,3 +145,690 @@ export function getOrPut(m, k, d) {
     v
   );
 }
+
+/**
+ * @template T
+ */
+class DQNode {
+  /** @type {DQNode?} */
+  l = null;
+  /** @type {DQNode?} */
+  r = null;
+  /** @type {T} */
+  v = null;
+
+  constructor(v) {
+    this.v = v;
+  }
+
+  remove() {
+    if (this.l) this.l.r = this.r;
+    if (this.r) this.r.l = this.l;
+  }
+  /**
+   * @param {DQNode} node
+   */
+  insert(node) {
+    if (this.r) this.r.l = node;
+    node.l = this;
+    node.r = this.r;
+    this.r = node;
+  }
+}
+
+/**
+ * @template {T}
+ */
+export class Deque {
+  /**
+   * @private
+   * @type {DQNode<T>?}
+   */
+  $head = null;
+  /**
+   * @private
+   * @type {DQNode<T>?}
+   */
+  $tail = null;
+  $length = 0;
+
+  /**
+   * @param {T[]?} initial
+   */
+  constructor(initial) {
+    this.$head = null;
+    this.$tail = null;
+    this.$length = 0;
+    initial?.forEach(v => this.add(v));
+  }
+
+  get length() {
+    return this.$length;
+  }
+  set length(v) {
+    if (!Number.isInteger(v)) return;
+    v = Math.max(v, 0);
+
+    if (v > this.$length) for (let i = v - this.$length; i > 0; i--) this.add(undefined);
+    else for (let i = this.$length - v; i > 0; i--) this.pop();
+  }
+
+  $get(i) {
+    if (i < 0) i += this.$length;
+    if (!Number.isInteger(i) || i < 0 || i >= this.$length) return undefined;
+
+    if (i < this.$length >> 1) {
+      let c = this.$head;
+      while (--i >= 0) c = c.r;
+      return c;
+    }
+    let c = this.$tail;
+    while (++i < this.$length) c = c.l;
+    return c;
+  }
+
+  $create(n) {
+    if (this.$head) return false;
+    this.$head = n;
+    this.$tail = n;
+    this.$length = 1;
+    return true;
+  }
+
+  /**
+   * @param {T} v
+   */
+  add(v) {
+    const n = new DQNode(v);
+    if (this.$create(n)) return;
+    this.$tail.insert(n);
+    this.$tail = n;
+    this.$length++;
+  }
+
+  /**
+   * @param {T} v
+   */
+  addFirst(v) {
+    const n = new DQNode(v);
+    if (this.$create(n)) return;
+    this.$head.l = n;
+    n.r = this.$head;
+    this.$head = n;
+    this.$length++;
+  }
+
+  /**
+   * @param {T} v
+   */
+  addLast(v) {
+    this.add(v);
+  }
+
+  /**
+   * @param {T} v
+   * @returns {boolean}
+   */
+  contains(v) {
+    return this.includes(v);
+  }
+
+  /**
+   * @returns {T?}
+   */
+  element() {
+    return this.$head?.v;
+  }
+
+  /**
+   * @returns {T?}
+   */
+  getFirst() {
+    return this.element();
+  }
+
+  /**
+   * @returns {T?}
+   */
+  getLast() {
+    return this.$tail?.v;
+  }
+
+  /**
+   * @param {T} v
+   */
+  offer(v) {
+    this.add(v);
+  }
+
+  /**
+   * @param {T} v
+   */
+  offerFirst(v) {
+    this.addFirst(v);
+  }
+
+  /**
+   * @param {T} v
+   */
+  offerLast(v) {
+    this.addLast(v);
+  }
+
+  /**
+   * @returns {T?}
+   */
+  peek() {
+    return this.getFirst();
+  }
+
+  /**
+   * @returns {T?}
+   */
+  peekFirst() {
+    return this.getFirst();
+  }
+
+  /**
+   * @returns {T?}
+   */
+  peekLast() {
+    return this.getLast();
+  }
+
+  /**
+   * @returns {T?}
+   */
+  poll() {
+    return this.shift();
+  }
+
+  /**
+   * @returns {T?}
+   */
+  pollFirst() {
+    return this.shift();
+  }
+
+  /**
+   * @returns {T?}
+   */
+  pollLast() {
+    return this.pop();
+  }
+
+  /**
+   * @overload
+   * @returns {T?}
+   *
+   * @overload
+   * @param {T} o
+   * @returns {boolean}
+   */
+  remove(o) {
+    if (arguments.length === 0) return this.shift();
+    let c = this.$head;
+    while (c) {
+      if (c.v === o) {
+        c.remove();
+        if (c === this.$head) this.$head = c.r;
+        if (c === this.$tail) this.$tail = c.l;
+        return true;
+      }
+      c = c.r;
+    }
+    return false;
+  }
+
+  /**
+   * @returns {T?}
+   */
+  removeFirst() {
+    if (!this.$head) return;
+    this.$head.remove();
+    this.$length--;
+    const v = this.$head.v;
+    this.$head = this.$head.r;
+    return v;
+  }
+
+  /**
+   * @param {T} o
+   * @returns {boolean}
+   */
+  removeFirstOccurrence(o) {
+    return this.remove(o);
+  }
+
+  /**
+   * @returns {T?}
+   */
+  removeLast() {
+    if (!this.$tail) return;
+    this.$tail.remove();
+    this.$length--;
+    const v = this.$tail.v;
+    this.$tail = this.$tail.l;
+    return v;
+  }
+
+  /**
+   * @param {T} o
+   * @returns {boolean}
+   */
+  removeLastOccurrence(o) {
+    let c = this.$tail;
+    while (c) {
+      if (c.v === o) {
+        c.remove();
+        if (c === this.$head) this.$head = c.r;
+        if (c === this.$tail) this.$tail = c.l;
+        return true;
+      }
+      c = c.l;
+    }
+    return false;
+  }
+
+  /**
+   * @returns {number}
+   */
+  size() {
+    return this.$length;
+  }
+
+  /**
+   * @overload
+   * @param {number} i
+   * @returns {T?}
+   *
+   * @overload
+   * @template {T} V
+   * @param {number} i
+   * @param {V} v
+   * @returns {V}
+   */
+  at(i, v) {
+    if (arguments.length <= 1) return this.$get(i ?? 0)?.v;
+    this.$get(i).v = v;
+    return v;
+  }
+
+  /**
+   * DOES NOT RETURN A CLONE
+   * @template K
+   * @param {K[] | Deque<K>} arr
+   * @returns {Deque<K | T>}
+   */
+  concat(arr) {
+    if (arr instanceof Deque) {
+      if (this.$tail) {
+        this.$tail.r = arr.$head;
+        arr.$head.l = this.$tail;
+        this.$tail = arr.$tail;
+      } else {
+        this.$head = arr.$head;
+        this.$tail = arr.$tail;
+      }
+      this.$length += arr.$length;
+    } else arr.forEach(v => this.add(v));
+    return this;
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {boolean}
+   */
+  every(func, that = this) {
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      if (!func.call(that, c.v, i, this)) return false;
+      c = c.r;
+      i++;
+    }
+    return true;
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {Deque<T>}
+   */
+  filter(func, that = this) {
+    const dq = new Deque();
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      if (func.call(that, c.v, i, this)) dq.add(c.v);
+      c = c.r;
+      i++;
+    }
+    return dq;
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {T?}
+   */
+  find(func, that = this) {
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      if (func.call(that, c.v, i, this)) return c.v;
+      c = c.r;
+      i++;
+    }
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {number}
+   */
+  findIndex(func, that = this) {
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      if (func.call(that, c.v, i, this)) return i;
+      c = c.r;
+      i++;
+    }
+    return -1;
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {T?}
+   */
+  findLast(func, that = this) {
+    let c = this.$tail;
+    let i = this.$length - 1;
+    while (c) {
+      if (func.call(that, c.v, i, this)) return c.v;
+      c = c.l;
+      i--;
+    }
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {number}
+   */
+  findLastIndex(func, that = this) {
+    let c = this.$tail;
+    let i = this.$length - 1;
+    while (c) {
+      if (func.call(that, c.v, i, this)) return i;
+      c = c.l;
+      i--;
+    }
+    return -1;
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => void} func
+   */
+  forEach(func, that = this) {
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      func.call(that, c.v, i, this);
+      c = c.r;
+      i++;
+    }
+  }
+
+  /**
+   * @param {T} v
+   * @param {number?} i
+   * @returns {boolean}
+   */
+  includes(v, i = 0) {
+    return this.findIndex((_v, _i) => _v === v && _i >= i) >= 0;
+  }
+
+  /**
+   * @param {T} v
+   * @param {number?} i
+   * @returns {number}
+   */
+  indexOf(v, i = 0) {
+    return this.findIndex((_v, _i) => _v === v && _i >= i);
+  }
+
+  /**
+   * @param {T} v
+   * @param {number?} i
+   * @returns {number}
+   */
+  lastIndexOf(v, i = 0) {
+    return this.findLastIndex((_v, _i) => _v === v && _i >= i);
+  }
+
+  /**
+   * @param {string?} sep
+   * @returns {string}
+   */
+  join(sep) {
+    let sb = new java.lang.StringBuilder();
+    let b = false;
+    this.forEach(v => {
+      if (b) sb.append(sep);
+      sb.append(v.toString());
+      b = true;
+    });
+    return sb.toString();
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {Deque<T>}
+   */
+  map(func, that = this) {
+    const dq = new Deque();
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      dq.add(func.call(that, c.v, i, this));
+      c = c.r;
+      i++;
+    }
+    return dq;
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {Deque<T>}
+   */
+  mapFilter(func, that = this) {
+    const dq = new Deque();
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      v = func.call(that, c.v, i, this);
+      if (v) dq.add(v);
+      c = c.r;
+      i++;
+    }
+    return dq;
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {boolean}
+   */
+  some(func, that = this) {
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      if (func.call(that, c.v, i, this)) return true;
+      c = c.r;
+      i++;
+    }
+    return false;
+  }
+
+  /**
+   * @template U
+   * @param {(a: U, v: T, i: number, a: Deque<T>) => boolean} func
+   * @param {U} initial
+   * @returns {Deque<T>}
+   */
+  reduce(func, initial) {
+    let v = initial;
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      if (v === undefined && i === 0) v = c.v;
+      else v = func.call(this, v, c.v, i, this);
+      c = c.r;
+      i++;
+    }
+    return v;
+  }
+
+  /**
+   * @template U
+   * @param {(a: U, v: T, i: number, a: Deque<T>) => boolean} func
+   * @param {U} initial
+   * @returns {Deque<T>}
+   */
+  reduceRight(func, initial) {
+    let v = initial;
+    let c = this.$tail;
+    let i = this.$length - 1;
+    while (c) {
+      if (v === undefined && i === this.$length - 1) v = c.v;
+      else v = func.call(this, v, c.v, i, this);
+      c = c.l;
+      i--;
+    }
+    return v;
+  }
+
+  reverse() {
+    let p;
+    let c = this.$head;
+    this.$tail = this.$head;
+    while (c) {
+      this.$head = c;
+      c.l = c.r;
+      c.r = p;
+      p = c;
+      c = c.l;
+    }
+    return this;
+  }
+
+  /**
+   * @returns {T?}
+   */
+  pop() {
+    return this.removeLast();
+  }
+
+  /**
+   * @param {...T} elems
+   * @returns {number}
+   */
+  push(...elems) {
+    elems.forEach(v => this.add(v));
+    return this.$length;
+  }
+
+  /**
+   * @returns {T?}
+   */
+  shift() {
+    return this.removeFirst();
+  }
+
+  /**
+   * @param {...T} elems
+   * @returns {number}
+   */
+  unshift(...elems) {
+    elems.reverse().forEach(v => this.addFirst(v));
+    return this.$length;
+  }
+
+  /**
+   * @param {number} i
+   * @param {number} n
+   * @param  {...T} a
+   * @returns {T[]}
+   */
+  splice(i, n, ...a) {
+    const p = this.$get(i);
+    if (!p) return [];
+    const r = [];
+    let c = p;
+    while (c && --n >= 0) {
+      r.push(c.v);
+      c.remove();
+      if (c === this.$head) this.$head = c.r;
+      if (c === this.$tail) this.$tail = c.l;
+      this.$length--;
+      c = c.r;
+    }
+    if (i === 0) this.unshift.apply(this, a);
+    else {
+      let n;
+      a.reverse().forEach(v => p.l.insert(n = new DQNode(v)));
+      this.$length += a.length;
+      if (p.l === this.$tail) this.$tail = n;
+    }
+    return r;
+  }
+
+  /**
+   * @param {number?} s
+   * @param {number?} e
+   * @returns {Deque<T>}
+   */
+  slice(s = 0, e = this.$length) {
+    if (s < 0) s += this.$length;
+    if (!Number.isInteger(s) || s < 0) s = 0;
+    if (s >= this.$length) return new Deque();
+    if (e < 0) e += this.$length;
+    if (!Number.isInteger(e) || e < 0) e = this.$length;
+    return this.filter((_, i) => s <= i && i < e);
+  }
+
+  /**
+   * @returns {T[]}
+   */
+  toArray() {
+    return this.reduce((a, v) => (a.push(v), a), []);
+  }
+
+  /**
+   * @returns {Iterable<T>}
+   */
+  values() {
+    let f = false;
+    let c = this.$head;
+    return {
+      next() {
+        const v = c?.v;
+        c = c?.r;
+        f |= !c;
+        return {
+          value: v,
+          done: f
+        };
+      },
+      return() {
+        c = undefined;
+        f = true;
+      },
+      throw() {
+        c = undefined;
+        f = true;
+      }
+    };
+  }
+
+  [Symbol.iterator]() {
+    return this.values();
+  }
+}
