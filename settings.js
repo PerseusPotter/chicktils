@@ -949,7 +949,6 @@ export const props = {
   crosshairRenderInGui: new Property('CustomCrosshairRenderInGuis', page, ++sort, Property.Type.Toggle, false),
 
   // 15
-
   enableavarice: new Property('EnableAvariceAddons', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'things for avarice' }),
 
   avariceShowCoinCounter: new Property('AvariceShowCoinCounter', page, ++sort, Property.Type.Toggle, true, { desc: 'show avarice coins in a hud' }),
@@ -968,7 +967,6 @@ export const props = {
   avariceTaraTrader: new Property('AvariceTaraTrader', page, ++sort, Property.Type.Toggle, false, { desc: 'block hits on tara if slayer quest not started\nlag go brr\nnote: doesnt block custom hits (i.e. >3 block range)' }),
 
   // 16
-
   enablegreatspook: new Property('EnableGreatSpook', ++page, sort = 0, Property.Type.Toggle, false),
   greatSpookPrimalTimer: new Property('GreatSpookPrimalTimer', page, ++sort, Property.Type.Toggle, true, { desc: 'timer until primal fear can spawn' }),
   moveGreatSpookPrimalTimer: new Property('MoveGreatSpookPrimalTimer', page, ++sort, Property.Type.Action),
@@ -978,6 +976,7 @@ export const props = {
   greatSpookPrimalAlertTime: new Property('GreatSpookPrimalAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
   greatSpookPrimalAlertSound: new Property('GreatSpookPrimalAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
 
+  // 17
   enablefishingtils: new Property('EnableFishingTils', ++page, sort = 0, Property.Type.Toggle, true),
   fishingTilsHotspotWaypoint: new Property('FishingTilsHotspotWaypoint', page, ++sort, Property.Type.Toggle, false),
   fishingTilsHotspotWaypointColor: new Property('FishingTilsHotspotWaypointColor', page, ++sort, Property.Type.Color, 0xFA771EFF),
@@ -985,8 +984,16 @@ export const props = {
   fishingTilsHotspotWaypointArrow: new Property('FishingTilsHotspotWaypointArrow', page, ++sort, Property.Type.Toggle, true),
   fishingTilsUpdateSBAList: new Property('FishingTilsUpdateSBAList', page, ++sort, Property.Type.Toggle, true, { desc: 'update the sba sea creature list\nrequires game restart to fully disable (why though)' }),
 
-  // 17
+  // 18
+  enablenecromancy: new Property('EnableNecromancy', ++page, sort = 0, Property.Type.Toggle, false),
+  necromancyTrackSouls: new Property('NecromancyTrackSouls', page, ++sort, Property.Type.Toggle, true, { desc: 'track info about souls that get dropped' }),
+  necromancySoulEsp: new Property('NecromancySoulEsp', page, ++sort, Property.Type.Toggle, false, { desc: 'esp on soul rendering' }),
+  necromancyShowMobName: new Property('NecromancyShowMobName', page, ++sort, Property.Type.Toggle, true, { desc: 'render name of mob above soul' }),
+  necromancyBoxSoul: new Property('NecromancyBoxSoul', page, ++sort, Property.Type.Toggle, true),
+  necromancySoulColorNew: new Property('NecromancySoulColorNew', page, ++sort, Property.Type.Color, 0x00FFFFA0, { desc: 'color of newly dropped soul' }),
+  necromancySoulColorOld: new Property('NecromancySoulColorOld', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: 'color of soul about to despawn' }),
 
+  // 19
   enableboxallentities: new Property('EnableBoxAllEntities', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
   boxAllEntitiesInvis: new Property('BoxAllEntitiesInvisible', page, ++sort, Property.Type.Toggle, false, { desc: 'box invisible entities' }),
   boxAllEntitiesColor: new Property('BoxAllEntitiesColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
@@ -1016,8 +1023,7 @@ export const props = {
   logDamageCurse: new Property('LogDamageCurse', page, ++sort, Property.Type.Toggle, true, { desc: 'gaia construct lightning' }),
   logDamageCombo: new Property('LogDamageCombo', page, ++sort, Property.Type.Toggle, true, { desc: 'blaze dagger repeat' }),
 
-  // 18
-
+  // 20
   enableexcavatorsolver: new Property('EnableExcavatorSolver', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'find fossils' }),
   excavatorSolverOnlyShowBest: new Property('ExcavatorSolverOnlyHighlightBest', page, ++sort, Property.Type.Toggle, true, { desc: 'only highlight the best move' }),
   excavatorSolverShowRoute: new Property('ExcavatorSolverHighlightStartPath', page, ++sort, Property.Type.Toggle, false, { desc: 'highlight best starting path (turn off if citrine gemstones)' }),
@@ -1091,6 +1097,7 @@ const pageNames = [
   'Avarice Addons',
   'Great Spook',
   'FishingTils',
+  'Necromancy',
   'Testing',
   'Misc.'
 ];
