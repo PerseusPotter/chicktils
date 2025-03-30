@@ -36,13 +36,13 @@ export default class Grid {
     });
     this.arrs[key].push(item);
     this.age.push(key);
-    if (this.age.length > this.maxSize) this.arrs[this.age.shift()].shift();
+    if (this.age.length > this.maxSize * (1 + 4 * this.addNeighbors)) this.arrs[this.age.shift()].shift();
     this._lock.unlock();
   }
   _getById(id, tries = 1) {
     try {
       const i = (this.locked ? this.oldHm : this.hm)?.get(id);
-      if (i === null || i === undefined) return [];
+      if (i === null || i === undefined) return new Deque();
       return (this.locked ? this.oldArrs : this.arrs)[i];
     } catch (e) {
       if (tries === 0) throw e;
