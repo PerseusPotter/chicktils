@@ -52,7 +52,7 @@ const hotspotUpdateReg = reg('step', () => {
         const d = Math.hypot(Player.getX() - v[0], Player.getZ() - v[2]);
         if (d < a[1]) return [v, d];
         return a;
-      }, [[NaN, NaN, NaN], Number.POSITIVE_INFINITY]);
+      }, [null, Number.POSITIVE_INFINITY]);
       stateNearestHotspot.set(nearest);
       stateHotspotDist.set(dist);
     });
