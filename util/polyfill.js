@@ -177,7 +177,7 @@ class DQNode {
 }
 
 /**
- * @template {T}
+ * @template T
  */
 export class Deque {
   /**
