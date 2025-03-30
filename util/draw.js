@@ -1177,3 +1177,45 @@ export function oklabToRgb(L, a, b) {
   const XYZ = oklabToXyz(L, a, b);
   return xyzToRgb(XYZ[0], XYZ[1], XYZ[2]);
 }
+
+export class Gradient {
+  c1 = [0, 0, 0];
+  c2 = [0, 0, 0];
+  a1 = 0;
+  a2 = 0;
+
+  /**
+   * @param {import('./state').StateVar<number>} c1
+   * @param {import('./state').StateVar<number>} c2
+   */
+  constructor(c1, c2) {
+    c1.listen(this._updateC1);
+    c2.listen(this._updateC2);
+    this._updateC1(c1.get());
+    this._updateC2(c2.get());
+  }
+
+  /**
+   * @param {number} m
+   * @return {[number, number, number, number]}
+   */
+  get(m) {
+    const c = oklabToRgb(
+      lerp(this.c1[0], this.c2[0], m),
+      lerp(this.c1[1], this.c2[1], m),
+      lerp(this.c1[2], this.c2[2], m)
+    );
+    return [c[0], c[1], c[2], lerp(this.a1, this.a2, m)];
+  }
+
+  _updateC1(col) {
+    const c = normColor(col);
+    this.c1 = rgbToOklab(...c);
+    this.a1 = c[3];
+  }
+  _updateC2(col) {
+    const c = normColor(col);
+    this.c2 = rgbToOklab(...c);
+    this.a2 = c[3];
+  }
+}
