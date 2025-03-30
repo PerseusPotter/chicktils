@@ -793,7 +793,30 @@ export class Deque {
     if (s >= this.$length) return new Deque();
     if (e < 0) e += this.$length;
     if (!Number.isInteger(e) || e < 0) e = this.$length;
-    return this.filter((_, i) => s <= i && i < e);
+
+    const dq = new Deque();
+
+    if (s <= this.$length - e) {
+      let c = this.$get(s);
+      let i = s;
+      while (c) {
+        dq.add(c.v);
+        c = c.r;
+        i++;
+        if (i >= e) break;
+      }
+    } else {
+      let c = this.$get(e - 1);
+      let i = e - 1;
+      while (c) {
+        dq.addFirst(c.v);
+        c = c.l;
+        i--;
+        if (i < s) break;
+      }
+    }
+
+    return dq;
   }
 
   /**
