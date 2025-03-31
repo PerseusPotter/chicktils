@@ -99,8 +99,8 @@ const worldUnloadReg = reg('worldUnload', () => {
 }).setEnabled(settings._necromancyTrackSouls);
 
 export function init() {
-  settings._necromancySoulWhitelist.listen(v => soulWhitelist = v.split(','));
-  settings._necromancySoulBlacklist.listen(v => soulBlacklist = v.split(','));
+  settings._necromancySoulWhitelist.listen(v => soulWhitelist = v ? v.split(',') : []);
+  settings._necromancySoulBlacklist.listen(v => soulBlacklist = v ? v.split(',') : []);
 }
 export function load() {
   mobDieReg.register();
