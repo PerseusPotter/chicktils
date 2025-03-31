@@ -334,7 +334,6 @@ export function renderOutline(x, y, z, w, h, color, esp = false, center = true, 
     GlStateManager2.disableBlend();
   }
   if (esp) GlStateManager2.enableDepth();
-  GlStateManager2.enableLighting();
 }
 
 /**
@@ -557,7 +556,6 @@ export function renderLine(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
     GlStateManager2.disableBlend();
   }
   if (esp) GlStateManager2.enableDepth();
-  GlStateManager2.enableLighting();
 }
 
 /**
@@ -613,7 +611,6 @@ export function renderParaCurve(color, func, t0, te, segments, esp = false, lw =
     GlStateManager2.disableBlend();
   }
   if (esp) GlStateManager2.enableDepth();
-  GlStateManager2.enableLighting();
 }
 
 /**
@@ -688,7 +685,6 @@ export function renderString(text, x, y, z, color = 0xFFFFFFFF, renderBlackBox =
   GlStateManager2.disableBlend();
   GlStateManager2.depthMask(true);
   if (esp) GlStateManager2.enableDepth();
-  GlStateManager2.enableLighting();
 }
 
 /**
@@ -801,7 +797,6 @@ export function drawArc(color, x, y, r, a1, a2, segments, lw = 2) {
   GlStateManager2.enableDepth();
   GlStateManager2.enableCull();
   GlStateManager2.disableBlend();
-  GlStateManager2.enableLighting();
   GL11.glLineWidth(1);
   GL11.glDisable(GL11.GL_LINE_SMOOTH);
 }
@@ -849,7 +844,6 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   GlStateManager2.enableDepth();
   GlStateManager2.enableCull();
   GlStateManager2.disableBlend();
-  GlStateManager2.enableLighting();
   GL11.glLineWidth(1);
 }
 
@@ -955,7 +949,6 @@ export function renderBeaconBeam(x, y, z, color, scuffed, esp = false, center = 
     GlStateManager2.enableDepth();
     GlStateManager2.depthMask(true);
   }
-  GlStateManager2.enableLighting();
 
   GlStateManager2.popMatrix();
 }
