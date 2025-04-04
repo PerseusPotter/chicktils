@@ -4,6 +4,7 @@ import reg from '../util/registerer';
 import createTextGui, { editDisplay } from '../util/customtextgui';
 import { StateProp, StateVar } from '../util/state';
 import Marquee from '../util/marquee';
+import { unrun } from '../util/threading';
 
 const ProcessBuilder = Java.type('java.lang.ProcessBuilder');
 const Scanner = Java.type('java.util.Scanner');
@@ -34,7 +35,7 @@ function updatePrefix() {
   spotifyGui.setLine(spotifyPrefixDisplay);
 }
 const spotifyGui = createTextGui(() => data.spotifyDisplayLoc, () => [spotifyPrefixDisplay]);
-updatePrefix();
+unrun(() => updatePrefix());
 spotifyGui.on('editRender', () => {
   updatePrefix();
   const loc = spotifyGui.getTrueLoc();
