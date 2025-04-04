@@ -46,7 +46,11 @@ const soulSpawnReg = reg('packetReceived', pack => {
   const id = pack.func_149389_d();
   if (!recentSpawnIds.has(id)) return;
   if (pack.func_149388_e() !== 4) return;
-  if (pack.func_149390_c()?.func_77978_p()?.func_74775_l('SkullOwner')?.func_74775_l('Properties')?.func_150295_c('textures', 10)?.func_150305_b(0)?.func_74779_i('Value') !== 'ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81YWY0MDM1ZWMwZGMxNjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ==') return;
+  const idx = [
+    'ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81YWY0MDM1ZWMwZGMxNjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ==',
+    'ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI4NzY2NSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzUwNDk4MzZjN2M2MTA2NTkzMjA4MTAwMjBmNmE0Y2FlNDFiZmFkN2UwZGU2ZDI2MzgxZjQ5OWNmNjUxNGI5MmQiCiAgICB9CiAgfQp9'
+  ].indexOf(pack.func_149390_c()?.func_77978_p()?.func_74775_l('SkullOwner')?.func_74775_l('Properties')?.func_150295_c('textures', 10)?.func_150305_b(0)?.func_74779_i('Value'));
+  if (idx < 0) return;
 
   const skull = recentSpawnIds.get(id);
   Client.scheduleTask(2, () => {
@@ -62,8 +66,10 @@ const soulSpawnReg = reg('packetReceived', pack => {
 
     const i = mob.name.search(/§r §\w\d/);
     const name = mob.name.slice(0, i >= 0 ? i : mob.name.length);
-    if (soulWhitelist.length && !soulWhitelist.some(v => name.includes(v))) return;
-    if (soulBlacklist.some(v => name.includes(v))) return;
+    if (!(settings.necromancyAlwaysTrackBoss && idx === 1)) {
+      if (soulWhitelist.length && !soulWhitelist.some(v => name.includes(v))) return;
+      if (soulBlacklist.some(v => name.includes(v))) return;
+    }
     droppedSouls.set(id, {
       name,
       t: customRegs.serverTick2.tick

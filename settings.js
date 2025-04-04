@@ -989,6 +989,7 @@ export const props = {
   necromancyTrackSouls: new Property('NecromancyTrackSouls', page, ++sort, Property.Type.Toggle, true, { desc: 'track info about souls that get dropped' }),
   necromancySoulWhitelist: new Property('NecromancySoulWhitelist', page, ++sort, Property.Type.Text, '', { desc: 'comma separated names, will search inclusively, case sensitive' }),
   necromancySoulBlacklist: new Property('NecromancySoulBlacklist', page, ++sort, Property.Type.Text, '', { desc: 'comma separated names, will search inclusively, case sensitive' }),
+  necromancyAlwaysTrackBoss: new Property('NecromancyAlwaysTrackBoss', page, ++sort, Property.Type.Toggle, true, { desc: 'always track powerful (dark) souls, regardless of white/blacklist' }),
   necromancySoulEsp: new Property('NecromancySoulEsp', page, ++sort, Property.Type.Toggle, false, { desc: 'esp on soul rendering' }),
   necromancyShowMobName: new Property('NecromancyShowMobName', page, ++sort, Property.Type.Toggle, true, { desc: 'render name of mob above soul' }),
   necromancyBoxSoul: new Property('NecromancyBoxSoul', page, ++sort, Property.Type.Toggle, true),
