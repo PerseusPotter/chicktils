@@ -1,4 +1,5 @@
 import settings from '../settings';
+import data from '../data';
 import { renderString, renderWaypoint } from '../util/draw';
 import { execCmd, getPlayerName } from '../util/format';
 import { getLeader, getMembers, isInParty, isLeader, listen, unlisten } from '../util/party';
@@ -179,13 +180,15 @@ const followReg = reg(net.minecraftforge.client.event.ClientChatReceivedEvent, e
   if (settings.chatTilsClickAnywhereFollowOnlyLead && ign !== getLeader()) return;
   lastFollowTime = Date.now();
   lastFollowToken = evn.message.func_150256_b().func_150235_h()?.func_150668_b();
-  log(`Open chat then click anywhere on-screen to follow &b${ign}`);
+  log(`Press ${Java.type('org.lwjgl.input.Keyboard').getKeyName(followKey.getKeyCode())} to follow &b${ign}`);
 }).setEnabled(settings._chatTilsClickAnywhereFollow);
-const clickChatReg = reg(net.minecraftforge.client.event.GuiScreenEvent.MouseInputEvent.Post, evn => {
-  if (Java.type('org.lwjgl.input.Mouse').getEventButtonState() || Java.type('org.lwjgl.input.Mouse').getEventButton() !== 0 || !(evn.gui instanceof Java.type('net.minecraft.client.gui.GuiChat'))) return;
+const followKey = new KeyBind('Follow Party', data.chattilsFollowKey, 'ChickTils');
+followKey.registerKeyRelease(() => {
+  data.chattilsFollowKey = followKey.getKeyCode();
+  if (!followReg.isActive()) return;
   if (!lastFollowToken || Date.now() - lastFollowTime > 10_000) return;
   execCmd(lastFollowToken.slice(1));
-}).setEnabled(settings._chatTilsClickAnywhereFollow);
+});
 
 let imgArtLines = [];
 let imgArtId = 0;
@@ -489,7 +492,6 @@ export function load() {
   guildChatReg.register();
   chatPingReg.register();
   followReg.register();
-  clickChatReg.register();
   genImgArtReg.register();
   nextArtLineReg.register();
   cancelArtLines.register();
@@ -517,7 +519,6 @@ export function unload() {
   guildChatReg.unregister();
   chatPingReg.unregister();
   followReg.unregister();
-  clickChatReg.unregister();
   genImgArtReg.unregister();
   nextArtLineReg.unregister();
   cancelArtLines.unregister();

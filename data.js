@@ -40,6 +40,7 @@ export function setIsMain() {
  *  feroEstimateLoc: TextLocation;
  *  serverScrutinizerPPSDisplay: TextLocation;
  *  sackTilsItemDisplay: TextLocation;
+ *  chattilsFollowKey: number;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -119,6 +120,11 @@ if (!data.unlockedHubWarps || !Array.isArray(data.unlockedHubWarps) || !data.unl
 if (typeof data.dianaWarpKey !== 'number') {
   data.dianaWarpKey = 0;
   reset('dianaWarpKey');
+}
+
+if (typeof data.chattilsFollowKey !== 'number') {
+  data.chattilsFollowKey = 0;
+  reset('chattilsFollowKey');
 }
 
 data.firstLoad = false;

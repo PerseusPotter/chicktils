@@ -120,6 +120,7 @@ const createRegister = function(type, shit) {
 /**
  * @template C
  * @typedef {{
+ *  isActive() => boolean;
  *  isRegistered() => boolean;
  *  setRegistered(v: boolean) => C;
  *  setEnabled(v: StateVar) => C;
@@ -148,6 +149,7 @@ reg = function reg(type, shit) {
       switch (p) {
         case 'register': return _register;
         case 'unregister': return _unregister;
+        case 'isActive': return _isActive;
         case 'isRegistered': return _isRegistered;
         case 'setRegistered': return _setRegistered;
         case 'setEnabled': return _setEnabled;
@@ -173,6 +175,7 @@ reg = function reg(type, shit) {
     isReg = false;
     isAReg = false;
   });
+  const _isActive = () => isAReg;
   const _isRegistered = () => isReg;
   const _setRegistered = wrap(rr, prox, v => {
     if (v) _register();
