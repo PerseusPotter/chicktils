@@ -106,6 +106,13 @@ const createRegister = function(type, shit) {
       getOrPut(data, id, () => []).push(end - start);
     };
   }
+  if (type === 'packetReceived' || type === 'packetSent') {
+    const orig = shit;
+    const createTime = Date.now();
+    shit = function(pack, evn) {
+      if (pack && Date.now() - createTime > 100) orig(pack, evn);
+    };
+  }
   if (type in customRegs) return new (customRegs[type])(shit);
   return register(type, shit).unregister();
 };
