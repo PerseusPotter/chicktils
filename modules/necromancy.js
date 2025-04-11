@@ -1,3 +1,4 @@
+import { getRenderX, getRenderY, getRenderZ } from '../../Apelles/index';
 import settings from '../settings';
 import { Gradient, renderString, renderWaypoint } from '../util/draw';
 import Grid from '../util/grid';
@@ -46,6 +47,7 @@ const soulSpawnReg = reg('packetReceived', pack => {
   const id = pack.func_149389_d();
   if (!recentSpawnIds.has(id)) return;
   if (pack.func_149388_e() !== 4) return;
+  if (droppedSouls.has(id)) return;
   const idx = [
     'ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS81YWY0MDM1ZWMwZGMxNjkxNzc4ZDVlOTU4NDAxNzAyMjdlYjllM2UyOTQzYmVhODUzOTI5Y2U5MjNjNTk4OWFkIgogICAgfQogIH0KfQ==',
     'ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI4NzY2NSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzUwNDk4MzZjN2M2MTA2NTkzMjA4MTAwMjBmNmE0Y2FlNDFiZmFkN2UwZGU2ZDI2MzgxZjQ5OWNmNjUxNGI5MmQiCiAgICB9CiAgfQp9'
@@ -53,7 +55,7 @@ const soulSpawnReg = reg('packetReceived', pack => {
   if (idx < 0) return;
 
   const skull = recentSpawnIds.get(id);
-  Client.scheduleTask(2, () => {
+  Client.scheduleTask(5, () => {
     const [d, mob] = deadMobs.get(skull.x, skull.z).reduce((a, v) => {
       const d =
         dist(v.x, skull.x) +
@@ -90,11 +92,11 @@ const soulRenderReg = reg('postRenderEntity', (ent, pos) => {
     settings.necromancySoulEsp, true, true
   );
   if (settings.necromancyBoxSoul) renderWaypoint(
-    pos.getX(), pos.getY() + 1.4375, pos.getZ(),
+    pos.getX() + getRenderX(), pos.getY() + 1.4375 + getRenderY(), pos.getZ() + getRenderZ(),
     0.7, 0.7,
     soulGradient.get((t - data.t) / MAX_SOUL_LIFE),
     settings.necromancySoulEsp, true,
-    3, true
+    3
   );
 }).setEnabled(settings._necromancyTrackSouls);
 const worldUnloadReg = reg('worldUnload', () => {
