@@ -1,120 +1,8 @@
-import createAlert from '../util/alert';
-import { renderOutline, renderBeaconBeam, drawArrow3DPos, renderTracer } from '../util/draw';
 import settings from '../settings';
 import reg from '../util/registerer';
-import { getSbDate } from '../util/skyblock';
-import { StateProp, StateVar } from '../util/state';
 import { DelayTimer } from '../util/timers';
 import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
-import { run, unrun } from '../util/threading';
 import { deleteMessages } from '../util/helper';
-
-const stateIsSpring = new StateVar(false);
-const stateDoSpring = new StateProp(settings._rabbitSniffer).and(stateIsSpring);
-
-const eggSpawnAlert = createAlert('Egg Spawned !');
-const eggFoundAlert = createAlert('Egg Found !');
-let eggs = [];
-let activeEggs = [2, 2, 2, 2, 2, 2];
-let lastSpawnDays = [0, 0, 0, 0, 0, 0];
-let foundPos = new Map();
-const types = {
-  Breakfast: 0,
-  Lunch: 1,
-  Dinner: 2,
-  Brunch: 3,
-  Déjeuner: 4,
-  Supper: 5
-};
-const eggTextures = [
-  'ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjY3MzE0OSwKICAicHJvZmlsZUlkIiA6ICJiN2I4ZTlhZjEwZGE0NjFmOTY2YTQxM2RmOWJiM2U4OCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbmFiYW5hbmFZZzciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQ5MzMzZDg1YjhhMzE1ZDAzMzZlYjJkZjM3ZDhhNzE0Y2EyNGM1MWI4YzYwNzRmMWI1YjkyN2RlYjUxNmMyNCIKICAgIH0KICB9Cn0',
-  'ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjU2ODExMiwKICAicHJvZmlsZUlkIiA6ICI3NzUwYzFhNTM5M2Q0ZWQ0Yjc2NmQ4ZGUwOWY4MjU0NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJSZWVkcmVsIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdhZTZkMmQzMWQ4MTY3YmNhZjk1MjkzYjY4YTRhY2Q4NzJkNjZlNzUxZGI1YTM0ZjJjYmM2NzY2YTAzNTZkMGEiCiAgICB9CiAgfQp9',
-  'ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjY0OTcwMSwKICAicHJvZmlsZUlkIiA6ICI3NGEwMzQxNWY1OTI0ZTA4YjMyMGM2MmU1NGE3ZjJhYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZXp6aXIiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTVlMzYxNjU4MTlmZDI4NTBmOTg1NTJlZGNkNzYzZmY5ODYzMTMxMTkyODNjMTI2YWNlMGM0Y2M0OTVlNzZhOCIKICAgIH0KICB9Cn0',
-  'ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjY3MzE0OSwKICAicHJvZmlsZUlkIiA6ICJiN2I4ZTlhZjEwZGE0NjFmOTY2YTQxM2RmOWJiM2U4OCIsCiAgInByb2ZpbGVOYW1lIiA6ICJBbmFiYW5hbmFZZzciLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTQ5MzMzZDg1YjhhMzE1ZDAzMzZlYjJkZjM3ZDhhNzE0Y2EyNGM1MWI4YzYwNzRmMWI1YjkyN2RlYjUxNmMyNCIKICAgIH0KICB9Cn0',
-  'ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjU2ODExMiwKICAicHJvZmlsZUlkIiA6ICI3NzUwYzFhNTM5M2Q0ZWQ0Yjc2NmQ4ZGUwOWY4MjU0NiIsCiAgInByb2ZpbGVOYW1lIiA6ICJSZWVkcmVsIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzdhZTZkMmQzMWQ4MTY3YmNhZjk1MjkzYjY4YTRhY2Q4NzJkNjZlNzUxZGI1YTM0ZjJjYmM2NzY2YTAzNTZkMGEiCiAgICB9CiAgfQp9',
-  'ewogICJ0aW1lc3RhbXAiIDogMTcxMTQ2MjY0OTcwMSwKICAicHJvZmlsZUlkIiA6ICI3NGEwMzQxNWY1OTI0ZTA4YjMyMGM2MmU1NGE3ZjJhYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZXp6aXIiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTVlMzYxNjU4MTlmZDI4NTBmOTg1NTJlZGNkNzYzZmY5ODYzMTMxMTkyODNjMTI2YWNlMGM0Y2M0OTVlNzZhOCIKICAgIH0KICB9Cn0'
-];
-const unloadReg = reg('worldUnload', () => {
-  eggs = [];
-  list = [];
-}).setEnabled(stateIsSpring);
-const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
-let list = [];
-function scanEgg() {
-  if (!settings.rabbitSniffer) return;
-  unrun(() => list = World.getAllEntitiesOfType(EntityArmorStand));
-  run(() => {
-    const l = eggs.length;
-    const { year, month, day, hour } = getSbDate();
-    const timeHash = year * 10889 + month * 907 + day * 29 + hour;
-    eggs = list.filter(v => {
-      const nbt = v.entity.func_71124_b(4)?.func_77978_p();
-      if (!nbt) return false;
-      const tex = nbt.func_74775_l('SkullOwner')?.func_74775_l('Properties')?.func_150295_c('textures', 10)?.func_150305_b(0)?.func_74779_i('Value');
-      const pos = `${~~v.getX()},${~~v.getY()},${~~v.getZ()}`;
-      return eggTextures.find((v, i) => activeEggs[i] === 2 && v === tex && (foundPos.get(pos) || 0) <= timeHash);
-    }).sort((a, b) => Player.asPlayerMP().distanceTo(a) - Player.asPlayerMP().distanceTo(b));
-    if (settings.rabbitAlertEggFound && eggs.length > l) unrun(() => eggFoundAlert.show(settings.rabbitAlertFoundTime));
-  });
-}
-const eggSpawnReg = reg('step', () => {
-  unrun(() => {
-    const { year, month, day, hour } = getSbDate();
-    stateIsSpring.set(month <= 3);
-    if (month > 3) return;
-    const timeHash = year * 10889 + month * 907 + day * 29 + hour;
-    let type;
-    if (hour === 7) type = 0;
-    else if (hour === 14) type = 1;
-    else if (hour === 21) type = 2;
-    else return;
-    if (day & 1 === 0) type += 3;
-
-    if (lastSpawnDays[type] === timeHash) return;
-    lastSpawnDays[type] = timeHash;
-    activeEggs[type] = 2;
-
-    if (settings.rabbitAlertEggSpawn && (!settings.rabbitAlertOnlyDinner || activeEggs.every(v => v === 2))) eggSpawnAlert.show(settings.rabbitAlertFoundTime);
-  });
-}).setDelay(5).setEnabled(new StateProp(settings._rabbitAlertEggSpawn).or(settings._rabbitSniffer));
-const eggStepReg = reg('step', () => scanEgg()).setDelay(1).setEnabled(stateDoSpring);
-function onCollect(type) {
-  const t = types[type];
-  activeEggs[t] = 1;
-  const e = eggs[0];
-  if (e) {
-    const tex = e.entity.func_71124_b(4)?.func_77978_p()?.func_74775_l('SkullOwner')?.func_74775_l('Properties')?.func_150295_c('textures', 10)?.func_150305_b(0)?.func_74779_i('Value');
-    const i = eggTextures.indexOf(tex);
-    if (i >= 0 && i === t % 3) {
-      let { year, month, day, hour } = getSbDate();
-      const h = ((t % 3) + 1) * 7;
-      if (day & 1 ^ t < 3) day++;
-      else if (hour >= h) day += 2;
-      if (day > 31) {
-        day -= 31;
-        month++;
-      }
-      hour = h;
-      foundPos.set(`${~~e.getX()},${~~e.getY()},${~~e.getZ()}`, year * 10889 + month * 907 + day * 29 + hour);
-    }
-  }
-  Client.scheduleTask(() => scanEgg());
-}
-const eggCollectReg = reg('chat', onCollect).setCriteria('&r&d&lHOPPITY\'S HUNT &r&dYou found a &r&${*}Chocolate ${type} Egg &r&d${*}').setEnabled(stateDoSpring);
-const eggAlrCollectReg = reg('chat', onCollect).setCriteria('&r&cYou have already collected this Chocolate ${type} Egg&r&c! Try again when it respawns!&r').setEnabled(stateDoSpring);
-const eggRenWrldReg = reg('renderWorld', () => {
-  eggs.forEach(v => {
-    const x = v.getRenderX();
-    const y = v.getRenderY();
-    const z = v.getRenderZ();
-    renderOutline(x, y + 1.5, z, 0.5, 0.5, settings.rabbitBoxColor, settings.rabbitBoxEsp);
-    renderBeaconBeam(x, y + 2.5, z, settings.rabbitBoxColor, settings.useScuffedBeacon, settings.rabbitBoxEsp);
-  });
-  if (settings.preferUseTracer && eggs.length > 0) renderTracer(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
-}).setEnabled(stateDoSpring);
-const eggRendOvReg = reg('renderOverlay', () => {
-  if (eggs.length > 0) drawArrow3DPos(settings.rabbitBoxColor, eggs[0].getX(), eggs[0].getY() + 1.75, eggs[0].getZ(), false);
-}).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateDoSpring));
 
 const guiReg = reg('guiOpened', evn => {
   if (!settings.rabbitShowBestUpgrade) return;
@@ -206,29 +94,12 @@ const promoteReg = reg('chat', (name, lvl, status, evn) => {
   prevMessages[n] = msg.getFormattedText();
 }).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r').setEnabled(settings._rabbitCondenseChat);
 
-export function init() {
-  settings._rabbitAlertSpawnSound.listen(v => eggSpawnAlert.sound = v);
-  settings._rabbitAlertFoundSound.listen(v => eggFoundAlert.sound = v);
-}
+export function init() { }
 export function load() {
-  eggSpawnReg.register();
-  eggStepReg.register();
   guiReg.register();
   promoteReg.register();
-  unloadReg.register();
-  eggCollectReg.register();
-  eggAlrCollectReg.register();
-  eggRenWrldReg.register();
-  eggRendOvReg.register();
 }
 export function unload() {
-  eggSpawnReg.unregister();
-  eggStepReg.unregister();
   guiReg.unregister();
   promoteReg.unregister();
-  unloadReg.unregister();
-  eggCollectReg.unregister();
-  eggAlrCollectReg.unregister();
-  eggRenWrldReg.unregister();
-  eggRendOvReg.unregister();
 }

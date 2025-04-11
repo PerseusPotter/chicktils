@@ -793,16 +793,6 @@ export const props = {
 
   // 11
   enablerabbit: new Property('EnableRabbitTils', ++page, sort = 0, Property.Type.Toggle, false),
-  rabbitSniffer: new Property('RabbitTilsSniffEggs', page, ++sort, Property.Type.Toggle, false),
-  rabbitBoxColor: new Property('RabbitTilsBoxColor', page, ++sort, Property.Type.Color, 0x00FF80FF),
-  rabbitBoxEsp: new Property('RabbitTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
-  rabbitAlertEggSpawn: new Property('RabbitTilsAlertEggSpawn', page, ++sort, Property.Type.Toggle, true),
-  rabbitAlertEggFound: new Property('RabbitTilsAlertEggFound', page, ++sort, Property.Type.Toggle, true),
-  rabbitAlertSpawnTime: new Property('RabbitTilsAlertSpawnTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
-  rabbitAlertSpawnSound: new Property('RabbitTilsAlertSpawnSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
-  rabbitAlertFoundTime: new Property('RabbitTilsAlertFoundTime', page, ++sort, Property.Type.Integer, 500, { desc: 'in ms', min: 0 }),
-  rabbitAlertFoundSound: new Property('RabbitTilsAlertFoundSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
-  rabbitAlertOnlyDinner: new Property('RabbitTilsOnlyAlertFull', page, ++sort, Property.Type.Toggle, false, { desc: 'only ping when 3 available eggs for peak afk' }),
   rabbitShowBestUpgrade: new Property('RabbitTilsShowBestUpgrade', page, ++sort, Property.Type.Toggle, true, { desc: 'highlight most cost effective rabbit upgrade' }),
   rabbitCondenseChat: new Property('RabbitTilsCondenseChat', page, ++sort, Property.Type.Toggle, true, { desc: 'has been promoted lookin mf' }),
 
