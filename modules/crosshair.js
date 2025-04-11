@@ -1,5 +1,6 @@
+import { DefaultVertexFormats } from '../../Apelles/index';
 import settings from '../settings';
-import { _drawArc, DefaultVertexFormats, tess, worldRen } from '../util/draw';
+import { _drawArc, tess, worldRen } from '../util/draw';
 import glStateManager from '../util/glStateManager';
 import reg from '../util/registerer';
 

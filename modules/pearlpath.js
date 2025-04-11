@@ -1,5 +1,5 @@
+import { getRenderX, getRenderY, getRenderZ, renderBoxFilled, renderBoxOutline, renderLine } from '../../Apelles/index';
 import settings from '../settings';
-import { getRenderX, getRenderY, getRenderZ, renderFilledBox, renderOutline, renderParaCurve } from '../util/draw';
 import { lerp } from '../util/math';
 import { getEyeHeight } from '../util/mc';
 import reg from '../util/registerer';
@@ -85,29 +85,26 @@ const BlocksFlowerPot = Java.type('net.minecraft.init.Blocks').field_150457_bL;
 const renderReg = reg('renderWorld', pt => {
   if (pearlPos.length === 0) return;
 
-  if (collidedEntity) renderOutline(
+  if (collidedEntity) renderBoxOutline(
+    settings.pearlPathCollidedEntityColor,
     lerp(collidedEntity.field_70169_q, collidedEntity.field_70165_t, pt),
     lerp(collidedEntity.field_70167_r, collidedEntity.field_70163_u, pt),
     lerp(collidedEntity.field_70166_s, collidedEntity.field_70161_v, pt),
     collidedEntity.field_70130_N,
     collidedEntity.field_70131_O,
-    settings.pearlPathCollidedEntityColor,
-    settings.pearlPathEsp,
-    true
+    { phase: settings.pearlPathEsp, lw: 3 }
   );
   const rx = getRenderX();
   const ry = getRenderY();
   const rz = getRenderZ();
-  if (pearlPos.length > 1) renderParaCurve(
+  if (pearlPos.length > 1) renderLine(
     settings.pearlPathPathColor,
-    t => [
-      rx + pearlPos[t][0],
-      ry + pearlPos[t][1],
-      rz + pearlPos[t][2]
-    ],
-    0, pearlPos.length - 1,
-    pearlPos.length - 1,
-    settings.pearlPathEsp
+    pearlPos.map(v => [
+      rx + v[0],
+      ry + v[1],
+      rz + v[2]
+    ]),
+    { phase: settings.pearlPathEsp }
   );
 
   const ex = Math.floor(rx + pearlPos[pearlPos.length - 1][0]) + 0.5;
@@ -125,19 +122,17 @@ const renderReg = reg('renderWorld', pt => {
     if (isBottomSlab) ey += 0.5;
     else if (collidedBlock !== BlocksAir && collidedBlock !== BlocksCarpet && collidedBlock !== BlocksSkull && collidedBlock !== BlocksFlowerPot) ey++;
   }
-  renderFilledBox(
-    ex, ey, ez,
-    0.6, Player.isSneaking() ? 1.5 : 1.8,
+  renderBoxFilled(
     settings.pearlPathDestColorFill,
-    settings.pearlPathEsp,
-    true
-  );
-  renderOutline(
     ex, ey, ez,
     0.6, Player.isSneaking() ? 1.5 : 1.8,
+    { phase: settings.pearlPathEsp }
+  );
+  renderBoxOutline(
     settings.pearlPathDestColorOutline,
-    settings.pearlPathEsp,
-    true
+    ex, ey, ez,
+    0.6, Player.isSneaking() ? 1.5 : 1.8,
+    { phase: settings.pearlPathEsp }
   );
 }).setEnabled(stateHoldingPearl);
 

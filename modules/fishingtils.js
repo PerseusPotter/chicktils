@@ -1,5 +1,6 @@
+import { renderBeacon, renderTracer } from '../../Apelles/index';
 import settings from '../settings';
-import { drawArrow3DPos, renderBeaconBeam, renderTracer } from '../util/draw';
+import { drawArrow3DPos } from '../util/draw';
 import { compareFloat } from '../util/math';
 import { DSU, JavaTypeOrNull, setAccessible } from '../util/polyfill';
 import reg from '../util/registerer';
@@ -86,11 +87,10 @@ const hotspotPartReg = reg('packetReceived', pack => {
 const stateInHotspotRange = new StateProp(stateHotspotDist).customBinary(settings._fishingTilsHotspotWaypointDisableRange, (d, s) => d > s).and(settings._fishingTilsHotspotWaypoint);
 const hotspotRenderReg = reg('renderWorld', () => {
   hotspots.forEach(v => {
-    renderBeaconBeam(
-      v[0], v[1], v[2],
+    renderBeacon(
       settings.fishingTilsHotspotWaypointColor,
-      settings.useScuffedBeacon,
-      true
+      v[0], v[1], v[2],
+      { phase: true }
     );
   });
 }).setEnabled(stateInHotspotRange);
@@ -105,7 +105,7 @@ const hotspotArrowWrdReg = reg('renderWorld', () => {
   renderTracer(
     settings.fishingTilsHotspotWaypointColor,
     stateNearestHotspot.get()[0], stateNearestHotspot.get()[1], stateNearestHotspot.get()[2],
-    false
+    { lw: 3 }
   );
 }).setEnabled(stateInHotspotRange.and(stateNearestHotspot).and(settings._preferUseTracer));
 

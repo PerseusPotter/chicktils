@@ -1,9 +1,10 @@
 import settings from '../../settings';
-import { worldRen, DefaultVertexFormats, tess } from '../../util/draw';
+import { worldRen, tess } from '../../util/draw';
 import reg from '../../util/registerer';
 import { rescale } from '../../util/math';
 import { StateProp } from '../../util/state';
 import glStateManager from '../../util/glStateManager';
+import { DefaultVertexFormats } from '../../../Apelles/index';
 
 let canUseStencil = false;
 const TextureMap = Java.type('net.minecraft.client.renderer.texture.TextureMap');

@@ -1,5 +1,5 @@
+import { renderBoxOutline } from '../../../Apelles/index';
 import settings from '../../settings';
-import { renderOutline } from '../../util/draw';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
@@ -19,7 +19,7 @@ const renderWorldReg = reg('renderWorld', () => {
     const x = e.getRenderX();
     const y = e.getRenderY();
     const z = e.getRenderZ();
-    renderOutline(x, y - 0.25, z, 1.5, 4, settings.dungeonBoxWitherColor, settings.dungeonBoxWitherEsp);
+    renderBoxOutline(settings.dungeonBoxWitherColor, x, y - 0.25, z, 1.5, 4, { phase: settings.dungeonBoxWitherEsp });
   });
 }).setEnabled(stateBoxWithers);
 

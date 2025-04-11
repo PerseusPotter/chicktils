@@ -1,5 +1,6 @@
+import { getRenderX, getRenderY, getRenderZ, renderBoxOutline } from '../../Apelles/index';
 import settings from '../settings';
-import { renderOutline, renderString, rm } from '../util/draw';
+import { renderString, rm } from '../util/draw';
 import { setAccessible } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
@@ -11,11 +12,11 @@ function renderEntity(e, x, y, z, w, h, nt) {
   const c = e.getClassName();
   if (whitelist.size && !whitelist.has(c)) return;
   if (blacklist.size && blacklist.has(c)) return;
-  renderOutline(
-    x, y, z,
+  renderBoxOutline(
+    settings.boxAllEntitiesColor,
+    x + (nt ? getRenderX() : 0), y + (nt ? getRenderY() : 0), z + (nt ? getRenderZ() : 0),
     Math.max(w, 0.1), Math.max(h, 0.1),
-    settings.boxAllEntitiesColor, settings.boxAllEntitiesEsp,
-    true, 3, nt
+    { phase: settings.boxAllEntitiesEsp, lw: 3 }
   );
   if (settings.boxAllEntitiesName) {
     const rc = rm.func_78713_a(e.entity);

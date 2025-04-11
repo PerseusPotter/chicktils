@@ -1,7 +1,8 @@
+import { getRenderX, getRenderY, getRenderZ, renderBoxOutline, renderTracer } from '../../Apelles/index';
 import data from '../data';
 import settings from '../settings';
 import createTextGui from '../util/customtextgui';
-import { drawArrow3DPos, renderOutline, renderTracer } from '../util/draw';
+import { drawArrow3DPos } from '../util/draw';
 import { commaNumber } from '../util/format';
 import { lerp } from '../util/math';
 import { getItemId, getMaxHp } from '../util/mc';
@@ -110,17 +111,17 @@ const arachneServerTick = reg('serverTick2', () => {
 
 const arachneRenderReg = reg('postRenderEntity', (ent, pos) => {
   const e = ent.entity;
-  if (settings.avariceArachneBoxBigSpooder && e === arachneEnt) renderOutline(
-    pos.getX(), pos.getY(), pos.getZ(),
+  if (settings.avariceArachneBoxBigSpooder && e === arachneEnt) renderBoxOutline(
+    settings.avariceArachneBoxBigSpooderColor,
+    pos.getX() + getRenderX(), pos.getY() + getRenderY(), pos.getZ() + getRenderZ(),
     1.5, 1,
-    settings.avariceArachneBoxBigSpooderColor, settings.avariceArachneBoxBigSpooderEsp,
-    true, 5, true
+    { phase: settings.avariceArachneBoxBigSpooderEsp, lw: 5 }
   );
-  if (settings.avariceArachneBoxSmallSpooders && e instanceof EntityCaveSpider && arachneBroodEnts.containsKey(e)) renderOutline(
-    pos.getX(), pos.getY(), pos.getZ(),
+  if (settings.avariceArachneBoxSmallSpooders && e instanceof EntityCaveSpider && arachneBroodEnts.containsKey(e)) renderBoxOutline(
+    settings.avariceArachneBoxSmallSpoodersColor,
+    pos.getX() + getRenderX(), pos.getY() + getRenderY(), pos.getZ() + getRenderZ(),
     0.8, 0.6,
-    settings.avariceArachneBoxSmallSpoodersColor, settings.avariceArachneBoxSmallSpoodersEsp,
-    true, 5, true
+    { phase: settings.avariceArachneBoxSmallSpoodersEsp, lw: 5 }
   );
 }).setEnabled(stateDoArachne);
 const arachneTracerReg = reg('renderWorld', partial => {
@@ -129,7 +130,7 @@ const arachneTracerReg = reg('renderWorld', partial => {
     lerp(arachneEnt.field_70169_q, arachneEnt.field_70165_t, partial),
     lerp(arachneEnt.field_70167_r, arachneEnt.field_70163_u, partial) + 0.5,
     lerp(arachneEnt.field_70166_s, arachneEnt.field_70161_v, partial),
-    false
+    { lw: 3 }
   );
 }).setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(settings._preferUseTracer));
 const arachnePointReg = reg('renderOverlay', () => {

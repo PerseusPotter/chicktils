@@ -3,12 +3,13 @@ import data from '../data';
 import reg, { customRegs } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { drawArrow3DPos, renderBeaconBeam, renderLine, renderOutline, renderParaCurve, renderString, renderTracer } from '../util/draw';
+import { drawArrow3DPos, renderParaCurve, renderString } from '../util/draw';
 import { compareFloat, convergeHalfInterval, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, toPolynomial } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
 import { unrun } from '../util/threading';
+import { renderBeacon, renderBoxOutline, renderLine, renderTracer } from '../../Apelles/index';
 
 const warps = [
   {
@@ -150,11 +151,11 @@ const burrowResetReg = reg('chat', () => {
 }).setCriteria('&r&6Poof! &r&eYou have cleared your griffin burrows!&r');
 const renderTargetsReg = reg('renderWorld', () => {
   burrows.forEach(v => {
-    renderOutline(
+    renderBoxOutline(
+      settings[`dianaBurrow${v[4]}Color`] ?? 0,
       v[0], v[1], v[2],
       1, 1,
-      settings[`dianaBurrow${v[4]}Color`] ?? 0,
-      true, true
+      { phase: true }
     );
     renderString(
       '&5&l' + v[4],
@@ -164,18 +165,17 @@ const renderTargetsReg = reg('renderWorld', () => {
     );
   });
   prevGuesses.forEach(v => {
-    renderOutline(
+    renderBoxOutline(
+      settings.dianaBurrowPrevGuessColor,
       v[0], v[1], v[2],
       1, 1,
-      settings.dianaBurrowPrevGuessColor,
-      true, true
+      { phase: true }
     );
   });
-  if (targetLoc) renderBeaconBeam(
-    targetLoc[0], targetLoc[1] + 1, targetLoc[2],
+  if (targetLoc) renderBeacon(
     settings.dianaArrowToBurrowColor,
-    settings.useScuffedBeacon,
-    true, true, 50
+    targetLoc[0], targetLoc[1] + 1, targetLoc[2],
+    { phase: true }
   );
 });
 
@@ -481,11 +481,11 @@ const renderGuessReg = reg('renderWorld', () => {
   }
   guessPos.forEach((v, k) => {
     if (!v) return;
-    renderOutline(
+    renderBoxOutline(
+      settings[`dianaGuessFromParticles${k}Color`] ?? 0,
       v[0], v[1], v[2],
       1, 1,
-      settings[`dianaGuessFromParticles${k}Color`] ?? 0,
-      true, true
+      { phase: true }
     );
     if (settings.dianaGuessFromParticlesRenderName) renderString(
       k,
@@ -496,13 +496,19 @@ const renderGuessReg = reg('renderWorld', () => {
   });
   if (arrowVec) renderLine(
     settings.dianaGuessFromParticlesArrowColor,
-    arrowVec[0][0],
-    arrowVec[2],
-    arrowVec[0][1],
-    arrowVec[0][0] + arrowVec[1][0] * 500,
-    arrowVec[2],
-    arrowVec[0][1] + arrowVec[1][1] * 500,
-    true
+    [
+      [
+        arrowVec[0][0],
+        arrowVec[2],
+        arrowVec[0][1],
+      ],
+      [
+        arrowVec[0][0] + arrowVec[1][0] * 500,
+        arrowVec[2],
+        arrowVec[0][1] + arrowVec[1][1] * 500,
+      ]
+    ],
+    { phase: true, lw: 3 }
   );
 }).setEnabled(settings._dianaGuessFromParticles);
 
@@ -540,7 +546,7 @@ const renderArrowOvReg = reg('renderOverlay', () => {
   if (targetLoc) drawArrow3DPos(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], false);
 }).setEnabled(new StateProp(settings._preferUseTracer).not().and(settings._dianaArrowToBurrow));
 const renderArrowWrldReg = reg('renderWorld', () => {
-  if (targetLoc) renderTracer(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], false);
+  if (targetLoc) renderTracer(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], { lw: 3 });
 }).setEnabled(new StateProp(settings._preferUseTracer).and(settings._dianaArrowToBurrow));
 
 const startBurrowReg = reg('chat', () => {

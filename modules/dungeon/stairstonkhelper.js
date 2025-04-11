@@ -1,8 +1,8 @@
 import settings from '../../settings';
-import { renderFilledBox, renderLine } from '../../util/draw';
 import reg from '../../util/registerer';
 import Grid from '../../util/grid';
 import { getBlockPos } from '../../util/mc';
+import { renderBoxFilled, renderLine } from '../../../Apelles/index';
 
 const brokenStairBucket = new Grid({ size: 2, addNeighbors: 2 });
 let cID = NaN;
@@ -68,14 +68,15 @@ const renderWorldReg = reg('renderWorld', () => {
     // drawLine(settings.dungeonStairStonkHelperColor, ...v[1], ...v[2], 2);
     renderLine(
       settings.dungeonStairStonkHelperColor,
-      v[1][0], v[1][1], v[1][2],
-      v[2][0], v[2][1], v[2][2],
-      false,
-      2
+      [
+        [v[1][0], v[1][1], v[1][2]],
+        [v[2][0], v[2][1], v[2][2]]
+      ],
+      { lw: 2 }
     );
   });
 
-  if (lookPos) renderFilledBox(lookPos.x - 0.005, lookPos.y - 0.005, lookPos.z - 0.005, 1.01, 1.01, settings.dungeonStairStonkHelperHighlightColor, false, false);
+  if (lookPos) renderBoxFilled(settings.dungeonStairStonkHelperHighlightColor, lookPos.x - 0.005, lookPos.y - 0.005, lookPos.z - 0.005, 1.01, 1.01, { centered: false });
 }).setEnabled(settings._dungeonStairStonkHelper);
 
 export function init() { }

@@ -1,10 +1,10 @@
 import settings from '../../settings';
-import { renderOutline } from '../../util/draw';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
 import { stateIsInBoss } from '../dungeon.js';
 import { unrun } from '../../util/threading';
 import { setAccessible } from '../../util/polyfill';
+import { getRenderX, getRenderY, getRenderZ, renderBoxOutline } from '../../../Apelles/index';
 
 const stateBoxMob = new StateProp(settings._dungeonBoxMobs).and(new StateProp(settings._dungeonBoxMobDisableInBoss).not().or(new StateProp(stateIsInBoss).not()));
 const boxMobs = new Map();
@@ -89,7 +89,14 @@ const nameChangeReg = reg('packetReceived', pack => {
 }).setFilteredClass(net.minecraft.network.play.server.S1CPacketEntityMetadata).setEnabled(stateBoxMob.and(new StateProp(stateIsInBoss).not()));
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity.func_145782_y());
-  if (data) renderOutline(pos.getX(), pos.getY() - data.yO, pos.getZ(), 1, data.h, settings[boxColors[data.c]], settings.dungeonBoxMobEsp, true, undefined, true);
+  if (data) renderBoxOutline(
+    settings[boxColors[data.c]],
+    pos.getX() + getRenderX(),
+    pos.getY() - data.yO + getRenderY(),
+    pos.getZ() + getRenderZ(),
+    1, data.h,
+    { phase: settings.dungeonBoxMobEsp, lw: 3 }
+  );
 }).setEnabled(stateBoxMob);
 
 export function init() { }

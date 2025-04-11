@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import data from '../../data';
-import { renderOutline, renderFilledBox, renderString, getPartialServerTick } from '../../util/draw';
+import { renderString, getPartialServerTick } from '../../util/draw';
 import reg, { customRegs } from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import { getAveragePing } from '../../util/ping';
@@ -11,6 +11,7 @@ import { DelayTimer } from '../../util/timers';
 import { getItemId } from '../../util/mc';
 import { listenBossMessages, roundRoomCoords, stateIsInBoss } from '../dungeon.js';
 import { run, unrun } from '../../util/threading';
+import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
 
 let bloodMobs = [];
 let bloodMobsSet = new Set();
@@ -144,8 +145,8 @@ const renderWorldReg = reg('renderWorld', () => {
       z = lerp(lastEstZ, estZ, smoothFactor);
     }
     const m = Math.min(1, (maxTtl - ttl + getPartialServerTick() + getAveragePing() / 50) / maxTtl);
-    renderOutline(x, y + 1.5, z, 1, 2, settings.dungeonCampWireColor, settings.dungeonCampBoxEsp, true, 3);
-    renderFilledBox(x, y + 2.5 - m, z, m, 2 * m, settings.dungeonCampBoxColor, settings.dungeonCampBoxEsp);
+    renderBoxOutline(settings.dungeonCampWireColor, x, y + 1.5, z, 1, 2, { phase: settings.dungeonCampBoxEsp, lw: 3 });
+    renderBoxFilled(settings.dungeonCampBoxColor, x, y + 2.5 - m, z, m, 2 * m, { phase: settings.dungeonCampBoxEsp });
 
     if (settings.dungeonCampTimer) renderString(((ttl - getPartialServerTick() - getAveragePing() / 50) / 20).toFixed(2), x, y + 1, z);
   });

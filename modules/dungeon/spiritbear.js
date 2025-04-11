@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import data from '../../data';
-import { renderOutline, renderFilledBox, renderString, getPartialServerTick } from '../../util/draw';
+import { renderString, getPartialServerTick } from '../../util/draw';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import { getAveragePing } from '../../util/ping';
@@ -10,6 +10,7 @@ import { log } from '../../util/log';
 import { StateProp, StateVar } from '../../util/state';
 import { DelayTimer } from '../../util/timers';
 import { listenBossMessages } from '../dungeon.js';
+import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
 
 const bearSpawnTicks = 70;
 const bearParticleHeightCap = 80;
@@ -104,8 +105,8 @@ const renderWorldReg = reg('renderWorld', () => {
     z = lerp(estPrev.z, est.z, smoothFactor);
   }
   const m = Math.min(1, (bearSpawnTicks - ticks.get() + getPartialServerTick() + getAveragePing() / 50) / bearSpawnTicks);
-  renderOutline(x, y, z, 1, 2, settings.dungeonSpiritBearWireColor, settings.dungeonSpiritBearBoxEsp, true, 3);
-  renderFilledBox(x, y + 1 - m, z, m, 2 * m, settings.dungeonSpiritBearBoxColor, settings.dungeonSpiritBearBoxEsp);
+  renderBoxOutline(settings.dungeonSpiritBearWireColor, x, y, z, 1, 2, { phase: settings.dungeonSpiritBearBoxEsp, lw: 3 });
+  renderBoxFilled(settings.dungeonSpiritBearBoxColor, x, y + 1 - m, z, m, 2 * m, { phase: settings.dungeonSpiritBearBoxEsp });
 
   if (settings.dungeonSpiritBearTimer) renderString(((ticks.get() - getPartialServerTick() - getAveragePing() / 50) / 20).toFixed(2), x, y + 2.5, z);
 }).setEnabled(stateBearSpawning);
