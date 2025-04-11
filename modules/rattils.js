@@ -1,11 +1,11 @@
 import createAlert from '../util/alert';
-import { renderOutline } from '../util/draw';
 import settings from '../settings';
 import { _clearTimeout, _setTimeout } from '../util/timers';
 import { log } from '../util/log';
 import reg from '../util/registerer';
 import { run } from '../util/threading';
 import { getPlayerName } from '../util/format';
+import { renderBoxOutline } from '../../Apelles/index';
 
 const cheeseAlert = createAlert('Cheese !');
 let cheese = [];
@@ -55,7 +55,7 @@ const cheeseRenderReg = reg('renderWorld', () => {
     const x = v.getRenderX();
     const y = v.getRenderY();
     const z = v.getRenderZ();
-    renderOutline(x, y, z, 0.5, 0.5, settings.ratTilsBoxColor, settings.ratTilsBoxEsp);
+    renderBoxOutline(settings.ratTilsBoxColor, x, y, z, 0.5, 0.5, { phase: settings.ratTilsBoxEsp });
   });
 });
 const muteReg = reg('soundPlay', (pos, name, vol, pitch, category, evn) => vol === 1 && (Math.abs(pitch - 1.19047) < 0.0001) && cancel(evn)).setCriteria('mob.bat.idle').setEnabled(settings._ratTilsMuteSound);

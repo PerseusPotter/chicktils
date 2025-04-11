@@ -1,5 +1,6 @@
+import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
 import settings from '../../settings';
-import { getPartialServerTick, renderFilledBox, renderOutline, renderString } from '../../util/draw';
+import { getPartialServerTick, renderString } from '../../util/draw';
 import { colorForNumber } from '../../util/format';
 import { getBlockId } from '../../util/mc';
 import reg from '../../util/registerer';
@@ -36,17 +37,15 @@ const renderReg = reg('renderWorld', () => {
     const t = v[0] - getPartialServerTick();
     const m = 1 - t / stateMaxTicks.get();
     if (doBox) {
-      renderFilledBox(
-        v[1], v[2], v[3],
-        0.6, 1.8 * m,
+      renderBoxFilled(
         settings.dungeonTerracottaRespawnFillColor,
-        false, true
+        v[1], v[2], v[3],
+        0.6, 1.8 * m
       );
-      renderOutline(
+      renderBoxOutline(
+        settings.dungeonTerracottaRespawnOutlineColor,
         v[1], v[2], v[3],
         0.6, 1.8,
-        settings.dungeonTerracottaRespawnOutlineColor,
-        false, true
       );
     }
     if (doTimer) renderString(

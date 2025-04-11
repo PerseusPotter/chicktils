@@ -4,7 +4,7 @@ import { compareFloat } from '../../util/math';
 import { StateProp, StateVar } from '../../util/state';
 import { getBlockId, getBlockPos } from '../../util/mc';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
-import { renderAABBFilled } from '../../util/draw';
+import { renderAABBFilled } from '../../../Apelles/index';
 
 const stateSimonSays = new StateProp(stateFloor).equalsmult('F7', 'M7').and(stateIsInBoss).and(settings._dungeonSimonSays);
 const stateAtSS = new StateVar(false);
@@ -63,14 +63,13 @@ const renderWorldReg = reg('renderWorld', () => {
     const x = 110;
     const e = 0.002;
     renderAABBFilled(
+      c,
       x + 1 - 2 / 16 - e,
       y + 0.375 - e,
       z + 0.3125 - e,
       x + 1 + e,
       y + 0.625 + e,
-      z + 0.6875 + e,
-      c,
-      false
+      z + 0.6875 + e
     );
   });
 }).setEnabled(stateDoSimonSays);

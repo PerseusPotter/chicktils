@@ -1,5 +1,5 @@
+import { renderBeacon } from '../../../Apelles/index';
 import settings from '../../settings';
-import { renderBeaconBeam } from '../../util/draw';
 import { fastDistance } from '../../util/math';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
@@ -20,7 +20,7 @@ const tickReg = reg('tick', () => {
 }).setEnabled(stateM7LBWaypoints);
 const renderWorldReg = reg('renderWorld', () => {
   if (Player.getY() > 30 || !nearest) return;
-  renderBeaconBeam(nearest[0], 0, nearest[1], nearest[2], settings.useScuffedBeacon, true, false, 17);
+  renderBeacon(nearest[2], nearest[0], 0, nearest[1], { centered: false, h: 17 });
 }).setEnabled(stateM7LBWaypoints);
 
 export function init() { }

@@ -1,28 +1,27 @@
+import { renderBoxOutline } from '../../../Apelles/index';
 import settings from '../../settings';
-import { renderOutline } from '../../util/draw';
 import reg from '../../util/registerer';
 import { getPlayers, registerTrackPlayers } from '../dungeon.js';
 
-const teammates = new (Java.type('java.util.WeakHashMap'))();
-
-const tickReg = reg('tick', () => getPlayers().forEach(v => v.me && teammates.put(v.me, v.class))).setEnabled(settings._dungeonBoxTeammates);
-const postRenderReg = reg('postRenderEntity', (ent, pos) => {
-  const c = teammates.get(ent.entity);
-  if (!c) return;
-  const col = settings[`dungeonBoxTeammates${c.slice(0, 4)}Color`] ?? settings.boxAllEntitiesColor;
-  renderOutline(pos.getX(), pos.getY(), pos.getZ(), 0.8, 2, col, settings.dungeonBoxTeammatesEsp, true, undefined, true);
-}).setFilteredClass(net.minecraft.client.entity.EntityOtherPlayerMP).setEnabled(settings._dungeonBoxTeammates);
+const renderReg = reg('renderWorld', () => {
+  getPlayers().forEach(p => {
+    if (p.e === Player) return;
+    const col = settings[`dungeonBoxTeammates${p['class'].slice(0, 4)}Color`] ?? settings.boxAllEntitiesColor;
+    renderBoxOutline(
+      col,
+      p.e.getRenderX(), p.e.getRenderY(), p.e.getRenderZ(),
+      0.8, 2,
+      { phase: settings.dungeonBoxTeammatesEsp, lw: 3 }
+    )
+  });
+}).setEnabled(settings._dungeonBoxTeammates);
 
 export function init() {
   registerTrackPlayers(settings._dungeonBoxTeammates);
 }
 export function start() {
-  teammates.clear();
-
-  tickReg.register();
-  postRenderReg.register();
+  renderReg.register();
 }
 export function reset() {
-  tickReg.unregister();
-  postRenderReg.unregister();
+  renderReg.unregister();
 }

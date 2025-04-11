@@ -1,6 +1,7 @@
+import { DefaultVertexFormats, getRenderX, getRenderY, getRenderZ } from '../../Apelles/index';
 import settings from '../settings';
 import createTextGui from '../util/customtextgui';
-import { DefaultVertexFormats, getRenderX, getRenderY, getRenderZ, tess, worldRen } from '../util/draw';
+import { tess, worldRen } from '../util/draw';
 import glStateManager from '../util/glStateManager';
 import { fastDistance } from '../util/math';
 import { getEyeHeight } from '../util/mc';

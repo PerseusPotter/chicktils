@@ -2,27 +2,11 @@ import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
 import { getEyeHeight } from './mc';
 import GlStateManager2 from './glStateManager';
 import reg from './registerer';
-import { setAccessible } from './polyfill';
+import { DefaultVertexFormats, getRenderX, getRenderY, getRenderZ, renderBoxFilled, renderBoxOutline, renderLine } from '../../Apelles/index';
 
 export const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 export const worldRen = tess.func_178180_c();
-export const DefaultVertexFormats = Java.type('net.minecraft.client.renderer.vertex.DefaultVertexFormats');
 export const rm = Renderer.getRenderManager();
-const xa = setAccessible(rm.class.getDeclaredField('field_78725_b'));
-const ya = setAccessible(rm.class.getDeclaredField('field_78726_c'));
-const za = setAccessible(rm.class.getDeclaredField('field_78723_d'));
-/**
- * @type {() => number}
- */
-export function getRenderX() { return xa.get(rm); };
-/**
- * @type {() => number}
- */
-export function getRenderY() { return ya.get(rm); };
-/**
- * @type {() => number}
- */
-export function getRenderZ() { return za.get(rm); };
 function getXMult() {
   return Client.settings.getSettings().field_74320_O === 2 ? -1 : 1;
 }
@@ -201,59 +185,6 @@ export function drawArrow3DPos(color, dx, dy, dz, rel = true, scale = 3) {
 }
 
 /**
- * @param {number} color rgba
- * @param {number} x
- * @param {number} y
- * @param {number} z
- * @param {boolean?} rel (true)
- * @param {number?} lw (3)
- */
-export function renderTracer(color, x, y, z, rel = true, lw = 3) {
-  const rgba = normColor(color);
-  if (rgba[3] === 0) return;
-  const p = Player.getPlayer();
-  if (!p) return;
-  if (rel) {
-    x += getRenderX();
-    y += getRenderY();
-    z += getRenderZ();
-  }
-  const look = p.func_70676_i(Tessellator.partialTicks);
-  renderLine(rgba, x, y, z, getRenderX() + look.field_72450_a, getRenderY() + look.field_72448_b + getEyeHeight(p), getRenderZ() + look.field_72449_c, true, lw);
-}
-
-/**
- * @param {number} minX
- * @param {number} minY
- * @param {number} minZ
- * @param {number} maxX
- * @param {number} maxY
- * @param {number} maxZ
- * @param {number} color rgba
- * @param {boolean?} esp is visible through walls (false)
- * @param {number?} lw line width (5)
- */
-export function renderAABBOutline(minX, minY, minZ, maxX, maxY, maxZ, color, esp = false, lw = 5) {
-  const mx = Math.min(minX, maxX);
-  const my = Math.min(minY, maxY);
-  const mz = Math.min(minZ, maxZ);
-  const Mx = Math.max(minX, maxX);
-  const My = Math.max(minY, maxY);
-  const Mz = Math.max(minZ, maxZ);
-  renderOutline(
-    mx, my, mz,
-    Mx - mx,
-    My - my,
-    color,
-    esp,
-    false,
-    lw,
-    false,
-    Mz - mz
-  );
-}
-
-/**
  * @param {number} x
  * @param {number} y
  * @param {number} z
@@ -263,209 +194,15 @@ export function renderAABBOutline(minX, minY, minZ, maxX, maxY, maxZ, color, esp
  * @param {boolean?} esp is visible through walls (false)
  * @param {boolean?} center are coordinates already centered (true)
  * @param {number?} lw line width (5)
- * @param {boolean?} nt use if renderentity.pos (false)
  * @param {number?} wz
  */
-export function renderOutline(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false, wz = w) {
-  const rgba = normColor(color);
-  if (rgba[3] === 0) return;
-  let wx = w;
-  if (center) {
-    x -= wx / 2;
-    z -= wz / 2;
-  }
-  if (!nt) {
-    let s;
-    ({ x, y, z, s } = rescaleRender(x, y, z));
-    wx *= s;
-    wz *= s;
-    h *= s;
-    lw *= s;
-  }
-
-  GlStateManager2.disableTexture2D();
-  GlStateManager2.disableLighting();
-  GlStateManager2.disableAlpha();
-  GL11.glLineWidth(lw);
-  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
-  if (!nt) {
-    GlStateManager2.pushMatrix();
-    GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
-  }
-  if (rgba[3] === 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  } else {
-    GlStateManager2.depthMask(false);
-    GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
-  }
-  if (esp) GlStateManager2.disableDepth();
-
-  worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
-  worldRen.func_181662_b(x, y, z).func_181675_d();
-  worldRen.func_181662_b(x, y, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-  tess.func_78381_a();
-  worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
-  worldRen.func_181662_b(x, y + h, z).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
-  tess.func_78381_a();
-  worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
-  worldRen.func_181662_b(x, y, z).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z).func_181675_d();
-  worldRen.func_181662_b(x, y, z + wz).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-  worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
-  tess.func_78381_a();
-
-  if (!nt) GlStateManager2.popMatrix();
-  GlStateManager2.enableTexture2D();
-  GlStateManager2.enableAlpha();
-  GL11.glLineWidth(1);
-  if (rgba[3] !== 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  }
-  if (esp) GlStateManager2.enableDepth();
-}
-
-/**
- * @param {number} minX
- * @param {number} minY
- * @param {number} minZ
- * @param {number} maxX
- * @param {number} maxY
- * @param {number} maxZ
- * @param {number} color rgba
- * @param {boolean?} esp is visible through walls (false)
- */
-export function renderAABBFilled(minX, minY, minZ, maxX, maxY, maxZ, color, esp = false) {
-  const mx = Math.min(minX, maxX);
-  const my = Math.min(minY, maxY);
-  const mz = Math.min(minZ, maxZ);
-  const Mx = Math.max(minX, maxX);
-  const My = Math.max(minY, maxY);
-  const Mz = Math.max(minZ, maxZ);
-  renderFilledBox(
-    mx, my, mz,
-    Mx - mx,
-    My - my,
-    color,
-    esp,
-    false,
-    false,
-    Mz - mz
-  );
-}
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} z
- * @param {number} w
- * @param {number} h
- * @param {number} color rgba
- * @param {boolean?} esp is visible through walls (false)
- * @param {boolean?} center are coordinates already centered (true)
- * @param {boolean?} nt use if renderentity.pos (false)
- * @param {number?} wz
- */
-export function renderFilledBox(x, y, z, w, h, color, esp = false, center = true, nt = false, wz = w) {
-  const rgba = normColor(color);
-  if (rgba[3] === 0) return;
-  let wx = w;
-  if (center) {
-    x -= wx / 2;
-    z -= wz / 2;
-  }
-  if (!nt) {
-    let s;
-    ({ x, y, z, s } = rescaleRender(x, y, z));
-    wx *= s;
-    wz *= s;
-    h *= s;
-  }
-
-  GlStateManager2.disableTexture2D();
-  GlStateManager2.disableLighting();
-  GlStateManager2.disableAlpha();
-  GlStateManager2.disableCull();
-  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
-  if (!nt) {
-    GlStateManager2.pushMatrix();
-    GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
-  }
-  if (rgba[3] === 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  } else {
-    GlStateManager2.depthMask(false);
-    GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
-  }
-  if (esp) GlStateManager2.disableDepth();
-
-  worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
-  worldRen.func_181662_b(x, y, z).func_181675_d();
-  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-  worldRen.func_181662_b(x, y, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z).func_181675_d();
-  worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
-  worldRen.func_181662_b(x, y, z).func_181675_d();
-  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-  tess.func_78381_a();
-  worldRen.func_181668_a(7, DefaultVertexFormats.field_181705_e);
-  worldRen.func_181662_b(x, y, z).func_181675_d();
-  worldRen.func_181662_b(x, y, z + wz).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
-  worldRen.func_181662_b(x, y + h, z).func_181675_d();
-  worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-  worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
-  worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
-  tess.func_78381_a();
-
-  if (!nt) GlStateManager2.popMatrix();
-  GlStateManager2.enableTexture2D();
-  GlStateManager2.enableAlpha();
-  GlStateManager2.enableCull();
-  if (rgba[3] !== 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  }
-  if (esp) GlStateManager2.enableDepth();
-}
-
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} z
- * @param {number} w
- * @param {number} h
- * @param {number} color rgba
- * @param {boolean?} esp is visible through walls (false)
- * @param {boolean?} center are coordinates already centered (true)
- * @param {number?} lw line width (5)
- * @param {boolean?} nt use if renderentity.pos (false)
- * @param {number?} wz
- */
-export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5, nt = false, wz = w) {
+export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5, wz = w) {
   const rgba = normColor(color);
   if (rgba[3] === 0) return;
   rgba[3] /= 4;
-  renderFilledBox(x, y, z, w, h, rgba, esp, center, nt, wz);
+  renderBoxFilled(rgba, x, y, z, w, h, { centered: center, wz, lw, phase: esp });
   rgba[3] *= 4;
-  renderOutline(x, y, z, w, h, rgba, esp, center, lw, nt, wz);
+  renderBoxOutline(rgba, x, y, z, w, h, { centered: center, wz, lw, phase: esp });
 }
 
 /**
@@ -510,56 +247,6 @@ function applyTint(c, a) {
 
 /**
  * @param {number} color rgba
- * @param {number} x1
- * @param {number} y1
- * @param {number} z1
- * @param {number} x2
- * @param {number} y2
- * @param {number} z2
- * @param {number} esp (false)
- * @param {number?} lw (2)
- */
-export function renderLine(color, x1, y1, z1, x2, y2, z2, esp = false, lw = 2) {
-  const rgba = normColor(color);
-  if (rgba[3] === 0) return;
-  ({ x: x1, y: y1, z: z1 } = rescaleRender(x1, y1, z1));
-  ({ x: x2, y: y2, z: z2 } = rescaleRender(x2, y2, z2));
-
-  GlStateManager2.pushMatrix();
-  GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
-  GlStateManager2.disableTexture2D();
-  GlStateManager2.disableLighting();
-  GlStateManager2.disableAlpha();
-  GL11.glLineWidth(lw);
-  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
-  if (rgba[3] === 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  } else {
-    GlStateManager2.depthMask(false);
-    GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
-  }
-  if (esp) GlStateManager2.disableDepth();
-
-  worldRen.func_181668_a(3, DefaultVertexFormats.field_181705_e);
-  worldRen.func_181662_b(x1, y1, z1).func_181675_d();
-  worldRen.func_181662_b(x2, y2, z2).func_181675_d();
-  tess.func_78381_a();
-
-  GlStateManager2.popMatrix();
-  GlStateManager2.enableTexture2D();
-  GlStateManager2.enableAlpha();
-  GL11.glLineWidth(1);
-  if (rgba[3] !== 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  }
-  if (esp) GlStateManager2.enableDepth();
-}
-
-/**
- * @param {number} color rgba
  * @param {(t: number) => [number, number, number]} func
  * @param {number} t0
  * @param {number} te
@@ -571,46 +258,7 @@ export function renderParaCurve(color, func, t0, te, segments, esp = false, lw =
   const rgba = normColor(color);
   if (rgba[3] === 0) return;
 
-  GlStateManager2.pushMatrix();
-  GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
-  GlStateManager2.disableTexture2D();
-  GlStateManager2.disableLighting();
-  GlStateManager2.disableAlpha();
-  GlStateManager2.color(rgba[0], rgba[1], rgba[2], rgba[3]);
-  if (rgba[3] === 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  } else {
-    GlStateManager2.depthMask(false);
-    GlStateManager2.enableBlend();
-    GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
-  }
-  if (esp) GlStateManager2.disableDepth();
-
-  worldRen.func_181668_a(3, DefaultVertexFormats.field_181705_e);
-  const step = (te - t0) / segments;
-  let plw = 1;
-  for (let i = 0; i <= segments; i++) {
-    let pos = func(t0 + i * step);
-    let { x, y, z, s } = rescaleRender(pos[0], pos[1], pos[2]);
-    let l = lw * s;
-    if (compareFloat(plw, l) !== 0) {
-      GL11.glLineWidth(l);
-      plw = l;
-    }
-    worldRen.func_181662_b(x, y, z).func_181675_d();
-  }
-  tess.func_78381_a();
-
-  GlStateManager2.popMatrix();
-  GlStateManager2.enableTexture2D();
-  GlStateManager2.enableAlpha();
-  GL11.glLineWidth(1);
-  if (rgba[3] !== 1) {
-    GlStateManager2.depthMask(true);
-    GlStateManager2.disableBlend();
-  }
-  if (esp) GlStateManager2.enableDepth();
+  renderLine(color, new Array(segments + 1).fill(0).map((_, i) => func(rescale(i, 0, segments, t0, te))), { phase: esp, lw });
 }
 
 /**
@@ -845,112 +493,6 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   GlStateManager2.enableCull();
   GlStateManager2.disableBlend();
   GL11.glLineWidth(1);
-}
-
-const ResourceLocation = Java.type('net.minecraft.util.ResourceLocation');
-const beaconBeamText = new ResourceLocation('textures/entity/beacon_beam.png');
-/**
- * @param {number} x
- * @param {number} y
- * @param {number} z
- * @param {number} color rgba
- * @param {boolean} scuffed
- * @param {boolean?} esp is visible through walls (false)
- * @param {boolean?} center are coordinates already centered (true)
- * @param {number?} height (300)
- * @link https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/98f4f6140ab8371f1fd18846f5489318af2b2252/src/main/java/io/github/moulberry/notenoughupdates/core/util/render/RenderUtils.java#L220
- */
-export function renderBeaconBeam(x, y, z, color, scuffed, esp = false, center = true, height = 300) {
-  const rgba = normColor(color);
-  if (rgba[3] === 0) return;
-  if (!center) {
-    x += 0.5;
-    z += 0.5;
-  }
-  if (scuffed) return renderFilledBox(x, y, z, 0.4, height - y, color, esp);
-  ({ x, y, z, s } = rescaleRender(x, y, z));
-
-  GlStateManager2.pushMatrix();
-  GlStateManager2.translate(-getRenderX(), -getRenderY(), -getRenderZ());
-
-  const bottomOffset = 0;
-  const topOffset = bottomOffset + height;
-  if (esp) {
-    GlStateManager2.disableDepth();
-    GlStateManager2.depthMask(false);
-  }
-  Client.getMinecraft().func_110434_K().func_110577_a(beaconBeamText);
-  GL11.glTexParameterf(3553, 10242, 10497);
-  GL11.glTexParameterf(3553, 10243, 10497);
-  GlStateManager2.disableLighting();
-  GlStateManager2.enableCull();
-  GlStateManager2.enableTexture2D();
-  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
-  GlStateManager2.enableBlend();
-  const time = 0.2 * (World.getWorld().func_82737_E() + Tessellator.partialTicks);
-  const d1 = Math.ceil(time) - time;
-  const r = rgba[0];
-  const g = rgba[1];
-  const b = rgba[2];
-  const a = rgba[3];
-  const d2 = time * -0.1875;
-  const d4 = Math.cos(d2 + 2.356194490192345) * 0.2 * s;
-  const d5 = Math.sin(d2 + 2.356194490192345) * 0.2 * s;
-  const d6 = Math.cos(d2 + 0.7853981633974483) * 0.2 * s;
-  const d7 = Math.sin(d2 + 0.7853981633974483) * 0.2 * s;
-  const d8 = Math.cos(d2 + 3.9269908169872414) * 0.2 * s;
-  const d9 = Math.sin(d2 + 3.9269908169872414) * 0.2 * s;
-  const d10 = Math.cos(d2 + 5.497787143782138) * 0.2 * s;
-  const d11 = Math.sin(d2 + 5.497787143782138) * 0.2 * s;
-  const d14 = d1 - 1;
-  const d15 = height * 2.5 + d14;
-  worldRen.func_181668_a(7, DefaultVertexFormats.field_181709_i);
-  worldRen.func_181662_b(x + d4, y + topOffset, z + d5).func_181673_a(1, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
-  worldRen.func_181662_b(x + d4, y + bottomOffset, z + d5).func_181673_a(1, d14).func_181666_a(r, g, b, 1).func_181675_d();
-  worldRen.func_181662_b(x + d6, y + bottomOffset, z + d7).func_181673_a(0, d14).func_181666_a(r, g, b, 1).func_181675_d();
-  worldRen.func_181662_b(x + d6, y + topOffset, z + d7).func_181673_a(0, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
-  worldRen.func_181662_b(x + d10, y + topOffset, z + d11).func_181673_a(1, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
-  worldRen.func_181662_b(x + d10, y + bottomOffset, z + d11).func_181673_a(1, d14).func_181666_a(r, g, b, 1).func_181675_d();
-  worldRen.func_181662_b(x + d8, y + bottomOffset, z + d9).func_181673_a(0, d14).func_181666_a(r, g, b, 1).func_181675_d();
-  worldRen.func_181662_b(x + d8, y + topOffset, z + d9).func_181673_a(0, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
-  worldRen.func_181662_b(x + d6, y + topOffset, z + d7).func_181673_a(1, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
-  worldRen.func_181662_b(x + d6, y + bottomOffset, z + d7).func_181673_a(1, d14).func_181666_a(r, g, b, 1).func_181675_d();
-  worldRen.func_181662_b(x + d10, y + bottomOffset, z + d11).func_181673_a(0, d14).func_181666_a(r, g, b, 1).func_181675_d();
-  worldRen.func_181662_b(x + d10, y + topOffset, z + d11).func_181673_a(0, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
-  worldRen.func_181662_b(x + d8, y + topOffset, z + d9).func_181673_a(1, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
-  worldRen.func_181662_b(x + d8, y + bottomOffset, z + d9).func_181673_a(1, d14).func_181666_a(r, g, b, 1).func_181675_d();
-  worldRen.func_181662_b(x + d4, y + bottomOffset, z + d5).func_181673_a(0, d14).func_181666_a(r, g, b, 1).func_181675_d();
-  worldRen.func_181662_b(x + d4, y + topOffset, z + d5).func_181673_a(0, d15).func_181666_a(r, g, b, 1 * a).func_181675_d();
-  tess.func_78381_a();
-  GlStateManager2.disableCull();
-  const d12 = d1 - 1;
-  const d13 = height + d12;
-  worldRen.func_181668_a(7, DefaultVertexFormats.field_181709_i);
-  const w = 0.3 * s;
-  worldRen.func_181662_b(x - w, y + topOffset, z - w).func_181673_a(1, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
-  worldRen.func_181662_b(x - w, y + bottomOffset, z - w).func_181673_a(1, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
-  worldRen.func_181662_b(x + w, y + bottomOffset, z - w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
-  worldRen.func_181662_b(x + w, y + topOffset, z - w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
-  worldRen.func_181662_b(x + w, y + topOffset, z + w).func_181673_a(1, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
-  worldRen.func_181662_b(x + w, y + bottomOffset, z + w).func_181673_a(1, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
-  worldRen.func_181662_b(x - w, y + bottomOffset, z + w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
-  worldRen.func_181662_b(x - w, y + topOffset, z + w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
-  worldRen.func_181662_b(x + w, y + topOffset, z - w).func_181673_a(1, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
-  worldRen.func_181662_b(x + w, y + bottomOffset, z - w).func_181673_a(1, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
-  worldRen.func_181662_b(x + w, y + bottomOffset, z + w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
-  worldRen.func_181662_b(x + w, y + topOffset, z + w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
-  worldRen.func_181662_b(x - w, y + topOffset, z + w).func_181673_a(1, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
-  worldRen.func_181662_b(x - w, y + bottomOffset, z + w).func_181673_a(1, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
-  worldRen.func_181662_b(x - w, y + bottomOffset, z - w).func_181673_a(0, d12).func_181666_a(r, g, b, 0.25).func_181675_d();
-  worldRen.func_181662_b(x - w, y + topOffset, z - w).func_181673_a(0, d13).func_181666_a(r, g, b, 0.25 * a).func_181675_d();
-  tess.func_78381_a();
-  GlStateManager2.enableTexture2D();
-  if (esp) {
-    GlStateManager2.enableDepth();
-    GlStateManager2.depthMask(true);
-  }
-
-  GlStateManager2.popMatrix();
 }
 
 /**

@@ -1,11 +1,11 @@
 import settings from '../../settings';
-import { renderOutline, drawArrow3DPos, renderTracer } from '../../util/draw';
+import { drawArrow3DPos } from '../../util/draw';
 import reg from '../../util/registerer';
 import { StateProp, StateVar } from '../../util/state';
 import { _setTimeout } from '../../util/timers';
-import { getBlockPos } from '../../util/mc';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
 import { run } from '../../util/threading';
+import { renderBoxOutline, renderTracer } from '../../../Apelles/index';
 
 const stateFindLivid = new StateProp(stateFloor).equalsmult('F5', 'M5').and(settings._dungeonBoxLivid).and(stateIsInBoss);
 const stateLivid = new StateVar();
@@ -58,8 +58,8 @@ const tickReg = reg('tick', () => {
 }).setEnabled(stateFindLivid);
 const rendWrldReg = reg('renderWorld', () => {
   const livid = stateLivid.get();
-  renderOutline(livid.getRenderX(), livid.getRenderY(), livid.getRenderZ(), 1, 2, settings.dungeonBoxLividColor, settings.dungeonBoxLividEsp, true, 5);
-  if (settings.preferUseTracer) renderTracer(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ(), false);
+  renderBoxOutline(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY(), livid.getRenderZ(), 1, 2, { phase: settings.dungeonBoxLividEsp, lw: 5 });
+  if (settings.preferUseTracer) renderTracer(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ(), { lw: 3 });
 }).setEnabled(stateFindLivid.and(stateLivid));
 const rendOverReg = reg('renderOverlay', () => {
   const livid = stateLivid.get();

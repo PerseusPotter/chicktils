@@ -1,11 +1,11 @@
 import settings from '../../settings';
-import { renderOutline, renderFilledBox } from '../../util/draw';
 import reg from '../../util/registerer';
 import { cross, lerp, normalize, rotate } from '../../util/math';
 import Grid from '../../util/grid';
 import { fromVec3, getItemId, toVec3 } from '../../util/mc';
 import { getPlayers, isMob, registerTrackHeldItem, registerTrackPlayers } from '../dungeon.js';
 import { run, unrun } from '../../util/threading';
+import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
 
 let allMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
@@ -124,8 +124,8 @@ const renderWorldReg = reg('renderWorld', partial => {
     const z = lerp(e.field_70166_s, e.field_70161_v, partial);
     const w = e.field_70130_N + 0.2;
     const h = e.field_70131_O + 0.2;
-    renderOutline(x, y, z, w, h, settings.dungeonBoxIceSprayedOutlineColor, settings.dungeonBoxIceSprayedEsp, true, 5);
-    renderFilledBox(x, y, z, w, h, settings.dungeonBoxIceSprayedFillColor, settings.dungeonBoxIceSprayedEsp);
+    renderBoxOutline(settings.dungeonBoxIceSprayedOutlineColor, x, y, z, w, h, { phase: settings.dungeonBoxIceSprayedEsp, lw: 5 });
+    renderBoxFilled(settings.dungeonBoxIceSprayedFillColor, x, y, z, w, h, { phase: settings.dungeonBoxIceSprayedEsp });
   });
 }).setEnabled(settings._dungeonBoxIceSprayed);
 

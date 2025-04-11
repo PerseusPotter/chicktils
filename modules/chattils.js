@@ -1,5 +1,5 @@
 import settings from '../settings';
-import { renderBeaconBeam, renderOutline, renderString, renderWaypoint } from '../util/draw';
+import { renderString, renderWaypoint } from '../util/draw';
 import { execCmd, getPlayerName } from '../util/format';
 import { getLeader, getMembers, isInParty, isLeader, listen, unlisten } from '../util/party';
 import { log, logMessage } from '../util/log';
@@ -11,6 +11,7 @@ import { getImage } from '../util/clipboard';
 import { _setTimeout } from '../util/timers';
 import { deleteMessages } from '../util/helper';
 import { setAccessible } from '../util/polyfill';
+import { renderBeacon, renderBoxOutline } from '../../Apelles/index';
 
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
@@ -22,9 +23,9 @@ const removeOldestCmd = reg('command', () => coords.shift()).setName('ctsremoveo
 const worldRenderReg = reg('renderWorld', () => {
   if (settings.chatTilsWaypointType !== 'None') coords.forEach(v => {
     if (settings.chatTilsWaypointType === 'Box') renderWaypoint(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
-    else renderOutline(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
+    else renderBoxOutline(settings.chatTilsWaypointColor, v.x, v.y, v.z, 1, 1, { phase: true, centered: false });
   });
-  if (settings.chatTilsWaypointBeacon) coords.forEach(v => renderBeaconBeam(v.x, v.y + 1, v.z, settings.chatTilsWaypointColor, settings.useScuffedBeacon, true, false));
+  if (settings.chatTilsWaypointBeacon) coords.forEach(v => renderBeacon(settings.chatTilsWaypointColor, v.x, v.y + 1, v.z, { phase: true, centered: false }));
   if (settings.chatTilsWaypointName) coords.forEach(v => renderString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(settings.chatTilsWaypointColor)*/));
 });
 let waypointReloadNum = 0;

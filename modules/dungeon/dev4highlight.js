@@ -3,7 +3,7 @@ import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
 import { toArray } from '../../util/math';
-import { renderFilledBox } from '../../util/draw';
+import { renderBoxFilled } from '../../../Apelles/index';
 
 const stateEnable = new StateProp(stateFloor).equalsmult('F7', 'M7').and(stateIsInBoss).and(settings._dungeonDev4HighlightBlock);
 
@@ -21,11 +21,11 @@ const blockChangeReg = reg('blockChange', (pos, bs) => {
 }).setEnabled(stateEnable);
 const renderReg = reg('renderWorld', () => {
   if (emBlockPos === resetPos) return;
-  renderFilledBox(
+  renderBoxFilled(
+    settings.dungeonDev4HighlightBlockColor,
     emBlockPos[0] - 0.005, emBlockPos[1] - 0.005, emBlockPos[2] - 0.005,
     1.01, 1.01,
-    settings.dungeonDev4HighlightBlockColor, settings.dungeonDev4HighlightBlockEsp,
-    false
+    { phase: settings.dungeonDev4HighlightBlockEsp, centered: false }
   );
 }).setEnabled(stateEnable);
 
