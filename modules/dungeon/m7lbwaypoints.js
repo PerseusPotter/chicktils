@@ -8,11 +8,11 @@ import { stateFloor, stateIsInBoss } from '../dungeon.js';
 const stateM7LBWaypoints = new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonM7LBWaypoints);
 
 const lbs = [
-  [27, 55, 0xFF0000FF],
-  [58, 125, 0x800080FF],
-  [85, 58, 0xFF8000FF],
+  [27, 56, 0xFF0000FF],
+  [56, 124, 0x800080FF],
+  [82, 56, 0xFF8000FF],
   [82, 96, 0x0000FFFF],
-  [29, 92, 0x00FF00FF]
+  [27, 92, 0x00FF00FF]
 ];
 let nearest;
 const tickReg = reg('tick', () => {
