@@ -56,6 +56,7 @@ export function start() {
   termOpenReg.register();
 }
 export function reset() {
+  if (origGuiSize.get() !== -1) Client.settings.video.setGuiScale(origGuiSize.get());
   tickReg.unregister();
   termOpenReg.unregister();
 }
