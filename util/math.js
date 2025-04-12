@@ -165,6 +165,25 @@ export function cross(pos1, pos2) {
   };
 }
 
+/**
+ *
+ * @param {{ x: number, y: number, z: number }} pos1
+ * @param {{ x: number, y: number, z: number }} pos2
+ * @returns {number}
+ */
+export function dot(pos1, pos2) {
+  return pos1.x * pos2.x + pos1.y * pos2.y + pos1.z * pos2.z;
+}
+
+/**
+ *
+ * @param {{ x: number, y: number, z: number }} vec
+ * @returns {{ x: number, y: number, z: number }}
+ */
+export function negate(vec) {
+  return { x: -vec.x, y: -vec.y, z: -vec.z };
+}
+
 // why is rhino so shit
 // normalize({ x, y, z }, newLength = 1)
 // normalize({ ... });
