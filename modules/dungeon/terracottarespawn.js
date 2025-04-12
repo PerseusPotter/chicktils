@@ -3,12 +3,13 @@ import settings from '../../settings';
 import { getPartialServerTick, renderString } from '../../util/draw';
 import { colorForNumber } from '../../util/format';
 import { getBlockId } from '../../util/mc';
+import { Deque } from '../../util/polyfill';
 import reg from '../../util/registerer';
 import { StateProp, StateVar } from '../../util/state';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
 
-/** @type {number[][]} */
-let deathPos = [];
+/** @type {Deque<number[]>} */
+const deathPos = new Deque();
 const stateMaxTicks = new StateProp(stateFloor).customUnary(f => f === 'F6' ? 300 : 240);
 const stateTerraPhase = new StateVar(false);
 const stateTerraRespawn = new StateProp(stateFloor).equalsmult('F6', 'M6').and(settings._dungeonTerracottaRespawn).and(stateIsInBoss).and(stateTerraPhase);
@@ -22,13 +23,11 @@ const blockUpdateReg = reg('blockChange', (pos, bs) => {
 }).setEnabled(stateTerraRespawn);
 const stickReg = reg('serverTick2', () => {
   if (deathPos.length === 0) return;
-  let m = 0;
-  let i = 0;
-  while (i < deathPos.length) {
-    if (--deathPos[i][0] === 0) m++;
-    i++;
+  const iter = deathPos.iter();
+  while (!iter.done()) {
+    if (--iter.value()[0] === 0) iter.remove();
+    iter.next();
   }
-  if (m > 0) deathPos = deathPos.slice(m);
 }).setEnabled(stateTerraRespawn);
 const renderReg = reg('renderWorld', () => {
   const doBox = settings.dungeonTerracottaRespawnType === 'Box' || settings.dungeonTerracottaRespawnType === 'Both';
@@ -71,7 +70,7 @@ export function start() {
   terraStopReg.register();
 }
 export function reset() {
-  deathPos = [];
+  deathPos.clear();
 
   blockUpdateReg.unregister();
   stickReg.unregister();
