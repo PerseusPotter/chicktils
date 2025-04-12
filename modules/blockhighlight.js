@@ -1,8 +1,6 @@
-import { DefaultVertexFormats, getRenderX, getRenderY, getRenderZ } from '../../Apelles/index';
+import { getRenderX, getRenderY, getRenderZ, renderBoxFilled, renderBoxOutline } from '../../Apelles/index';
 import settings from '../settings';
 import createTextGui from '../util/customtextgui';
-import { tess, worldRen } from '../util/draw';
-import glStateManager from '../util/glStateManager';
 import { fastDistance } from '../util/math';
 import { getEyeHeight } from '../util/mc';
 import reg from '../util/registerer';
@@ -188,97 +186,32 @@ function tryHighlightBlock(blockPos, cw, cf, lw, isEther) {
 
   block.func_180654_a(w, blockPos);
   const aabb = block.func_180646_a(w, blockPos)
-    .func_72314_b(0.002, 0.002, 0.002)
+    .func_72314_b(0.01, 0.01, 0.01)
     .func_72317_d(-getRenderX(), -getRenderY(), -getRenderZ());
   renderBlockHighlight(aabb, cw, cf, lw, isEther);
 }
 
 function renderBlockHighlight(aabb, cw, cf, lw, isEther) {
-  glStateManager.enableBlend();
-  glStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-  GL11.glLineWidth(lw);
-  glStateManager.disableTexture2D();
-  glStateManager.depthMask(false);
-
-  const x = aabb.field_72340_a;
-  const y = aabb.field_72338_b;
-  const z = aabb.field_72339_c;
+  const x = aabb.field_72340_a + getRenderX();
+  const y = aabb.field_72338_b + getRenderY();
+  const z = aabb.field_72339_c + getRenderZ();
   const wx = aabb.field_72336_d - aabb.field_72340_a;
   const h = aabb.field_72337_e - aabb.field_72338_b;
   const wz = aabb.field_72334_f - aabb.field_72339_c;
 
-  let r = ((cf >> 24) & 0xFF) / 255;
-  let g = ((cf >> 16) & 0xFF) / 255;
-  let b = ((cf >> 8) & 0xFF) / 255;
-  let a = ((cf >> 0) & 0xFF) / 255;
+  renderBoxFilled(
+    cf,
+    x, y, z,
+    wx, h,
+    { centered: false, wz }
+  );
 
-  if (a > 0) {
-    glStateManager.color(r, g, b, a);
-
-    worldRen.func_181668_a(5, DefaultVertexFormats.field_181705_e);
-    worldRen.func_181662_b(x, y, z).func_181675_d();
-    worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-    worldRen.func_181662_b(x, y, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
-    worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
-    worldRen.func_181662_b(x, y + h, z).func_181675_d();
-    worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
-    worldRen.func_181662_b(x, y, z).func_181675_d();
-    worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-    tess.func_78381_a();
-    worldRen.func_181668_a(7, DefaultVertexFormats.field_181705_e);
-    worldRen.func_181662_b(x, y, z).func_181675_d();
-    worldRen.func_181662_b(x, y, z + wz).func_181675_d();
-    worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
-    worldRen.func_181662_b(x, y + h, z).func_181675_d();
-    worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-    worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
-    tess.func_78381_a();
-  }
-
-  r = ((cw >> 24) & 0xFF) / 255;
-  g = ((cw >> 16) & 0xFF) / 255;
-  b = ((cw >> 8) & 0xFF) / 255;
-  a = ((cw >> 0) & 0xFF) / 255;
-
-  if (a > 0) {
-    glStateManager.color(r, g, b, a);
-    GL11.glEnable(GL11.GL_LINE_SMOOTH);
-    if (isEther) glStateManager.disableDepth();
-
-    worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
-    worldRen.func_181662_b(x, y, z).func_181675_d();
-    worldRen.func_181662_b(x, y, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-    tess.func_78381_a();
-    worldRen.func_181668_a(2, DefaultVertexFormats.field_181705_e);
-    worldRen.func_181662_b(x, y + h, z).func_181675_d();
-    worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
-    tess.func_78381_a();
-    worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
-    worldRen.func_181662_b(x, y, z).func_181675_d();
-    worldRen.func_181662_b(x, y + h, z).func_181675_d();
-    worldRen.func_181662_b(x, y, z + wz).func_181675_d();
-    worldRen.func_181662_b(x, y + h, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y + h, z + wz).func_181675_d();
-    worldRen.func_181662_b(x + wx, y, z).func_181675_d();
-    worldRen.func_181662_b(x + wx, y + h, z).func_181675_d();
-    tess.func_78381_a();
-
-    GL11.glDisable(GL11.GL_LINE_SMOOTH);
-    if (isEther) glStateManager.enableDepth();
-  }
-
-  glStateManager.depthMask(true);
-  glStateManager.enableTexture2D();
-  glStateManager.disableBlend();
+  renderBoxOutline(
+    cw,
+    x, y, z,
+    wx, h,
+    { centered: false, wz, lw, phase: isEther, smooth: true }
+  );
 }
 
 export function init() { }
