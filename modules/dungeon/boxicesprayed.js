@@ -1,11 +1,12 @@
 import settings from '../../settings';
 import reg from '../../util/registerer';
-import { cross, lerp, normalize, rotate } from '../../util/math';
+import { dot, lerp, negate, rotate } from '../../util/math';
 import Grid from '../../util/grid';
-import { fromVec3, getItemId, toVec3 } from '../../util/mc';
+import { fromVec3, getEyeHeight, getItemId } from '../../util/mc';
 import { getPlayers, isMob, registerTrackHeldItem, registerTrackPlayers } from '../dungeon.js';
 import { run, unrun } from '../../util/threading';
 import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
+import { setAccessible } from '../../util/polyfill';
 
 let allMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
@@ -18,7 +19,7 @@ const EntityWither = Java.type('net.minecraft.entity.boss.EntityWither');
 const entSpawnReg = reg('spawnEntity', e => {
   if (isMob(e)) {
     allMobs.push(e);
-    allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
+    allMobsBucket.add(e.field_70118_ct / 32, e.field_70116_cv / 32, e);
   } else if (e instanceof EntityItem) itemCand.push(e);
 }).setEnabled(settings._dungeonBoxIceSprayed);
 const step2Reg = reg('step', () => {
@@ -30,80 +31,86 @@ const step2Reg = reg('step', () => {
     if (e.field_70128_L) return false;
     if (e instanceof EntityOtherPlayerMP && e.func_110124_au().version() === 4) return false;
     if (e instanceof EntityWither && e.func_110138_aP() === 300) return false;
-    allMobsBucket.add(e.field_70165_t, e.field_70161_v, e);
+    allMobsBucket.add(e.field_70118_ct / 32, e.field_70116_cv / 32, e);
     return true;
   });
   allMobsBucket.unfreeze();
 }).setFps(2).setOffset(0).setEnabled(settings._dungeonBoxIceSprayed);
+const lastReportedPosX = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175172_bI'));
+const lastReportedPosY = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175166_bJ'));
+const lastReportedPosZ = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175167_bK'));
+
+const far = 8;
+const near = 0.01;
+const fov = 90 * Math.PI / 180;
+const aspect = 1;
 const serverTickReg = reg('serverTick2', () => {
   frozenMobs = frozenMobs.filter(v => --v[1] > 0);
   run(() => {
     const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');
     itemCand = [];
     if (!hasIce) return;
+
     const icers = getPlayers().filter(({ items }) => items.some(v => v.id === 'ICE_SPRAY_WAND' || v.id === 'STARRED_ICE_SPRAY_WAND'));
-    const wS = 1;
-    const l = 8;
-    const ls = l * l;
-    const wE = 3.4;
-    const n = 5;
+    if (icers.length === 0) return;
+
     const frozenBuff = [];
-    icers.forEach(({ e: p }) => {
-      const ent = (p === Player ? p.getPlayer() : p.entity);
+    icers.forEach(({ e, me: ent }) => {
       if (!ent) return;
-      const look = ent.func_70040_Z();
-      const h = rotate(look.field_72450_a, 0, look.field_72449_c, Math.PI / 2, 0, 0);
-      // const v = rotate(look.field_72450_a, look.field_72448_b, look.field_72449_c, 0, Math.PI / 2, 0);
-      const v = cross(fromVec3(look), h);
-      const vs = [];
-      const ve = [];
-      const hso = toVec3(normalize(h, wS / n));
-      const vso = toVec3(normalize(v, wS / n));
-      const heo = toVec3(normalize(h, wE / n));
-      const veo = toVec3(normalize(v, wE / n));
-      vs.push(ent.func_174824_e(1));
-      ve.push(toVec3(normalize(fromVec3(look), l)).func_178787_e(vs[0]));
-      for (let i = 0; i < n; i++) {
-        vs.push(vs[i].func_178787_e(hso));
-        ve.push(ve[i].func_178787_e(heo));
-      }
-      for (let i = 0; i < n; i++) {
-        vs.push(vs[i === 0 ? 0 : vs.length - 1].func_178788_d(hso));
-        ve.push(ve[i === 0 ? 0 : ve.length - 1].func_178788_d(heo));
-      }
-      for (let x = 0; x <= n; x++) {
-        for (let y = 0; y < n; y++) {
-          vs.push(vs[y === 0 ? x : vs.length - 1].func_178787_e(vso));
-          ve.push(ve[y === 0 ? x : ve.length - 1].func_178787_e(veo));
-        }
-      }
-      for (let x = 0; x <= n; x++) {
-        for (let y = 0; y < n; y++) {
-          vs.push(vs[y === 0 ? x : vs.length - 1].func_178788_d(vso));
-          ve.push(ve[y === 0 ? x : ve.length - 1].func_178788_d(veo));
-        }
-      }
-      for (let x = 0; x < n; x++) {
-        for (let y = 0; y < n; y++) {
-          vs.push(vs[y === 0 ? x + n + 1 : vs.length - 1].func_178787_e(vso));
-          ve.push(ve[y === 0 ? x + n + 1 : ve.length - 1].func_178787_e(veo));
-        }
-      }
-      for (let x = 0; x < n; x++) {
-        for (let y = 0; y < n; y++) {
-          vs.push(vs[y === 0 ? x + n + 1 : vs.length - 1].func_178788_d(vso));
-          ve.push(ve[y === 0 ? x + n + 1 : ve.length - 1].func_178788_d(veo));
-        }
-      }
-      const pAABB = ent.func_174813_aQ().func_72314_b(0.2, 0, 0.2);
-      allMobsBucket.get(p.getX(), p.getZ()).forEach(e => {
+
+      const pos = {
+        x: e === Player ? lastReportedPosX.get(ent) : ent.field_70118_ct / 32,
+        y: (e === Player ? lastReportedPosY.get(ent) : ent.field_70117_cu / 32) + getEyeHeight(ent),
+        z: e === Player ? lastReportedPosZ.get(ent) : ent.field_70116_cv / 32
+      };
+      const look = fromVec3(ent.func_70040_Z());
+      const plane = (n, p) => [n.x, n.y, n.z, -dot(n, p)];
+      const planes = [
+        // left
+        plane(rotate(look.x, look.y, look.z, (+fov - Math.PI) / 2, 0, 0), pos),
+        // right
+        plane(rotate(look.x, look.y, look.z, (-fov + Math.PI) / 2, 0, 0), pos),
+        // bottom
+        plane(rotate(look.x, look.y, look.z, 0, (+fov * aspect - Math.PI) / 2, 0), pos),
+        // top
+        plane(rotate(look.x, look.y, look.z, 0, (-fov * aspect + Math.PI) / 2, 0), pos),
+        // near
+        plane(look, { x: pos.x + look.x * near, y: pos.y + look.y * near, z: pos.z + look.z * near }),
+        // far
+        plane(negate(look), { x: pos.x + look.x * far, y: pos.y + look.y * far, z: pos.z + look.z * far })
+      ];
+
+      allMobsBucket.get(pos.x, pos.z).forEach(e => {
+        const epos = {
+          x: e.field_70118_ct / 32,
+          y: e.field_70117_cu / 32,
+          z: e.field_70116_cv / 32
+        };
+        const w = e.field_70130_N;
+        const h = e.field_70131_O;
         if (
-          (ent.field_70165_t - e.field_70165_t) ** 2 +
-          (ent.field_70163_u - e.field_70163_u) ** 2 +
-          (ent.field_70161_v - e.field_70161_v) ** 2 > ls
+          (epos.x - pos.x) ** 2 +
+          (epos.y - pos.y) ** 2 +
+          (epos.z - pos.z) ** 2 > (far + w) ** 2
         ) return;
-        const aabb = e.func_174813_aQ();
-        if (aabb.func_72326_a(pAABB) || vs.some((v, i) => aabb.func_72327_a(v, ve[i]))) frozenBuff.push([e, 5 * 20]);
+
+        const x1 = epos.x - w / 2;
+        const y1 = epos.y;
+        const z1 = epos.z - w / 2;
+        const x2 = epos.x + w / 2;
+        const y2 = epos.y + h;
+        const z2 = epos.z + w / 2;
+        const points = [
+          [x1, y1, z1],
+          [x1, y1, z2],
+          [x1, y2, z1],
+          [x1, y2, z2],
+          [x2, y1, z1],
+          [x2, y1, z2],
+          [x2, y2, z1],
+          [x2, y2, z2]
+        ];
+        if (points.some(v => planes.every(p => p[0] * v[0] + p[1] * v[1] + p[2] * v[2] + p[3] >= 0))) frozenBuff.push([e, 5 * 20]);
       });
     });
     if (frozenBuff.length) unrun(() => {
