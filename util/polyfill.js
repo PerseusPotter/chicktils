@@ -190,6 +190,7 @@ export class Deque {
    * @type {DQNode<T>?}
    */
   $tail = null;
+  /** @private */
   $length = 0;
 
   /**
@@ -221,6 +222,11 @@ export class Deque {
     this.$length = 0;
   }
 
+  /**
+   * @private
+   * @param {number} i
+   * @returns {DQNode<T>?}
+   */
   $get(i) {
     if (i < 0) i += this.$length;
     if (!Number.isInteger(i) || i < 0 || i >= this.$length) return undefined;
@@ -235,12 +241,30 @@ export class Deque {
     return c;
   }
 
+  /**
+   * @private
+   * @param {DQNode<T>} n
+   * @returns {boolean}
+   */
   $create(n) {
     if (this.$head) return false;
     this.$head = n;
     this.$tail = n;
     this.$length = 1;
     return true;
+  }
+
+  /**
+   * @private
+   * @param {DQNode<T>} n
+   * @returns {DQNode<T>}
+   */
+  $remove(n) {
+    n.remove();
+    if (n === this.$head) this.$head = n.r;
+    if (n === this.$tail) this.$tail = n.l;
+    this.$length--;
+    return n;
   }
 
   /**
@@ -378,9 +402,7 @@ export class Deque {
     let c = this.$head;
     while (c) {
       if (c.v === o) {
-        c.remove();
-        if (c === this.$head) this.$head = c.r;
-        if (c === this.$tail) this.$tail = c.l;
+        this.$remove(c);
         return true;
       }
       c = c.r;
@@ -393,11 +415,7 @@ export class Deque {
    */
   removeFirst() {
     if (!this.$head) return;
-    this.$head.remove();
-    this.$length--;
-    const v = this.$head.v;
-    this.$head = this.$head.r;
-    return v;
+    return this.$remove(this.$head).v;
   }
 
   /**
@@ -413,11 +431,7 @@ export class Deque {
    */
   removeLast() {
     if (!this.$tail) return;
-    this.$tail.remove();
-    this.$length--;
-    const v = this.$tail.v;
-    this.$tail = this.$tail.l;
-    return v;
+    return this.$remove(this.$tail).v;
   }
 
   /**
@@ -428,9 +442,7 @@ export class Deque {
     let c = this.$tail;
     while (c) {
       if (c.v === o) {
-        c.remove();
-        if (c === this.$head) this.$head = c.r;
-        if (c === this.$tail) this.$tail = c.l;
+        this.$remove(c);
         return true;
       }
       c = c.l;
@@ -772,10 +784,7 @@ export class Deque {
     let c = p;
     while (c && --n >= 0) {
       r.push(c.v);
-      c.remove();
-      if (c === this.$head) this.$head = c.r;
-      if (c === this.$tail) this.$tail = c.l;
-      this.$length--;
+      this.$remove(c);
       c = c.r;
     }
     if (i === 0) this.unshift.apply(this, a);
@@ -860,12 +869,25 @@ export class Deque {
   }
 
   /**
+   * @template T
+   * @typedef Iterator
+   * @property {() => T} value
+   * @property {() => boolean} done
+   * @property {() => Iterator<T>} next
+   * @property {() => Iterator<T>} prev
+   * @property {() => void} remove
+   */
+
+  /**
    * @param {number?} i
+   * @returns {Iterator<T>}
    */
   iter(i = 0) {
     let c = this.$get(i);
+    const that = this;
     const o = {
       value() { return c.v; },
+      done() { return !c.r; },
       next() {
         c = c.r;
         return o;
@@ -873,6 +895,9 @@ export class Deque {
       prev() {
         c = c.l;
         return o;
+      },
+      remove() {
+        that.$remove(c);
       }
     };
     return o;
