@@ -6,7 +6,7 @@ import { getPlayers, registerTrackPlayers } from '../dungeon.js';
 const renderReg = reg('renderWorld', () => {
   getPlayers().forEach(p => {
     if (p.e === Player) return;
-    if (p.e.isDead()) return;
+    if (!p.e || p.e.isDead()) return;
     const col = settings[`dungeonBoxTeammates${p['class'].slice(0, 4)}Color`] ?? settings.boxAllEntitiesColor;
     renderBoxOutline(
       col,
