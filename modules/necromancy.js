@@ -21,7 +21,7 @@ const mobDieReg = reg('entityDeath', ent => {
   let name = ent.getName();
   for (let i = ent.entity.func_145782_y() + 1, k = 0; k < 3; i++, k++) {
     let tag = World.getWorld().func_73045_a(i);
-    if (tag instanceof EntityArmorStand) {
+    if (tag instanceof EntityArmorStand && tag.func_145818_k_()) {
       name = tag.func_70005_c_();
       break;
     }
