@@ -227,6 +227,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     GlStateManager2.depthMask(false);
     GlStateManager2.enableBlend();
     GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
+    GlStateManager2.color(1, 1, 1, 1);
     updateLocCache();
     if (!skipDraw) img?.draw(rx, ry, rw, rh);
     skipDraw = false;
