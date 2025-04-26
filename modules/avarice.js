@@ -130,7 +130,7 @@ const arachneTracerReg = reg('renderWorld', partial => {
     lerp(arachneEnt.field_70169_q, arachneEnt.field_70165_t, partial),
     lerp(arachneEnt.field_70167_r, arachneEnt.field_70163_u, partial) + 0.5,
     lerp(arachneEnt.field_70166_s, arachneEnt.field_70161_v, partial),
-    { lw: 3 }
+    { lw: 3, phase: true }
   );
 }).setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(settings._preferUseTracer));
 const arachnePointReg = reg('renderOverlay', () => {

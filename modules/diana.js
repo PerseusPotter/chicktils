@@ -545,7 +545,7 @@ const renderArrowOvReg = reg('renderOverlay', () => {
   if (targetLoc) drawArrow3DPos(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], false);
 }).setEnabled(new StateProp(settings._preferUseTracer).not().and(settings._dianaArrowToBurrow));
 const renderArrowWrldReg = reg('renderWorld', () => {
-  if (targetLoc) renderTracer(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], { lw: 3 });
+  if (targetLoc) renderTracer(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], { lw: 3, phase: true });
 }).setEnabled(new StateProp(settings._preferUseTracer).and(settings._dianaArrowToBurrow));
 
 const startBurrowReg = reg('chat', () => {

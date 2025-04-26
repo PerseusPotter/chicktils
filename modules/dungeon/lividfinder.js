@@ -59,7 +59,7 @@ const tickReg = reg('tick', () => {
 const rendWrldReg = reg('renderWorld', () => {
   const livid = stateLivid.get();
   renderBoxOutline(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY(), livid.getRenderZ(), 1, 2, { phase: settings.dungeonBoxLividEsp, lw: 5 });
-  if (settings.preferUseTracer) renderTracer(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ(), { lw: 3 });
+  if (settings.preferUseTracer) renderTracer(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ(), { lw: 3, phase: true });
 }).setEnabled(stateFindLivid.and(stateLivid));
 const rendOverReg = reg('renderOverlay', () => {
   const livid = stateLivid.get();
