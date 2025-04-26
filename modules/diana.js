@@ -10,7 +10,6 @@ import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
 import { unrun } from '../util/threading';
 import { renderBeacon, renderBoxOutline, renderLine, renderTracer } from '../../Apelles/index';
-import { Deque } from '../util/polyfill';
 
 const warps = [
   {
@@ -124,7 +123,6 @@ const burrowSpawnReg = reg('packetReceived', pack => {
     }
   });
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._dianaScanBurrows);
-let lastDigId = '';
 const burrowDigReg = reg('packetSent', pack => {
   let bp;
   if (pack.func_149574_g) bp = pack.func_179724_a();
@@ -134,9 +132,6 @@ const burrowDigReg = reg('packetSent', pack => {
   const { x, y, z } = getBlockPos(bp);
   if (x === -1 && y === -1 && z === -1) return;
 
-  const id = `${x},${y},${z}`;
-  if (id !== lastDigId) prevStand = null;
-  lastDigId = id;
   unrun(() => {
     const burrowI = burrows.findIndex(v => v[0] === x + 0.5 && v[1] === y && v[2] === z + 0.5);
     if (burrowI >= 0) {
@@ -188,17 +183,11 @@ let spadeUseTime = 0;
 let prevSounds = [];
 /** @type {{ t: number, x: number, y: number, z: number }[]} */
 let prevParticles = [];
-/** @type {Map<'Average' | 'Spline' | 'MLAT' | 'Arrow' | 'Bezier', [number, number, number]?>} */
+/** @type {Map<'Average' | 'Spline' | 'MLAT' | 'Bezier', [number, number, number]?>} */
 let guessPos = new Map();
 /** @type {[(t: number) => number, (t: number) => number, (t: number) => number]?} */
 let splinePoly;
 let splinePolyPos = [];
-/** @type {[[number, number], [number, number], number]?} */
-let arrowVec;
-/** @type {Deque<string>} */
-const recentStands = new Deque();
-/** @type {string?} */
-let prevStand;
 let prevGuessL = 0;
 const RESET_THRESH = 58;
 function resetGuess() {
@@ -249,6 +238,9 @@ function updateGuesses() {
     toPolynomial(splineCoeff[2])
   ];
 
+  const { b: pitchB, a: pitchA } = linReg(pitches.map((v, i) => [i, v.p]));
+  const distanceBackup = Math.E / pitchB;
+
   // from https://github.com/hannibal002/SkyHanni/blob/08e5cf831e3e22401d1de830ee522aadcff6634d/src/main/java/at/hannibal2/skyhanni/utils/PolynomialFitter.kt
   const spline3X = ndRegression(3, particles.map((v, i) => [i, v.x]));
   const spline3Y = ndRegression(3, particles.map((v, i) => [i, v.y]));
@@ -268,9 +260,7 @@ function updateGuesses() {
     )
   ) + 25);
   const weightT = 3 * weight / Math.hypot(dx0, dy0, dz0);
-  const distance = weightT * 1.9;
-
-  const { b: pitchB, a: pitchA } = linReg(pitches.map((v, i) => [i, v.p]));
+  const distance = dist(weightT * 1.9, distanceBackup) / distanceBackup > 0.3 ? distanceBackup : weightT * 1.9;
   // const distance =
   //   settings.dianaGuessDistanceEstimator === 'Slope' ?
   //     Math.E / pitchB :
@@ -322,26 +312,6 @@ function updateGuesses() {
       guesses.get('Spline').slice(),
       [[-500, 500], [-500, 500], [-500, 500]]
     ));
-  }
-
-  if (arrowVec && prevStand) {
-    // const AVERAGE_BURROW_Y = 75;
-    const BURROW_Y = guesses.get('Spline')[1];
-    const xl = arrowVec[0][0];
-    const zl = arrowVec[0][1];
-    const xc = particles[0].x;
-    const yc = particles[0].y;
-    const zc = particles[0].z;
-    const cx = xl - xc;
-    const cz = zl - zc;
-    const dx = arrowVec[1][0];
-    const dz = arrowVec[1][1];
-    const A = dx * dx + dz * dz;
-    const B = 2 * (cx * dx + cz * dz);
-    const D2 = distance * distance - (yc - BURROW_Y) ** 2;
-    const C = cx * cx + cz * cz - D2;
-    const t = (-B + Math.sign(A) * Math.sqrt(B * B - 4 * A * C)) / 2 / A;
-    guesses.set('Arrow', [xl + t * dx, BURROW_Y, zl + t * dz]);
   }
 
   {
@@ -441,43 +411,6 @@ const spawnPartReg = reg('packetReceived', pack => {
   });
   updateGuesses();
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._dianaGuessFromParticles);
-const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
-const armorStandReg = reg('packetReceived', (pack, doDupe) => {
-  if (pack.func_149388_e() !== 0) return;
-  const ent = World.getWorld().func_73045_a(pack.func_149389_d());
-  if (!ent) {
-    if (doDupe) Client.scheduleTask(2, () => armorStandReg.forceTrigger(pack, Number.isInteger(doDupe) ? doDupe - 1 : 10));
-    return;
-  }
-  if (!(ent instanceof EntityArmorStand)) return;
-  if (getItemId(pack.func_149390_c()) !== 'minecraft:arrow') return;
-
-  const yaw = ent.field_70177_z * Math.PI / 180;
-  const x = ent.field_70165_t - Math.sin(yaw + Math.PI / 2) * 0.9;
-  const y = ent.field_70163_u;
-  const z = ent.field_70161_v + Math.cos(yaw + Math.PI / 2) * 0.9;
-
-  if (!recentDugBurrows.some(v =>
-    Math.floor(x) === Math.floor(v[0]) &&
-    Math.floor(y) === v[1] &&
-    Math.floor(z) === Math.floor(v[2])
-  )) return;
-
-  const id = `${Math.floor(x)},${Math.floor(y)},${Math.floor(z)}`;
-  if (recentStands.includes(id)) return;
-  recentStands.push(id);
-  if (recentStands.length > 5) recentStands.shift();
-
-  arrowVec = [
-    [x, z],
-    [
-      -Math.sin(yaw),
-      +Math.cos(yaw)
-    ],
-    y
-  ];
-  prevStand = id;
-}).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment).setEnabled(settings._dianaGuessFromParticles);
 
 const renderGuessReg = reg('renderWorld', () => {
   if (splinePolyPos.length) renderLine(
@@ -500,22 +433,6 @@ const renderGuessReg = reg('renderWorld', () => {
       true, 1, true, true, true
     );
   });
-  if (arrowVec) renderLine(
-    settings.dianaGuessFromParticlesArrowColor,
-    [
-      [
-        arrowVec[0][0],
-        arrowVec[2],
-        arrowVec[0][1],
-      ],
-      [
-        arrowVec[0][0] + arrowVec[1][0] * 500,
-        arrowVec[2],
-        arrowVec[0][1] + arrowVec[1][1] * 500,
-      ]
-    ],
-    { phase: true, lw: 3 }
-  );
 }).setEnabled(settings._dianaGuessFromParticles);
 
 const tickReg = reg('tick', () => {
@@ -565,7 +482,6 @@ const startBurrowReg = reg('chat', () => {
   renderTargetsReg.register();
   soundPlayReg.register();
   spawnPartReg.register();
-  armorStandReg.register();
   renderGuessReg.register();
   tickReg.register();
   renderArrowOvReg.register();
@@ -580,7 +496,6 @@ const unloadReg = reg('worldUnload', () => {
   renderTargetsReg.unregister();
   soundPlayReg.unregister();
   spawnPartReg.unregister();
-  armorStandReg.unregister();
   renderGuessReg.unregister();
   tickReg.unregister();
   renderArrowOvReg.unregister();
