@@ -850,7 +850,6 @@ export const props = {
   dianaAlertFoundBurrowTime: new Property('DianaAlertFoundBurrowTime', page, ++sort, Property.Type.Integer, 500, { desc: 'in ms' }),
   dianaAlertFoundBurrowSound: new Property('DianaAlertFoundBurrowSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
   dianaGuessFromParticles: new Property('DianaGuessFromParticles', page, ++sort, Property.Type.Toggle, false, { desc: '/togglesound must be on' }),
-  dianaGuessDistanceEstimator: new Property('DianaGuessDistanceEstimator', page, ++sort, Property.Type.Option, 'Slope', { options: ['Slope', 'Intercept'], desc: 'what to use to guess distance\nSlope: of sound pitch (most accurate if you wait long)\nIntercept: uses (estimate) of the first pitch' }),
   dianaGuessRememberPrevious: new Property('DianaRememberPreviousGuesses', page, ++sort, Property.Type.Toggle, true, { desc: 'guesses only removed when nearby burrow is found i.e. DianaScanBurrows must be on\nor use /ctsremoveclosestdiana' }),
   dianaGuessFromParticlesPathColor: new Property('DianaGuessFromParticlesPathColor', page, ++sort, Property.Type.Color, 0x00FFFFFF, { desc: 'color of path of particles' }),
   dianaGuessFromParticlesArrowColor: new Property('DianaGuessFromParticlesArrowColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color of arrow from armor stand' }),
