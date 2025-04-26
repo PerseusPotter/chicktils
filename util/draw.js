@@ -246,22 +246,6 @@ function applyTint(c, a) {
 }
 
 /**
- * @param {number} color rgba
- * @param {(t: number) => [number, number, number]} func
- * @param {number} t0
- * @param {number} te
- * @param {number} segments
- * @param {number} esp (false)
- * @param {number?} lw (2)
- */
-export function renderParaCurve(color, func, t0, te, segments, esp = false, lw = 2) {
-  const rgba = normColor(color);
-  if (rgba[3] === 0) return;
-
-  renderLine(color, new Array(segments + 1).fill(0).map((_, i) => func(rescale(i, 0, segments, t0, te))), { phase: esp, lw });
-}
-
-/**
  * @param {string} text
  * @param {number} x
  * @param {number} y

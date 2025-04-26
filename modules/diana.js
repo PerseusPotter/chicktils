@@ -3,8 +3,8 @@ import data from '../data';
 import reg, { customRegs } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { drawArrow3DPos, renderParaCurve, renderString } from '../util/draw';
-import { compareFloat, convergeHalfInterval, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, toPolynomial } from '../util/math';
+import { drawArrow3DPos, renderString } from '../util/draw';
+import { compareFloat, convergeHalfInterval, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, rescale, toPolynomial } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
@@ -188,6 +188,7 @@ let prevParticles = [];
 let guessPos = new Map();
 /** @type {[(t: number) => number, (t: number) => number, (t: number) => number]?} */
 let splinePoly;
+let splinePolyPos = [];
 /** @type {[[number, number], [number, number], number]?} */
 let arrowVec;
 /** @type {string[]} */
@@ -238,7 +239,7 @@ function updateGuesses() {
     ndRegression(2, particles.map((v, i) => [i, v.y])),
     ndRegression(2, particles.map((v, i) => [i, v.z]))
   ];
-  const _splinePoly = [
+  splinePoly = [
     toPolynomial(splineCoeff[0]),
     toPolynomial(splineCoeff[1]),
     toPolynomial(splineCoeff[2])
@@ -269,8 +270,8 @@ function updateGuesses() {
   }());
   const splineIntPoly = createSplineIntersectPoly(distance);
   const splineIntTime = newtonRaphson(splineIntPoly, 1);
-  // const splineIntTime = gradientDescentRestarts(([t]) => -dist(distance, Math.hypot(_splinePoly[0](t) - splineCoeff[0][0], _splinePoly[1](t) - splineCoeff[1][0], _splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
-  guesses.set('Spline', _splinePoly.map(v => v(splineIntTime)));
+  // const splineIntTime = gradientDescentRestarts(([t]) => -dist(distance, Math.hypot(splinePoly[0](t) - splineCoeff[0][0], splinePoly[1](t) - splineCoeff[1][0], splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
+  guesses.set('Spline', splinePoly.map(v => v(splineIntTime)));
 
   {
     const poly = createPitchDistPoly(distance);
@@ -346,8 +347,17 @@ function updateGuesses() {
 
   guesses.set('Average', geoMedian(Array.from(guesses.values())));
 
+  const splinePolyPos = [];
+  for (let i = 0; i <= 60; i++) {
+    let t = rescale(i, 0, 60, 0, 20);
+    splinePolyPos.push(splinePoly.map(v => v(t)));
+  }
+  for (let i = 0; i <= 40; i++) {
+    let t = rescale(i, 0, 40, 20, 500);
+    splinePolyPos.push(splinePoly.map(v => v(t)));
+  }
   unrun(() => {
-    splinePoly = _splinePoly;
+    splinePolyPos = splinePolyPos;
     guessPos = guesses;
   });
 }
@@ -463,22 +473,11 @@ const armorStandReg = reg('packetReceived', (pack, doDupe) => {
 }).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment).setEnabled(settings._dianaGuessFromParticles);
 
 const renderGuessReg = reg('renderWorld', () => {
-  if (splinePoly) {
-    renderParaCurve(
-      settings.dianaGuessFromParticlesPathColor,
-      t => splinePoly.map(v => v(t)),
-      0, 20,
-      60,
-      true
-    );
-    renderParaCurve(
-      settings.dianaGuessFromParticlesPathColor,
-      t => splinePoly.map(v => v(t)),
-      20, 500,
-      40,
-      true
-    );
-  }
+  if (splinePolyPos.length) renderLine(
+    settings.dianaGuessFromParticlesPathColor,
+    splinePolyPos,
+    { phase: true }
+  );
   guessPos.forEach((v, k) => {
     if (!v) return;
     renderBoxOutline(
