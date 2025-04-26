@@ -244,11 +244,33 @@ function updateGuesses() {
     toPolynomial(splineCoeff[1]),
     toPolynomial(splineCoeff[2])
   ];
+
+  // from https://github.com/hannibal002/SkyHanni/blob/08e5cf831e3e22401d1de830ee522aadcff6634d/src/main/java/at/hannibal2/skyhanni/utils/PolynomialFitter.kt
+  const spline3X = ndRegression(3, particles.map((v, i) => [i, v.x]));
+  const spline3Y = ndRegression(3, particles.map((v, i) => [i, v.y]));
+  const spline3Z = ndRegression(3, particles.map((v, i) => [i, v.z]));
+  const dx0 = spline3X[1];
+  const dy0 = spline3Y[1];
+  const dz0 = spline3Z[1];
+  const xz = Math.hypot(dx0, dz0);
+
+  const weight = Math.sqrt(-24 * Math.sin(
+    convergeHalfInterval(
+      x => Math.atan2(Math.sin(x) - 0.75, Math.cos(x)),
+      -Math.atan2(dy0, xz),
+      -Math.PI / 2,
+      Math.PI / 2,
+      true
+    )
+  ) + 25);
+  const weightT = 3 * weight / Math.hypot(dx0, dy0, dz0);
+  const distance = weightT * 1.9;
+
   const { b: pitchB, a: pitchA } = linReg(pitches.map((v, i) => [i, v.p]));
-  const distance =
-    settings.dianaGuessDistanceEstimator === 'Slope' ?
-      Math.E / pitchB :
-      2836.3513351166325 * pitchA + -1395.7763277125964;
+  // const distance =
+  //   settings.dianaGuessDistanceEstimator === 'Slope' ?
+  //     Math.E / pitchB :
+  //     2836.3513351166325 * pitchA + -1395.7763277125964;
   // const dist3 = 2924.6641104450428 * pitches[0].p + -1442.1515587278568;
 
   const createSplineIntersectPoly = (function() {
@@ -319,45 +341,26 @@ function updateGuesses() {
   }
 
   {
-    // from https://github.com/hannibal002/SkyHanni/blob/08e5cf831e3e22401d1de830ee522aadcff6634d/src/main/java/at/hannibal2/skyhanni/utils/PolynomialFitter.kt
-    const spline3X = ndRegression(3, particles.map((v, i) => [i, v.x]));
-    const spline3Y = ndRegression(3, particles.map((v, i) => [i, v.y]));
-    const spline3Z = ndRegression(3, particles.map((v, i) => [i, v.z]));
-    const dx0 = spline3X[1];
-    const dy0 = spline3Y[1];
-    const dz0 = spline3Z[1];
-    const xz = Math.hypot(dx0, dz0);
-
-    const weight = Math.sqrt(-24 * Math.sin(
-      convergeHalfInterval(
-        x => Math.atan2(Math.sin(x) - 0.75, Math.cos(x)),
-        -Math.atan2(dy0, xz),
-        -Math.PI / 2,
-        Math.PI / 2,
-        true
-      )
-    ) + 25);
-    const t = 3 * weight / Math.hypot(dx0, dy0, dz0);
     guesses.set('Bezier', [
-      toPolynomial(spline3X)(t) + 0.5,
-      toPolynomial(spline3Y)(t),
-      toPolynomial(spline3Z)(t) + 0.5
+      toPolynomial(spline3X)(weightT) + 0.5,
+      toPolynomial(spline3Y)(weightT),
+      toPolynomial(spline3Z)(weightT) + 0.5
     ]);
   }
 
   guesses.set('Average', geoMedian(Array.from(guesses.values())));
 
-  const splinePolyPos = [];
+  const _splinePolyPos = [];
   for (let i = 0; i <= 60; i++) {
     let t = rescale(i, 0, 60, 0, 20);
-    splinePolyPos.push(splinePoly.map(v => v(t)));
+    _splinePolyPos.push(splinePoly.map(v => v(t)));
   }
   for (let i = 0; i <= 40; i++) {
     let t = rescale(i, 0, 40, 20, 500);
-    splinePolyPos.push(splinePoly.map(v => v(t)));
+    _splinePolyPos.push(splinePoly.map(v => v(t)));
   }
   unrun(() => {
-    splinePolyPos = splinePolyPos;
+    splinePolyPos = _splinePolyPos;
     guessPos = guesses;
   });
 }
