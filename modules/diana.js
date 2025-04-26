@@ -10,6 +10,7 @@ import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
 import { unrun } from '../util/threading';
 import { renderBeacon, renderBoxOutline, renderLine, renderTracer } from '../../Apelles/index';
+import { Deque } from '../util/polyfill';
 
 const warps = [
   {
@@ -123,6 +124,7 @@ const burrowSpawnReg = reg('packetReceived', pack => {
     }
   });
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._dianaScanBurrows);
+let lastDigId = '';
 const burrowDigReg = reg('packetSent', pack => {
   let bp;
   if (pack.func_149574_g) bp = pack.func_179724_a();
@@ -132,7 +134,9 @@ const burrowDigReg = reg('packetSent', pack => {
   const { x, y, z } = getBlockPos(bp);
   if (x === -1 && y === -1 && z === -1) return;
 
-  prevStand = null;
+  const id = `${x},${y},${z}`;
+  if (id !== lastDigId) prevStand = null;
+  lastDigId = id;
   unrun(() => {
     const burrowI = burrows.findIndex(v => v[0] === x + 0.5 && v[1] === y && v[2] === z + 0.5);
     if (burrowI >= 0) {
@@ -191,8 +195,8 @@ let splinePoly;
 let splinePolyPos = [];
 /** @type {[[number, number], [number, number], number]?} */
 let arrowVec;
-/** @type {string[]} */
-let recentStands = [];
+/** @type {Deque<string>} */
+const recentStands = new Deque();
 /** @type {string?} */
 let prevStand;
 let prevGuessL = 0;
