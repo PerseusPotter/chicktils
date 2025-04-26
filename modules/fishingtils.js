@@ -105,7 +105,7 @@ const hotspotArrowWrdReg = reg('renderWorld', () => {
   renderTracer(
     settings.fishingTilsHotspotWaypointColor,
     stateNearestHotspot.get()[0], stateNearestHotspot.get()[1], stateNearestHotspot.get()[2],
-    { lw: 3 }
+    { lw: 3, phase: true }
   );
 }).setEnabled(stateInHotspotRange.and(stateNearestHotspot).and(settings._preferUseTracer));
 
