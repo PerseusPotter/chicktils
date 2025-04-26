@@ -203,6 +203,7 @@ function resetGuess() {
   prevParticles = [];
 
   prevGuessL = 0;
+  splinePoly = null;
   unrun(() => {
     if (settings.dianaGuessRememberPrevious && !foundGuessBurrow && guessPos.has('Average')) {
       const v = guessPos.get('Average');
@@ -220,7 +221,6 @@ function resetGuess() {
       ) prevGuesses.push([v[0], v[1], v[2], getTickCount(), 40]);
     }
     guessPos.clear();
-    splinePoly = null;
     foundGuessBurrow = false;
   });
 }
