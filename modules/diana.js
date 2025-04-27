@@ -102,10 +102,17 @@ const burrowSpawnReg = reg('packetReceived', pack => {
   const x = Math.floor(pack.func_149220_d()) + 0.5;
   const y = Math.floor(pack.func_149226_e()) - 1;
   const z = Math.floor(pack.func_149225_f()) + 0.5;
-  if (burrows.some(v => v[0] === x && v[1] === y && v[2] === z)) return;
-  if (recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z && getTickCount() - v[3] < 20)) return;
+
+  if (guessPos.has('Average')) {
+    const p = guessPos.get('Average');
+    const d = (x - p[0]) ** 2 + (z - p[2]) ** 2;
+    if (d < 400) foundGuessBurrow = true;
+    if (d < 100) resetGuess();
+  }
 
   unrun(() => {
+    if (burrows.some(v => v[0] === x && v[1] === y && v[2] === z)) return;
+    if (recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z && getTickCount() - v[3] < 20)) return;
     if (settings.dianaAlertFoundBurrow && (!settings.dianaAlertFoundBurrowNoStart || type !== 'Start') && !recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z)) burrowFoundAlert.show(settings.dianaAlertFoundBurrowTime);
     burrows.push([
       x, y, z,
@@ -114,13 +121,6 @@ const burrowSpawnReg = reg('packetReceived', pack => {
     ]);
 
     prevGuesses = prevGuesses.filter(v => (x - v[0]) ** 2 + (z - v[2]) ** 2 > 400);
-
-    if (guessPos.has('Average')) {
-      const p = guessPos.get('Average');
-      const d = (x - p[0]) ** 2 + (z - p[2]) ** 2;
-      if (d < 400) foundGuessBurrow = true;
-      if (d < 100) resetGuess();
-    }
   });
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._dianaScanBurrows);
 const burrowDigReg = reg('packetSent', pack => {
@@ -134,11 +134,9 @@ const burrowDigReg = reg('packetSent', pack => {
 
   unrun(() => {
     const burrowI = burrows.findIndex(v => v[0] === x + 0.5 && v[1] === y && v[2] === z + 0.5);
-    if (burrowI >= 0) {
-      burrows.splice(burrowI, 1);
-      recentDugBurrows.push([x + 0.5, y, z + 0.5, getTickCount()]);
-      if (recentDugBurrows.length > 5) recentDugBurrows.shift();
-    }
+    if (burrowI >= 0) burrows.splice(burrowI, 1);
+    recentDugBurrows.push([x + 0.5, y, z + 0.5, getTickCount()]);
+    if (recentDugBurrows.length > 10) recentDugBurrows.shift();
   });
 }).setFilteredClasses([net.minecraft.network.play.client.C07PacketPlayerDigging, net.minecraft.network.play.client.C08PacketPlayerBlockPlacement]).setEnabled(settings._dianaScanBurrows);
 const burrowResetReg = reg('chat', () => {
