@@ -316,9 +316,9 @@ function updateGuesses() {
 
   {
     guesses.set('Bezier', [
-      toPolynomial(spline3X)(weightT) + 0.5,
+      toPolynomial(spline3X)(weightT),
       toPolynomial(spline3Y)(weightT),
-      toPolynomial(spline3Z)(weightT) + 0.5
+      toPolynomial(spline3Z)(weightT)
     ]);
   }
 
