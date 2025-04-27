@@ -166,7 +166,7 @@ const renderTargetsReg = reg('renderWorld', () => {
   prevGuesses.forEach(v => {
     renderBoxOutline(
       settings.dianaBurrowPrevGuessColor,
-      v[0], v[1], v[2],
+      v[0], v[1] - 1, v[2],
       1, 1,
       { phase: true }
     );
@@ -200,18 +200,20 @@ function resetGuess() {
   unrun(() => {
     if (settings.dianaGuessRememberPrevious && !foundGuessBurrow && guessPos.has('Average')) {
       const v = guessPos.get('Average');
-      if (
-        (
-          v[2] < -30 ?
-            v[0] > -230 :
-            v[0] > -300
-        ) &&
-        v[0] < 210 &&
-        v[2] > -240 &&
-        v[2] < 210 &&
-        v[1] > 50 &&
-        v[1] < 120
-      ) prevGuesses.push([v[0], v[1], v[2], getTickCount(), 40]);
+      if (Math.hypot(Player.getX() - v[0], Player.getY() - v[1], Player.getZ() - v[2]) > 10) {
+        if (
+          (
+            v[2] < -30 ?
+              v[0] > -230 :
+              v[0] > -300
+          ) &&
+          v[0] < 210 &&
+          v[2] > -240 &&
+          v[2] < 210 &&
+          v[1] > 50 &&
+          v[1] < 120
+        ) prevGuesses.push([v[0], v[1], v[2], getTickCount(), 40]);
+      }
     }
     guessPos.clear();
     foundGuessBurrow = false;
@@ -227,27 +229,21 @@ function updateGuesses() {
   const particles = prevParticles.slice(0, l);
   const pitches = prevSounds.slice(0, l);
 
-  const splineCoeff = [
-    ndRegression(2, particles.map((v, i) => [i, v.x])),
-    ndRegression(2, particles.map((v, i) => [i, v.y])),
-    ndRegression(2, particles.map((v, i) => [i, v.z]))
-  ];
-  splinePoly = [
-    toPolynomial(splineCoeff[0]),
-    toPolynomial(splineCoeff[1]),
-    toPolynomial(splineCoeff[2])
-  ];
-
   const { b: pitchB, a: pitchA } = linReg(pitches.map((v, i) => [i, v.p]));
   const distanceBackup = Math.E / pitchB;
 
   // from https://github.com/hannibal002/SkyHanni/blob/08e5cf831e3e22401d1de830ee522aadcff6634d/src/main/java/at/hannibal2/skyhanni/utils/PolynomialFitter.kt
-  const spline3X = ndRegression(3, particles.map((v, i) => [i, v.x]));
-  const spline3Y = ndRegression(3, particles.map((v, i) => [i, v.y]));
-  const spline3Z = ndRegression(3, particles.map((v, i) => [i, v.z]));
-  const dx0 = spline3X[1];
-  const dy0 = spline3Y[1];
-  const dz0 = spline3Z[1];
+  const splineX = ndRegression(3, particles.map((v, i) => [i, v.x]));
+  const splineY = ndRegression(3, particles.map((v, i) => [i, v.y]));
+  const splineZ = ndRegression(3, particles.map((v, i) => [i, v.z]));
+  splinePoly = [
+    toPolynomial(splineX),
+    toPolynomial(splineY),
+    toPolynomial(splineZ)
+  ];
+  const dx0 = splineX[1];
+  const dy0 = splineY[1];
+  const dz0 = splineZ[1];
   const xz = Math.hypot(dx0, dz0);
 
   const weight = Math.sqrt(-24 * Math.sin(
@@ -267,27 +263,36 @@ function updateGuesses() {
   //     2836.3513351166325 * pitchA + -1395.7763277125964;
   // const dist3 = 2924.6641104450428 * pitches[0].p + -1442.1515587278568;
 
-  const createSplineIntersectPoly = (function() {
-    const a1 = splineCoeff[0][2];
-    const a2 = splineCoeff[1][2];
-    const a3 = splineCoeff[2][2];
-    const b1 = splineCoeff[0][1];
-    const b2 = splineCoeff[1][1];
-    const b3 = splineCoeff[2][1];
-    return function(dist) {
-      return toPolynomial([
-        -dist * dist,
-        0,
-        b1 * b1 + b2 * b2 + b3 * b3,
-        2 * (a1 * b1 + a2 * b2 + a3 * b3),
-        a1 * a1 + a2 * a2 + a3 * a3
-      ]);
-    };
-  }());
-  const splineIntPoly = createSplineIntersectPoly(distance);
-  const splineIntTime = newtonRaphson(splineIntPoly, 1);
-  // const splineIntTime = gradientDescentRestarts(([t]) => -dist(distance, Math.hypot(splinePoly[0](t) - splineCoeff[0][0], splinePoly[1](t) - splineCoeff[1][0], splinePoly[2](t) - splineCoeff[2][0])), [[0, 500]])[0];
-  guesses.set('Spline', splinePoly.map(v => v(splineIntTime)));
+  {
+    /*
+    const a1 = splineX[3];
+    const a2 = splineY[3];
+    const a3 = splineZ[3];
+    const b1 = splineX[2];
+    const b2 = splineY[2];
+    const b3 = splineZ[2];
+    const c1 = splineX[1];
+    const c2 = splineY[1];
+    const c3 = splineZ[1];
+    const splineIntPoly = toPolynomial([
+      -distance * distance,
+      0,
+      c1 * c1 + c2 * c2 + c3 * c3,
+      2 * (b1 * c1 + b2 * c2 + b3 * c3),
+      2 * (a1 * c1 + a2 * c2 + a3 * c3) + (b1 * b1 + b2 * b2 + b3 * b3),
+      2 * (a1 * b1 + a2 * b2 + a3 * b3),
+      a1 * a1 + a2 * a2 + a3 * a3
+    ]);
+    const splineIntTime = newtonRaphson(splineIntPoly, weightT);
+    */
+    const splineIntTime = convergeHalfInterval(
+      t => distance - Math.hypot(splinePoly[0](t) - splineX[0], splinePoly[1](t) - splineY[0], splinePoly[2](t) - splineZ[0]),
+      0,
+      0, weightT + 2,
+      false
+    );
+    guesses.set('Spline', splinePoly.map(v => v(splineIntTime)));
+  }
 
   {
     const poly = createPitchDistPoly(distance);
@@ -315,22 +320,14 @@ function updateGuesses() {
   }
 
   {
-    guesses.set('Bezier', [
-      toPolynomial(spline3X)(weightT),
-      toPolynomial(spline3Y)(weightT),
-      toPolynomial(spline3Z)(weightT)
-    ]);
+    guesses.set('Bezier', splinePoly.map(v => v(weightT)));
   }
 
   guesses.set('Average', geoMedian(Array.from(guesses.values())));
 
   const _splinePolyPos = [];
-  for (let i = 0; i <= 60; i++) {
-    let t = rescale(i, 0, 60, 0, 20);
-    _splinePolyPos.push(splinePoly.map(v => v(t)));
-  }
-  for (let i = 0; i <= 40; i++) {
-    let t = rescale(i, 0, 40, 20, 500);
+  for (let i = 0; i <= 100; i++) {
+    let t = rescale(i, 0, 100, 0, weightT);
     _splinePolyPos.push(splinePoly.map(v => v(t)));
   }
   unrun(() => {
@@ -386,20 +383,10 @@ const spawnPartReg = reg('packetReceived', pack => {
   const t = getTickCount();
   if (prevParticles.length) {
     if (t - spadeUseTime === prevParticles[prevParticles.length - 1].t) return;
-    if (prevParticles.length > 2 && splinePoly) {
-      const estPX = splinePoly[0](prevParticles.length);
-      const estPY = splinePoly[1](prevParticles.length);
-      const estPZ = splinePoly[2](prevParticles.length);
-      if ((estPX - x) ** 2 + (estPY - y) ** 2 + (estPZ - z) ** 2 > 16) {
-        if (t - spadeUseTime >= RESET_THRESH) resetGuess();
-        else return;
-      }
-    } else {
-      const pp = prevParticles[prevParticles.length - 1];
-      if ((pp.x - x) ** 2 + (pp.y - y) ** 2 + (pp.z - z) ** 2 > 25) {
-        if (t - spadeUseTime >= RESET_THRESH) resetGuess();
-        else return;
-      }
+    const pp = prevParticles[prevParticles.length - 1];
+    if ((pp.x - x) ** 2 + (pp.y - y) ** 2 + (pp.z - z) ** 2 > 25) {
+      if (t - spadeUseTime >= RESET_THRESH) resetGuess();
+      else return;
     }
   }
 
@@ -422,13 +409,13 @@ const renderGuessReg = reg('renderWorld', () => {
     if (!v) return;
     renderBoxOutline(
       settings[`dianaGuessFromParticles${k}Color`] ?? 0,
-      v[0], v[1], v[2],
+      v[0], v[1] - 1, v[2],
       1, 1,
       { phase: true }
     );
     if (settings.dianaGuessFromParticlesRenderName) renderString(
       k,
-      v[0], v[1] + 1.5, v[2],
+      v[0], v[1] - 1 + 1.5, v[2],
       settings[`dianaGuessFromParticles${k}Color`] ?? 0,
       true, 1, true, true, true
     );
