@@ -2,14 +2,23 @@ import { log } from './log';
 
 const Threading = Java.type('gg.essential.api.utils.Multithreading');
 let mainThread;
-Client.scheduleTask(() => mainThread = Thread.currentThread());
+Client.scheduleTask(() => {
+  mainThread = Thread.currentThread();
+  packetThreadReg.register();
+});
+let packetThread;
+const packetThreadReg = register('packetReceived', () => {
+  packetThread = Thread.currentThread();
+  packetThreadReg.unregister();
+}).unregister();
 export function run(cb) {
-  cb = wrap(cb)
-  if (!mainThread || mainThread === Thread.currentThread()) Threading.runAsync(cb);
+  cb = wrap(cb);
+  const t = Thread.currentThread();
+  if (!mainThread || mainThread === t || packetThread === t) Threading.runAsync(cb);
   else cb();
 }
 export function unrun(cb) {
-  cb = wrap(cb)
+  cb = wrap(cb);
   if (mainThread === Thread.currentThread()) cb();
   else Client.scheduleTask(cb);
 }
