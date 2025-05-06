@@ -756,6 +756,7 @@ export const props = {
   ratTilsBoxEsp: new Property('RatTilsBoxEsp', page, ++sort, Property.Type.Toggle, true),
   ratTilsAlertTime: new Property('RatTilsAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
   ratTilsAlertSound: new Property('RatTilsAlertSound', page, ++sort, Property.Type.Toggle, true, { desc: 'play sound with the alert' }),
+  ratTilsChannel: new Property('RatTilsChannel', page, ++sort, Property.Type.Text, 'pc'),
   ratTilsMessage: new Property('RatTilsMessage', page, ++sort, Property.Type.Text, 'i.imgur.com/8da4IiM.png', { desc: 'empty to disable' }),
   ratTilsMuteSound: new Property('RatTilsMuteSound', page, ++sort, Property.Type.Toggle, true, { desc: 'mute rat squeaking sounds' }),
 

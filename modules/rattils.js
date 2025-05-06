@@ -40,13 +40,13 @@ const cheeseSpawnReg = reg('chat', () => {
   cheeseRenderReg.register();
   scanCheese();
   cheeseAlert.show(settings.ratTilsAlertTime);
-  if (settings.ratTilsMessage) ChatLib.command('pc [RatTils] ' + settings.ratTilsMessage);
+  if (settings.ratTilsMessage) ChatLib.command(`${settings.ratTilsChannel} [RatTils] ${settings.ratTilsMessage}`);
 }).setCriteria('&r&e&lCHEESE! &r&7You smell Cheese nearby!&r');
 const cheeseStepReg = reg('step', () => scanCheese()).setFps(1);
 const cheesePickReg = reg('chat', (name, t) => {
   name = getPlayerName(name);
   Client.scheduleTask(() => scanCheese());
-  ChatLib.command(`pc [RatTils] Buffed ${name}`);
+  ChatLib.command(`${settings.ratTilsChannel} [RatTils] Buffed ${name}`);
   if (name in players) _clearTimeout(players[name]);
   players[name] = _setTimeout(() => log(`Rat Buff to ${name} has expired.`), t * 1000);
 }).setCriteria('&r&e&lCHEESE!&r&7 You buffed ${name} giving them &r&b+${*}✯ Magic Find&r&7 for &r&a${t}&r&7 seconds&r&7!&r');
