@@ -54,6 +54,9 @@ function createFonts(size) {
 const BufferedImage = Java.type('java.awt.image.BufferedImage');
 const RenderingHints = Java.type('java.awt.RenderingHints');
 const FontHelper = Java.type('com.perseuspotter.chicktilshelper.FontHelper');
+const Raster = Java.type('java.awt.image.Raster');
+const DataBufferByte = Java.type('java.awt.image.DataBufferByte');
+const colorModel = new (Java.type('java.awt.image.ComponentColorModel'))(Java.type('java.awt.color.ColorSpace').getInstance(Java.type('java.awt.color.ColorSpace').CS_LINEAR_RGB), true, false, (Java.type('java.awt.Transparency')).TRANSLUCENT, DataBufferByte.TYPE_BYTE);
 export const allDisplays = [];
 {
   const cols = [
@@ -167,7 +170,8 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     lines.forEach(v => {
       if (v.d) {
         if (!tmpG) {
-          const tmpI = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+          const raster = Raster.createInterleavedRaster(DataBufferByte.TYPE_BYTE, 1, 1, 4, 4, [0, 1, 2, 3], null);
+          const tmpI = new BufferedImage(colorModel, raster, false, null);
           tmpG = tmpI.createGraphics();
           tmpG.setFont(fonts[0]);
         }
@@ -196,7 +200,8 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     actH = FONT_RENDER_SIZE.get() * (lines.length + 1) + (cb ? FONT_RENDER_SIZE.get() / 10 : 0);
     imgW = ceilPow2(actW, 1);
     imgH = ceilPow2(actH, 2);
-    const bimg = new BufferedImage(imgW, imgH, BufferedImage.TYPE_INT_ARGB);
+    const raster = Raster.createInterleavedRaster(DataBufferByte.TYPE_BYTE, imgW, imgH, imgW * 4, 4, [0, 1, 2, 3], null);
+    const bimg = new BufferedImage(colorModel, raster, false, null);
     const g = bimg.createGraphics();
     g.setFont(fonts[0]);
     const ascent = g.getFontMetrics().getAscent();

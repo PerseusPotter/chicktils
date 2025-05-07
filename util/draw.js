@@ -2,7 +2,7 @@ import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
 import { getEyeHeight } from './mc';
 import GlStateManager2 from './glStateManager';
 import reg from './registerer';
-import { DefaultVertexFormats, getRenderX, getRenderY, getRenderZ, renderBoxFilled, renderBoxOutline, renderLine } from '../../Apelles/index';
+import { DefaultVertexFormats, getRenderX, getRenderY, getRenderZ, renderBoxFilled, renderBoxOutline } from '../../Apelles/index';
 
 export const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 export const worldRen = tess.func_178180_c();
@@ -536,41 +536,94 @@ export class JavaColorWrapper {
   }
 }
 
-register('gameUnload', () => BufferedImageWrapper.ALL_IMAGES.forEach(v => v.destroy()));
-const DynamicTexture = Java.type('net.minecraft.client.renderer.texture.DynamicTexture');
+const BufferUtils = Java.type('org.lwjgl.BufferUtils');
+register('gameUnload', () => BufferedImageWrapper.ALL_IMAGES.forEach(v => v._internalDestroy()));
 export class BufferedImageWrapper {
   static ALL_IMAGES = new Set();
   img = null;
   w = 0;
   h = 0;
+  static mode = -1;
+  textureId = -1;
+  pboId = -1;
   constructor(img) {
+    if (BufferedImageWrapper.mode === -1) {
+      const cap = Java.type('org.lwjgl.opengl.GLContext').getCapabilities();
+      BufferedImageWrapper.mode = cap.OpenGL21 ? 1 : 0;
+    }
+    this._create(img);
+    BufferedImageWrapper.ALL_IMAGES.add(this);
+  }
+  _create(img) {
     this.w = img.getWidth();
     this.h = img.getHeight();
-    this.img = new DynamicTexture(img);
-    BufferedImageWrapper.ALL_IMAGES.add(this);
+    this.textureId = GL11.glGenTextures();
+    GlStateManager2.bindTexture(this.textureId);
+    GL11['glTexImage2D(int,int,int,int,int,int,int,int,java.nio.ByteBuffer)'](GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, this.w, this.h, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, null);
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LEVEL, 0);
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MIN_LOD, 0);
+    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL12.GL_TEXTURE_MAX_LOD, 0);
+    GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, 0);
+    GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+    if (BufferedImageWrapper.mode === 1) {
+      this.pboId = GL15.glGenBuffers();
+      GL15.glBindBuffer(GL21.GL_PIXEL_UNPACK_BUFFER, this.pboId);
+      GL15.glBufferData(GL21.GL_PIXEL_UNPACK_BUFFER, this.w * this.h * 4, GL15.GL_STREAM_DRAW);
+      GL15.glBindBuffer(GL21.GL_PIXEL_UNPACK_BUFFER, 0);
+    }
+    this.update(img);
   }
   update(img) {
     const w = img.getWidth();
     const h = img.getHeight();
     if (w === this.w && h === this.h) {
-      img.getRGB(0, 0, img.getWidth(), img.getHeight(), this.img.func_110565_c(), 0, img.getWidth());
-      this.img.func_110564_a();
+      const pixels = img.getRaster().getDataBuffer().getData();
+      if (BufferedImageWrapper.mode === 1) {
+        GL15.glBindBuffer(GL21.GL_PIXEL_UNPACK_BUFFER, this.pboId);
+
+        const buf = GL15.glMapBuffer(GL21.GL_PIXEL_UNPACK_BUFFER, GL15.GL_WRITE_ONLY, null);
+        if (buf !== null) {
+          buf.put(pixels);
+          buf.flip();
+          GL15.glUnmapBuffer(GL21.GL_PIXEL_UNPACK_BUFFER);
+        }
+
+        GlStateManager2.bindTexture(this.textureId);
+        GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, this.w, this.h, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, 0);
+
+        GL15.glBindBuffer(GL21.GL_PIXEL_UNPACK_BUFFER, 0);
+      } else {
+        const buf = BufferUtils.createByteBuffer(pixels.length);
+        buf.put(pixels);
+        buf.flip();
+
+        GlStateManager2.bindTexture(this.textureId);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, this.w, this.h, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
+      }
     } else {
-      this.w = w;
-      this.h = h;
-      this.img.func_147631_c();
-      this.img = new DynamicTexture(img);
+      this._internalDestroy();
+      this._create(img);
     }
     return this;
   }
+  _internalDestroy() {
+    if (this.textureId === -1) return;
+    GlStateManager2.deleteTexture(this.textureId);
+    GL15.glDeleteBuffers(this.pboId);
+    this.textureId = this.pboId = -1;
+  }
   destroy() {
-    this.img.func_147631_c();
+    this._internalDestroy();
     BufferedImageWrapper.ALL_IMAGES.delete(this);
   }
   draw(x, y, w, h) {
     w ??= this.w;
     h ??= this.h / this.w * w;
-    GlStateManager2.bindTexture(this.img.func_110552_b());
+    GlStateManager2.bindTexture(this.textureId);
     return drawTexturedRect(x, y, 0, 0, w, h, w, h, w, h);
   }
 }
