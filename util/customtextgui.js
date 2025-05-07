@@ -56,7 +56,7 @@ const RenderingHints = Java.type('java.awt.RenderingHints');
 const FontHelper = Java.type('com.perseuspotter.chicktilshelper.FontHelper');
 const Raster = Java.type('java.awt.image.Raster');
 const DataBufferByte = Java.type('java.awt.image.DataBufferByte');
-const colorModel = new (Java.type('java.awt.image.ComponentColorModel'))(Java.type('java.awt.color.ColorSpace').getInstance(Java.type('java.awt.color.ColorSpace').CS_LINEAR_RGB), true, false, (Java.type('java.awt.Transparency')).TRANSLUCENT, DataBufferByte.TYPE_BYTE);
+const colorModel = new (Java.type('java.awt.image.ComponentColorModel'))(Java.type('java.awt.color.ColorSpace').getInstance(Java.type('java.awt.color.ColorSpace').CS_sRGB), true, false, (Java.type('java.awt.Transparency')).TRANSLUCENT, DataBufferByte.TYPE_BYTE);
 export const allDisplays = [];
 {
   const cols = [
