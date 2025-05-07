@@ -72,20 +72,17 @@ const overlayReg = reg(net.minecraftforge.client.event.RenderBlockOverlayEvent, 
     p(1, -1);
     p(1, -s);
     p(-1, -s);
-    tess.func_78381_a();
-    worldRen.func_181668_a(7, DefaultVertexFormats.field_181707_g);
+
     p(-1, -s);
     p(-s, -s);
     p(-s, s);
     p(-1, s);
-    tess.func_78381_a();
-    worldRen.func_181668_a(7, DefaultVertexFormats.field_181707_g);
+
     p(s, -s);
     p(1, -s);
     p(1, s);
     p(s, s);
-    tess.func_78381_a();
-    worldRen.func_181668_a(7, DefaultVertexFormats.field_181707_g);
+
     p(-1, s);
     p(1, s);
     p(1, 1);
