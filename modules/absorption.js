@@ -1,5 +1,6 @@
+import { DefaultVertexFormats } from '../../Apelles/index';
 import settings from '../settings';
-import { drawTexturedRect } from '../util/draw';
+import { tess, worldRen } from '../util/draw';
 import { dist } from '../util/math';
 import reg from '../util/registerer';
 
@@ -20,6 +21,20 @@ const actionBarReg = reg('actionBar', (curr, max) => {
   actualAbsorb = Math.min(Math.max(Math.ceil(curr / hpph) - hp, 0), settings.absorptionMaxHearts);
 }).setChatCriteria('${curr}/${max}❤${*}');
 
+function drawTexturedRect(x, y, u, v, w, h, tw, th, uw, vh) {
+  if (!uw) uw = w;
+  if (!vh) vh = h;
+  const f = 1 / tw;
+  const g = 1 / th;
+  u *= f;
+  v *= g;
+  uw *= f;
+  vh *= g;
+  worldRen.func_181662_b(x, y + h, 0).func_181673_a(u, v + vh).func_181675_d();
+  worldRen.func_181662_b(x + w, y + h, 0).func_181673_a(u + uw, v + vh).func_181675_d();
+  worldRen.func_181662_b(x + w, y, 0).func_181673_a(u + uw, v).func_181675_d();
+  worldRen.func_181662_b(x, y, 0).func_181673_a(u, v).func_181675_d();
+}
 const renderHeartReg = reg('renderHealth', evn => {
   const playerE = Player.getPlayer();
   if (!playerE) return;
@@ -74,6 +89,8 @@ const renderHeartReg = reg('renderHealth', evn => {
     drawTexturedRect(pos[i][0], pos[i][1], u, TOP, 9, 9, 256, 256);
   };
 
+  worldRen.func_181668_a(7, DefaultVertexFormats.field_181707_g);
+
   let x = 0;
   let y = 0;
   while (slots > 0) {
@@ -122,6 +139,7 @@ const renderHeartReg = reg('renderHealth', evn => {
     hp -= 2;
   }
 
+  tess.func_78381_a();
   GL11.glDisable(GL11.GL_BLEND);
 });
 
