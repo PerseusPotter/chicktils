@@ -349,36 +349,6 @@ export function drawOutlinedString(text, x, y) {
 }
 
 /**
- * @param {number} x
- * @param {number} y
- * @param {number} u
- * @param {number} v
- * @param {number} w
- * @param {number} h
- * @param {number} tw
- * @param {number} th
- * @param {number?} uw
- * @param {number?} vh
- * @param {number?} z
- */
-export function drawTexturedRect(x, y, u, v, w, h, tw, th, uw, vh) {
-  if (!uw) uw = w;
-  if (!vh) vh = h;
-  const f = 1 / tw;
-  const g = 1 / th;
-  u *= f;
-  v *= g;
-  uw *= f;
-  vh *= g;
-  worldRen.func_181668_a(7, DefaultVertexFormats.field_181707_g);
-  worldRen.func_181662_b(x, y + h, 0).func_181673_a(u, v + vh).func_181675_d();
-  worldRen.func_181662_b(x + w, y + h, 0).func_181673_a(u + uw, v + vh).func_181675_d();
-  worldRen.func_181662_b(x + w, y, 0).func_181673_a(u + uw, v).func_181675_d();
-  worldRen.func_181662_b(x, y, 0).func_181673_a(u, v).func_181675_d();
-  tess.func_78381_a();
-}
-
-/**
  * @param {number} x center
  * @param {number} y center
  * @param {number} r
@@ -624,7 +594,13 @@ export class BufferedImageWrapper {
     w ??= this.w;
     h ??= this.h / this.w * w;
     GlStateManager2.bindTexture(this.textureId);
-    return drawTexturedRect(x, y, 0, 0, w, h, w, h, w, h);
+
+    worldRen.func_181668_a(7, DefaultVertexFormats.field_181707_g);
+    worldRen.func_181662_b(x, y + h, 0).func_181673_a(0, 1).func_181675_d();
+    worldRen.func_181662_b(x + w, y + h, 0).func_181673_a(1, 1).func_181675_d();
+    worldRen.func_181662_b(x + w, y, 0).func_181673_a(1, 0).func_181675_d();
+    worldRen.func_181662_b(x, y, 0).func_181673_a(0, 0).func_181675_d();
+    tess.func_78381_a();
   }
 }
 
