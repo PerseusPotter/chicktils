@@ -283,10 +283,19 @@ function updateGuesses() {
     ]);
     const splineIntTime = newtonRaphson(splineIntPoly, weightT);
     */
+    let t;
+    while (t < weightT + 2) {
+      if (
+        (splinePoly[0](t) - splineX[0]) ** 2 +
+        (splinePoly[1](t) - splineY[0]) ** 2 +
+        (splinePoly[2](t) - splineZ[0]) ** 2 >
+        distance * distance
+      ) break;
+    }
     const splineIntTime = convergeHalfInterval(
       t => distance - Math.hypot(splinePoly[0](t) - splineX[0], splinePoly[1](t) - splineY[0], splinePoly[2](t) - splineZ[0]),
       0,
-      0, weightT + 2,
+      t - 1, t,
       false
     );
     guesses.set('Spline', splinePoly.map(v => v(splineIntTime)));
@@ -444,7 +453,7 @@ const tickReg = reg('tick', () => {
       closest = v;
       closestD = d;
     }
-    if (d <= 100) return --v[4] > 0;
+    if ((Player.getX() - v[0]) ** 2 + (Player.getZ() - v[2]) ** 2 <= 100) return --v[4] > 0;
     return true;
   });
 
