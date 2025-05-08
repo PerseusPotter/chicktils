@@ -2,6 +2,7 @@ import { getOrPut } from './polyfill';
 
 export const PROFILER = false;
 
+const nanoTime = java.lang.System.nanoTime;
 if (PROFILER) {
   var $rendData = new Map();
   var $tickData = new Map();
@@ -9,11 +10,13 @@ if (PROFILER) {
   Client.scheduleTask(() => $mainThread = Thread.currentThread());
   const writer = new java.io.BufferedWriter(new java.io.FileWriter('./config/ChatTriggers/modules/chicktils/ticktimes.log', false));
   register('gameUnload', () => writer.close());
+  let rTickStart = 0;
   register(net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent, evn => {
-    if (evn.phase.toString() !== 'END') return;
+    if (evn.phase.toString() !== 'END') return rTickStart = nanoTime();
     writer.write('RENDER TICK START\n');
     const time = dumpData($rendData);
-    writer.write(`RENDER TICK END ${time}\n`);
+    const dt = nanoTime() - rTickStart;
+    writer.write(`RENDER TICK END ${time} frame: ${dt} fps: ${~~(1e9 / dt)}\n`);
     $rendData.clear();
   });
   register(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, evn => {
@@ -48,7 +51,6 @@ if (PROFILER) {
   }
 }
 
-const nanoTime = java.lang.System.nanoTime;
 let startTime;
 export function start() {
   startTime = nanoTime();
