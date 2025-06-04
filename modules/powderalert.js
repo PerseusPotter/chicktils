@@ -42,12 +42,12 @@ const renderReg = reg('renderWorld', () => {
     const col = chestGradient.get(dt / MAX_CHEST_LIFE);
     renderBoxOutline(
       col,
-      v.x, v.y, v.z, 1, 1,
+      v.x - 0.01, v.y - 0.01, v.z - 0.01, 1.02, 1.02,
       { centered: false, phase: settings.powderBoxEsp, lw: 5 }
     );
     renderBoxFilled(
       [col[0], col[1], col[2], col[3] / 2],
-      v.x, v.y, v.z, 1, 1,
+      v.x - 0.01, v.y - 0.01, v.z - 0.01, 1.02, 1.02,
       { centered: false, phase: false }
     );
     if (dt > MAX_CHEST_LIFE) chests.delete(k);
