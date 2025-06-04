@@ -1,9 +1,10 @@
 import createAlert from '../util/alert';
-import { Gradient, renderWaypoint } from '../util/draw';
+import { Gradient } from '../util/draw';
 import settings from '../settings';
 import reg, { customRegs } from '../util/registerer';
 import { getBlockId } from '../util/mc';
 import { unrun } from '../util/threading';
+import { renderBoxFilled, renderBoxOutline } from '../../Apelles/index';
 
 const chests = new Map();
 const recent = new Set();
@@ -38,10 +39,16 @@ const renderReg = reg('renderWorld', () => {
   const t = customRegs.serverTick2.tick;
   Array.from(chests.entries()).forEach(([k, v]) => {
     const dt = t - v.t;
-    renderWaypoint(
+    const col = chestGradient.get(dt / MAX_CHEST_LIFE);
+    renderBoxOutline(
+      col,
       v.x, v.y, v.z, 1, 1,
-      chestGradient.get(dt / MAX_CHEST_LIFE),
-      settings.powderBoxEsp, false
+      { centered: false, phase: settings.powderBoxEsp, lw: 5 }
+    );
+    renderBoxFilled(
+      [col[0], col[1], col[2], col[3] / 2],
+      v.x, v.y, v.z, 1, 1,
+      { centered: false, phase: false }
     );
     if (dt > MAX_CHEST_LIFE) chests.delete(k);
   });
