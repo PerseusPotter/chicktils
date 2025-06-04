@@ -199,9 +199,7 @@ export function drawArrow3DPos(color, dx, dy, dz, rel = true, scale = 3) {
 export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true, lw = 5, wz = w) {
   const rgba = normColor(color);
   if (rgba[3] === 0) return;
-  rgba[3] /= 4;
-  renderBoxFilled(rgba, x, y, z, w, h, { centered: center, wz, lw, phase: esp });
-  rgba[3] *= 4;
+  renderBoxFilled([rgba[0], rgba[1], rgba[2], rgba[3] / 4], x, y, z, w, h, { centered: center, wz, lw, phase: esp });
   renderBoxOutline(rgba, x, y, z, w, h, { centered: center, wz, lw, phase: esp });
 }
 
