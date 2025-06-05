@@ -983,7 +983,17 @@ export const props = {
   necromancySoulColorNew: new Property('NecromancySoulColorNew', page, ++sort, Property.Type.Color, 0x00FFFFA0, { desc: 'color of newly dropped soul' }),
   necromancySoulColorOld: new Property('NecromancySoulColorOld', page, ++sort, Property.Type.Color, 0xFF0000FF, { desc: 'color of soul about to despawn' }),
 
-  // 19
+  enabledojo: new Property('EnableDojo', ++page, sort = 0, Property.Type.Toggle, false),
+  dojoMastery: new Property('DojoMaster', page, ++sort, Property.Type.Toggle, true),
+  dojoMasteryPointToLowest: new Property('DojoMasteryPointToLowest', page, ++sort, Property.Type.Toggle, true),
+  dojoMasteryPointToLowestColor: new Property('DojoMasteryPointToLowestColor', page, ++sort, Property.Type.Color, 0x55FF55FF),
+  dojoMasteryShowLowestTime: new Property('DojoMasteryShowLowestTime', page, ++sort, Property.Type.Toggle, true, { desc: 'render lowest time below crosshair' }),
+  dojoMasteryPointToNext: new Property('DojoMasteryPointToNext', page, ++sort, Property.Type.Toggle, true),
+  dojoMasteryPointToNextColor: new Property('DojoMasteryPointToNextColor', page, ++sort, Property.Type.Color, 0x5555FFFF),
+  dojoMasteryPointToNextTimer: new Property('DojoMasteryPointToNextTimer', page, ++sort, Property.Type.Toggle, true, { desc: 'show timer for the next block' }),
+  dojoMasteryHideTitles: new Property('DojoMasteryHideTitles', page, ++sort, Property.Type.Toggle, true),
+
+  // 20
   enableboxallentities: new Property('EnableBoxAllEntities', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
   boxAllEntitiesInvis: new Property('BoxAllEntitiesInvisible', page, ++sort, Property.Type.Toggle, false, { desc: 'box invisible entities' }),
   boxAllEntitiesColor: new Property('BoxAllEntitiesColor', page, ++sort, Property.Type.Color, 0xFF0000FF),
@@ -1013,7 +1023,7 @@ export const props = {
   logDamageCurse: new Property('LogDamageCurse', page, ++sort, Property.Type.Toggle, true, { desc: 'gaia construct lightning' }),
   logDamageCombo: new Property('LogDamageCombo', page, ++sort, Property.Type.Toggle, true, { desc: 'blaze dagger repeat' }),
 
-  // 20
+  // 21
   enableexcavatorsolver: new Property('EnableExcavatorSolver', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'find fossils' }),
   excavatorSolverOnlyShowBest: new Property('ExcavatorSolverOnlyHighlightBest', page, ++sort, Property.Type.Toggle, true, { desc: 'only highlight the best move' }),
   excavatorSolverShowRoute: new Property('ExcavatorSolverHighlightStartPath', page, ++sort, Property.Type.Toggle, false, { desc: 'highlight best starting path (turn off if citrine gemstones)' }),
@@ -1088,6 +1098,7 @@ const pageNames = [
   'Great Spook',
   'FishingTils',
   'Necromancy',
+  'Dojo',
   'Testing',
   'Misc.'
 ];
