@@ -462,8 +462,8 @@ export class Deque {
    * @param {number} i
    * @returns {T?}
    *
-   * @overload
    * @template {T} V
+   * @overload
    * @param {number} i
    * @param {V} v
    * @returns {V}
