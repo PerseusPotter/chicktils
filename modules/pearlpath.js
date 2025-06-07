@@ -19,13 +19,14 @@ const g = -0.03;
 const Vec3 = Java.type('net.minecraft.util.Vec3');
 const AABB = new (Java.type('net.minecraft.util.AxisAlignedBB'))(-0.125, 0, -0.125, 0.125, 0.25, 0.125);
 const tickReg = reg('tick', () => {
-  stateHoldingPearl.set(getSbId(Player.getHeldItem()) === 'ENDER_PEARL');
+  const heldItem = getSbId(Player.getHeldItem());
+  stateHoldingPearl.set(heldItem === 'ENDER_PEARL' || heldItem === 'ENDER_BOW');
 
   if (!stateHoldingPearl.get()) return;
 
   pearlPos = [];
   collidedEntity = null;
-  if (!settings.pearlPathCheeto && Client.getMinecraft().field_71476_x && Client.getMinecraft().field_71476_x.field_72313_a.toString() === 'BLOCK') return;
+  if (!settings.pearlPathCheeto && heldItem === 'ENDER_PEARL' && Client.getMinecraft().field_71476_x && Client.getMinecraft().field_71476_x.field_72313_a.toString() === 'BLOCK') return;
 
   let yaw = Player.getRawYaw() / 180 * Math.PI;
   let pitch = Player.getPitch() / 180 * Math.PI;
