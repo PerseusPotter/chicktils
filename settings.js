@@ -705,6 +705,8 @@ export const props = {
   dungeonTerracottaRespawnType: new Property('DungeonTerracottaRespawnTimerType', page, ++sort, Property.Type.Option, 'Timer', { options: ['Timer', 'Box', 'Both'] }),
   dungeonTerracottaRespawnOutlineColor: new Property('DungeonTerracottaRespawnOutlineColor', page, ++sort, Property.Type.Color, 0x91553DFF),
   dungeonTerracottaRespawnFillColor: new Property('DungeonTerracottaRespawnFillColor', page, ++sort, Property.Type.Color, 0xA27157A0),
+  dungeonTerracottaRespawnGui: new Property('DungeonTerracottaRespawnGui', page, ++sort, Property.Type.Toggle, false, { desc: 'render the timer for the first terracotta on hud' }),
+  moveDungeonTerracottaRespawnGui: new Property('MoveDungeonTerracottaRespawnGui', page, ++sort, Property.Type.Action),
 
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
