@@ -1,5 +1,7 @@
 import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
+import data from '../../data';
 import settings from '../../settings';
+import createTextGui from '../../util/customtextgui';
 import { getPartialServerTick, renderString } from '../../util/draw';
 import { colorForNumber } from '../../util/format';
 import { getBlockId } from '../../util/mc';
@@ -13,6 +15,7 @@ const deathPos = new Deque();
 const stateMaxTicks = new StateProp(stateFloor).customUnary(f => f === 'F6' ? 300 : 240);
 const stateTerraPhase = new StateVar(false);
 const stateTerraRespawn = new StateProp(stateFloor).equalsmult('F6', 'M6').and(settings._dungeonTerracottaRespawn).and(stateIsInBoss).and(stateTerraPhase);
+const respawnGui = createTextGui(() => data.terracottaRespawnTimer, () => ['&66.90s']);
 
 const blockUpdateReg = reg('blockChange', (pos, bs) => {
   if (getBlockId(bs.func_177230_c()) !== 140) return;
@@ -59,8 +62,17 @@ const renderReg = reg('renderWorld', () => {
   });
 }).setEnabled(stateTerraRespawn);
 const terraStopReg = reg('chat', () => stateTerraPhase.set(false)).setCriteria('&r&c[BOSS] Sadan&r&f: ENOUGH!&r').setEnabled(stateTerraRespawn);
+const terraRespawnGuiReg = reg('renderOverlay', () => {
+  if (deathPos.length === 0) return;
+  const first = deathPos.getFirst();
+  const t = first[0] - getPartialServerTick();
+  respawnGui.setLine(`${colorForNumber(t, stateMaxTicks.get())}${(t / 20).toFixed(2)}s`);
+  respawnGui.render();
+}).setEnabled(stateTerraRespawn.and(settings._dungeonTerracottaRespawnGui));
 
-export function init() { }
+export function init() {
+  settings._moveDungeonTerracottaRespawnGui.onAction(() => respawnGui.edit());
+}
 export function start() {
   stateTerraPhase.set(true);
 
@@ -68,6 +80,7 @@ export function start() {
   stickReg.register();
   renderReg.register();
   terraStopReg.register();
+  terraRespawnGuiReg.register();
 }
 export function reset() {
   deathPos.clear();
@@ -76,4 +89,5 @@ export function reset() {
   stickReg.unregister();
   renderReg.unregister();
   terraStopReg.unregister();
+  terraRespawnGuiReg.unregister();
 }

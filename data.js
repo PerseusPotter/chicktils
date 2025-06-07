@@ -41,6 +41,7 @@ export function setIsMain() {
  *  serverScrutinizerPPSDisplay: TextLocation;
  *  sackTilsItemDisplay: TextLocation;
  *  chattilsFollowKey: number;
+ *  terracottaRespawnTimer: number;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -89,7 +90,8 @@ function verifyTextLocation(value) {
   'assfangCheeseLoc',
   'feroEstimateLoc',
   'serverScrutinizerPPSDisplay',
-  'sackTilsItemDisplay'
+  'sackTilsItemDisplay',
+  'terracottaRespawnTimer'
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v);
