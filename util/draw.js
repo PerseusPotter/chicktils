@@ -10,12 +10,14 @@ export const rm = Renderer.getRenderManager();
 function getXMult() {
   return Client.settings.getSettings().field_74320_O === 2 ? -1 : 1;
 }
-function getYaw() {
+/** @returns {number} */
+export function getYaw() {
   const p = Player.getPlayer();
   if (!p) return 0;
   return p.field_70126_B + (p.field_70177_z - p.field_70126_B) * Tessellator.partialTicks;
 }
-function getPitch() {
+/** @returns {number} */
+export function getPitch() {
   const p = Player.getPlayer();
   if (!p) return 0;
   return p.field_70127_C + (p.field_70125_A - p.field_70127_C) * Tessellator.partialTicks;
