@@ -67,6 +67,15 @@ export function getAngle(x1, y1, z1, x2, y2, z2, smallest = true) {
 }
 
 /**
+ * @param {number} v
+ * @param {number} m
+ * @returns {number} `v % m`
+ */
+export function posMod(v, m) {
+  return ((v % m) + m) % m;
+}
+
+/**
  * @param {number} n1
  * @param {number} n2
  */
@@ -81,7 +90,7 @@ export function dist(n1, n2) {
  * @returns {number}
  */
 export function distAngle(a1, a2) {
-  const d = dist(a1, a2);
+  const d = dist(posMod(a1, 360), posMod(a2, 360));
   return Math.min(d, 360 - d);
 }
 
