@@ -1078,7 +1078,14 @@ export const props = {
   pearlPathDestColorFill: new Property('PearlPathDestinationColorFill', page, ++sort, Property.Type.Color, 0x00000000, { desc: 'fill color of player hitbox on teleport' }),
   pearlPathCollideEntity: new Property('PearlPathCollideWithEntities', page, ++sort, Property.Type.Toggle, false, { desc: 'whether to check for collisions with entities' }),
   pearlPathCollidedEntityColor: new Property('PearlPathCollidedEntityColor', page, ++sort, Property.Type.Color, 0x00FF00FF, { desc: 'color to box entity that was collided with' }),
-  pearlPathCheeto: new Property('PearlPathCheeto', page, ++sort, Property.Type.Toggle, false, { desc: 'shame shame shame\ndoesn\'t disable when looking at a block' })
+  pearlPathCheeto: new Property('PearlPathCheeto', page, ++sort, Property.Type.Toggle, false, { desc: 'shame shame shame\ndoesn\'t disable when looking at a block' }),
+
+  enablelookat: new Property('EnableLookAt', page, ++sort, Property.Type.Toggle, true, { desc: '/lookat <pitch> <yaw>\ndisplays a thing to help aim' }),
+  lookAtColor: new Property('LookAtColor', page, ++sort, Property.Type.Color, 0x00FFFFFF),
+  lookAtSize: new Property('LookAtSize', page, ++sort, Property.Type.Number, 0.01, { min: 0 }),
+  lookAtPointTo: new Property('LookAtPointToLocation', page, ++sort, Property.Type.Toggle, false),
+  lookAtThreshold: new Property('LookAtTreshold', page, ++sort, Property.Type.Number, 0.1, { min: 0, desc: 'threshold (in degrees) until it is "good enough"' }),
+  lookAtTimeout: new Property('LookAtTimeout', page, ++sort, Property.Type.Integer, 600, { min: 1, desc: 'time (in ticks) until it gives up' })
 };
 const pageNames = [
   '',
