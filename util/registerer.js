@@ -3,7 +3,7 @@ import { getBlockPos } from './mc';
 import { getOrPut, inherits, setAccessible } from './polyfill';
 import { endRender, endTick, PROFILER, start } from './profiler';
 import { StateVar } from './state';
-import { run, wrap as wrapFunc } from './threading';
+import { run, unrun, wrap as wrapFunc } from './threading';
 
 function wrap(orig, wrap, prop) {
   return function(...args) {
@@ -555,7 +555,7 @@ reg = function reg(type, shit) {
   ChickTilsWorldLoad.prototype.getList = function getList() {
     return ChickTilsWorldLoad.list;
   };
-  let isWorldLoaded = false;
+  let isWorldLoaded = true;
   ChickTilsWorldLoad.worldLoadReg = reg('worldLoad', () => {
     if (isWorldLoaded) return;
     ChickTilsWorldLoad.list.forEach(v => v.cb());
@@ -580,9 +580,11 @@ reg = function reg(type, shit) {
     return ChickTilsWorldUnload.list;
   };
   ChickTilsWorldUnload.worldUnloadReg = reg('worldUnload', () => {
-    if (!isWorldLoaded) return;
-    ChickTilsWorldUnload.list.forEach(v => v.cb());
-    isWorldLoaded = false;
+    unrun(() => {
+      if (!isWorldLoaded) return;
+      ChickTilsWorldUnload.list.forEach(v => v.cb());
+      isWorldLoaded = false;
+    });
   });
   ChickTilsWorldUnload.prototype.update = ChickTilsWorldLoad.prototype.update;
 
