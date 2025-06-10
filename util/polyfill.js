@@ -887,7 +887,7 @@ export class Deque {
     const that = this;
     const o = {
       value() { return c.v; },
-      done() { return !c.r; },
+      done() { return !c; },
       next() {
         c = c.r;
         return o;
