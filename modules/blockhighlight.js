@@ -11,6 +11,7 @@ let etherDistance = 0;
 let maxEtherDist = 0;
 const etherReasonDisplay = createTextGui(() => ({ a: 0, c: 3, s: 4 / Renderer.screen.getScale(), x: Renderer.screen.getWidth() / 2, y: Renderer.screen.getHeight() / 2 - 20, b: true }));
 const stateCanEther = new StateVar(false);
+let isConduit = false;
 
 const itemCache = new (Java.type('java.util.WeakHashMap'))();
 const tickReg = reg('tick', () => {
@@ -18,13 +19,19 @@ const tickReg = reg('tick', () => {
 
   etherDistance = 0;
   const item = Player.getHeldItem();
+  isConduit = false;
   if (!item) return;
 
   const stack = item.itemStack;
-  const dist = itemCache.get(stack);
+  let dist = itemCache.get(stack);
+  if (dist < 0) {
+    isConduit = true;
+    dist = -dist;
+  }
   if (dist !== null) return etherDistance = dist;
 
-  if (['ETHERWARP_CONDUIT', 'ASPECT_OF_THE_VOID', 'ASPECT_OF_THE_END'].includes(getSbId(item))) {
+  const id = getSbId(item);
+  if (['ETHERWARP_CONDUIT', 'ASPECT_OF_THE_VOID', 'ASPECT_OF_THE_END'].includes(id)) {
     const tag = stack.func_77978_p().func_74775_l('display');
     const lore = tag.func_150295_c('Lore', 8);
     for (let i = 0; i < lore.func_74745_c(); i++) {
@@ -34,9 +41,14 @@ const tickReg = reg('tick', () => {
         break;
       }
     }
+    if (id === 'ETHERWARP_CONDUIT') {
+      isConduit = true;
+      etherDistance = -etherDistance;
+    }
   }
 
   itemCache.put(stack, etherDistance);
+  if (id === 'ETHERWARP_CONDUIT') etherDistance = -etherDistance;
 }).setEnabled(settings._blockHighlightCheckEther);
 
 const MovingObjectTypeBLOCK = Java.type('net.minecraft.util.MovingObjectPosition').MovingObjectType.BLOCK;
@@ -72,7 +84,7 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
     return;
   }
 
-  if (settings.blockHighlightCheckEther && etherDistance > 0 && Player.isSneaking()) {
+  if (settings.blockHighlightCheckEther && etherDistance > 0 && (isConduit || Player.isSneaking())) {
     let result = raycast(Player.getPlayer(), 1, 0, etherDistance, 0.1);
     if (!result) {
       stateCanEther.set(false);
