@@ -41,7 +41,7 @@ export function setIsMain() {
  *  serverScrutinizerPPSDisplay: TextLocation;
  *  sackTilsItemDisplay: TextLocation;
  *  chattilsFollowKey: number;
- *  terracottaRespawnTimer: number;
+ *  terracottaRespawnTimer: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
