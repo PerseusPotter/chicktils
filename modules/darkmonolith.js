@@ -162,8 +162,7 @@ const drop1Reg = reg('chat', () => data.monolithPowder += 100).setCriteria('&r&5
 const drop2Reg = reg('chat', () => data.monolithCoins += 50_000).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&650,000 Coins&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
 const drop3Reg = reg('chat', () => { data.monolithPowder += 1_000; data.monolithCoins += 2_500; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&62,500 Coins &r&aand &r&21,000 ᠅ Mithril Powder&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
 const drop4Reg = reg('chat', () => data.monolithPowder += 3_000).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&23,000 ᠅ Mithril Powder&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
-// todo: actually drop a fish
-const drop5Reg = reg('chat', () => data.monolithFish++).setCriteria(/&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded .+?Fish.+?&r/).setEnabled(settings._darkMonolithTrackDrops);
+const drop5Reg = reg('chat', () => data.monolithFish++).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&cRock the Fish&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
 function formatDrops() {
   return [
     `&6${commaNumber(data.monolithCoins)} Coins`,
