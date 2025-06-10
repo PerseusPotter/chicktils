@@ -27,7 +27,9 @@ function formatSong(song) {
 const stateSpotifyOpen = new StateVar(false);
 const spotifyPrefix = '&2Spotify &7>&r ';
 let spotifyPrefixDisplay = '';
-function updatePrefix() {
+function updatePrefix(d = 1) {
+  // lmao i give up
+  if (d > 0) Client.scheduleTask(5, updatePrefix(d - 1));
   spotifyGui.setLine(' ');
   spotifyGui._forceUpdate();
   const spaceWidth = spotifyGui.getWidth();
