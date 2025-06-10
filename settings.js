@@ -1085,7 +1085,14 @@ export const props = {
   lookAtSize: new Property('LookAtSize', page, ++sort, Property.Type.Number, 0.01, { min: 0 }),
   lookAtPointTo: new Property('LookAtPointToLocation', page, ++sort, Property.Type.Toggle, false),
   lookAtThreshold: new Property('LookAtTreshold', page, ++sort, Property.Type.Number, 0.1, { min: 0, desc: 'threshold (in degrees) until it is "good enough"' }),
-  lookAtTimeout: new Property('LookAtTimeout', page, ++sort, Property.Type.Integer, 600, { min: 1, desc: 'time (in ticks) until it gives up' })
+  lookAtTimeout: new Property('LookAtTimeout', page, ++sort, Property.Type.Integer, 600, { min: 1, desc: 'time (in ticks) until it gives up' }),
+
+  enabledarkmonolith: new Property('EnableDarkMonolith', page, ++sort, Property.Type.Toggle, false),
+  darkMonolithColor: new Property('DarkMonolithColor', page, ++sort, Property.Type.Color, 0x000000FF),
+  darkMonolithPossibleColor: new Property('DarkMonolithPossibleColor', page, ++sort, Property.Type.Color, 0x55FF55FF),
+  darkMonolithScannedColor: new Property('DarkMonolithScannedColor', page, ++sort, Property.Type.Color, 0xFF5555FF),
+  darkMonolithEsp: new Property('DarkMonolithEsp', page, ++sort, Property.Type.Toggle, true),
+  darkMonolithPointTo: new Property('DarkMonolithPointTo', page, ++sort, Property.Type.Toggle, true)
 };
 const pageNames = [
   '',
