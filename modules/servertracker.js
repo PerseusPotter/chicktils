@@ -8,7 +8,10 @@ import { _setTimeout } from '../util/timers';
 const servers = {};
 let lastWarp = 0;
 let currServ = '';
-const warpReg = reg('chat', id => {
+const warpReg = reg('chat', () => {
+  lastWarp = Date.now();
+}).setCriteria('&r&7Warping...&r');
+const joinReg = reg('chat', id => {
   const t = Date.now();
   if (currServ) servers[currServ] = t;
   if (id in servers) {
@@ -16,7 +19,6 @@ const warpReg = reg('chat', id => {
     const timeStr = timeToStr(timeDif);
     log(timeStr, 'since last visited');
   } else log('new server');
-  lastWarp = t;
   currServ = id;
 }).setCriteria('&7Sending to server ${id}...&r');
 const unloadReg = reg('worldUnload', () => (Date.now() - lastWarp > 1000) && (currServ = ''));
@@ -104,11 +106,13 @@ const regs = [
 export function init() { }
 export function load() {
   warpReg.register();
+  joinReg.register();
   unloadReg.register();
   regs.forEach(v => v.register());
 }
 export function unload() {
   warpReg.unregister();
+  joinReg.unregister();
   unloadReg.unregister();
   regs.forEach(v => v.unregister());
 }
