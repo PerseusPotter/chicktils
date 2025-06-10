@@ -42,6 +42,10 @@ export function setIsMain() {
  *  sackTilsItemDisplay: TextLocation;
  *  chattilsFollowKey: number;
  *  terracottaRespawnTimer: TextLocation;
+ *  monolithCoins: number;
+ *  monolithPowder: number;
+ *  monolithFish: number;
+ *  monolithTracker: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -91,7 +95,8 @@ function verifyTextLocation(value) {
   'feroEstimateLoc',
   'serverScrutinizerPPSDisplay',
   'sackTilsItemDisplay',
-  'terracottaRespawnTimer'
+  'terracottaRespawnTimer',
+  'monolithTracker'
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v);
@@ -119,15 +124,18 @@ if (!data.unlockedHubWarps || !Array.isArray(data.unlockedHubWarps) || !data.unl
   reset('unlockedHubWarps');
 }
 
-if (typeof data.dianaWarpKey !== 'number') {
-  data.dianaWarpKey = 0;
-  reset('dianaWarpKey');
-}
-
-if (typeof data.chattilsFollowKey !== 'number') {
-  data.chattilsFollowKey = 0;
-  reset('chattilsFollowKey');
-}
+[
+  'dianaWarpKey',
+  'chattilsFollowKey',
+  'monolithCoins',
+  'monolithPowder',
+  'monolithFish'
+].forEach(v => {
+  if (typeof data[v] !== 'number') {
+    data[v] = 0;
+    reset(v);
+  }
+});
 
 data.firstLoad = false;
 

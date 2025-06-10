@@ -1092,7 +1092,10 @@ export const props = {
   darkMonolithPossibleColor: new Property('DarkMonolithPossibleColor', page, ++sort, Property.Type.Color, 0x55FF55FF),
   darkMonolithScannedColor: new Property('DarkMonolithScannedColor', page, ++sort, Property.Type.Color, 0xFF5555FF),
   darkMonolithEsp: new Property('DarkMonolithEsp', page, ++sort, Property.Type.Toggle, true),
-  darkMonolithPointTo: new Property('DarkMonolithPointTo', page, ++sort, Property.Type.Toggle, true)
+  darkMonolithPointTo: new Property('DarkMonolithPointTo', page, ++sort, Property.Type.Toggle, true),
+  darkMonolithTrackDrops: new Property('DarkMonolithTrackDrops', page, ++sort, Property.Type.Toggle, true),
+  moveDarkMonolithDropsTracker: new Property('MoveDarkMonolithDropsTracker', page, ++sort, Property.Type.Action),
+  resetDarkMonolithDropsTracker: new Property('ResetDarkMonolithDropsTracker', page, ++sort, Property.Type.Action)
 };
 const pageNames = [
   '',

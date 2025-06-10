@@ -7,6 +7,9 @@ import { unrun } from '../util/threading';
 import { drawArrow3DPos, normColor } from '../util/draw';
 import { renderBeacon, renderBoxFilled, renderBoxOutlineMiter, renderTracer } from '../../Apelles/index';
 import { Deque, flatMap } from '../util/polyfill';
+import data from '../data';
+import { commaNumber } from '../util/format';
+import createTextGui from '../util/customtextgui';
 
 /** @type {StateVar<[number, number, number]?} */
 const stateMonolithPosition = new StateVar();
@@ -153,8 +156,34 @@ const renderOvReg = reg('renderOverlay', () => {
   );
 }).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateMonolithPosition));
 
+const trackerGui = createTextGui(() => data.monolithTracker, () => formatDrops());
+
+const drop1Reg = reg('chat', () => data.monolithPowder += 100).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&2100 ᠅ Mithril Powder&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
+const drop2Reg = reg('chat', () => data.monolithCoins += 50_000).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&650,000 Coins&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
+const drop3Reg = reg('chat', () => { data.monolithPowder += 1_000; data.monolithCoins += 2_500; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&62,500 Coins &r&aand &r&21,000 ᠅ Mithril Powder&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
+const drop4Reg = reg('chat', () => data.monolithPowder += 3_000).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&23,000 ᠅ Mithril Powder&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
+// todo: actually drop a fish
+const drop5Reg = reg('chat', () => data.monolithFish++).setCriteria(/&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded .+?Fish.+?&r/).setEnabled(settings._darkMonolithTrackDrops);
+function formatDrops() {
+  return [
+    `&6${commaNumber(data.monolithCoins)} Coins`,
+    `&2${commaNumber(data.monolithPowder)} Powder`,
+    `&c${commaNumber(data.monolithFish)} 🪨🐟`
+  ];
+}
+const renderTrackerReg = reg('renderOverlay', () => {
+  trackerGui.setLines(formatDrops());
+  trackerGui.render();
+}).setEnabled(settings._darkMonolithTrackDrops);
+
 export function init() {
   settings._enabledarkmonolith.listen(v => v && Client.scheduleTask(() => log('seek therapy')));
+  settings._moveDarkMonolithDropsTracker.onAction(() => trackerGui.edit());
+  settings._resetDarkMonolithDropsTracker.onAction(() => {
+    data.monolithCoins = 0;
+    data.monolithPowder = 0;
+    data.monolithFish = 0;
+  });
 }
 export function load() {
   scanReg.register();
@@ -164,6 +193,12 @@ export function load() {
   leaveReg.register();
   renderReg.register();
   renderOvReg.register();
+  drop1Reg.register();
+  drop2Reg.register();
+  drop3Reg.register();
+  drop4Reg.register();
+  drop5Reg.register();
+  renderTrackerReg.register();
 }
 export function unload() {
   reset();
@@ -175,4 +210,10 @@ export function unload() {
   leaveReg.unregister();
   renderReg.unregister();
   renderOvReg.unregister();
+  drop1Reg.unregister();
+  drop2Reg.unregister();
+  drop3Reg.unregister();
+  drop4Reg.unregister();
+  drop5Reg.unregister();
+  renderTrackerReg.unregister();
 }
