@@ -45,6 +45,7 @@ export function setIsMain() {
  *  monolithCoins: number;
  *  monolithPowder: number;
  *  monolithFish: number;
+ *  monolithCount: number;
  *  monolithTracker: TextLocation;
  * }}
  */
@@ -129,7 +130,8 @@ if (!data.unlockedHubWarps || !Array.isArray(data.unlockedHubWarps) || !data.unl
   'chattilsFollowKey',
   'monolithCoins',
   'monolithPowder',
-  'monolithFish'
+  'monolithFish',
+  'monolithCount'
 ].forEach(v => {
   if (typeof data[v] !== 'number') {
     data[v] = 0;
