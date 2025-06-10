@@ -61,6 +61,27 @@ public class FontHelper {
         str.addAttribute(a, v, s, e);
     }
 
+    private static void setFontAttrOhShit(AttributedString att, char c, Font f, int i) {
+        if (!f.canDisplay(c)) {
+            Font n = ohShitFindAFontForThisCharacterSobs(c);
+            if (n != null) f = n;
+        }
+        addAttribute(att, TextAttribute.FONT, f, i, i + 1);
+    }
+
+    private static Map<Character, Font> ohShitIRememberThisOne = new HashMap<>();
+    private static Font ohShitFindAFontForThisCharacterSobs(char c) {
+        // null :sob:
+        if (!ohShitIRememberThisOne.containsKey(c)) ohShitIRememberThisOne.put(c, ohShitFindAFontForThisCharacterButActuallyFindIt(c));
+        return ohShitIRememberThisOne.get(c);
+    }
+    private static Font ohShitFindAFontForThisCharacterButActuallyFindIt(char c) {
+        for (Font f : GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()) {
+            if (f.canDisplay(c)) return f;
+        }
+        return null;
+    }
+
     private static void setFontAttr(AttributedString att, char[] str, Font f1, Font f2, int s, int e) {
         if (att == null) return;
         if (s >= e) return;
@@ -68,13 +89,10 @@ public class FontHelper {
         if (e > str.length) return;
 
         int i = f1.canDisplayUpTo(str, s, e);
-        int maxIters = 10;
         while (s < str.length && i >= 0) {
-            if (--maxIters == 0) return;
             addAttribute(att, TextAttribute.FONT, f1, s, i);
-            int b = s = i;
-            while (s < e && f1.canDisplayUpTo(str, s, s + 1) != -1) s++;
-            addAttribute(att, TextAttribute.FONT, f2, b, s);
+            setFontAttrOhShit(att, str[i], f2, i);
+            s = i + 1;
             i = f1.canDisplayUpTo(str, s, e);
         }
         addAttribute(att, TextAttribute.FONT, f1, s, e);
