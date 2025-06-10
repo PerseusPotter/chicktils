@@ -20,7 +20,7 @@ const monolithPositions = new Deque(
     [
       [-94, 201, -31],
       [-92, 221, -54],
-      [-93, 221, -51],
+      [-93, 221, -51, true],
       [-64, 206, -63],
       [-15, 236, -92],
       [-10, 162, 109],
@@ -35,7 +35,7 @@ const monolithPositions = new Deque(
       [150, 196, 190]
     ],
     p => offsets
-      .map((o, i) => [p[0] + o[0], p[1], p[2] + o[1], i === 4])
+      .map((o, i) => [p[0] + o[0], p[1], p[2] + o[1], !p[3] && i === 4])
       .map(v => [v[0], v[1], v[2], new MCBlockPos(v[0], v[1], v[2]), v[3]])
   )
 );
