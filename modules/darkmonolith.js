@@ -65,10 +65,9 @@ const scanReg = reg('tick', () => {
   const w = World.getWorld();
   const iter = remaining.iter();
   let i = 0;
-  const scanSize = Math.ceil(remaining.length / 20);
   while (!iter.done()) {
     let v = iter.value();
-    if (i % scanSize === scanI && w.func_175668_a(v[3], false)) {
+    if (i % settings.darkMonolithScanDelay === scanI && w.func_175668_a(v[3], false)) {
       if (getBlockId(w.func_180495_p(v[3]).func_177230_c()) === 122) stateMonolithPosition.set(v);
       else checked.push(v);
       iter.remove();
@@ -78,7 +77,7 @@ const scanReg = reg('tick', () => {
   }
 
   scanI++;
-  if (scanI >= scanSize) scanI = 0;
+  if (scanI >= settings.darkMonolithScanDelay) scanI = 0;
 }).setEnabled(stateScanMonolith);
 const fallingBlockReg = reg('packetReceived', pack => {
   if (pack.func_148993_l() !== 70) return;
