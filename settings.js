@@ -1096,7 +1096,7 @@ export const props = {
   darkMonolithTrackDrops: new Property('DarkMonolithTrackDrops', page, ++sort, Property.Type.Toggle, true),
   moveDarkMonolithDropsTracker: new Property('MoveDarkMonolithDropsTracker', page, ++sort, Property.Type.Action),
   resetDarkMonolithDropsTracker: new Property('ResetDarkMonolithDropsTracker', page, ++sort, Property.Type.Action),
-  darkMonolithScanDelay: new Property('DarkMonolithScanDelay', page, ++sort, Property.Type.Integer, 20, { desc: 'time in ticks taken to scan all possible positions, lower = laggier', min: 1 })
+  darkMonolithScanDelay: new Property('DarkMonolithScanDelay', page, ++sort, Property.Type.Integer, 5, { desc: 'time in ticks taken to scan all possible positions, lower = laggier', min: 1 })
 };
 const pageNames = [
   '',
