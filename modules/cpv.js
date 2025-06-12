@@ -11,7 +11,7 @@ function _getUUID(user) {
   if (!user) return Player.getUUID();
   let uuid;
   try {
-    uuid = urlToString('https://api.mojang.com/users/profiles/minecraft/' + user);
+    uuid = urlToString('https://api.minecraftservices.com/minecraft/profile/lookup/name/' + user);
     if (uuid) uuid = JSON.parse(uuid).id;
     if (uuid) return uuid;
   } catch (e) { }
@@ -22,7 +22,7 @@ function _getUUID(user) {
   return '';
 }
 function getUUID(user) {
-  if (userUUIDC.has(user)) return userUUIDC.get(user);
+  if (user && userUUIDC.has(user)) return userUUIDC.get(user);
   const uuid = _getUUID(user);
   if (uuid) userUUIDC.set(user, uuid);
   return uuid;
