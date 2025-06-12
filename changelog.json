@@ -664,6 +664,15 @@
           "desc": "a lot of dev tax :sobs:"
         }
       ]
+    },
+    {
+      "version": "0.11.1",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "diana"
+        }
+      ]
     }
   ]
 }
