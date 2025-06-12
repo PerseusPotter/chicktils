@@ -563,6 +563,107 @@
           "desc": "add bayou to stat gui"
         }
       ]
+    },
+    {
+      "version": "0.11.0",
+      "changes": [
+        {
+          "type": "misc",
+          "desc": "update sack list"
+        },
+        {
+          "type": "misc",
+          "desc": "obligatory dev tax"
+        },
+        {
+          "type": "feat",
+          "desc": "sack item hud"
+        },
+        {
+          "type": "change",
+          "desc": "implementation of powder chest thing"
+        },
+        {
+          "type": "misc",
+          "desc": "add option to show powder from chests"
+        },
+        {
+          "type": "fix",
+          "desc": "spotify string width on different fonts"
+        },
+        {
+          "type": "fix",
+          "desc": "text sometimes appearing discolored"
+        },
+        {
+          "type": "feat",
+          "desc": "necromancy soul display (dropped souls)"
+        },
+        {
+          "type": "change",
+          "desc": "swap to apelles for rendering"
+        },
+        {
+          "type": "del",
+          "desc": "remove rabbit sniffer"
+        },
+        {
+          "type": "fix",
+          "desc": "random npe's"
+        },
+        {
+          "type": "change",
+          "desc": "box ice spray logic"
+        },
+        {
+          "type": "change",
+          "desc": "diana stuff"
+        },
+        {
+          "type": "misc",
+          "desc": "pbos for faster text rendering"
+        },
+        {
+          "type": "misc",
+          "desc": "add option to change channel for rattils message"
+        },
+        {
+          "type": "feat",
+          "desc": "dojo (only mastery rn i was skill issuing stfu)"
+        },
+        {
+          "type": "feat",
+          "desc": "timer for earliest terracotta respawn on hud"
+        },
+        {
+          "type": "change",
+          "desc": "make ender bow work with pearl path"
+        },
+        {
+          "type": "feat",
+          "desc": "add /lookat (to help aiming angles)"
+        },
+        {
+          "type": "feat",
+          "desc": "dark monolith scanner"
+        },
+        {
+          "type": "feat",
+          "desc": "dark monolith drop tracker"
+        },
+        {
+          "type": "change",
+          "desc": "start player transfer cooldown on warp message"
+        },
+        {
+          "type": "change",
+          "desc": "/cpv now uses a different api"
+        },
+        {
+          "type": "misc",
+          "desc": "a lot of dev tax :sobs:"
+        }
+      ]
     }
   ]
 }
