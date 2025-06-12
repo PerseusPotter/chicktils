@@ -283,7 +283,7 @@ function updateGuesses() {
     ]);
     const splineIntTime = newtonRaphson(splineIntPoly, weightT);
     */
-    let t;
+    let t = 0;
     while (t < weightT + 2) {
       if (
         (splinePoly[0](t) - splineX[0]) ** 2 +
@@ -291,6 +291,7 @@ function updateGuesses() {
         (splinePoly[2](t) - splineZ[0]) ** 2 >
         distance * distance
       ) break;
+      t++;
     }
     const splineIntTime = convergeHalfInterval(
       t => distance - Math.hypot(splinePoly[0](t) - splineX[0], splinePoly[1](t) - splineY[0], splinePoly[2](t) - splineZ[0]),
