@@ -637,7 +637,6 @@ export const props = {
   dungeonTerminalBreakdown: new Property('DungeonTerminalBreakdown', page, ++sort, Property.Type.Toggle, false, { desc: 'displays terminals done by each person' }),
 
   dungeonPlaySoundKey: new Property('DungeonPlaySoundOnKey', page, ++sort, Property.Type.Toggle, false, { desc: 'play dulkir secret sound on pickup key' }),
-  dungeonPlaySoundBat: new Property('DungeonPlaySoundOnBatDeath', page, ++sort, Property.Type.Toggle, false, { desc: 'play dulkir secret sound on bat death' }),
 
   dungeonIceSprayAlert: new Property('DungeonRareMobDropAlert', page, ++sort, Property.Type.Toggle, true, { desc: 'alert on ice spray/sm cp' }),
   dungeonIceSprayAlertTime: new Property('DungeonRareMobDropAlertTime', page, ++sort, Property.Type.Integer, 2000, { desc: 'in ms', min: 0 }),
@@ -657,7 +656,7 @@ export const props = {
   dungeonSpiritBearTimerHud: new Property('DungeonSpiritBearTimerHud', page, ++sort, Property.Type.Toggle, true, { desc: 'show spirit bear timer on hud' }),
   moveSpiritBearTimerHud: new Property('MoveSpiritBearTimerHud', page, ++sort, Property.Type.Action),
 
-  dungeonSilverfishHasteTimer: new Property('DungeonSilverfishHasteTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render how much longer haste from silverfish will last' }),
+  dungeonSilverfishHasteTimer: new Property('DungeonSilverfishHasteTimer', page, ++sort, Property.Type.Toggle, false, { desc: 'render how much longer haste from silverfish will last\nobsolete after haste artifact' }),
   moveSilverfishHasteTimer: new Property('MoveSilverfishHasteTimer', page, ++sort, Property.Type.Action),
 
   dungeonHideFallingBlocks: new Property('DungeonHideFallingBlocks', page, ++sort, Property.Type.Toggle, true, { desc: 'dont render falling blocks in boss' }),
@@ -811,9 +810,9 @@ export const props = {
   chatTilsWaypointShowOwn: new Property('ChatTilsWaypointShowOwn', page, ++sort, Property.Type.Toggle, true, { desc: 'show your own waypoints' }),
   chatTilsWaypointPersist: new Property('ChatTilsWaypointPersist', page, ++sort, Property.Type.Toggle, false, { desc: 'whether to persist on swapping servers' }),
 
-  chatTilsHideBonzo: new Property('ChatTilsHideAzureBonzo', page, ++sort, Property.Type.Option, 'False', { desc: '"Bonzo Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
-  chatTilsHidePhoenix: new Property('ChatTilsHideAzurePhoenix', page, ++sort, Property.Type.Option, 'False', { desc: '"Phoenix Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
-  chatTilsHideSpirit: new Property('ChatTilsHideAzureSpirit', page, ++sort, Property.Type.Option, 'False', { desc: '"Spirit Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
+  chatTilsHideBonzo: new Property('ChatTilsHidePartyChatBonzo', page, ++sort, Property.Type.Option, 'False', { desc: '"Bonzo Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
+  chatTilsHidePhoenix: new Property('ChatTilsHidePartyChatPhoenix', page, ++sort, Property.Type.Option, 'False', { desc: '"Phoenix Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
+  chatTilsHideSpirit: new Property('ChatTilsHidePartyChatSpirit', page, ++sort, Property.Type.Option, 'False', { desc: '"Spirit Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
   chatTilsHideLeap: new Property('ChatTilsHidePartyChatLeaps', page, ++sort, Property.Type.Option, 'False', { desc: '"Leaped/Leaping to plinkingndriving" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
   chatTilsHideMelody: new Property('ChatTilsHidePartyChatMelody', page, ++sort, Property.Type.Option, 'False', { desc: '"melody (1/4)/25%" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'] }),
   chatTilsCompactMelody: new Property('ChatTilsCompactPartyChatMelody', page, ++sort, Property.Type.Toggle, true, { desc: 'only keep most recent melody message from a player' }),
@@ -1050,7 +1049,7 @@ export const props = {
 
   enableunfocus: new Property('PreventRenderingWhenUnfocused', page, ++sort, Property.Type.Toggle, false, { desc: 'similar to patcher\'s unfocused fps\nbut instead of capping fps, it completely stops rendering' }),
 
-  enableassfangcheese: new Property('EnableAssfangCheeseHealth', page, ++sort, Property.Type.Toggle, false, { desc: 'show real assfang health' }),
+  enableassfangcheese: new Property('EnableAssfangCheeseHealth', page, ++sort, Property.Type.Toggle, false, { desc: 'show real assfang health\nobsolete' }),
   moveAssfangCheese: new Property('MoveAssfangCheeseHealth', page, ++sort, Property.Type.Action),
 
   enableblockhighlight: new Property('EnableBlockHighlight', page, ++sort, Property.Type.Toggle, false),
