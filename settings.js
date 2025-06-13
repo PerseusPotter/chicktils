@@ -707,6 +707,8 @@ export const props = {
   dungeonTerracottaRespawnGui: new Property('DungeonTerracottaRespawnGui', page, ++sort, Property.Type.Toggle, false, { desc: 'render the timer for the first terracotta on hud' }),
   moveDungeonTerracottaRespawnGui: new Property('MoveDungeonTerracottaRespawnGui', page, ++sort, Property.Type.Action),
 
+  dungeonStormClearLaser: new Property('DungeonStormClearLaserChecker', page, ++sort, Property.Type.Toggle, false, { desc: 'warn when someone is using laser in storm clear' }),
+
   // 4
   enablestatgui: new Property('EnableStatGUI', ++page, sort = 0, Property.Type.Toggle, false, { desc: 'render stats from tab onto hud' }),
   loc0: new Property('EnablePrivateIslandGUI', page, ++sort, Property.Type.Toggle, true),
