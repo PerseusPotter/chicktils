@@ -3,6 +3,7 @@ import { getPlayerName } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
 import { getSbId } from '../util/skyblock';
 import { Deque, JavaTypeOrNull, setAccessible } from '../util/polyfill';
+import { unrun } from '../util/threading';
 
 function reset() {
   dungeonLeaveReg.unregister();
@@ -130,14 +131,16 @@ const getPlayersStep2Reg = reg('step', () => {
   }
 }).setFps(2);
 const playerItemReg = reg('serverTick2', t => {
-  players.forEach(v => {
-    const e = v.e;
-    const id = getSbId(e ? e === Player ? e.getHeldItem() : e.getItemInSlot(0) : null);
+  unrun(() => {
+    players.forEach(v => {
+      const e = v.e;
+      const id = getSbId(e ? e === Player ? e.getHeldItem() : e.getItemInSlot(0) : null);
 
-    const p = v.items.getFirst();
-    if (p.id === id) p.t = t;
-    else v.items.unshift({ id, t: t });
-    if (t - v.items.getLast().t > 20) v.items.pop();
+      const p = v.items.getFirst();
+      if (p.id === id) p.t = t;
+      else v.items.unshift({ id, t: t });
+      if (t - v.items.getLast().t > 20) v.items.pop();
+    });
   });
 });
 
