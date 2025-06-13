@@ -41,6 +41,7 @@ const bossCbs = [];
 
 export const stateIsInBoss = new StateVar(false);
 export const statePlayerClass = new StateVar('Unknown');
+export const stateBossName = new StateVar('');
 let stateTrackPlayers = new StateProp(false);
 export function registerTrackPlayers(cond) {
   stateTrackPlayers = stateTrackPlayers.or(cond);
@@ -152,6 +153,7 @@ const bossMessageReg = reg('chat', (name, msg) => {
     if (msg === `If I had spent more time studying and less time watching anime, maybe mother would be here with me!`) return;
   }
   stateIsInBoss.set(true);
+  stateBossName.set(name);
 }).setCriteria(/^&r&(?:c|4)\[BOSS\] (.+?)&r&(?:f|c): (?:&.)*(.+?)&r$/);
 // const dungeonEndReg = reg('chat', () => dungeon.emit('dungeonEnd')).setChatCriteria('&r&f                            &r&fTeam Score:').setParameter('START');
 
