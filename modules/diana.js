@@ -120,7 +120,7 @@ const burrowSpawnReg = reg('packetReceived', pack => {
       type
     ]);
 
-    prevGuesses = prevGuesses.filter(v => (x - v[0]) ** 2 + (z - v[2]) ** 2 > 400);
+    prevGuesses = prevGuesses.filter(v => (x - v[0]) ** 2 + (z - v[2]) ** 2 > 100);
   });
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._dianaScanBurrows);
 const burrowDigReg = reg('packetSent', pack => {
@@ -210,7 +210,7 @@ function resetGuess() {
           v[2] < 210 &&
           v[1] > 50 &&
           v[1] < 120
-        ) prevGuesses.push([v[0], v[1], v[2], getTickCount(), 40]);
+        ) prevGuesses.push([v[0], v[1], v[2], getTickCount(), 20]);
       }
     }
     guessPos.clear();
@@ -433,6 +433,10 @@ const renderGuessReg = reg('renderWorld', () => {
 const tickReg = reg('tick', () => {
   let closest = foundGuessBurrow ? null : guessPos.get('Average');
   let closestD = closest ? (Player.getX() - closest[0]) ** 2 + (Player.getY() - closest[1]) ** 2 + (Player.getZ() - closest[2]) ** 2 : Number.POSITIVE_INFINITY;
+  if (Number.isNaN(closestD)) {
+    closest = null;
+    closestD = Number.POSITIVE_INFINITY;
+  }
 
   const t = getTickCount();
 
