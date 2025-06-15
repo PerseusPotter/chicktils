@@ -1,5 +1,5 @@
 import { log } from './util/log';
-import settings, { Property, props, setIsMain as setIsMainS } from './settings';
+import settings, { props } from './settings';
 import { setIsMain as setIsMainD } from './data';
 import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
@@ -8,7 +8,8 @@ import { centerMessage, cleanNumber } from './util/format';
 import { getPing, getAveragePing } from './util/ping';
 import { getRegs, simulate } from './util/registerer';
 import { calcMedian } from './util/math';
-setIsMainS();
+import { Property } from './settingsLib';
+settings.setMainInstance();
 setIsMainD();
 const VERSION = '0.11.1';
 

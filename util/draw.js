@@ -495,7 +495,7 @@ export function rgbaToJavaColor(c) {
 export class JavaColorWrapper {
   cache;
   /**
-   * @param {import ('../settings').Property} prop
+   * @param {import ('../settingsLib').Property} prop
    */
   constructor(prop) {
     this.cache = rgbaToJavaColor(prop.valueOf());
