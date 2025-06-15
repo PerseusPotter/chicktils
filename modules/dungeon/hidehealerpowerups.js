@@ -48,7 +48,7 @@ const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (!id.equals(EnumParticleTypes.REDSTONE)) return;
   const b = part.underlyingEntity.func_70535_g();
   if (b === 0 || b > 10) return;
-  if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 2 && dist(e.field_70161_v, part.getZ()) < 2 && dist(e.field_70163_u + 2, part.getY() < 5))) cancel(evn);
+  if (hiddenPowerupsBucket.get(part.getX(), part.getZ()).some(e => dist(e.field_70165_t, part.getX()) < 2 && dist(e.field_70161_v, part.getZ()) < 2 && dist(e.field_70163_u + 2, part.getY()) < 3)) cancel(evn);
 }).triggerIfCanceled(false).setEnabled(settings._dungeonHideHealerPowerups);
 const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.containsKey(e.entity)) cancel(evn);
