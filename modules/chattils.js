@@ -22,12 +22,14 @@ const blockNameCmd = reg('command', ign => {
 const coords = [];
 const removeOldestCmd = reg('command', () => coords.shift()).setName('ctsremoveoldestwaypoint').setEnabled(settings._chatTilsWaypoint);
 const worldRenderReg = reg('renderWorld', () => {
-  if (settings.chatTilsWaypointType !== 'None') coords.forEach(v => {
-    if (settings.chatTilsWaypointType === 'Box') renderWaypoint(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
-    else renderBoxOutline(settings.chatTilsWaypointColor, v.x, v.y, v.z, 1, 1, { phase: true, centered: false });
+  coords.forEach(v => {
+    if (settings.chatTilsWaypointType !== 'None') {
+      if (settings.chatTilsWaypointType === 'Box') renderWaypoint(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
+      else renderBoxOutline(settings.chatTilsWaypointColor, v.x, v.y, v.z, 1, 1, { phase: true, centered: false });
+    }
+    if (settings.chatTilsWaypointBeacon) renderBeacon(settings.chatTilsWaypointColor, v.x, v.y + 1, v.z, { phase: true, centered: false });
+    if (settings.chatTilsWaypointName) renderString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(settings.chatTilsWaypointColor)*/);
   });
-  if (settings.chatTilsWaypointBeacon) coords.forEach(v => renderBeacon(settings.chatTilsWaypointColor, v.x, v.y + 1, v.z, { phase: true, centered: false }));
-  if (settings.chatTilsWaypointName) coords.forEach(v => renderString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(settings.chatTilsWaypointColor)*/));
 });
 let waypointReloadNum = 0;
 const worldUnloadReg = reg('worldUnload', () => {
