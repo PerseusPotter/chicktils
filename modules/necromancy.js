@@ -74,7 +74,7 @@ const soulSpawnReg = reg('packetReceived', pack => {
     }
     droppedSouls.set(id, {
       name,
-      t: customRegs.serverTick2.tick
+      t: customRegs.serverTick.tick
     });
   });
 }).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment).setEnabled(settings._necromancyTrackSouls);
@@ -83,7 +83,7 @@ const soulGradient = new Gradient(settings._necromancySoulColorNew, settings._ne
 const soulRenderReg = reg('postRenderEntity', (ent, pos) => {
   const data = droppedSouls.get(ent.entity.func_145782_y());
   if (!data) return;
-  const t = customRegs.serverTick2.tick;
+  const t = customRegs.serverTick.tick;
   if (settings.necromancyShowMobName) renderString(
     data.name,
     pos.getX(), pos.getY() + 1.4375 + 0.9, pos.getZ(),

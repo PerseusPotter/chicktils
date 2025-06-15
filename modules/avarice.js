@@ -74,7 +74,7 @@ const arachneSpawnReg = reg('spawnEntity', ent => {
   if (settings.avariceArachneBoxBigSpooder && (!arachneEnt || arachneEnt.field_70128_L) && ent instanceof EntitySpider && !(ent instanceof EntityCaveSpider)) arachnePossBig.push([100, ent]);
   if (settings.avariceArachneBoxSmallSpooders && ent instanceof EntityCaveSpider) arachnePossSmall.push([5, ent]);
 }).setEnabled(stateDoArachne);
-const arachneServerTick = reg('serverTick2', () => {
+const arachneServerTick = reg('serverTick', () => {
   run(() => {
     arachnePossBig = arachnePossBig.filter(v => {
       const hp = getMaxHp(v[1]);
@@ -169,7 +169,7 @@ const taraLeaveReg = reg('worldUnload', () => {
   stateDoingTara.set(false);
   stateTaraStarted.set(0);
 }).setEnabled(new StateProp(stateDoingTara).and(settings._avariceTaraTrader));
-const taraServerTickReg = reg('serverTick2', () => stateTaraStarted.set(stateTaraStarted.get() - 1)).setEnabled(new StateProp(stateTaraStarted).notequals(0));
+const taraServerTickReg = reg('serverTick', () => stateTaraStarted.set(stateTaraStarted.get() - 1)).setEnabled(new StateProp(stateTaraStarted).notequals(0));
 
 export function init() {
   settings._moveAvariceCoinCounter.onAction(v => coinCounter.edit(v));

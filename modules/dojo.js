@@ -28,10 +28,10 @@ const masteryBlockReg = reg('blockChange', (pos, bs) => {
   }
   if (id !== 35) return;
   if (block.func_176201_c(bs) !== 5) return;
-  masteryBlocks.push({ pos, time: customRegs.serverTick2.tick });
+  masteryBlocks.push({ pos, time: customRegs.serverTick.tick });
 }).setEnabled(stateMasteryEnabled);
 const masteryBlockRenderWorldReg = reg('renderWorld', () => {
-  while (masteryBlocks.length > 0 && 135 < customRegs.serverTick2.tick - masteryBlocks.getFirst().time) masteryBlocks.shift();
+  while (masteryBlocks.length > 0 && 135 < customRegs.serverTick.tick - masteryBlocks.getFirst().time) masteryBlocks.shift();
 
   if (settings.dojoMasteryPointToLowest && masteryBlocks.length > 0 && settings.preferUseTracer) {
     const first = masteryBlocks.getFirst();
@@ -55,7 +55,7 @@ const masteryBlockRenderWorldReg = reg('renderWorld', () => {
       { lw: 3 }
     );
     if (settings.dojoMasteryPointToNextTimer) {
-      const timeRemaining = (125 - (customRegs.serverTick2.tick - next.time)) * 50;
+      const timeRemaining = (125 - (customRegs.serverTick.tick - next.time)) * 50;
       renderString(
         `${colorForNumber(timeRemaining, 1000)}${~~(timeRemaining / 1000)}:${(timeRemaining % 1000).toString().padStart(3, '0')}`,
         first.pos.x + 0.5,
@@ -78,7 +78,7 @@ const masteryBlockRenderOvReg = reg('renderOverlay', () => {
     false
   );
   if (settings.dojoMasteryShowLowestTime) {
-    const timeRemaining = (125 - (customRegs.serverTick2.tick - first.time)) * 50;
+    const timeRemaining = (125 - (customRegs.serverTick.tick - first.time)) * 50;
     masteryTimerGui.setLine(`${colorForNumber(timeRemaining, 1000)}${~~(timeRemaining / 1000)}:${(timeRemaining % 1000).toString().padStart(3, '0')}`);
     masteryTimerGui.render();
   }

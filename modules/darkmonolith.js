@@ -57,7 +57,7 @@ let scanI = 0;
 // wiki says it's 10s, i think it's 3 minutes and so does a guy on the forums 4 years go
 const eggRespawnTime = 200 + 20;
 const scanReg = reg('tick', () => {
-  if (disappearTime !== 0 && customRegs.serverTick2.tick - disappearTime < eggRespawnTime) return;
+  if (disappearTime !== 0 && customRegs.serverTick.tick - disappearTime < eggRespawnTime) return;
   if (remaining.length === 0) {
     log('&4no valid locations found, resetting');
     reset();
@@ -95,14 +95,14 @@ const interactReg = reg('playerInteract', (action, pos) => {
   const egg = stateMonolithPosition.get();
   if (pos.x === egg[0] && pos.y === egg[1] && pos.z === egg[2]) {
     reset();
-    disappearTime = customRegs.serverTick2.tick;
+    disappearTime = customRegs.serverTick.tick;
   }
 }).setEnabled(stateMonolithPosition);
 const hitReg = reg('hitBlock', block => {
   const egg = stateMonolithPosition.get();
   if (block.x === egg[0] && block.y === egg[1] && block.z === egg[2]) {
     reset();
-    disappearTime = customRegs.serverTick2.tick;
+    disappearTime = customRegs.serverTick.tick;
   }
 }).setEnabled(stateMonolithPosition);
 const leaveReg = reg('worldUnload', () => {

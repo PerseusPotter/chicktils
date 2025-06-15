@@ -46,7 +46,7 @@ const warps = [
 ];
 
 function getTickCount() {
-  return customRegs.serverTick2.tick;
+  return customRegs.serverTick.tick;
 }
 
 const burrowFoundAlert = createAlert('Burrow Found');
