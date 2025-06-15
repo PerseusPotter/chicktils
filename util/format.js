@@ -1,4 +1,5 @@
 import { log } from './log';
+import { JavaTypeOrNull } from './polyfill';
 
 /**
  * @param {number} t
@@ -55,13 +56,15 @@ export function colorForNumber(n, max = 1) {
         '§4');
 }
 
+const isUsingChatting = JavaTypeOrNull('org.polyfrost.chatting.Chatting') !== null;
 /**
  * @param {string} msg
  */
 function getCenteredTextLen(msg) {
-  const msgWidth = Renderer.getStringWidth(msg) * Client.settings.chat.getScale();
+  const scale = isUsingChatting ? 1 : Client.settings.chat.getScale();
+  const msgWidth = Renderer.getStringWidth(msg) / scale;
   const margins = ChatLib.getChatWidth() - msgWidth;
-  return (margins / Renderer.getStringWidth(' ') / Client.settings.chat.getScale()) >> 1;
+  return (margins / Renderer.getStringWidth(' ') / scale) >> 1;
 }
 
 /**
