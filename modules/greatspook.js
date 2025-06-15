@@ -31,7 +31,7 @@ const primalSpawnReg = reg('chat', () => {
 }).setCriteria('&r&5&lFEAR. &r&eA &r&dPrimal Fear &r&ehas been summoned!&r');
 
 export function init() {
-  settings._moveGreatSpookPrimalTimer.onAction(() => primalTimer.edit());
+  settings._moveGreatSpookPrimalTimer.onAction(v => primalTimer.edit(v));
   settings._greatSpookPrimalAlertSound.listen(v => primalAlert.sound = v);
 }
 export function load() {

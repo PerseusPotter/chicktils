@@ -50,7 +50,7 @@ const renderOverlayReg = reg('renderOverlay', () => {
 }).setEnabled(new StateProp(settings._dungeonNecronDragTimer).equalsmult('OnScreen', 'Both').and(new StateProp(necronDragTicks).notequals(0)));
 
 export function init() {
-  settings._moveNecronDragTimer.onAction(() => necronDragTimer.edit());
+  settings._moveNecronDragTimer.onAction(v => necronDragTimer.edit(v));
 }
 export function start() {
   necronDragTicks.set(0);

@@ -12,7 +12,7 @@ const EventEmitter = require('./events');
  *  isEdit: boolean;
  *  getEditText: () => string[];
  *  customEditMsg: string;
- *  edit(): void;
+ *  edit(wasFromGui: boolean): void;
  *  render(): void;
  *  setLine(str: string): CustomTextGui;
  *  setLines(strs: string[]): CustomTextGui;
@@ -104,9 +104,10 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
   obj.isEdit = false;
   obj.getEditText = getEditText;
   obj.customEditMsg = customEditMsg;
-  obj.edit = function() {
+  obj.edit = function(wasFromGui) {
     this.isEdit = true;
     curr = this;
+    reopenGui = wasFromGui;
     renderReg.register();
     editGui.open();
   };
@@ -348,6 +349,7 @@ export const editDisplay = createTextGui(() => curr.getLoc(), () => []);
  * @type {CustomTextGui}
  */
 let curr;
+let reopenGui = false;
 const renderReg = reg('renderOverlay', () => {
   Renderer.drawRect(0x80000000, 0, 0, 5000, 5000);
 
@@ -370,6 +372,8 @@ editGui.registerClosed(() => {
   renderReg.unregister();
   curr.isEdit = false;
   curr.emit('editClose');
+  if (reopenGui) settings.amaterasu.openGui();
+  reopenGui = false;
 });
 editGui.registerKeyTyped((c, n) => {
   const l = curr.getLoc();

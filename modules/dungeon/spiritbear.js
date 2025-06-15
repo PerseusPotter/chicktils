@@ -118,7 +118,7 @@ const renderOvlyReg = reg('renderOverlay', () => {
 
 export function init() {
   settings._dungeonSpiritBearSmoothTime.listen(v => spiritBearGuessDelay.delay = v);
-  settings._moveSpiritBearTimerHud.onAction(() => spiritBearTimer.edit());
+  settings._moveSpiritBearTimerHud.onAction(v => spiritBearTimer.edit(v));
   listenBossMessages((name, msg) => settings.dungeonSpiritBearHelper && name === 'Thorn' && msg === 'Welcome Adventurers! I am Thorn, the Spirit! And host of the Vegan Trials!' && stateInFM4.set(true));
 }
 export function start() {

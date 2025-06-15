@@ -177,7 +177,7 @@ const renderTrackerReg = reg('renderOverlay', () => {
 
 export function init() {
   settings._enabledarkmonolith.listen(v => v && Client.scheduleTask(() => log('seek therapy')));
-  settings._moveDarkMonolithDropsTracker.onAction(() => trackerGui.edit());
+  settings._moveDarkMonolithDropsTracker.onAction(v => trackerGui.edit(v));
   settings._resetDarkMonolithDropsTracker.onAction(() => {
     data.monolithCoins = 0;
     data.monolithPowder = 0;

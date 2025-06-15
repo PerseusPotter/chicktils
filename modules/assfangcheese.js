@@ -29,7 +29,7 @@ const renderHealthHud = reg('renderOverlay', () => {
 }).setEnabled(stateAssfangEntity);
 
 export function init() {
-  settings._moveAssfangCheese.onAction(() => healthHud.edit());
+  settings._moveAssfangCheese.onAction(v => healthHud.edit(v));
 }
 export function load() {
   findAssfangReg.register();

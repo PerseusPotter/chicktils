@@ -73,7 +73,7 @@ const renderOvReg = reg('renderOverlay', () => {
 });
 
 export function init() {
-  settings._moveFeroEstimate.onAction(() => hud.edit());
+  settings._moveFeroEstimate.onAction(v => hud.edit(v));
   settings._feroEstimateUpdateDelay.listen(v => updateDelay.delay = v);
 }
 export function load() {

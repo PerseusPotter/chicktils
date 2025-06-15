@@ -269,15 +269,15 @@ const rendOvPps = reg('renderOverlay', () => {
 }).setEnabled(settings._serverScrutinizerPPSDisplay);
 
 export function init() {
-  settings._moveTPSDisplay.onAction(() => tpsDisplay.edit());
-  settings._moveLastTickDisplay.onAction(() => lastTickDisplay.edit());
+  settings._moveTPSDisplay.onAction(v => tpsDisplay.edit(v));
+  settings._moveLastTickDisplay.onAction(v => lastTickDisplay.edit(v));
   settings._serverScrutinizerTPSMaxAge.listen(v => ticks.maxAge = v);
   settings._serverScrutinizerTPSDisplayCap20.listen(v => ticks.cap = v ? 20 : Number.POSITIVE_INFINITY);
-  settings._moveFPSDisplay.onAction(() => fpsDisplay.edit());
+  settings._moveFPSDisplay.onAction(v => fpsDisplay.edit(v));
   settings._serverScrutinizerFPSMaxAge.listen(v => frames.maxAge = v);
-  settings._movePingDisplay.onAction(() => pingDisplay.edit());
+  settings._movePingDisplay.onAction(v => pingDisplay.edit(v));
   settings._serverScrutinizerPPSMaxAge.listen(v => packets.maxAge = v);
-  settings._movePPSDisplay.onAction(() => ppsDisplay.edit());
+  settings._movePPSDisplay.onAction(v => ppsDisplay.edit(v));
 }
 export function load() {
   ticks.clear();

@@ -71,7 +71,7 @@ const terraRespawnGuiReg = reg('renderOverlay', () => {
 }).setEnabled(stateTerraRespawn.and(settings._dungeonTerracottaRespawnGui));
 
 export function init() {
-  settings._moveDungeonTerracottaRespawnGui.onAction(() => respawnGui.edit());
+  settings._moveDungeonTerracottaRespawnGui.onAction(v => respawnGui.edit(v));
 }
 export function start() {
   stateTerraPhase.set(true);

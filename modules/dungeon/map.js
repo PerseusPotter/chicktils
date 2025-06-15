@@ -81,7 +81,7 @@ register('command', () => {
 
 export function init() {
   registerTrackPlayers(stateMap);
-  settings._moveDungeonMap.onAction(() => mapDisplay.edit());
+  settings._moveDungeonMap.onAction(v => mapDisplay.edit(v));
 }
 export function start() {
   map = null;
