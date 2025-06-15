@@ -132,7 +132,6 @@ class TickInfo {
 }
 
 const stateTrackTicks = new StateProp(settings._serverScrutinizerTPSDisplay).or(settings._serverScrutinizerLastTickDisplay);
-let lastLoadTime = Date.now();
 let lastTickTime = Date.now();
 const ticks = new TickInfo(settings.serverScrutinizerTPSMaxAge, 1_000, settings.serverScrutinizerTPSDisplayCap20 ? 20 : undefined);
 
@@ -143,7 +142,6 @@ const serverTickReg = reg('serverTick', () => {
 }).setEnabled(stateTrackTicks);
 const worldLoadReg = reg('worldLoad', () => {
   ticks.clear();
-  lastLoadTime = lastTickTime = Date.now();
 }).setEnabled(stateTrackTicks);
 
 function getTickColor(val, max, min) {
@@ -159,7 +157,6 @@ const tpsCmd = reg('command', () => {
 }).setName('tps').setEnabled(stateTrackTicks);
 
 function formatTps(curr, avg, min, max) {
-  if (Date.now() - lastLoadTime < 11_000) return ['TPS: Loading...'];
   if (settings.serverScrutinizerTPSDisplayCurr + settings.serverScrutinizerTPSDisplayAvg + settings.serverScrutinizerTPSDisplayMin + settings.serverScrutinizerFPSDisplayMax === 1) {
     if (settings.serverScrutinizerTPSDisplayCurr) return ['TPS: ' + getTickColor(curr, 20, 0.75) + curr];
     if (settings.serverScrutinizerTPSDisplayAvg) return ['TPS: ' + getTickColor(avg, 20, 0.75) + avg.toFixed(1)];
@@ -185,9 +182,7 @@ const rendOvTps = reg('renderOverlay', () => {
 
 const lastTickDisplay = createTextGui(() => data.serverScrutinizerLastPacketDisplay, () => ['zzz for &469.42s']);
 const rendOvLTD = reg('renderOverlay', () => {
-  const d = Date.now();
-  if (d - lastLoadTime < 11_000) return;
-  const t = d - lastTickTime;
+  const t = Date.now() - lastTickTime;
   if (t < settings.serverScrutinizerLastTickThreshold) return;
   lastTickDisplay.setLine(`zzz for ${colorForNumber(2000 - t, 2000)}${(t / 1000).toFixed(2)}s`);
   lastTickDisplay.render();
