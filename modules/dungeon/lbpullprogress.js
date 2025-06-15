@@ -19,7 +19,7 @@ const tickReg = reg('tick', () => {
     id === 'STARRED_LAST_BREATH'
   );
 }).setEnabled(settings._dungeonLBPullProgress);
-const serverTickReg = reg('serverTick2', () => {
+const serverTickReg = reg('serverTick', () => {
   totalTicks++;
   const ticks = Math.min(20, totalTicks);
   World.playSound(ticks >= settings.dungeonLBPullProgressThreshold ? 'random.successful_hit' : 'note.pling', settings.dungeonLBPullProgressVolume, rescale(ticks, 0, 20, 0.5, 2));

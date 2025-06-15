@@ -106,7 +106,7 @@ const partSpawnReg = reg('packetReceived', pack => {
     else if (z === 56) addDragon('o');
   } else if (x === 56) addDragon('p');
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(stateDragonHelperActive);
-const serverTickReg = reg('serverTick2', () => {
+const serverTickReg = reg('serverTick', () => {
   spawnedDrags.forEach((v, k) => {
     if (v > -60) spawnedDrags.set(k, v - 1);
     else spawnedDrags.delete(k);
@@ -148,7 +148,7 @@ function formatTime(ticks) {
   }
   return ticks.toString();
 }
-const serverTickHitReg = reg('serverTick2', () => {
+const serverTickHitReg = reg('serverTick', () => {
   const drag = stateDragon.get();
   if (drag.field_70128_L || drag.func_110143_aJ() <= 0 || hitTimes.length >= 4 * 20) {
     const d = DRAGONS[currDragPrio];

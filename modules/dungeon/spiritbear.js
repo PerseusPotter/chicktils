@@ -58,7 +58,7 @@ const tickReg = reg('tick', () => {
     };
   }
 }).setEnabled(new StateProp(ticks).equals(0).and(stateInFM4));
-const serverTickReg = reg('serverTick2', () => ticks.set(ticks.get() - 1)).setEnabled(stateBearSpawning);
+const serverTickReg = reg('serverTick', () => ticks.set(ticks.get() - 1)).setEnabled(stateBearSpawning);
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const particleReg = reg('spawnParticle', (part, id, evn) => {
   if (!id.equals(EnumParticleTypes.SPELL_MOB)) return;

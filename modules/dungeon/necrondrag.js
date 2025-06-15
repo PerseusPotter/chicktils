@@ -24,7 +24,7 @@ const tickReg = reg('tick', () => {
     lock.unlock();
   } else instaMidProc.set(void 0);
 }).setEnabled(new StateProp(instaMidProc).notequals(undefined));
-const serverTickReg = reg('serverTick2', () => {
+const serverTickReg = reg('serverTick', () => {
   necronDragTicks.set(necronDragTicks.get() - 1);
 
   const inst = instaMidProc.get();

@@ -130,7 +130,7 @@ const getPlayersStep2Reg = reg('step', () => {
     getPlayersStep2Reg.unregister();
   }
 }).setFps(2);
-const playerItemReg = reg('serverTick2', t => {
+const playerItemReg = reg('serverTick', t => {
   unrun(() => {
     players.forEach(v => {
       const e = v.e;

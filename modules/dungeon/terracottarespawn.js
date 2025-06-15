@@ -24,7 +24,7 @@ const blockUpdateReg = reg('blockChange', (pos, bs) => {
     pos.x + 0.5, 69, pos.z + 0.5
   ]);
 }).setEnabled(stateTerraRespawn);
-const stickReg = reg('serverTick2', () => {
+const stickReg = reg('serverTick', () => {
   if (deathPos.length === 0) return;
   const iter = deathPos.iter();
   while (!iter.done()) {

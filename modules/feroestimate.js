@@ -51,7 +51,7 @@ const calcFero = (function() {
   };
 }());
 function getTickCount() {
-  return customRegs.serverTick2.tick;
+  return customRegs.serverTick.tick;
 }
 
 const soundReg = reg('soundPlay', (pos, name) => {

@@ -47,7 +47,7 @@ const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand')
 const entSpawnReg = reg('spawnEntity', e => {
   if (e instanceof EntityArmorStand) possibleSkulls.push(e);
 }).setEnabled(stateCamp);
-const serverTickReg = reg('serverTick2', tick => {
+const serverTickReg = reg('serverTick', tick => {
   if (skipKillTime > 0) skipKillTime--;
   if (bloodOpenTime === 0 || (possibleSkulls.length === 0 && bloodMobs.length === 0)) return;
   const arr = possibleSkulls;
@@ -158,7 +158,7 @@ const renderOverlayReg = reg('renderOverlay', () => {
     dialogueSkipTimer.render();
   }
 }).setEnabled(stateCamp.and(settings._dungeonCampSkipTimer));
-const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = customRegs.serverTick2.tick)).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r').setEnabled(stateCamp);
+const bloodOpenReg = reg('chat', () => bloodOpenTime || (bloodOpenTime = customRegs.serverTick.tick)).setChatCriteria('&r&cThe &r&c&lBLOOD DOOR&r&c has been opened!&r').setEnabled(stateCamp);
 
 export function init() {
   listenBossMessages((name, msg) => {
@@ -166,7 +166,7 @@ export function init() {
     if (msg === 'That will be enough for now.') stateBloodClosed.set(true);
     if (msg === 'You have proven yourself. You may pass.') stateBloodClosed.set(true);
     if (msg === 'Let\'s see how you can handle this.') bloodMobCount = 4;
-    if (!bloodOpenTime) bloodOpenTime = customRegs.serverTick2.tick;
+    if (!bloodOpenTime) bloodOpenTime = customRegs.serverTick.tick;
   });
   settings._moveDungeonCampSkipTimer.onAction(v => dialogueSkipTimer.edit(v));
 }

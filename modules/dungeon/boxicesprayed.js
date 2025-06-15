@@ -44,7 +44,7 @@ const far = 8;
 const near = 0.01;
 const fov = 90 * Math.PI / 180;
 const aspect = 1;
-const serverTickReg = reg('serverTick2', () => {
+const serverTickReg = reg('serverTick', () => {
   frozenMobs = frozenMobs.filter(v => --v[1] > 0);
   run(() => {
     const hasIce = itemCand.some(e => getItemId(e.func_92059_d()) === 'minecraft:ice');

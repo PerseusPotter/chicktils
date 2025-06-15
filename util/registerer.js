@@ -23,7 +23,7 @@ export function getRegs() {
 
 export const customRegs = {};
 /**
- * @type {((triggerType: 'spawnEntity', callback: (entity: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick', callback: (tick: number) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick2', callback: (tick: number) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'blockChange', callback: (pos: { x: number, y: number, z: number }, bs: import('../../@types/External').JavaClass<'net.minecraft.block.state.IBlockState'>, bp: import('../../@types/External').JavaClass<'net.minecraft.util.BlockPos'>) => void) => import('../../@types/IRegister').Trigger) & typeof register}
+ * @type {((triggerType: 'spawnEntity', callback: (entity: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'serverTick', callback: (tick: number) => void) => import('../../@types/IRegister').Trigger) & ((triggerType: 'blockChange', callback: (pos: { x: number, y: number, z: number }, bs: import('../../@types/External').JavaClass<'net.minecraft.block.state.IBlockState'>, bp: import('../../@types/External').JavaClass<'net.minecraft.util.BlockPos'>) => void) => import('../../@types/IRegister').Trigger) & typeof register}
  */
 const createRegister = function(type, shit) {
   if (PROFILER) {
@@ -361,35 +361,6 @@ reg = function reg(type, shit) {
     }
   };
 
-  function ChickTilsServerTick2(cb) {
-    ChickTilsRegister.call(this, cb);
-  }
-  inherits(ChickTilsServerTick2, ChickTilsRegister);
-  ChickTilsServerTick2.list = new Map();
-  listenList(ChickTilsServerTick2.list);
-  ChickTilsServerTick2.prototype.getList = function getList() {
-    return ChickTilsServerTick2.list;
-  };
-  ChickTilsServerTick2.tick = 0;
-  const cTickEnabled = new StateVar(true);
-  ChickTilsServerTick2.cTickReg = reg('tick', () => {
-    ChickTilsServerTick2.list.forEach(v => v.cb(ChickTilsServerTick2.tick));
-    ChickTilsServerTick2.tick++;
-  }).setEnabled(cTickEnabled);
-  ChickTilsServerTick2.worldReg = reg('worldLoad', () => cTickEnabled.set(true));
-  ChickTilsServerTick2.prototype.update = function update() {
-    if (ChickTilsServerTick2.list.size) {
-      cTickEnabled.set(true);
-      ChickTilsServerTick2.cTickReg.register();
-      ChickTilsServerTick2.sTickReg.register();
-      ChickTilsServerTick2.worldReg.register();
-    } else {
-      ChickTilsServerTick2.cTickReg.unregister();
-      ChickTilsServerTick2.sTickReg.unregister();
-      ChickTilsServerTick2.worldReg.unregister();
-    }
-  };
-
   const _chatParams = new Map([
     ['<c>', 'CONTAINS'],
     ['<contains>', 'CONTAINS'],
@@ -622,19 +593,13 @@ reg = function reg(type, shit) {
   customRegs['spawnEntity'] = ChickTilsSpawnEntity;
   customRegs['step'] = ChickTilsStep;
   customRegs['serverTick'] = ChickTilsServerTick;
-  customRegs['serverTick2'] = ChickTilsServerTick2;
   customRegs['chat'] = ChickTilsChat;
   customRegs['actionBar'] = ChickTilsActionBar;
   customRegs['worldLoad'] = ChickTilsWorldLoad;
   customRegs['worldUnload'] = ChickTilsWorldUnload;
   customRegs['blockChange'] = ChickTilsBlockChange;
 
-  ChickTilsServerTick2.sTickReg = reg('serverTick', () => {
-    cTickEnabled.set(false);
-    ChickTilsServerTick2.list.forEach(v => v.cb(ChickTilsServerTick2.tick));
-    ChickTilsServerTick2.tick++;
-  });
-  ChickTilsSpawnEntity.tickReg = reg('serverTick2', () => {
+  ChickTilsSpawnEntity.tickReg = reg('serverTick', () => {
     if (ChickTilsSpawnEntity.newMobs.length === 0) return;
     run(() => {
       ChickTilsSpawnEntity.newMobs.forEach(v => ChickTilsSpawnEntity.list.forEach(c => c.cb(v)));

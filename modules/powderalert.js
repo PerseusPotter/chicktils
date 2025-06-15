@@ -28,7 +28,7 @@ const blockReg = reg('blockChange', (pos, bs) => {
       (Player.getZ() - pos.z) ** 2
       > settings.powderScanRange ** 2
     ) return;
-    chests.set(id, { x: pos.x, y: pos.y, z: pos.z, t: customRegs.serverTick2.tick });
+    chests.set(id, { x: pos.x, y: pos.y, z: pos.z, t: customRegs.serverTick.tick });
     chestAlert.text = 'Chest x' + chests.size;
     chestAlert.show(settings.powderAlertTime);
   });
@@ -36,7 +36,7 @@ const blockReg = reg('blockChange', (pos, bs) => {
 const MAX_CHEST_LIFE = 20 * 60;
 const chestGradient = new Gradient(settings._powderBoxColor, settings._powderBoxColor2);
 const renderReg = reg('renderWorld', () => {
-  const t = customRegs.serverTick2.tick;
+  const t = customRegs.serverTick.tick;
   Array.from(chests.entries()).forEach(([k, v]) => {
     const dt = t - v.t;
     const col = chestGradient.get(dt / MAX_CHEST_LIFE);
