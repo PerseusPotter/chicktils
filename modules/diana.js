@@ -357,19 +357,19 @@ const soundPlayReg = reg('packetReceived', pack => {
   if (pack.func_149208_g() !== 1) return;
   const pitch = pack.func_149209_h();
 
-  const t = getTickCount();
+  const t = getTickCount() - spadeUseTime;
   if (prevSounds.length) {
-    if (t - spadeUseTime === prevSounds[prevSounds.length - 1].t) return;
+    if (t === prevSounds[prevSounds.length - 1].t) return;
     const estA = prevSounds[0].p;
     const estB = Math.E / (2836.3513351166325 * estA + -1395.7763277125964);
     if (dist((pitch - estA) / (prevSounds.length + 1), estB) / estB > 1) {
-      if (t - spadeUseTime > RESET_THRESH) resetGuess();
+      if (t > RESET_THRESH) resetGuess();
       else return;
-    }
+    } else if (t > RESET_THRESH && t - prevSounds[prevSounds.length - 1].t > 3) resetGuess();
   }
 
   prevSounds.push({
-    t: t - spadeUseTime,
+    t,
     p: pitch
   });
   updateGuesses();
@@ -388,18 +388,18 @@ const spawnPartReg = reg('packetReceived', pack => {
   const x = pack.func_149220_d();
   const y = pack.func_149226_e();
   const z = pack.func_149225_f();
-  const t = getTickCount();
+  const t = getTickCount() - spadeUseTime;
   if (prevParticles.length) {
-    if (t - spadeUseTime === prevParticles[prevParticles.length - 1].t) return;
+    if (t === prevParticles[prevParticles.length - 1].t) return;
     const pp = prevParticles[prevParticles.length - 1];
     if ((pp.x - x) ** 2 + (pp.y - y) ** 2 + (pp.z - z) ** 2 > 25) {
-      if (t - spadeUseTime >= RESET_THRESH) resetGuess();
+      if (t > RESET_THRESH) resetGuess();
       else return;
-    }
+    } else if (t > RESET_THRESH && t - prevParticles[prevParticles.length - 1].t > 3) resetGuess();
   }
 
   prevParticles.push({
-    t: t - spadeUseTime,
+    t,
     x,
     y,
     z
