@@ -257,7 +257,7 @@ const kuudraEndReg = reg('chat', () => reset()).setChatCriteria('&r&f           
 const kuudraLeaveReg = reg('worldUnload', () => reset());
 
 export function init() {
-  settings._moveKuudraHp.onAction(() => hpDisplay.edit());
+  settings._moveKuudraHp.onAction(v => hpDisplay.edit(v));
 }
 export function load() {
   kuudraStartReg.register();

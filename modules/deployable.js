@@ -535,7 +535,7 @@ const partTickReg = reg('tick', () => {
 }).setEnabled(new StateProp(settings._deployableParticlesOwn).equals('Custom').or(new StateProp(settings._deployableParticlesOther).equals('Custom')));
 
 export function init() {
-  settings._moveDeployableHUD.onAction(() => display.edit());
+  settings._moveDeployableHUD.onAction(v => display.edit(v));
 }
 export function load() {
   knownEEnts.clear();

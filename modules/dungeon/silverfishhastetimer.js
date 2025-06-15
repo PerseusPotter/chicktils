@@ -30,7 +30,7 @@ const tickReg = reg('tick', () => {
 const renderOvReg = reg('renderOverlay', () => hasteTimer.render()).setEnabled(stateEnableTimer);
 
 export function init() {
-  settings._moveSilverfishHasteTimer.onAction(() => hasteTimer.edit());
+  settings._moveSilverfishHasteTimer.onAction(v => hasteTimer.edit(v));
 }
 export function start() {
   stateEnableTimer.set(false);

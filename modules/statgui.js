@@ -29,16 +29,15 @@ const locs = [
 let currLoc = -1;
 let editLoc = -1;
 const display = createTextGui(() => display.isEdit ? data.statLocs[editLoc] : data.statLocs[currLoc], () => [' §r Speed: §r§f✦400§r', ' §r Strength: §r§c❁9999§r', ' §r Crit Chance: §r§9☣100§r', ' §r Crit Damage: §r§9☠9999§r', ' §r Attack Speed: §r§e⚔100§r'], '\n&7[&25&7] &fApply to All Locations');
-function editLocation(index) {
+function editLocation(index, fromGui) {
   editLoc = index;
   display.on('editKey', n => {
     if (n !== 6) return;
     data.statLocs = locs.map(() => Object.assign({}, data.statLocs[editLoc]));
   });
 
-  display.edit();
+  display.edit(fromGui);
 }
-
 
 function loadListeners(tries = 0) {
   if (!settings.enablestatgui) return;
@@ -86,7 +85,7 @@ const updateReg = reg('step', () => {
 export function init() {
   locs.forEach((_, i) => {
     settings['_loc' + i].listen(() => loadListeners());
-    settings['_moveLoc' + i].onAction(() => editLocation(i));
+    settings['_moveLoc' + i].onAction(v => editLocation(i, v));
   });
 }
 export function load() {

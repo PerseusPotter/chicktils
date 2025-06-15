@@ -192,7 +192,7 @@ export function init() {
   registerTrackPlayers(stateDragonHelper);
 
   settings._dungeonDragonHelperAlertSound.listen(v => spawnAlert.sound = v);
-  settings._moveDragonHelperTimer.onAction(() => timerHud.edit());
+  settings._moveDragonHelperTimer.onAction(v => timerHud.edit(v));
   function checkPrio(v, o) {
     if (v.length === 5 && v.split('').sort().join('') === 'bgopr') return;
     log('&4invalid prio, it should only contain each of the characters "bgopr" exactly once (case sensitive)');

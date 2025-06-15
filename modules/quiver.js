@@ -143,7 +143,7 @@ const updateReg = reg('packetReceived', pack => {
 }).setFilteredClass(net.minecraft.network.play.server.S30PacketWindowItems);
 
 export function init() {
-  settings._moveQuiver.onAction(() => display.edit());
+  settings._moveQuiver.onAction(v => display.edit(v));
 }
 export function load() {
   updateReg.register();

@@ -26,7 +26,7 @@ const goldorStartReg = reg('chat', () => stateInGoldor.set(true)).setCriteria('&
 const goldorEndReg = reg('chat', () => stateInGoldor.set(false)).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(stateGoldorTimer);
 
 export function init() {
-  settings._moveGoldorFrenzyTimer.onAction(() => timerHud.edit());
+  settings._moveGoldorFrenzyTimer.onAction(v => timerHud.edit(v));
 }
 export function start() {
   stateInGoldor.set(false);

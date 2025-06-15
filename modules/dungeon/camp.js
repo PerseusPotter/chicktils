@@ -168,7 +168,7 @@ export function init() {
     if (msg === 'Let\'s see how you can handle this.') bloodMobCount = 4;
     if (!bloodOpenTime) bloodOpenTime = customRegs.serverTick2.tick;
   });
-  settings._moveDungeonCampSkipTimer.onAction(() => dialogueSkipTimer.edit());
+  settings._moveDungeonCampSkipTimer.onAction(v => dialogueSkipTimer.edit(v));
 }
 export function start() {
   bloodMobs = [];

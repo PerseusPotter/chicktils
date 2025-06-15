@@ -173,7 +173,7 @@ function matchesName(id, name, test) {
 }
 
 export function init() {
-  settings._moveSacksDisplay.onAction(() => itemGui.edit());
+  settings._moveSacksDisplay.onAction(v => itemGui.edit(v));
   settings._sacksDisplayResetAggregate.onAction(() => {
     itemAggregate.clear();
     log('&aCleared sack data');

@@ -172,7 +172,7 @@ const taraLeaveReg = reg('worldUnload', () => {
 const taraServerTickReg = reg('serverTick2', () => stateTaraStarted.set(stateTaraStarted.get() - 1)).setEnabled(new StateProp(stateTaraStarted).notequals(0));
 
 export function init() {
-  settings._moveAvariceCoinCounter.onAction(() => coinCounter.edit());
+  settings._moveAvariceCoinCounter.onAction(v => coinCounter.edit(v));
 }
 export function load() {
   coinCounterEnabled.set(false);
