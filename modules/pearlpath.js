@@ -82,6 +82,7 @@ const BlockSlab = Java.type('net.minecraft.block.BlockSlab');
 const BlocksAir = Java.type('net.minecraft.init.Blocks').field_150350_a;
 const BlocksCarpet = Java.type('net.minecraft.init.Blocks').field_150404_cg;
 const BlocksSkull = Java.type('net.minecraft.init.Blocks').field_150465_bP;
+const BlocksSnowLayer = Java.type('net.minecraft.init.Blocks').field_150431_aC;
 const BlocksFlowerPot = Java.type('net.minecraft.init.Blocks').field_150457_bL;
 const renderReg = reg('renderWorld', pt => {
   if (pearlPos.length === 0) return;
@@ -121,7 +122,7 @@ const renderReg = reg('renderWorld', pt => {
       isBottomSlab = collidedBlock instanceof BlockSlab && collidedState.func_177229_b(BlockSlab.field_176554_a) === BlockSlab.EnumBlockHalf.BOTTOM;
     } catch (_) { }
     if (isBottomSlab) ey += 0.5;
-    else if (collidedBlock !== BlocksAir && collidedBlock !== BlocksCarpet && collidedBlock !== BlocksSkull && collidedBlock !== BlocksFlowerPot) ey++;
+    else if (collidedBlock !== BlocksAir && collidedBlock !== BlocksCarpet && collidedBlock !== BlocksSkull && collidedBlock !== BlocksSnowLayer && collidedBlock !== BlocksFlowerPot) ey++;
   }
   renderBoxFilled(
     settings.pearlPathDestColorFill,
