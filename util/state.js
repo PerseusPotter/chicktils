@@ -131,7 +131,7 @@ export class StateProp extends StateVar {
    */
   or(v) {
     if (this.op !== StateProp.Operator.IDENTITY) return new StateProp(this).or(v);
-    const n = new StateProp(v);
+    v = StateVar.coerce(v);
     this.right = v;
     this._add(v);
     this.op = StateProp.Operator.OR;
