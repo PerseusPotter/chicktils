@@ -69,7 +69,7 @@ export class StateProp extends StateVar {
    */
   constructor(val) {
     super();
-    this.left = val instanceof StateVar ? val : new StateVar(val);
+    this.left = StateVar.coerce(val);
     this._add(this.left);
     this.op = StateProp.Operator.IDENTITY;
     this.dirt = true;
