@@ -10,13 +10,15 @@ import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
 import { unrun } from '../util/threading';
 import { renderBeacon, renderBoxOutline, renderLine, renderTracer } from '../../Apelles/index';
+import { toArrayList } from '../util/polyfill';
+import { getSbId } from '../util/skyblock';
 
 const warps = [
   {
     name: 'hub',
     loc: [-2.5, 70, -69.5],
     pos: 13,
-    cost: 0
+    cost: 10
   },
   {
     name: 'castle',
@@ -28,7 +30,7 @@ const warps = [
     name: 'da',
     loc: [91.5, 75, 173.5],
     pos: 21,
-    cost: 50
+    cost: 40
   },
   // crypt
   {
@@ -103,14 +105,14 @@ const burrowSpawnReg = reg('packetReceived', pack => {
   const y = Math.floor(pack.func_149226_e()) - 1;
   const z = Math.floor(pack.func_149225_f()) + 0.5;
 
-  if (guessPos.has('Average')) {
-    const p = guessPos.get('Average');
-    const d = (x - p[0]) ** 2 + (z - p[2]) ** 2;
-    if (d < 400) foundGuessBurrow = true;
-    if (d < 100) resetGuess();
-  }
-
   unrun(() => {
+    if (guessPos.has('Average')) {
+      const p = guessPos.get('Average');
+      const d = (x - p[0]) ** 2 + (z - p[2]) ** 2;
+      if (d < 400) foundGuessBurrow = true;
+      if (d < 100) resetGuess();
+    }
+
     if (burrows.some(v => v[0] === x && v[1] === y && v[2] === z)) return;
     if (recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z && getTickCount() - v[3] < 20)) return;
     if (settings.dianaAlertFoundBurrow && (!settings.dianaAlertFoundBurrowNoStart || type !== 'Start') && !recentDugBurrows.some(v => v[0] === x && v[1] === y && v[2] === z)) burrowFoundAlert.show(settings.dianaAlertFoundBurrowTime);
@@ -139,19 +141,17 @@ const burrowDigReg = reg('packetSent', pack => {
     if (recentDugBurrows.length > 10) recentDugBurrows.shift();
   });
 }).setFilteredClasses([net.minecraft.network.play.client.C07PacketPlayerDigging, net.minecraft.network.play.client.C08PacketPlayerBlockPlacement]).setEnabled(settings._dianaScanBurrows);
-const burrowResetReg = reg('chat', () => {
-  unrun(() => {
-    resetGuess();
-    burrows = [];
-    prevGuesses = [];
-  });
-}).setCriteria('&r&6Poof! &r&eYou have cleared your griffin burrows!&r');
 const renderTargetsReg = reg('renderWorld', () => {
   burrows.forEach(v => {
     renderBoxOutline(
       settings[`dianaBurrow${v[4]}Color`] ?? 0,
       v[0], v[1], v[2],
       1, 1,
+      { phase: true }
+    );
+    if (v !== targetLoc) renderBeacon(
+      settings[`dianaBurrow${v[4]}Color`] ?? 0,
+      v[0], v[1] + 1, v[2],
       { phase: true }
     );
     renderString(
@@ -166,6 +166,11 @@ const renderTargetsReg = reg('renderWorld', () => {
       settings.dianaBurrowPrevGuessColor,
       v[0], v[1] - 1, v[2],
       1, 1,
+      { phase: true }
+    );
+    if (v !== targetLoc) renderBeacon(
+      settings.dianaBurrowPrevGuessColor,
+      v[0], v[1], v[2],
       { phase: true }
     );
   });
@@ -185,9 +190,9 @@ let prevParticles = [];
 let guessPos = new Map();
 /** @type {[(t: number) => number, (t: number) => number, (t: number) => number]?} */
 let splinePoly;
-let splinePolyPos = [];
+let splinePolyPos = toArrayList([]);
 let prevGuessL = 0;
-const RESET_THRESH = 58;
+const RESET_THRESH = 20;
 function resetGuess() {
   spadeUseTime = getTickCount();
   prevSounds = [];
@@ -333,10 +338,10 @@ function updateGuesses() {
 
   guesses.set('Average', geoMedian(Array.from(guesses.values())));
 
-  const _splinePolyPos = [];
+  const _splinePolyPos = new ArrayList();
   for (let i = 0; i <= 100; i++) {
     let t = rescale(i, 0, 100, 0, weightT);
-    _splinePolyPos.push(splinePoly.map(v => v(t)));
+    _splinePolyPos.add(toArrayList(splinePoly.map(v => v(t))));
   }
   unrun(() => {
     splinePolyPos = _splinePolyPos;
@@ -359,13 +364,12 @@ const soundPlayReg = reg('packetReceived', pack => {
 
   const t = getTickCount() - spadeUseTime;
   if (prevSounds.length) {
-    if (t === prevSounds[prevSounds.length - 1].t) return;
     const estA = prevSounds[0].p;
     const estB = Math.E / (2836.3513351166325 * estA + -1395.7763277125964);
-    if (dist((pitch - estA) / (prevSounds.length + 1), estB) / estB > 1) {
+    if (dist((pitch - estA) / (prevSounds.length + 1), estB) / estB > 2 || pitch < estA) {
       if (t > RESET_THRESH) resetGuess();
       else return;
-    } else if (t > RESET_THRESH && t - prevSounds[prevSounds.length - 1].t > 3) resetGuess();
+    } else if (t > RESET_THRESH && t - prevSounds[prevSounds.length - 1].t > 5) resetGuess();
   }
 
   prevSounds.push({
@@ -390,12 +394,11 @@ const spawnPartReg = reg('packetReceived', pack => {
   const z = pack.func_149225_f();
   const t = getTickCount() - spadeUseTime;
   if (prevParticles.length) {
-    if (t === prevParticles[prevParticles.length - 1].t) return;
     const pp = prevParticles[prevParticles.length - 1];
-    if ((pp.x - x) ** 2 + (pp.y - y) ** 2 + (pp.z - z) ** 2 > 25) {
+    if ((pp.x - x) ** 2 + (pp.y - y) ** 2 + (pp.z - z) ** 2 > 49) {
       if (t > RESET_THRESH) resetGuess();
       else return;
-    } else if (t > RESET_THRESH && t - prevParticles[prevParticles.length - 1].t > 3) resetGuess();
+    } else if (t > RESET_THRESH && t - prevParticles[prevParticles.length - 1].t > 5) resetGuess();
   }
 
   prevParticles.push({
@@ -408,7 +411,7 @@ const spawnPartReg = reg('packetReceived', pack => {
 }).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles).setEnabled(settings._dianaGuessFromParticles);
 
 const renderGuessReg = reg('renderWorld', () => {
-  if (splinePolyPos.length) renderLine(
+  if (splinePolyPos.size()) renderLine(
     settings.dianaGuessFromParticlesPathColor,
     splinePolyPos,
     { phase: true }
@@ -451,6 +454,7 @@ const tickReg = reg('tick', () => {
   });
   if (i > 0) burrows = burrows.slice(i);
 
+  const isHoldingSpade = getSbId(Player.getHeldItem()) === 'ANCESTRAL_SPADE';
   prevGuesses = prevGuesses.filter(v => {
     if (t - v[3] > 5 * 60 * 20) return false;
     const d = (Player.getX() - v[0]) ** 2 + (Player.getY() - v[1]) ** 2 + (Player.getZ() - v[2]) ** 2;
@@ -458,7 +462,7 @@ const tickReg = reg('tick', () => {
       closest = v;
       closestD = d;
     }
-    if ((Player.getX() - v[0]) ** 2 + (Player.getZ() - v[2]) ** 2 <= 100) return --v[4] > 0;
+    if (isHoldingSpade && (Player.getX() - v[0]) ** 2 + (Player.getZ() - v[2]) ** 2 <= 100) return --v[4] > 0;
     return true;
   });
 
@@ -503,9 +507,17 @@ const unloadReg = reg('worldUnload', () => {
 
   targetLoc = null;
   resetGuess();
-  prevGuesses = [];
-  burrows = [];
+  // prevGuesses = [];
+  // burrows = [];
 });
+const burrowResetReg = reg('chat', () => {
+  unrun(() => {
+    targetLoc = null;
+    resetGuess();
+    burrows = [];
+    prevGuesses = [];
+  });
+}).setCriteria('&r&6Poof! &r&eYou have cleared your griffin burrows!&r');
 
 const warpOpenReg = reg('guiOpened', evn => {
   const gui = evn.gui;
