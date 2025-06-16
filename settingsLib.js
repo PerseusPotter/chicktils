@@ -32,7 +32,7 @@ export class Property extends StateVar {
    * @param {number} pageSort
    * @param {T} type
    * @param {V} defaultValue
-   * @param {{ desc?: string, min?: number, max?: number, len?: number, options?: O[], shouldShow?: StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, min?: number, max?: number, len?: number, options?: O[], shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, page, pageSort, type, defaultValue, { desc = '', min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY, len = Number.POSITIVE_INFINITY, options = [], shouldShow = new StateVar(true), isNewSection = false } = {}) {
     super(defaultValue);
@@ -654,6 +654,22 @@ export class Builder {
    */
   addAction(key, name, getOpts) {
     this.addProperty(key, name, 7, null, getOpts?.(this.props));
+    return this;
+  }
+
+  /**
+   * @template {Record<string, Property>} R
+   * @param {R} props
+   * @returns {Builder<P & R>}
+   */
+  addBulk(props) {
+    Object.entries(props).forEach(([k, v]) => {
+      if (typeof v.shouldShow === 'function') v.shouldShow = v.shouldShow(this.props);
+      v.page = this.page;
+      v.sort = this.sort;
+      this.props[k] = v;
+      this.sort++;
+    });
     return this;
   }
 }
