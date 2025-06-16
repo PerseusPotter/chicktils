@@ -1,12 +1,12 @@
 import reg from '../util/registerer';
 import { getPlayerName } from '../util/format';
 import { StateProp, StateVar } from '../util/state';
-import { getSbId } from '../util/skyblock';
+import { getSbId, registerListenIsland, stateIsland } from '../util/skyblock';
 import { Deque, JavaTypeOrNull, setAccessible } from '../util/polyfill';
 import { unrun } from '../util/threading';
+import settings from '../settings';
 
 function reset() {
-  dungeonLeaveReg.unregister();
   bossMessageReg.unregister();
   entSpawnReg.unregister();
   getPlayersStep2Reg.unregister();
@@ -24,7 +24,6 @@ function start() {
     return Boolean(m);
   })) stateFloor.set('');
 
-  dungeonLeaveReg.register();
   bossMessageReg.register();
   entSpawnReg.register();
   getPlayersStep2Reg.register();
@@ -144,9 +143,6 @@ const playerItemReg = reg('serverTick', t => {
   });
 });
 
-// const dungeonJoinReq = reg('chat', () => dungeon.emit('dungeonJoin'))setChatCriteria('{"server":"${*}","gametype":"SKYBLOCK","mode":"dungeon","map":"Dungeon"}');
-const dungeonStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
-const dungeonLeaveReg = reg('worldUnload', () => reset());
 const bossMessageReg = reg('chat', (name, msg) => {
   bossCbs.forEach(v => v(name, msg));
   if (name === 'The Watcher') return;
@@ -221,11 +217,14 @@ export function init() {
       }
     }
   }
+
+  registerListenIsland(settings._enabledungeon);
+  stateIsland.listen(v => {
+    if (v === 'Catacombs') start();
+    else if (bossMessageReg.isRegistered()) reset();
+  });
 }
-export function load() {
-  dungeonStartReg.register();
-}
+export function load() { }
 export function unload() {
-  dungeonStartReg.unregister();
   reset();
 }
