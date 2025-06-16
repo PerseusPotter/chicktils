@@ -907,3 +907,14 @@ export class Deque {
     return this.values();
   }
 }
+
+/**
+ * @template T
+ * @param {T[]} arr
+ * @returns ArrayList<T>
+ */
+export function toArrayList(arr) {
+  const list = new ArrayList();
+  arr.forEach(v => list.add(v));
+  return list;
+}
