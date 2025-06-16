@@ -1,4 +1,6 @@
-// maybe current world and things idk
+import { getBlockPos } from './mc';
+import reg from './registerer';
+import { StateProp, StateVar } from './state';
 
 /**
  * @author Koenbezeg
@@ -51,3 +53,45 @@ export function countItems(sbId) {
   if (!inv) return 0;
   return inv.getItems().reduce((a, v) => a + (getSbId(v) === sbId ? v.getStackSize() : 0), 0);
 }
+
+const spawnLocations = {
+  'Private Island': [7, 100, 7],
+  'Hub': [-3, 70, -70],
+  'Dungeon Hub': [-31, 121, 0],
+  'The Farming Islands': [113, 71, -208],
+  'The Park': [-279, 82, -14],
+  'Gold Mine': [-5, 74, -279],
+  'Deep Caverns': [4, 157, 80],
+  'Dwarven Mines': [-49, 200, -122],
+  'Crystal Hollows': [213, 113, 417],
+  'Spider\'s Den': [-203, 83, -233],
+  'The End': [-503, 101, -275],
+  'Crimson Isle': [-361, 80, -431],
+  'Garden': [-6, 71, 17],
+  'The Rift': [-45, 122, 69],
+  'Backwater Bayou': [-13, 74, -11],
+  'Dark Auction': [91, 75, 180],
+  'Catacombs': [0, 100, 0],
+  'Mineshaft': [-182, 100, -192],
+  'Kuudra': [-101, 100, -186],
+  'Jerry\'s Workshop': [-5, 76, 100]
+};
+/** @type {StateVar<'' | keyof typeof spawnLocations>} */
+export const stateIsland = new StateVar('');
+let stateListenIsland = new StateVar(false);
+/** @param {StateVar<boolean>} state */
+export function registerListenIsland(state) {
+  stateListenIsland = new StateProp(stateListenIsland).or(state);
+  playerSpawnReg.setEnabled(stateListenIsland);
+}
+
+const posKey = (x, y, z) => `${x},${y},${z}`;
+const locationMap = new Map(Object.entries(spawnLocations).map(([k, [x, y, z]]) => [posKey(x, y, z), k]));
+function updateSpawnPoint(bp) {
+  if (!bp) return;
+  const spawn = getBlockPos(bp);
+  const key = posKey(spawn.x, spawn.y, spawn.z);
+  stateIsland.set(locationMap.get(key) ?? '');
+}
+if (World.isLoaded()) updateSpawnPoint(Player.getPlayer().func_180470_cg());
+const playerSpawnReg = reg('packetReceived', pack => updateSpawnPoint(pack.func_179800_a())).setFilteredClass(net.minecraft.network.play.server.S05PacketSpawnPosition).setEnabled(stateListenIsland).register();
