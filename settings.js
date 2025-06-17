@@ -533,6 +533,24 @@ const $Dojo = {
   dojoMasteryHideTitles: new Property('DojoMasteryHideTitles', 0, 0, Property.Type.Toggle, true, { shouldShow: p => addDependency(p.dojoMastery) }),
 };
 
+const $EntityReducer = {
+  enableentityreducer: new Property('EnableEntityReducer', 0, 0, Property.Type.Toggle, false, { desc: 'reduce strain from excess entity spam\n"hiding" the entity prevents them from rendering, but you can still interact with them\n"removing" the entity completely deletes them\nremoving is better for performance but to get them back you must reload them from the server' }),
+
+  entityReducerHub: new Property('ReduceHubEntities', 0, 0, Property.Type.Toggle, true, { isNewSection: true }),
+  entityReducerHubMap: new Property('ReduceHubMap', 0, 0, Property.Type.Option, 'Remove', { desc: 'map of skyblock @ hub', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubCityProject: new Property('ReduceHubCityProject', 0, 0, Property.Type.Option, 'Remove', { options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubTopAuctions: new Property('ReduceHubTopAuctions', 0, 0, Property.Type.Option, 'Remove', { desc: 'top listings on AH, under auction house (only the cases not the items)', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubHex: new Property('ReduceHubHex', 0, 0, Property.Type.Option, 'Remove', { desc: 'physical hex pedestal', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubDHub: new Property('ReduceHubCatacombs', 0, 0, Property.Type.Option, 'Remove', { desc: 'the catacombs entrance near crypts', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubJax: new Property('ReduceHubJax', 0, 0, Property.Type.Option, 'Remove', { desc: 'random bows, arrows ,swords, etc near jax/rosetta', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubKatHouse: new Property('ReduceHubKatHouse', 0, 0, Property.Type.Option, 'Remove', { desc: 'pet care area on 2nd floor of kat house', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubVincent: new Property('ReduceHubVincent', 0, 0, Property.Type.Option, 'Remove', { desc: 'paintings in vincent house', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubTaylor: new Property('ReduceHubTaylor', 0, 0, Property.Type.Option, 'Remove', { desc: 'armor in basement of taylor house', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubCarpenter: new Property('ReduceHubCarpenter', 0, 0, Property.Type.Option, 'Remove', { desc: 'carpentry objects', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubMarco: new Property('ReduceHubMarco', 0, 0, Property.Type.Option, 'Remove', { desc: 'paintings in marco house', options: ['Normal', 'Hide', 'Remove'] }),
+  entityReducerHubRabbit: new Property('ReduceHubRabbitFamily', 0, 0, Property.Type.Option, 'Remove', { desc: 'rabbit house residents', options: ['Normal', 'Hide', 'Remove'] }),
+};
+
 const $Testing = {
   enableboxallentities: new Property('EnableBoxAllEntities', 0, 0, Property.Type.Toggle, false, { desc: 'mostly for debugging' }),
   boxAllEntitiesInvis: new Property('BoxAllEntitiesInvisible', 0, 0, Property.Type.Toggle, false, { desc: 'box invisible entities', shouldShow: p => addDependency(p.enableboxallentities) }),
@@ -677,6 +695,8 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addBulk($Necromancy)
   .addPage('Dojo')
   .addBulk($Dojo)
+  .addPage('Entity Reducer')
+  .addBulk($EntityReducer)
   .addPage('Testing')
   .addBulk($Testing)
   .addPage('Misc.')
