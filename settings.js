@@ -552,6 +552,9 @@ const $EntityReducer = {
 
   entityReducerDHub: new Property('ReduceDungeonHubEntities', 0, 0, Property.Type.Toggle, true, { isNewSection: true }),
   entityReducerDHubRace: new Property('ReduceDHubRaceLeaderboard', 0, 0, Property.Type.Option, 'Remove', { desc: 'leaderboard for races', options: ['Normal', 'Hide', 'Remove'] }),
+
+  entityReducerMines: new Property('ReduceDwarvenMinesEntities', 0, 0, Property.Type.Toggle, true, { isNewSection: true }),
+  entityReducerMinesFossil: new Property('ReduceDwarvenFossilCenter', 0, 0, Property.Type.Option, 'Remove', { desc: 'fossil research center in tunnels', options: ['Normal', 'Hide', 'Remove'] }),
 };
 
 const $Testing = {
