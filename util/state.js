@@ -39,6 +39,11 @@ export class StateVar {
 }
 
 /**
+ * @template {StateVar} T
+ * @typedef {T extends StateVar<infer U> ? U : never} ExtractStateVar
+ */
+
+/**
  * @template {1|3|2|4|5|7|9|11|6} [O = 1]
  * @template L
  * @template R
@@ -193,5 +198,35 @@ export class StateProp extends StateVar {
     this.op = StateProp.Operator.CUSTOMBINARY;
     this.tmp = cb;
     return this;
+  }
+}
+
+/**
+ * @template T
+ * @extends StateVar<T>
+ */
+export class AtomicStateVar extends StateVar {
+  /**
+   * @param {T} val
+   */
+  constructor(val) {
+    super(val);
+    this.lock = new (Java.type('java.util.concurrent.locks.ReentrantLock'))();
+  }
+
+  get() {
+    this.lock.lock();
+    const v = super.get();
+    this.lock.unlock();
+    return v;
+  }
+
+  /**
+   * @param {T} v
+   */
+  set(v) {
+    this.lock.lock();
+    super.set(v);
+    this.lock.unlock();
   }
 }
