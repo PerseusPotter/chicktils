@@ -7,6 +7,7 @@ import { unrun } from '../util/threading';
 import settings from '../settings';
 
 function reset() {
+  dungeonStartReg.unregister();
   bossMessageReg.unregister();
   entSpawnReg.unregister();
   getPlayersStep2Reg.unregister();
@@ -14,10 +15,18 @@ function reset() {
 
   modules.forEach(v => v.reset());
 }
-function start() {
+function enter() {
   players = [];
   stateIsInBoss.set(false);
   statePlayerClass.set('Unknown');
+  stateFloor.set('');
+
+  dungeonStartReg.register();
+  entSpawnReg.register();
+
+  modules.forEach(v => v.start());
+}
+function start() {
   if (!Scoreboard.getLines(false).some(v => {
     const m = v.getName().match(/^ §7⏣ §cThe Catac..§combs §7\(([MF][1-7]|E)\)$/);
     if (m) stateFloor.set(m[1]);
@@ -25,11 +34,8 @@ function start() {
   })) stateFloor.set('');
 
   bossMessageReg.register();
-  entSpawnReg.register();
   getPlayersStep2Reg.register();
   playerItemReg.register();
-
-  modules.forEach(v => v.start());
 }
 
 /**
@@ -143,6 +149,7 @@ const playerItemReg = reg('serverTick', t => {
   });
 });
 
+const dungeonStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &bMort&f: &rHere, I found this map when I first entered the dungeon.&r');
 const bossMessageReg = reg('chat', (name, msg) => {
   bossCbs.forEach(v => v(name, msg));
   if (name === 'The Watcher') return;
@@ -219,9 +226,9 @@ export function init() {
   }
 
   registerListenIsland(settings._enabledungeon);
-  stateIsland.listen(v => {
-    if (v === 'Catacombs') start();
-    else if (bossMessageReg.isRegistered()) reset();
+  stateIsland.listen((v, o) => {
+    if (v === 'Catacombs') enter();
+    else if (o === 'Catacombs') reset();
   });
 }
 export function load() { }
