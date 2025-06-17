@@ -16,7 +16,8 @@ import { AtomicStateVar, StateProp } from '../util/state';
 const stateHandler = new AtomicStateVar(null);
 const stateHub = new StateProp(stateIsland).equals('Hub').and(settings._entityReducerHub);
 const stateDHub = new StateProp(stateIsland).equals('Dungeon Hub').and(settings._entityReducerDHub);
-const stateEnabled = new StateProp(stateHandler).and(new StateProp(stateHub).or(stateDHub));
+const stateMines = new StateProp(stateIsland).equals('Dwarven Mines').and(settings._entityReducerMines);
+const stateEnabled = new StateProp(stateHandler).and(new StateProp(stateHub).or(stateDHub).or(stateMines));
 
 const spawnPlayerReg = reg('packetReceived', (pack, evn) => {
   const handler = stateHandler.get()?.player;
@@ -127,6 +128,18 @@ const handlers = {
       switch (type) {
         case 78: {
           if (settings.entityReducerDHubRace !== 'Normal' && -736 <= x && x <= -448 && 2720 <= y && y <= 2944 && -800 <= z && z <= -448) return settings.entityReducerDHubRace;
+          break;
+        }
+      }
+      return 'Normal';
+    }
+  },
+  'Dwarven Mines': {
+    object(type, id, x, y, z, packet) {
+      switch (type) {
+        case 78: {
+          // starts at 10, but can't open off of the armor stand name tag so
+          if (settings.entityReducerMinesFossil !== 'Normal' && 10 < id && id <= 109) return settings.entityReducerMinesFossil;
           break;
         }
       }
