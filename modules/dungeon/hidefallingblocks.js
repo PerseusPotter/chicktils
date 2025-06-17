@@ -8,8 +8,7 @@ const entSpawnReg = reg('spawnEntity', ent => {
   if (ent instanceof EntityFallingBlock) World.getWorld().func_72900_e(ent);
 }).setEnabled(new StateProp(settings._dungeonHideFallingBlocks).and(stateIsInBoss));
 
-export function init() { }
-export function start() {
+export function enter() {
   entSpawnReg.register();
 }
 export function reset() {

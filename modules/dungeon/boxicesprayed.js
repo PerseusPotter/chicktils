@@ -140,12 +140,13 @@ export function init() {
   registerTrackPlayers(settings._dungeonBoxIceSprayed);
   registerTrackHeldItem(settings._dungeonBoxIceSprayed);
 }
-export function start() {
+export function enter() {
   allMobs = [];
   allMobsBucket.clear();
   itemCand = [];
   frozenMobs = [];
-
+}
+export function start() {
   entSpawnReg.register();
   step2Reg.register();
   serverTickReg.register();

@@ -28,10 +28,11 @@ const goldorEndReg = reg('chat', () => stateInGoldor.set(false)).setCriteria('&r
 export function init() {
   settings._moveGoldorFrenzyTimer.onAction(v => timerHud.edit(v));
 }
-export function start() {
+export function enter() {
   stateInGoldor.set(false);
   ticksInvul = 60;
-
+}
+export function start() {
   renderReg.register();
   serverTickReg.register();
   goldorStartReg.register();

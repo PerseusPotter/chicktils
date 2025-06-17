@@ -24,9 +24,10 @@ export function init() {
   settings._dungeonGoldorDpsStartAlert.listen(v => !v && stateIsInGoldorDps.set(false));
   settings._dungeonGoldorDpsStartAlertSound.listen(v => goldorDpsStartAlert.sound = v);
 }
-export function start() {
+export function enter() {
   stateIsInGoldorDps.set(false);
-
+}
+export function start() {
   tickReg.register();
   terminalsEndReg.register();
   goldorDpsStartReg.register();

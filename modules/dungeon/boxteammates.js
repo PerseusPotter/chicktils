@@ -20,7 +20,7 @@ const renderReg = reg('renderWorld', () => {
 export function init() {
   registerTrackPlayers(settings._dungeonBoxTeammates);
 }
-export function start() {
+export function enter() {
   renderReg.register();
 }
 export function reset() {

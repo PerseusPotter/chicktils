@@ -73,9 +73,10 @@ const terraRespawnGuiReg = reg('renderOverlay', () => {
 export function init() {
   settings._moveDungeonTerracottaRespawnGui.onAction(v => respawnGui.edit(v));
 }
-export function start() {
+export function enter() {
   stateTerraPhase.set(true);
-
+}
+export function start() {
   blockUpdateReg.register();
   stickReg.register();
   renderReg.register();

@@ -23,10 +23,10 @@ const renderWorldReg = reg('renderWorld', () => {
   });
 }).setEnabled(stateBoxWithers);
 
-export function init() { }
-export function start() {
+export function enter() {
   withers = [];
-
+}
+export function start() {
   entSpawnReg.register();
   tickReg.register();
   renderWorldReg.register();

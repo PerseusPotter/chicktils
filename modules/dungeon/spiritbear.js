@@ -121,9 +121,10 @@ export function init() {
   settings._moveSpiritBearTimerHud.onAction(v => spiritBearTimer.edit(v));
   listenBossMessages((name, msg) => settings.dungeonSpiritBearHelper && name === 'Thorn' && msg === 'Welcome Adventurers! I am Thorn, the Spirit! And host of the Vegan Trials!' && stateInFM4.set(true));
 }
-export function start() {
+export function enter() {
   resetFM4Vars();
-
+}
+export function start() {
   tickReg.register();
   serverTickReg.register();
   particleReg.register();

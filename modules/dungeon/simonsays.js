@@ -93,11 +93,11 @@ const playerInteractReg = reg('playerInteract', (action, pos, evn) => {
   solution.shift();
 }).setEnabled(stateDoSimonSays);
 
-export function init() { }
-export function start() {
+export function enter() {
   stateAtSS.set(false);
   solution = [];
-
+}
+export function start() {
   tickReg.register();
   blockChangeReg.register();
   multiBlockReg.register();

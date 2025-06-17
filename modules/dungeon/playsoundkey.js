@@ -21,7 +21,6 @@ function playSound() {
 
 const pickupKeyReg = reg('chat', () => playSound()).setCriteria('&r&e&lRIGHT CLICK &r&7on ${*} to open it. This key can only be used to open &r&a1&r&7 door!&r').setEnabled(new StateProp(stateIsInBoss).not().and(settings._dungeonPlaySoundKey));
 
-export function init() { }
 export function start() {
   pickupKeyReg.register();
 }

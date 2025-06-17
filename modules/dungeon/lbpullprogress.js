@@ -25,8 +25,7 @@ const serverTickReg = reg('serverTick', () => {
   World.playSound(ticks >= settings.dungeonLBPullProgressThreshold ? 'random.successful_hit' : 'note.pling', settings.dungeonLBPullProgressVolume, rescale(ticks, 0, 20, 0.5, 2));
 }).setEnabled(new StateProp(settings._dungeonLBPullProgress).and(statePullingLb));
 
-export function init() { }
-export function start() {
+export function enter() {
   statePullingLb.set(false);
   totalTicks = 0;
 

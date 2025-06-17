@@ -54,10 +54,10 @@ const renderEntReg = reg('renderEntity', (e, pos, partial, evn) => {
   if (hiddenPowerups.containsKey(e.entity)) cancel(evn);
 }).setEnabled(settings._dungeonHideHealerPowerups);
 
-export function init() { }
-export function start() {
+export function enter() {
   hiddenPowerupsBucket.clear();
-
+}
+export function start() {
   orbSpawnReg.register();
   orbNameReg.register();
   particleReg.register();

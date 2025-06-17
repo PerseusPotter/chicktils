@@ -27,8 +27,10 @@ export function init() {
     if (msg === 'ENERGY HEED MY CALL!' || msg === 'THUNDER LET ME BE YOUR CATALYST!') stateInStormClear.set(false);
   });
 }
-export function start() {
+export function enter() {
   stateInStormClear.set(true);
+}
+export function start() {
   swingReg.register();
 }
 export function reset() {

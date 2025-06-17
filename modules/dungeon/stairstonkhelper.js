@@ -79,8 +79,7 @@ const renderWorldReg = reg('renderWorld', () => {
   if (lookPos) renderBoxFilled(settings.dungeonStairStonkHelperHighlightColor, lookPos.x - 0.005, lookPos.y - 0.005, lookPos.z - 0.005, 1.01, 1.01, { centered: false });
 }).setEnabled(settings._dungeonStairStonkHelper);
 
-export function init() { }
-export function start() {
+export function enter() {
   brokenStairBucket.clear();
   cID = NaN;
   cArr = null;

@@ -30,9 +30,10 @@ const terminalsEndReg = reg('chat', () => {
 export function init() {
   registerTrackPlayers(stateTermBreakdown);
 }
-export function start() {
+export function enter() {
   teamTerms.clear();
-
+}
+export function start() {
   termCompleteReg.register();
   terminalsEndReg.register();
 }

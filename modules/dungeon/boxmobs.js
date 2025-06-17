@@ -99,11 +99,11 @@ const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   );
 }).setEnabled(stateBoxMob);
 
-export function init() { }
-export function start() {
+export function enter() {
   boxMobs.clear();
   nameCand.clear();
-
+}
+export function start() {
   entSpawnReg.register();
   nameChangeReg.register();
   renderEntPostReg.register();
