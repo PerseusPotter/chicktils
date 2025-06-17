@@ -549,6 +549,9 @@ const $EntityReducer = {
   entityReducerHubCarpenter: new Property('ReduceHubCarpenter', 0, 0, Property.Type.Option, 'Remove', { desc: 'carpentry objects', options: ['Normal', 'Hide', 'Remove'] }),
   entityReducerHubMarco: new Property('ReduceHubMarco', 0, 0, Property.Type.Option, 'Remove', { desc: 'paintings in marco house', options: ['Normal', 'Hide', 'Remove'] }),
   entityReducerHubRabbit: new Property('ReduceHubRabbitFamily', 0, 0, Property.Type.Option, 'Remove', { desc: 'rabbit house residents', options: ['Normal', 'Hide', 'Remove'] }),
+
+  entityReducerDHub: new Property('ReduceDungeonHubEntities', 0, 0, Property.Type.Toggle, true, { isNewSection: true }),
+  entityReducerDHubRace: new Property('ReduceDHubRaceLeaderboard', 0, 0, Property.Type.Option, 'Remove', { desc: 'leaderboard for races', options: ['Normal', 'Hide', 'Remove'] }),
 };
 
 const $Testing = {
