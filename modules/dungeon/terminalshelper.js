@@ -49,9 +49,10 @@ const termOpenReg = reg('guiOpened', evn => {
 }).setEnabled(new StateProp(stateFloor).equalsmult('F7', 'M7').and(stateIsInBoss).and(settings._dungeonTerminalsHelper));
 
 export function init() { }
-export function start() {
+export function enter() {
   origGuiSize.set(-1);
-
+}
+export function start() {
   tickReg.register();
   termOpenReg.register();
 }

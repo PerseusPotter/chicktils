@@ -14,7 +14,6 @@ const partSpawnReg = reg('spawnParticle', (p, i, evn) => {
   if (p.getY() >= 9 && p.getY() <= 25 && p.getZ() <= 45 && i.equals(EnumParticleTypes.SPELL_WITCH)) cancel(evn);
 }).setEnabled(new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonHideWitherKing));
 
-export function init() { }
 export function start() {
   entSpawnReg.register();
   partSpawnReg.register();

@@ -206,13 +206,14 @@ export function init() {
     this.set(o);
   });
 }
-export function start() {
+export function enter() {
   stateInP5.set(false);
   spawnedDrags.clear();
   dragonCount = 0;
   stateDragon.set();
   hitTimes = [0];
-
+}
+export function start() {
   tickReg.register();
   partSpawnReg.register();
   serverTickReg.register();

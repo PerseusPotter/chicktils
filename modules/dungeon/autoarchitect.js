@@ -26,7 +26,6 @@ const architectUseReg = reg('chat', () => {
   architectUseReg.unregister();
 }).setCriteria('&r&aYou used the &r&5Architect\'s First Draft${*}').setEnabled(stateArchitect);
 
-export function init() { }
 export function start() {
   puzzleFailReg.register();
   quizFailReg.register();

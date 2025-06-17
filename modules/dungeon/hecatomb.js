@@ -47,9 +47,3 @@ export function init() {
   });
   settings._dungeonHecatombAlertSound.listen(v => hecAlert.sound = v);
 }
-export function start() {
-
-}
-export function reset() {
-
-}

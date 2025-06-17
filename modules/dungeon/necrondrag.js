@@ -52,9 +52,10 @@ const renderOverlayReg = reg('renderOverlay', () => {
 export function init() {
   settings._moveNecronDragTimer.onAction(v => necronDragTimer.edit(v));
 }
-export function start() {
+export function enter() {
   necronDragTicks.set(0);
-
+}
+export function start() {
   tickReg.register();
   serverTickReg.register();
   necronStartReg.register();

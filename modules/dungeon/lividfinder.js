@@ -66,11 +66,11 @@ const rendOverReg = reg('renderOverlay', () => {
   drawArrow3DPos(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ(), false, 5);
 }).setEnabled(stateFindLivid.and(stateLivid).and(new StateProp(settings._preferUseTracer).not()));
 
-export function init() { }
-export function start() {
+export function enter() {
   stateLivid.set(null);
   currColor = 14;
-
+}
+export function start() {
   blockChangeReg.register();
   tickReg.register();
   rendWrldReg.register();

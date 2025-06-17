@@ -170,7 +170,7 @@ export function init() {
   });
   settings._moveDungeonCampSkipTimer.onAction(v => dialogueSkipTimer.edit(v));
 }
-export function start() {
+export function enter() {
   bloodMobs = [];
   bloodMobsSet.clear();
   possibleSkulls = [];
@@ -181,7 +181,8 @@ export function start() {
   skipKillTime = 0;
   bloodOpenTime = 0;
   stateBloodClosed.set(false);
-
+}
+export function start() {
   entSpawnReg.register();
   serverTickReg.register();
   renderWorldReg.register();

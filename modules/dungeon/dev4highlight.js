@@ -29,10 +29,10 @@ const renderReg = reg('renderWorld', () => {
   );
 }).setEnabled(stateEnable);
 
-export function init() { }
-export function start() {
+export function enter() {
   emBlockPos = resetPos;
-
+}
+export function start() {
   blockChangeReg.register();
   renderReg.register();
 }

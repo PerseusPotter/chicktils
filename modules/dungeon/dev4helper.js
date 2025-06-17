@@ -15,9 +15,10 @@ const titleReg = reg('renderTitle', (t, s, evn) => {
 export function init() {
   settings._dungeonDev4Helper.listen(v => v === 'None' && stateIsAtDev4.set(false));
 }
-export function start() {
+export function enter() {
   stateIsAtDev4.set(false);
-
+}
+export function start() {
   tickReg.register();
   particleReg.register();
   titleReg.register();

@@ -83,7 +83,7 @@ export function init() {
   registerTrackPlayers(stateMap);
   settings._moveDungeonMap.onAction(v => mapDisplay.edit(v));
 }
-export function start() {
+export function enter() {
   map = null;
   mapId = null;
   lastRoom = '';

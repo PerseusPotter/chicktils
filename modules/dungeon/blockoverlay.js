@@ -102,7 +102,7 @@ export function init() {
     // canUseStencil = fb.isStencilEnabled() || fb.enableStencil();
   });
 }
-export function start() {
+export function enter() {
   overlayReg.register();
 }
 export function reset() {

@@ -13,7 +13,7 @@ function reset() {
   getPlayersStep2Reg.unregister();
   playerItemReg.unregister();
 
-  modules.forEach(v => v.reset());
+  modules.forEach(v => v?.reset());
 }
 function enter() {
   players = [];
@@ -24,7 +24,7 @@ function enter() {
   dungeonStartReg.register();
   entSpawnReg.register();
 
-  modules.forEach(v => v.start());
+  modules.forEach(v => v?.enter());
 }
 function start() {
   if (!Scoreboard.getLines(false).some(v => {
@@ -36,6 +36,8 @@ function start() {
   bossMessageReg.register();
   getPlayersStep2Reg.register();
   playerItemReg.register();
+
+  modules.forEach(v => v?.start());
 }
 
 /**
@@ -201,7 +203,7 @@ export function init() {
     require('./dungeon/terminalshelper'),
     require('./dungeon/terracottarespawn')
   ];
-  modules.forEach(v => v.init());
+  modules.forEach(v => v?.init());
 
   entSpawnReg.setEnabled(stateTrackPlayers);
   getPlayersStep2Reg.setEnabled(stateTrackPlayers);

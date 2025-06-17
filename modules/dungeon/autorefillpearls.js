@@ -31,14 +31,14 @@ const step1Reg = reg('step', () => {
   });
 }).setDelay(1).setEnabled(new StateProp(settings._dungeonAutoRefillPearlsThreshold).notequals(0).and(settings._dungeonAutoRefillPearls));
 
-export function init() { }
+export function enter() {
+  step1Reg.register();
+}
 export function start() {
   if (settings.dungeonAutoRefillPearls) {
     const c = settings.dungeonAutoRefillPearlsAmount - countItems('ENDER_PEARL');
     if (c > 0) execCmd('gfs ENDER_PEARL ' + c);
   }
-
-  step1Reg.register();
 }
 export function reset() {
   step1Reg.unregister();

@@ -23,7 +23,6 @@ const renderWorldReg = reg('renderWorld', () => {
   renderBeacon(nearest[2], nearest[0], 0, nearest[1], { centered: false, h: 17 });
 }).setEnabled(stateM7LBWaypoints);
 
-export function init() { }
 export function start() {
   tickReg.register();
   renderWorldReg.register();

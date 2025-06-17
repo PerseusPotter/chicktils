@@ -1,12 +1,14 @@
 import settings from '../../settings';
 import reg from '../../util/registerer';
-import { StateVar } from '../../util/state';
+import { registerListenIsland, stateIsland } from '../../util/skyblock';
+import { StateProp, StateVar } from '../../util/state';
 
+const stateEnabled = new StateProp(stateIsland).equals('Dungeon Hub').and(settings._dungeonDHubHighlightLow);
 const stateInGui = new StateVar(0);
 
 const guiOpenReg = reg('packetReceived', pack => {
   stateInGui.set(pack.func_148902_e() === 'minecraft:chest' && pack.func_179840_c().func_150260_c() === 'Dungeon Hub Selector' ? pack.func_148901_c() : 0);
-}).setFilteredClass(net.minecraft.network.play.server.S2DPacketOpenWindow).setEnabled(settings._dungeonDHubHighlightLow);
+}).setFilteredClass(net.minecraft.network.play.server.S2DPacketOpenWindow).setEnabled(stateEnabled);
 const windowItemsReg = reg('packetReceived', pack => {
   if (pack.func_148911_c() !== stateInGui.get()) return;
 
@@ -37,15 +39,14 @@ const windowItemsReg = reg('packetReceived', pack => {
     items[minI].func_150996_a(net.minecraft.item.Item.func_150899_d(133));
     items[minI].func_77964_b(0);
   }
-}).setFilteredClass(net.minecraft.network.play.server.S30PacketWindowItems).setEnabled(stateInGui);
-const guiCloseReg = reg('guiClosed', () => stateInGui.set(0)).setEnabled(stateInGui);
+}).setFilteredClass(net.minecraft.network.play.server.S30PacketWindowItems).setEnabled(stateEnabled.and(stateInGui));
+const guiCloseReg = reg('guiClosed', () => stateInGui.set(0)).setEnabled(stateEnabled.and(stateInGui));
 
 export function init() {
   settings._dungeonDHubHighlightLow.listen(() => stateInGui.set(0));
+  registerListenIsland(settings._dungeonDHubHighlightLow);
 
   guiOpenReg.register();
   windowItemsReg.register();
   guiCloseReg.register();
 }
-export function start() { }
-export function reset() { }

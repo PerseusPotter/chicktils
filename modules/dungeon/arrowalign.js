@@ -3,14 +3,14 @@ import { renderString } from '../../util/draw';
 import reg from '../../util/registerer';
 import { compareFloat } from '../../util/math';
 import { StateProp, StateVar } from '../../util/state';
-import { listenBossMessages, stateFloor, stateIsInBoss } from '../dungeon.js';
+import { stateBossName, stateFloor, stateIsInBoss } from '../dungeon.js';
 import { getItemId } from '../../util/mc';
 
 const stateArrowAlign = new StateProp(stateFloor).equalsmult('F7', 'M7').and(stateIsInBoss).and(settings._dungeonArrowAlign);
 const stateAtAA = new StateVar(false);
 const stateDoArrowAlign = stateArrowAlign.and(stateAtAA);
 const stateSolution = new StateVar();
-const stateIsPD = new StateVar(true);
+const stateIsPD = new StateProp(stateBossName).notequals('Goldor');
 
 const frameState = new Map();
 const clicksQueued = new Map();
@@ -126,16 +126,13 @@ const renderWorldReg = reg('renderWorld', () => {
   }
 }).setEnabled(stateDoArrowAlign.and(stateSolution));
 
-export function init() {
-  listenBossMessages(v => stateIsPD.set(stateIsPD.get() && v !== 'Goldor'));
-}
-export function start() {
+export function enter() {
   stateAtAA.set(false);
   stateSolution.set(null);
   frameState.clear();
   clicksQueued.clear();
-  stateIsPD.set(true);
-
+}
+export function start() {
   tickReg.register();
   calcReg.register();
   playerInteractReg.register();
