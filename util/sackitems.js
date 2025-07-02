@@ -11,6 +11,11 @@ export const ITEMS = [
     "id": "AGARIMOO_TONGUE"
   },
   {
+    "nameF": "§aAgatha's Coupon",
+    "nameUF": "Agatha's Coupon",
+    "id": "AGATHA_COUPON"
+  },
+  {
     "nameF": "§5Alligator Skin",
     "nameUF": "Alligator Skin",
     "id": "ALLIGATOR_SKIN"
@@ -361,8 +366,8 @@ export const ITEMS = [
     "id": "EMERALD"
   },
   {
-    "nameF": "§aEnchanted Acacia Wood",
-    "nameUF": "Enchanted Acacia Wood",
+    "nameF": "§aEnchanted Acacia Log",
+    "nameUF": "Enchanted Acacia Log",
     "id": "ENCHANTED_ACACIA_LOG"
   },
   {
@@ -371,8 +376,8 @@ export const ITEMS = [
     "id": "ENCHANTED_BAKED_POTATO"
   },
   {
-    "nameF": "§aEnchanted Birch Wood",
-    "nameUF": "Enchanted Birch Wood",
+    "nameF": "§aEnchanted Birch Log",
+    "nameUF": "Enchanted Birch Log",
     "id": "ENCHANTED_BIRCH_LOG"
   },
   {
@@ -481,8 +486,8 @@ export const ITEMS = [
     "id": "ENCHANTED_DANDELION"
   },
   {
-    "nameF": "§aEnchanted Dark Oak Wood",
-    "nameUF": "Enchanted Dark Oak Wood",
+    "nameF": "§aEnchanted Dark Oak Log",
+    "nameUF": "Enchanted Dark Oak Log",
     "id": "ENCHANTED_DARK_OAK_LOG"
   },
   {
@@ -529,6 +534,11 @@ export const ITEMS = [
     "nameF": "§aEnchanted Feather",
     "nameUF": "Enchanted Feather",
     "id": "ENCHANTED_FEATHER"
+  },
+  {
+    "nameF": "§9Enchanted Fig Log",
+    "nameUF": "Enchanted Fig Log",
+    "id": "ENCHANTED_FIG_LOG"
   },
   {
     "nameF": "§aEnchanted Flint",
@@ -631,8 +641,8 @@ export const ITEMS = [
     "id": "ENCHANTED_IRON_BLOCK"
   },
   {
-    "nameF": "§aEnchanted Jungle Wood",
-    "nameUF": "Enchanted Jungle Wood",
+    "nameF": "§aEnchanted Jungle Log",
+    "nameUF": "Enchanted Jungle Log",
     "id": "ENCHANTED_JUNGLE_LOG"
   },
   {
@@ -654,6 +664,11 @@ export const ITEMS = [
     "nameF": "§aEnchanted Magma Cream",
     "nameUF": "Enchanted Magma Cream",
     "id": "ENCHANTED_MAGMA_CREAM"
+  },
+  {
+    "nameF": "§9Enchanted Mangrove Log",
+    "nameUF": "Enchanted Mangrove Log",
+    "id": "ENCHANTED_MANGROVE_LOG"
   },
   {
     "nameF": "§aEnchanted Melon",
@@ -696,8 +711,8 @@ export const ITEMS = [
     "id": "ENCHANTED_NETHERRACK"
   },
   {
-    "nameF": "§aEnchanted Oak Wood",
-    "nameUF": "Enchanted Oak Wood",
+    "nameF": "§aEnchanted Oak Log",
+    "nameUF": "Enchanted Oak Log",
     "id": "ENCHANTED_OAK_LOG"
   },
   {
@@ -836,6 +851,11 @@ export const ITEMS = [
     "id": "ENCHANTED_SAND"
   },
   {
+    "nameF": "§aEnchanted Sea Lumies",
+    "nameUF": "Enchanted Sea Lumies",
+    "id": "ENCHANTED_SEA_LUMIES"
+  },
+  {
     "nameF": "§aEnchanted Seeds",
     "nameUF": "Enchanted Seeds",
     "id": "ENCHANTED_SEEDS"
@@ -881,8 +901,8 @@ export const ITEMS = [
     "id": "ENCHANTED_SPONGE"
   },
   {
-    "nameF": "§aEnchanted Spruce Wood",
-    "nameUF": "Enchanted Spruce Wood",
+    "nameF": "§aEnchanted Spruce Log",
+    "nameUF": "Enchanted Spruce Log",
     "id": "ENCHANTED_SPRUCE_LOG"
   },
   {
@@ -911,6 +931,11 @@ export const ITEMS = [
     "id": "ENCHANTED_SULPHUR_CUBE"
   },
   {
+    "nameF": "§9Enchanted Tender Wood",
+    "nameUF": "Enchanted Tender Wood",
+    "id": "ENCHANTED_TENDER_WOOD"
+  },
+  {
     "nameF": "§5Enchanted Titanium",
     "nameUF": "Enchanted Titanium",
     "id": "ENCHANTED_TITANIUM"
@@ -924,6 +949,11 @@ export const ITEMS = [
     "nameF": "§9Enchanted Umber",
     "nameUF": "Enchanted Umber",
     "id": "ENCHANTED_UMBER"
+  },
+  {
+    "nameF": "§9Enchanted Vinesap",
+    "nameUF": "Enchanted Vinesap",
+    "id": "ENCHANTED_VINESAP"
   },
   {
     "nameF": "§aEnchanted Lily Pad",
@@ -969,6 +999,16 @@ export const ITEMS = [
     "nameF": "§9Fel Pearl",
     "nameUF": "Fel Pearl",
     "id": "FEL_PEARL"
+  },
+  {
+    "nameF": "Fig Log",
+    "nameUF": "Fig Log",
+    "id": "FIG_LOG"
+  },
+  {
+    "nameF": "§5Figstone",
+    "nameUF": "Figstone",
+    "id": "FIGSTONE"
   },
   {
     "nameF": "§9Fine Amber Gemstone",
@@ -1151,8 +1191,8 @@ export const ITEMS = [
     "id": "GHAST_TEAR"
   },
   {
-    "nameF": "§5Bigfoot's Lasso",
-    "nameUF": "Bigfoot's Lasso",
+    "nameF": "§5Bigfoot's Bola",
+    "nameUF": "Bigfoot's Bola",
     "id": "GIANT_FRAGMENT_BIGFOOT"
   },
   {
@@ -1471,33 +1511,33 @@ export const ITEMS = [
     "id": "LIVID_FRAGMENT"
   },
   {
-    "nameF": "Oak Wood",
-    "nameUF": "Oak Wood",
+    "nameF": "Oak Log",
+    "nameUF": "Oak Log",
     "id": "LOG"
   },
   {
-    "nameF": "Acacia Wood",
-    "nameUF": "Acacia Wood",
+    "nameF": "Acacia Log",
+    "nameUF": "Acacia Log",
     "id": "LOG_2"
   },
   {
-    "nameF": "§fDark Oak Wood",
-    "nameUF": "Dark Oak Wood",
+    "nameF": "§fDark Oak Log",
+    "nameUF": "Dark Oak Log",
     "id": "LOG_2-1"
   },
   {
-    "nameF": "§fSpruce Wood",
-    "nameUF": "Spruce Wood",
+    "nameF": "§fSpruce Log",
+    "nameUF": "Spruce Log",
     "id": "LOG-1"
   },
   {
-    "nameF": "§fBirch Wood",
-    "nameUF": "Birch Wood",
+    "nameF": "§fBirch Log",
+    "nameUF": "Birch Log",
     "id": "LOG-2"
   },
   {
-    "nameF": "§fJungle Wood",
-    "nameUF": "Jungle Wood",
+    "nameF": "§fJungle Log",
+    "nameUF": "Jungle Log",
     "id": "LOG-3"
   },
   {
@@ -1509,6 +1549,11 @@ export const ITEMS = [
     "nameF": "§aLump of Magma",
     "nameUF": "Lump of Magma",
     "id": "LUMP_OF_MAGMA"
+  },
+  {
+    "nameF": "§aLushlilac",
+    "nameUF": "Lushlilac",
+    "id": "LUSHLILAC"
   },
   {
     "nameF": "§aMagma Chunk",
@@ -1564,6 +1609,16 @@ export const ITEMS = [
     "nameF": "§9Mana Ray§r §l§7§LSILVER",
     "nameUF": "Mana Ray SILVER",
     "id": "MANA_RAY_SILVER"
+  },
+  {
+    "nameF": "§5Mangcore",
+    "nameUF": "Mangcore",
+    "id": "MANGCORE"
+  },
+  {
+    "nameF": "Mangrove Log",
+    "nameUF": "Mangrove Log",
+    "id": "MANGROVE_LOG"
   },
   {
     "nameF": "Melon",
@@ -2126,6 +2181,11 @@ export const ITEMS = [
     "id": "SCORCHED_CRAB_STICK"
   },
   {
+    "nameF": "§fSea Lumies",
+    "nameUF": "Sea Lumies",
+    "id": "SEA_LUMIES"
+  },
+  {
     "nameF": "Seeds",
     "nameUF": "Seeds",
     "id": "SEEDS"
@@ -2361,6 +2421,11 @@ export const ITEMS = [
     "id": "TARANTULA_WEB"
   },
   {
+    "nameF": "§aTender Wood",
+    "nameUF": "Tender Wood",
+    "id": "TENDER_WOOD"
+  },
+  {
     "nameF": "§9Tentacle Meat",
     "nameUF": "Tentacle Meat",
     "id": "TENTACLE_MEAT"
@@ -2439,6 +2504,11 @@ export const ITEMS = [
     "nameF": "§f§f§9Vanille§r §l§7§LSILVER",
     "nameUF": "Vanille SILVER",
     "id": "VANILLE_SILVER"
+  },
+  {
+    "nameF": "§aVinesap",
+    "nameUF": "Vinesap",
+    "id": "VINESAP"
   },
   {
     "nameF": "§cVolcanic Rock",
@@ -2596,6 +2666,6 @@ export const ITEMS_ID_MAP = new Map(ITEMS.map(v => [v.id, v]));
  * @param {string} str
  */
 export function stripName(str) {
-  return str.toLowerCase().replace(/§\w/g, '').replace(/[^s'-.a-z0-9]/g, '').trim();
+  return str.toLowerCase().replace(/[^s'-.a-z0-9]/g, '').trim();
 };
 export const ITEMS_NAME_MAP = new Map(ITEMS.map(v => [stripName(v.nameUF), v]));
