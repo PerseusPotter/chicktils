@@ -72,16 +72,23 @@ function processMessageWaypoint(ign, msg) {
 
 const melodyMessages = new Map();
 const lastMessages = new Map();
-const odinMelodies = [
-  'Melody terminal is at 25%',
-  'Melody terminal is at 50%',
-  'Melody terminal is at 75%'
-];
-const weirdMelodies = [
-  'Melody ♪ Terminal [0/4]!',
-  'Melody ♪ Terminal [1/4]!',
-  'Melody ♪ Terminal [2/4]!',
-  'Melody ♪ Terminal [3/4]!'
+const fixedMelodies = [
+  [
+    'Melody terminal is at 25%',
+    'Melody terminal is at 50%',
+    'Melody terminal is at 75%'
+  ],
+  [
+    'Melody ♪ Terminal [0/4]!',
+    'Melody ♪ Terminal [1/4]!',
+    'Melody ♪ Terminal [2/4]!',
+    'Melody ♪ Terminal [3/4]!'
+  ],
+  [
+    'Melody 25%',
+    'Melody 50%',
+    'Melody 75%'
+  ]
 ];
 function hideMessage(option, evn) {
   if (option === 'False') return;
@@ -98,11 +105,14 @@ function tryMelody(ign, msg, evn, mel) {
       deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
     }
   } else {
-    let i = odinMelodies.indexOf(msg);
-    let arr = odinMelodies;
-    if (i < 0) {
-      i = weirdMelodies.indexOf(msg);
-      arr = weirdMelodies;
+    let i = -1;
+    let arr;
+    for (let j = 0; j < fixedMelodies.length; j++) {
+      i = fixedMelodies[j].indexOf(msg);
+      if (i >= 0) {
+        arr = fixedMelodies[j];
+        break;
+      }
     }
     if (i >= 0) {
       hideMessage(settings.chatTilsHideMelody, evn);
