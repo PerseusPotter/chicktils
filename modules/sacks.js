@@ -118,7 +118,7 @@ function updateItemGui(items, time) {
     const id = ITEMS_NAME_MAP.get(stripName(n))?.id ?? getOrPut(
       warnedItems, n,
       () => {
-        const i = stripName(n).replace(/\s+/g, '_').toUpperCase();
+        const i = stripName(n.replace(/\s+/g, '_')).toUpperCase();
         log(`&4Unknown item &7"&r${n}&7"&4. Will try to use the item id &7"&r${i}&7"&4. Please report this, this warning will not be sent for this item for the remainder of the session.`);
         return i;
       }
