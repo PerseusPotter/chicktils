@@ -219,6 +219,8 @@ const $Dungeon = {
   moveDungeonTerracottaRespawnGui: new Property('MoveDungeonTerracottaRespawnGui', 0, 0, Property.Type.Action, null, { shouldShow: p => addDependency(p.dungeonTerracottaRespawnGui) }),
 
   dungeonStormClearLaser: new Property('DungeonStormClearLaserChecker', 0, 0, Property.Type.Toggle, false, { desc: 'warn when someone is using laser in storm clear', shouldShow: p => addDependency(p.enabledungeon), isNewSection: true }),
+
+  dungeonHideSoulweaverSkulls: new Property('DungeonHideSoulweaverSkulls', 0, 0, Property.Type.Toggle, true),
 };
 
 const $ServerTracker = {
