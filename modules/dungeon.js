@@ -25,6 +25,8 @@ function enter() {
   entSpawnReg.register();
 
   modules.forEach(v => v?.enter());
+
+  if (Scoreboard.getLines(true).some(v => v.getName().startsWith('Time Elapsed:'))) dungeonStartReg.forceTrigger();
 }
 function start() {
   if (!Scoreboard.getLines(false).some(v => {
