@@ -187,6 +187,13 @@ const ENCHANT_DICT = [
     loreName: 'Spiked Hook',
     goodLevel: 5,
     maxLevel: 7
+  },
+  {
+    type: 'Normal',
+    nbtName: 'drain',
+    loreName: 'Drain',
+    goodLevel: 4,
+    maxLevel: 5
   }
 ];
 
