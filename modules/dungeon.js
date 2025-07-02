@@ -186,6 +186,7 @@ export function init() {
     require('./dungeon/hidefallingblocks'),
     require('./dungeon/hidehealerfairy'),
     require('./dungeon/hidehealerpowerups'),
+    require('./dungeon/hidesoulweaverskulls'),
     require('./dungeon/hidewitherking'),
     require('./dungeon/lbpullprogress'),
     require('./dungeon/lividfinder'),
