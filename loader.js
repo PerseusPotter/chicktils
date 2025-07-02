@@ -63,9 +63,14 @@ export function unloadModule(name) {
   modules.get(name)?.unload();
 }
 
+let postInitHook = [];
+export function listenPostInit(cb) {
+  postInitHook.push(cb);
+}
 export function postInit() {
   JSON.parse(FileLib.read('chicktils', 'modules/modules.json')).forEach(n => settings['_enable' + n].listen(v => moduleEnableListener(n, v)));
   settings._enableGlobal.listen(v => v ? load() : unload());
+  postInitHook.forEach(v => v());
 }
 
 function moduleEnableListener(name, value) {

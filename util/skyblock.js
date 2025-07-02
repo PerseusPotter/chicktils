@@ -1,3 +1,4 @@
+import { listenPostInit } from '../loader';
 import { getBlockPos } from './mc';
 import reg from './registerer';
 import { StateProp, StateVar } from './state';
@@ -93,5 +94,7 @@ function updateSpawnPoint(bp) {
   const key = posKey(spawn.x, spawn.y, spawn.z);
   stateIsland.set(locationMap.get(key) ?? '');
 }
-if (World.isLoaded()) updateSpawnPoint(Player.getPlayer().func_180470_cg());
+listenPostInit(() => Client.scheduleTask(() => {
+  if (World.isLoaded()) updateSpawnPoint(Player.getPlayer().func_180470_cg());
+}));
 const playerSpawnReg = reg('packetReceived', pack => updateSpawnPoint(pack.func_179800_a())).setFilteredClass(net.minecraft.network.play.server.S05PacketSpawnPosition).setEnabled(stateListenIsland).register();
