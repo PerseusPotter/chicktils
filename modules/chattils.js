@@ -79,7 +79,6 @@ const fixedMelodies = [
     'Melody terminal is at 75%'
   ],
   [
-    'Melody ♪ Terminal [0/4]!',
     'Melody ♪ Terminal [1/4]!',
     'Melody ♪ Terminal [2/4]!',
     'Melody ♪ Terminal [3/4]!'
@@ -145,13 +144,13 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
       mel = msg.slice(0, -4);
       melodyMessages.set(lIgn, mel);
       tryMelody(ign, msg, evn, mel);
-    } else if (msg === odinMelodies[0]) {
-      melodyMessages.set(lIgn, lastMessages.get(lIgn));
-      tryMelody(ign, msg, evn, lastMessages.get(lIgn));
-    } else if (msg === weirdMelodies[0]) {
-      melodyMessages.set(lIgn, msg);
-      tryMelody(ign, msg, evn, msg);
-    } else lastMessages.set(lIgn, msg);
+    } else {
+      const start = fixedMelodies.find(v => v[0] === msg);
+      if (start) {
+        melodyMessages.set(lIgn, lastMessages.get(lIgn));
+        tryMelody(ign, msg, evn, lastMessages.get(lIgn));
+      } else lastMessages.set(lIgn, msg);
+    }
   }
 }).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
 const coopChatReg = reg('chat', (ign, msg) => {
