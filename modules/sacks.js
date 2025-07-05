@@ -3,7 +3,7 @@ import settings from '../settings';
 import createTextGui from '../util/customtextgui';
 import { formatQuantity } from '../util/format';
 import { log } from '../util/log';
-import { getOrPut } from '../util/polyfill';
+import { Deque, getOrPut } from '../util/polyfill';
 import reg from '../util/registerer';
 import { ITEMS_ID_MAP, ITEMS_NAME_MAP, stripName } from '../util/sackitems';
 import { unrun } from '../util/threading';
@@ -87,11 +87,14 @@ const itemTimeoutTimer = new FrameTimer(10);
 const itemRenderReg = reg('renderOverlay', () => {
   if (itemTimeoutTimer.shouldRender()) {
     const t = Date.now();
-    for (let i = itemUpdateTime.length - 1; i >= 0; i--) {
-      if (t - itemUpdateTime[i][1] > settings.sacksDisplayTimeout) {
-        itemGui.removeLine(i);
-        itemUpdateTime.splice(i, 1);
+    const iter = itemUpdateTime.iter(itemUpdateTime.length - 1);
+    while (iter.index() >= 0) {
+      let v = iter.value();
+      if (t - v[1] > settings.sacksDisplayTimeout) {
+        itemGui.removeLine(iter.index());
+        iter.remove();
       }
+      iter.prev();
     }
   }
   itemGui.render();
@@ -99,8 +102,8 @@ const itemRenderReg = reg('renderOverlay', () => {
 
 /** @type {Map<string, Difference>} */
 const itemAggregate = new Map();
-/** @type {[string, number][]} */
-let itemUpdateTime = [];
+/** @type {Deque<[string, number]>} */
+const itemUpdateTime = new Deque();
 /** @type {string[]} */
 let itemWhitelist = [];
 /** @type {string[]} */
@@ -141,13 +144,15 @@ function updateItemGui(items, time) {
   unrun(() => {
     const t = Date.now();
     const updateLine = (id, str) => {
-      let i = itemUpdateTime.findIndex(v => v[0] === id);
-      if (i < 0) i = itemUpdateTime.push([id, t]) - 1;
+      let iter = itemUpdateTime.iterFind(v => v[0] === id);
+      if (iter.done()) {
+        itemUpdateTime.push([id, t]);
+        iter = itemUpdateTime.iter(itemUpdateTime.length - 1);
 
-      itemUpdateTime[i][1] = t;
+        itemGui.addLine(str);
+      } else itemGui.replaceLine(str, iter.index());
 
-      if (i === itemUpdateTime.length - 1) itemGui.addLine(str);
-      else itemGui.replaceLine(str, i);
+      iter.value()[1] = t;
     };
     itemsA.forEach(([k, d]) => {
       const n = ITEMS_ID_MAP.get(k).nameF;
@@ -189,7 +194,7 @@ export function load() {
 }
 export function unload() {
   itemAggregate.clear();
-  itemUpdateTime = [];
+  itemUpdateTime.clear();
 
   sackSingleMsgReg.unregister();
   sackBothMsgReg.unregister();
