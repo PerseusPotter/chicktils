@@ -527,14 +527,15 @@ export class Deque {
   }
 
   /**
+   * @private
    * @param {(v: T, i: number, a: Deque<T>) => boolean} func
-   * @returns {T?}
+   * @returns {{ node: DQNode<T>, index: number }?}
    */
-  find(func, that = this) {
+  _internalFind(func, that) {
     let c = this.$head;
     let i = 0;
     while (c) {
-      if (func.call(that, c.v, i, this)) return c.v;
+      if (func.call(that, c.v, i, this)) return { node: c, index: i };
       c = c.r;
       i++;
     }
@@ -542,17 +543,18 @@ export class Deque {
 
   /**
    * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {T?}
+   */
+  find(func, that = this) {
+    return this._internalFind(func, that)?.node;
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
    * @returns {number}
    */
   findIndex(func, that = this) {
-    let c = this.$head;
-    let i = 0;
-    while (c) {
-      if (func.call(that, c.v, i, this)) return i;
-      c = c.r;
-      i++;
-    }
-    return -1;
+    return this._internalFind(func, that)?.index ?? -1;
   }
 
   /**
@@ -872,6 +874,8 @@ export class Deque {
    * @template T
    * @typedef Iterator
    * @property {() => T} value
+   * @property {() => number} index
+   * @property {(v: T) => void} set
    * @property {() => boolean} done
    * @property {() => Iterator<T>} next
    * @property {() => Iterator<T>} prev
@@ -879,21 +883,26 @@ export class Deque {
    */
 
   /**
-   * @param {number?} i
+   * @private
+   * @param {DQNode<T>} c
+   * @param {number} i
    * @returns {Iterator<T>}
    */
-  iter(i = 0) {
-    let c = this.$get(i);
+  _interalIter(c, i) {
     const that = this;
     const o = {
       value() { return c.v; },
+      index() { return i; },
+      set(v) { c.v = v; },
       done() { return !c; },
       next() {
         c = c.r;
+        i++;
         return o;
       },
       prev() {
         c = c.l;
+        i--;
         return o;
       },
       remove() {
@@ -901,6 +910,24 @@ export class Deque {
       }
     };
     return o;
+  }
+
+  /**
+   * @param {number?} i
+   * @returns {Iterator<T>}
+   */
+  iter(i = 0) {
+    return this._interalIter(this.$get(i), i);
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {Iterator<T>}
+   */
+  iterFind(func, that = this) {
+    const pos = this._internalFind(func, that);
+    if (pos) return this._interalIter(pos.node, pos.index);
+    return this._interalIter(null, this.length);
   }
 
   [Symbol.iterator]() {
