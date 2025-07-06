@@ -384,6 +384,7 @@ editGui.registerKeyTyped((c, n) => {
       l.s = 1;
       l.a = 0;
       l.b = false;
+      l.c = 0;
       break;
     case 3:
       l.a = (l.a + 1) & 3;
