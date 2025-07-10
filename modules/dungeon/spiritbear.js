@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import data from '../../data';
-import { renderString, getPartialServerTick } from '../../util/draw';
+import { getPartialServerTick } from '../../util/draw';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import { getAveragePing } from '../../util/ping';
@@ -10,7 +10,7 @@ import { log } from '../../util/log';
 import { StateProp, StateVar } from '../../util/state';
 import { DelayTimer } from '../../util/timers';
 import { listenBossMessages } from '../dungeon.js';
-import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
+import { renderBillboardString, renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
 
 const bearSpawnTicks = 70;
 const bearParticleHeightCap = 80;
@@ -108,7 +108,7 @@ const renderWorldReg = reg('renderWorld', () => {
   renderBoxOutline(settings.dungeonSpiritBearWireColor, x, y, z, 1, 2, { phase: settings.dungeonSpiritBearBoxEsp, lw: 3 });
   renderBoxFilled(settings.dungeonSpiritBearBoxColor, x, y + 1 - m, z, m, 2 * m, { phase: settings.dungeonSpiritBearBoxEsp });
 
-  if (settings.dungeonSpiritBearTimer) renderString(((ticks.get() - getPartialServerTick() - getAveragePing() / 50) / 20).toFixed(2), x, y + 2.5, z);
+  if (settings.dungeonSpiritBearTimer) renderBillboardString(0xFFFFFFFF, ((ticks.get() - getPartialServerTick() - getAveragePing() / 50) / 20).toFixed(2), x, y + 2.5, z, { phase: settings.dungeonSpiritBearBoxEsp, increase: true });
 }).setEnabled(stateBearSpawning);
 const renderOvlyReg = reg('renderOverlay', () => {
   const d = (ticks.get() - getPartialServerTick() - getAveragePing() / 50) * 50;

@@ -1,10 +1,10 @@
 import settings from '../../settings';
-import { renderString } from '../../util/draw';
 import reg from '../../util/registerer';
 import { compareFloat } from '../../util/math';
 import { StateProp, StateVar } from '../../util/state';
 import { stateBossName, stateFloor, stateIsInBoss } from '../dungeon.js';
 import { getItemId } from '../../util/mc';
+import { renderString } from '../../../Apelles/index';
 
 const stateArrowAlign = new StateProp(stateFloor).equalsmult('F7', 'M7').and(stateIsInBoss).and(settings._dungeonArrowAlign);
 const stateAtAA = new StateVar(false);
@@ -121,7 +121,15 @@ const renderWorldReg = reg('renderWorld', () => {
     for (let z = 75; z < 80; z++) {
       let id = getFrameId(y, z);
       let v = getClicks(id);
-      if (v > 0) renderString(v.toString(), -2, y + 0.6, z + 0.5, 0xFFFFFFFF, false, 0.03, false);
+      if (v > 0) renderString(
+        0xFFFFFFFF,
+        v.toString(),
+        -1.9, y + 0.5, z + 0.5,
+        0, 0, -1,
+        0, -1, 0,
+        1, 0, 0,
+        { increase: false, scale: 1.5, blackBox: 0, anchor: 5 }
+      );
     }
   }
 }).setEnabled(stateDoArrowAlign.and(stateSolution));

@@ -1,6 +1,6 @@
-import { getRenderX, getRenderY, getRenderZ } from '../../Apelles/index';
+import { getRenderX, getRenderY, getRenderZ, renderBillboardString } from '../../Apelles/index';
 import settings from '../settings';
-import { Gradient, renderString, renderWaypoint } from '../util/draw';
+import { Gradient, renderWaypoint } from '../util/draw';
 import Grid from '../util/grid';
 import { dist, distAngle } from '../util/math';
 import { Deque } from '../util/polyfill';
@@ -84,12 +84,11 @@ const soulRenderReg = reg('postRenderEntity', (ent, pos) => {
   const data = droppedSouls.get(ent.entity.func_145782_y());
   if (!data) return;
   const t = customRegs.serverTick.tick;
-  if (settings.necromancyShowMobName) renderString(
+  if (settings.necromancyShowMobName) renderBillboardString(
+    0xFFFFFFFF,
     data.name,
-    pos.getX(), pos.getY() + 1.4375 + 0.9, pos.getZ(),
-    0xFFFFFFFF, false,
-    0.02, false,
-    settings.necromancySoulEsp, true, true
+    pos.getX() + getRenderX(), pos.getY() + getRenderY() + 1.4375 + 0.9, pos.getZ() + getRenderZ(),
+    { phase: settings.necromancySoulEsp, blackBox: 0 }
   );
   if (settings.necromancyBoxSoul) renderWaypoint(
     pos.getX() + getRenderX(), pos.getY() + 1.4375 + getRenderY(), pos.getZ() + getRenderZ(),
