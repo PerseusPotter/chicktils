@@ -1,9 +1,9 @@
-import { drawArrow2D, renderString, renderWaypoint } from '../util/draw';
+import { drawArrow2D, getPartialServerTick, renderString, renderWaypoint } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
 import { colorForNumber, execCmd } from '../util/format';
-import reg from '../util/registerer';
+import reg, { customRegs } from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
@@ -25,11 +25,7 @@ let dropLocs = dropLocsStatic.slice();
 let pearlLocs = [];
 let supplies = [];
 let chunks = [];
-let ticksUntilPickup = 0;
-let pickupStart = 0;
-let pickupAmount = 0;
-let lastPickUpdate = 0;
-let lastPickUpdateTime = 0;
+let pickupTime = 0;
 let isOnCannon = false;
 let isT5 = new StateVar(false);
 let kuuder;
@@ -37,7 +33,7 @@ const hpDisplay = createTextGui(() => data.kuudraHpLoc, () => ['&2240M']);
 const renderReg = reg('renderWorld', () => {
   if (settings.kuudraRenderPearlTarget && pearlLocs.length > 0) {
     const c = settings.kuudraPearlTargetColor;
-    const timeLeft = ticksUntilPickup - (Date.now() - lastPickUpdateTime);
+    const timeLeft = pickupTime - customRegs.serverTick.tick - getPartialServerTick();
     pearlLocs.forEach(v => {
       const { x, y, z } = intersectPL(
         Math.sin(v.phi) * Math.cos(v.theta),
@@ -52,7 +48,7 @@ const renderReg = reg('renderWorld', () => {
       renderLine(c, [[x - 1, y, z - 1], [x + 1, y, z + 1]], { phase: true, lw: 2 });
       renderLine(c, [[x - 1, y, z + 1], [x + 1, y, z - 1]], { phase: true, lw: 2 });
       const offset = normalize({ x: x - getRenderX(), y: 0, z: z - getRenderZ() });
-      renderString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x + offset.x, y, z + offset.z, c);
+      renderString(Math.max(0, (timeLeft - v.ticks) / 20).toFixed(2) + 's', x + offset.x, y, z + offset.z, c);
     });
   }
   if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => renderWaypoint(v.x, v.y, v.z, 1, 1, settings.kuudraEmptySupplySpotColor, true));
@@ -130,26 +126,67 @@ const bossBarReg = reg('renderBossHealth', () => {
   setBossBar(customBossBar);
 }).setEnabled(new StateProp(settings._kuudraCustomBossBar).and(isT5));
 
-const supplyPickReg = reg('renderTitle', (title, sub) => {
-  if (sub !== '§cDon\'t Move!§r') return;
-  const m = title.match(/^§8\[(?:§.\|*)+§8\] §b(\d+)%§r$/);
+const TitleType = net.minecraft.network.play.server.S45PacketTitle.Type;
+const TICK_REMAINING_DICT = {
+  0: 13,
+  7: 12,
+  15: 11,
+  23: 10,
+  30: 9,
+  38: 8,
+  46: 7,
+  53: 6,
+  61: 5,
+  69: 4,
+  76: 3,
+  84: 2,
+  92: 1,
+  100: 0,
+
+  9: 10,
+  18: 9,
+  27: 8,
+  36: 7,
+  45: 6,
+  54: 5,
+  63: 4,
+  72: 3,
+  81: 2,
+  90: 1,
+
+  11: 8,
+  22: 7,
+  33: 6,
+  44: 5,
+  55: 4,
+  66: 3,
+  77: 2,
+  88: 1,
+
+  14: 6,
+  28: 5,
+  42: 4,
+  57: 3,
+  71: 2,
+  85: 1,
+
+  20: 4,
+  40: 3,
+  60: 2,
+  80: 1,
+
+  33: 2,
+  66: 1
+};
+const supplyPickReg = reg('packetReceived', pack => {
+  if (pack.func_179807_a() !== TitleType.TITLE) return;
+  const m = pack.func_179805_b()?.func_150254_d()?.match(/^§8\[(?:§.\|*)+§8\] §b(\d+)%§r$/);
   if (!m) return;
   const progress = +m[1];
-  const t = Date.now();
-  if (progress === 0) {
-    if (t - pickupStart < 1000) return;
-    pickupStart = t;
-    ticksUntilPickup = 14 * 500;
-    lastPickUpdate = progress;
-    lastPickUpdateTime = t;
-    return;
-  }
-  if (lastPickUpdate === progress) return;
-  if (lastPickUpdate === 0) pickupAmount = progress;
-  lastPickUpdate = progress;
-  lastPickUpdateTime = t;
-  ticksUntilPickup = Math.round(100 / pickupAmount - Math.round(progress / pickupAmount)) * 500;
-}).setEnabled(settings._kuudraRenderPearlTarget);
+  unrun(() => {
+    pickupTime = customRegs.serverTick.tick + 10 * TICK_REMAINING_DICT[progress in TICK_REMAINING_DICT ? progress : 0];
+  });
+}).setFilteredClass(net.minecraft.network.play.server.S45PacketTitle).setEnabled(settings._kuudraRenderPearlTarget);
 
 const hideTitleReg = reg('renderTitle', (_, __, evn) => cancel(evn)).setEnabled(settings._kuudraDrawHpGui);
 const hpOverlayReg = reg('renderOverlay', () => {
@@ -192,11 +229,7 @@ function onBuildStart() {
   pearlLocs = [];
   supplies = [];
   chunks = [];
-  ticksUntilPickup = 0;
-  pickupStart = 0;
-  pickupAmount = 0;
-  lastPickUpdate = 0;
-  lastPickUpdateTime = 0;
+  pickupTime = 0;
   isOnCannon = false;
   supplyPickReg.unregister();
   cannonReg.register();
