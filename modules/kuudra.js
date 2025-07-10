@@ -48,7 +48,7 @@ const renderReg = reg('renderWorld', () => {
       renderLine(c, [[x - 1, y, z - 1], [x + 1, y, z + 1]], { phase: true, lw: 2 });
       renderLine(c, [[x - 1, y, z + 1], [x + 1, y, z - 1]], { phase: true, lw: 2 });
       const offset = normalize({ x: x - getRenderX(), y: 0, z: z - getRenderZ() });
-      renderBillboardString(c, Math.max(0, (timeLeft - v.ticks) / 20).toFixed(2) + 's', x + offset.x, y, z + offset.z, { increase: true, phase: true });
+      renderBillboardString(c, Math.max(0, (timeLeft - v.ticks) / 20).toFixed(2) + 's', x + offset.x, y, z + offset.z, { scale: 5, phase: true });
     });
   }
   if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => renderBoxOutlineMiter(settings.kuudraEmptySupplySpotColor, v.x, v.y, v.z, 1, 1, 0.4, { phase: true, increase: true }));
