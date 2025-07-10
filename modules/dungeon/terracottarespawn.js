@@ -1,8 +1,8 @@
-import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
+import { renderBillboardString, renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
 import data from '../../data';
 import settings from '../../settings';
 import createTextGui from '../../util/customtextgui';
-import { getPartialServerTick, renderString } from '../../util/draw';
+import { getPartialServerTick } from '../../util/draw';
 import { colorForNumber } from '../../util/format';
 import { getBlockId } from '../../util/mc';
 import { Deque } from '../../util/polyfill';
@@ -50,14 +50,11 @@ const renderReg = reg('renderWorld', () => {
         0.6, 1.8,
       );
     }
-    if (doTimer) renderString(
+    if (doTimer) renderBillboardString(
+      0xFFFFFFFF,
       `${colorForNumber(t, stateMaxTicks.get())}${(t / 20).toFixed(2)}s`,
       v[1], v[2] + 0.5, v[3],
-      0xFFFFFFFF,
-      false,
-      0.03,
-      false,
-      true
+      { scale: 1.5, phase: true, blackBox: 0 }
     );
   });
 }).setEnabled(stateTerraRespawn);

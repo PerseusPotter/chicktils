@@ -1,6 +1,6 @@
-import { getRenderX, getRenderY, getRenderZ, renderBoxOutline } from '../../Apelles/index';
+import { getRenderX, getRenderY, getRenderZ, renderBillboardString, renderBoxOutline } from '../../Apelles/index';
 import settings from '../settings';
-import { renderString, rm } from '../util/draw';
+import { rm } from '../util/draw';
 import { setAccessible } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
@@ -20,30 +20,24 @@ function renderEntity(e, x, y, z, w, h, nt) {
   );
   if (settings.boxAllEntitiesName) {
     const rc = rm.func_78713_a(e.entity);
-    if (!canRenderNameF.invoke(rc, e.entity)) renderString(
+    if (!canRenderNameF.invoke(rc, e.entity)) renderBillboardString(
+      0xFFFFFFFF,
       e.getName(),
-      x, y + h + 0.5, z,
-      0xFFFFFFFF, true,
-      0.03, false,
-      settings.boxAllEntitiesEsp, true,
-      nt
+      x + (nt ? getRenderX() : 0), y + (nt ? getRenderY() : 0) + h + 0.5, z + (nt ? getRenderZ() : 0),
+      { scale: 1.5, phase: settings.boxAllEntitiesEsp }
     );
   }
-  if (settings.boxAllEntitiesClassName) renderString(
+  if (settings.boxAllEntitiesClassName) renderBillboardString(
+    0xFFFFFFFF,
     e.getClassName(),
-    x, y + h + 0.2, z,
-    0xFFFFFFFF, true,
-    0.02, false,
-    settings.boxAllEntitiesEsp, true,
-    nt
+    x + (nt ? getRenderX() : 0), y + (nt ? getRenderY() : 0) + h + 0.2, z + (nt ? getRenderZ() : 0),
+    { phase: settings.boxAllEntitiesEsp }
   );
-  if (settings.boxAllEntitiesEntityId) renderString(
+  if (settings.boxAllEntitiesEntityId) renderBillboardString(
+    0xFFFFFFFF,
     e.entity.func_145782_y(),
-    x, y + h - 0.1, z,
-    0xFFFFFFFF, true,
-    0.02, false,
-    settings.boxAllEntitiesEsp, true,
-    nt
+    x + (nt ? getRenderX() : 0), y + (nt ? getRenderY() : 0) + h - 0.1, z + (nt ? getRenderZ() : 0),
+    { phase: settings.boxAllEntitiesEsp }
   );
 }
 

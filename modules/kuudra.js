@@ -1,4 +1,4 @@
-import { drawArrow2D, getPartialServerTick, renderString, renderWaypoint } from '../util/draw';
+import { drawArrow2D, getPartialServerTick, renderWaypoint } from '../util/draw';
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
@@ -8,7 +8,7 @@ import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
 import { run, unrun } from '../util/threading';
-import { getRenderX, getRenderY, getRenderZ, renderBeacon, renderBoxOutlineMiter, renderLine } from '../../Apelles/index';
+import { getRenderX, getRenderY, getRenderZ, renderBeacon, renderBillboardString, renderBoxOutlineMiter, renderLine } from '../../Apelles/index';
 const { intersectPL, fastDistance, normalize } = require('../util/math');
 
 const dropLocsStatic = [
@@ -48,7 +48,7 @@ const renderReg = reg('renderWorld', () => {
       renderLine(c, [[x - 1, y, z - 1], [x + 1, y, z + 1]], { phase: true, lw: 2 });
       renderLine(c, [[x - 1, y, z + 1], [x + 1, y, z - 1]], { phase: true, lw: 2 });
       const offset = normalize({ x: x - getRenderX(), y: 0, z: z - getRenderZ() });
-      renderString(Math.max(0, (timeLeft - v.ticks) / 20).toFixed(2) + 's', x + offset.x, y, z + offset.z, c);
+      renderBillboardString(c, Math.max(0, (timeLeft - v.ticks) / 20).toFixed(2) + 's', x + offset.x, y, z + offset.z, { increase: true, phase: true });
     });
   }
   if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => renderBoxOutlineMiter(settings.kuudraEmptySupplySpotColor, v.x, v.y, v.z, 1, 1, 0.4, { phase: true, increase: true }));

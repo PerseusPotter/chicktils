@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import data from '../../data';
-import { renderString, getPartialServerTick } from '../../util/draw';
+import { getPartialServerTick } from '../../util/draw';
 import createAlert from '../../util/alert';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
@@ -9,6 +9,7 @@ import { log } from '../../util/log';
 import { StateProp, StateVar } from '../../util/state';
 import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss } from '../dungeon.js';
 import { fastDistance } from '../../util/math';
+import { renderBillboardString } from '../../../Apelles/index';
 
 const stateDragonHelper = new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonDragonHelper);
 const stateInP5 = new StateVar(false);
@@ -117,7 +118,7 @@ const renderWorldReg = reg('renderWorld', () => {
     if (v < 0) return;
     const drag = DRAGONS[k];
     const t = (v - getPartialServerTick()) * 50;
-    renderString(`${colorForNumber(t, 5000)}${t.toFixed(0)}`, drag.pos[0], drag.pos[1], drag.pos[2], 0xFFFFFFFF, false, 0.2, false);
+    renderBillboardString(0xFFFFFFFF, `${colorForNumber(t, 5000)}${t.toFixed(0)}`, drag.pos[0], drag.pos[1], drag.pos[2], { scale: 10, blackBox: 0, phase: true });
   });
 }).setEnabled(stateDragonHelperActive.and(settings._dungeonDragonHelperTimer3D));
 const renderOverlayReg = reg('renderOverlay', () => {

@@ -3,8 +3,8 @@ import reg, { customRegs } from '../util/registerer';
 import settings from '../settings';
 import { getBlockId } from '../util/mc';
 import { Deque } from '../util/polyfill';
-import { renderLine, renderTracer } from '../../Apelles/index';
-import { drawArrow3DPos, renderString } from '../util/draw';
+import { renderBillboardString, renderLine, renderTracer } from '../../Apelles/index';
+import { drawArrow3DPos } from '../util/draw';
 import { colorForNumber } from '../util/format';
 import createTextGui from '../util/customtextgui';
 
@@ -56,15 +56,13 @@ const masteryBlockRenderWorldReg = reg('renderWorld', () => {
     );
     if (settings.dojoMasteryPointToNextTimer) {
       const timeRemaining = (125 - (customRegs.serverTick.tick - next.time)) * 50;
-      renderString(
+      renderBillboardString(
+        0xFFFFFFFF,
         `${colorForNumber(timeRemaining, 1000)}${~~(timeRemaining / 1000)}:${(timeRemaining % 1000).toString().padStart(3, '0')}`,
         first.pos.x + 0.5,
         first.pos.y + 1.5,
         first.pos.z + 0.5,
-        0xFFFFFFFF,
-        true,
-        0.04,
-        false, false
+        { scale: 2, phase: true }
       );
     }
   }

@@ -3,13 +3,13 @@ import data from '../data';
 import reg, { customRegs } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { drawArrow3DPos, renderString } from '../util/draw';
+import { drawArrow3DPos } from '../util/draw';
 import { compareFloat, convergeHalfInterval, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, rescale, toPolynomial } from '../util/math';
 import { execCmd } from '../util/format';
 import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
 import { unrun } from '../util/threading';
-import { renderBeacon, renderBoxOutline, renderLine, renderTracer } from '../../Apelles/index';
+import { renderBeacon, renderBillboardString, renderBoxOutline, renderLine, renderTracer } from '../../Apelles/index';
 import { toArrayList } from '../util/polyfill';
 import { getSbId } from '../util/skyblock';
 
@@ -154,11 +154,11 @@ const renderTargetsReg = reg('renderWorld', () => {
       v[0], v[1] + 1, v[2],
       { phase: true }
     );
-    renderString(
+    renderBillboardString(
+      0xFFFFFFFF,
       '&5&l' + v[4],
       v[0], v[1] + 1.5, v[2],
-      0xFFFFFFFF,
-      true, 1, true, true, true
+      { increase: true, phase: true }
     );
   });
   prevGuesses.forEach(v => {
@@ -424,11 +424,11 @@ const renderGuessReg = reg('renderWorld', () => {
       1, 1,
       { phase: true }
     );
-    if (settings.dianaGuessFromParticlesRenderName) renderString(
+    if (settings.dianaGuessFromParticlesRenderName) renderBillboardString(
+      settings[`dianaGuessFromParticles${k}Color`] ?? 0,
       k,
       v[0], v[1] - 1 + 1.5, v[2],
-      settings[`dianaGuessFromParticles${k}Color`] ?? 0,
-      true, 1, true, true, true
+      { increase: true, phase: true }
     );
   });
 }).setEnabled(settings._dianaGuessFromParticles);

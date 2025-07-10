@@ -1,6 +1,6 @@
 import settings from '../../settings';
 import data from '../../data';
-import { renderString, getPartialServerTick } from '../../util/draw';
+import { getPartialServerTick } from '../../util/draw';
 import reg, { customRegs } from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import { getAveragePing } from '../../util/ping';
@@ -11,7 +11,7 @@ import { DelayTimer } from '../../util/timers';
 import { getItemId } from '../../util/mc';
 import { listenBossMessages, roundRoomCoords, stateIsInBoss } from '../dungeon.js';
 import { run, unrun } from '../../util/threading';
-import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
+import { renderBillboardString, renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
 
 let bloodMobs = [];
 let bloodMobsSet = new Set();
@@ -148,7 +148,7 @@ const renderWorldReg = reg('renderWorld', () => {
     renderBoxOutline(settings.dungeonCampWireColor, x, y + 1.5, z, 1, 2, { phase: settings.dungeonCampBoxEsp, lw: 3 });
     renderBoxFilled(settings.dungeonCampBoxColor, x, y + 2.5 - m, z, m, 2 * m, { phase: settings.dungeonCampBoxEsp });
 
-    if (settings.dungeonCampTimer) renderString(((ttl - getPartialServerTick() - getAveragePing() / 50) / 20).toFixed(2), x, y + 1, z);
+    if (settings.dungeonCampTimer) renderBillboardString(0xFFFFFFFF, ((ttl - getPartialServerTick() - getAveragePing() / 50) / 20).toFixed(2), x, y + 1, z, { phase: settings.dungeonCampBoxEsp, increase: true });
   });
 }).setEnabled(stateCampFinal);
 const renderOverlayReg = reg('renderOverlay', () => {

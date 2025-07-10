@@ -1,6 +1,6 @@
 import settings from '../settings';
 import data from '../data';
-import { renderString, renderWaypoint } from '../util/draw';
+import { renderWaypoint } from '../util/draw';
 import { execCmd, getPlayerName } from '../util/format';
 import { getLeader, getMembers, isInParty, isLeader, listen, unlisten } from '../util/party';
 import { log, logMessage } from '../util/log';
@@ -12,7 +12,7 @@ import { getImage } from '../util/clipboard';
 import { _setTimeout } from '../util/timers';
 import { deleteMessages } from '../util/helper';
 import { setAccessible } from '../util/polyfill';
-import { renderBeacon, renderBoxOutline } from '../../Apelles/index';
+import { renderBeacon, renderBillboardString, renderBoxOutline } from '../../Apelles/index';
 
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
@@ -28,7 +28,7 @@ const worldRenderReg = reg('renderWorld', () => {
       else renderBoxOutline(settings.chatTilsWaypointColor, v.x, v.y, v.z, 1, 1, { phase: true, centered: false });
     }
     if (settings.chatTilsWaypointBeacon) renderBeacon(settings.chatTilsWaypointColor, v.x, v.y + 1, v.z, { phase: true, centered: false });
-    if (settings.chatTilsWaypointName) renderString(v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5/*, rgbaToARGB(settings.chatTilsWaypointColor)*/);
+    if (settings.chatTilsWaypointName) renderBillboardString(0xFFFFFFFF, v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5, { increase: true, phase: true });
   });
 });
 let waypointReloadNum = 0;
