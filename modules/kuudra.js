@@ -9,7 +9,7 @@ import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
 import { run, unrun } from '../util/threading';
 import { getRenderX, getRenderY, getRenderZ, renderBeacon, renderBoxOutline, renderLine } from '../../Apelles/index';
-const { intersectPL, fastDistance } = require('../util/math');
+const { intersectPL, fastDistance, normalize } = require('../util/math');
 
 const dropLocsStatic = [
   { x: -110, y: 79, z: -106 },
@@ -51,7 +51,8 @@ const renderReg = reg('renderWorld', () => {
       );
       renderLine(c, [[x - 1, y, z - 1], [x + 1, y, z + 1]], { phase: true, lw: 2 });
       renderLine(c, [[x - 1, y, z + 1], [x + 1, y, z - 1]], { phase: true, lw: 2 });
-      renderString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x, y + 1, z, c);
+      const offset = normalize({ x: x - getRenderX(), y: 0, z: z - getRenderZ() });
+      renderString(Math.max(0, (timeLeft - v.ticks * 50) / 1000).toFixed(2) + 's', x + offset.x, y, z + offset.z, c);
     });
   }
   if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => renderWaypoint(v.x, v.y, v.z, 1, 1, settings.kuudraEmptySupplySpotColor, true));
