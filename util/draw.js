@@ -2,7 +2,7 @@ import { compareFloat, getAngle, lerp, rescale, rotate, toArray } from './math';
 import { getEyeHeight } from './mc';
 import GlStateManager2 from './glStateManager';
 import reg from './registerer';
-import { DefaultVertexFormats, getRenderX, getRenderY, getRenderZ, renderBoxFilled, renderBoxOutline } from '../../Apelles/index';
+import { DefaultVertexFormats, getRenderX, getRenderY, getRenderZ, renderBoxFilled, renderBoxOutlineMiter } from '../../Apelles/index';
 
 export const tess = Java.type('net.minecraft.client.renderer.Tessellator').func_178181_a();
 export const worldRen = tess.func_178180_c();
@@ -202,7 +202,8 @@ export function renderWaypoint(x, y, z, w, h, color, esp = false, center = true,
   const rgba = normColor(color);
   if (rgba[3] === 0) return;
   renderBoxFilled([rgba[0], rgba[1], rgba[2], rgba[3] / 4], x, y, z, w, h, { centered: center, wz, lw, phase: esp });
-  renderBoxOutline(rgba, x, y, z, w, h, { centered: center, wz, lw, phase: esp });
+  // renderBoxOutline(rgba, x, y, z, w, h, { centered: center, wz, lw, phase: esp });
+  renderBoxOutlineMiter(rgba, x, y, z, w, h, lw / 5, { centered: center, wz, phase: esp, increase: true });
 }
 
 /**
