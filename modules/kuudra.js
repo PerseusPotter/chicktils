@@ -8,7 +8,7 @@ import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
 import { run, unrun } from '../util/threading';
-import { getRenderX, getRenderY, getRenderZ, renderBeacon, renderBoxOutline, renderLine } from '../../Apelles/index';
+import { getRenderX, getRenderY, getRenderZ, renderBeacon, renderBoxOutlineMiter, renderLine } from '../../Apelles/index';
 const { intersectPL, fastDistance, normalize } = require('../util/math');
 
 const dropLocsStatic = [
@@ -51,20 +51,20 @@ const renderReg = reg('renderWorld', () => {
       renderString(Math.max(0, (timeLeft - v.ticks) / 20).toFixed(2) + 's', x + offset.x, y, z + offset.z, c);
     });
   }
-  if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => renderWaypoint(v.x, v.y, v.z, 1, 1, settings.kuudraEmptySupplySpotColor, true));
+  if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => renderBoxOutlineMiter(settings.kuudraEmptySupplySpotColor, v.x, v.y, v.z, 1, 1, 0.4, { phase: true, increase: true }));
   if (settings.kuudraBoxSupplies && supplies.length > 0) supplies.forEach(v => {
     const x = v.getRenderX();
     const y = v.getRenderY();
     const z = v.getRenderZ();
     renderWaypoint(x, y, z, 3.6, 11.7, settings.kuudraBoxSuppliesGiantColor, settings.kuudraBoxSuppliesEsp, false);
-    renderBoxOutline(settings.kuudraBoxSuppliesColor, x - 3.25, y + 8, z + 2, 2.5, 2.5, { phase: settings.kuudraBoxSuppliesEsp, centered: false, lw: 3 });
+    renderBoxOutlineMiter(settings.kuudraBoxSuppliesColor, x - 3.25, y + 8, z + 2, 2.5, 2.5, 0.6, { phase: settings.kuudraBoxSuppliesEsp, centered: false, increase: true });
     renderBeacon(settings.kuudraBoxSuppliesColor, x - 2.5, y + 11, z + 2.75, { phase: settings.kuudraBoxSuppliesEsp, centered: false });
   });
   if (settings.kuudraBoxChunks && chunks.length > 0) chunks.forEach(v => {
     const x = v.getRenderX();
     const y = v.getRenderY();
     const z = v.getRenderZ();
-    renderBoxOutline(settings.kuudraBoxChunksColor, x - 3.25, y + 8, z + 2, 2.5, 2.5, { phase: settings.kuudraBoxChunksEsp, centered: false, lw: 3 });
+    renderBoxOutlineMiter(settings.kuudraBoxChunksColor, x - 3.25, y + 8, z + 2, 2.5, 2.5, 0.6, { phase: settings.kuudraBoxChunksEsp, centered: false, increase: true });
   });
   if (settings.kuudraShowCannonAim && isOnCannon && Player.getY() > 60) {
     const theta = (Player.getX() > -100 ? 130 : 50) / 180 * Math.PI;
@@ -79,7 +79,7 @@ const renderReg = reg('renderWorld', () => {
     );
     renderWaypoint(x, y, z, 1, 1, settings.kuudraCannonAimColor, true);
   }
-  if (settings.kuudraBoxKuudra && kuuder) renderBoxOutline(settings.kuudraBoxKuudraColor, kuuder.getX(), kuuder.getY(), kuuder.getZ(), 15, 15, { phase: settings.kuudraBoxKuudraEsp, lw: 3 });
+  if (settings.kuudraBoxKuudra && kuuder) renderBoxOutlineMiter(settings.kuudraBoxKuudraColor, kuuder.getX(), kuuder.getY(), kuuder.getZ(), 15, 15, 2, { phase: settings.kuudraBoxKuudraEsp, increase: true });
 }).setEnabled(new StateProp(settings._kuudraRenderPearlTarget).or(settings._kuudraRenderEmptySupplySpot).or(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks).or(settings._kuudraShowCannonAim).or(settings._kuudraBoxKuudra));
 
 const PearlHelper = Java.type('com.perseuspotter.chicktilshelper.PearlHelper');
