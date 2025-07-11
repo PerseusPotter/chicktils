@@ -6,10 +6,8 @@ import { StateVar } from './util/state';
 import { run } from './util/threading';
 
 /**
- * @template {0 | 1 | 2 | 3 | 4 | 5 | 6 | 7} T
  * @template {string | number | boolean | null} V
- * @template {string} O
- * @extends {StateVar<T extends 0 ? boolean : T extends 4 ? string : T extends 6 ? O : T extends 7 ? null : number>}
+ * @extends {StateVar<V>}
  */
 export class Property extends StateVar {
   /**
@@ -26,13 +24,12 @@ export class Property extends StateVar {
     Action: 7
   };
   /**
-   *
    * @param {string} name
    * @param {number} page
    * @param {number} pageSort
-   * @param {T} type
+   * @param {number} type
    * @param {V} defaultValue
-   * @param {{ desc?: string, min?: number, max?: number, len?: number, options?: O[], shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, min?: number, max?: number, len?: number, options?: V[], shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, page, pageSort, type, defaultValue, { desc = '', min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY, len = Number.POSITIVE_INFINITY, options = [], shouldShow = new StateVar(true), isNewSection = false } = {}) {
     super(defaultValue);
@@ -42,19 +39,13 @@ export class Property extends StateVar {
     this.page = page;
     this.sort = pageSort;
     this.type = type;
-    /**
-     * @type {T extends 0 ? boolean : T extends 4 ? string : T extends 6 ? O : T extends 7 ? null : number}
-     */
+    /** @type {V} */
     this.value;
     // typescript </3
     this.value = defaultValue;
-    /**
-     * @type {V}
-     */
+    /** @type {V} */
     this.defaultValue = defaultValue;
-    /**
-     * @type {{ min?: number, max?: number, len?: number, options?: O[] }}
-     */
+    /** @type {{ min?: number, max?: number, len?: number, options?: V[] }} */
     this.opts = { min, max, len, options };
     /** @type {StateVar<boolean>} */
     this.shouldShow = shouldShow;
@@ -63,54 +54,185 @@ export class Property extends StateVar {
     this.actionListeners = [];
   }
   set(v, force) {
-    if (this.type === Property.Type.Action) return;
     if (v === this.value) {
       if (force) this.trigger(v);
     } else super.set(v);
   }
-  validate(v) {
-    switch (this.type) {
-      case Property.Type.Toggle: break;
-      case Property.Type.Integer:
-      case Property.Type.Number:
-      case Property.Type.Percent:
-        if (v < this.opts.min) throw 'value must not be below ' + this.opts.min;
-        if (v > this.opts.max) throw 'value must not be above ' + this.opts.max;
-        break;
-      case Property.Type.Text:
-        if (v.length > this.opts.len) throw 'length of string must not exceed ' + this.opts.len;
-        break;
-      case Property.Type.Option: break;
-      case Property.Type.Color: break;
-      case Property.Type.Action: break;
-    }
-  }
+  /** @param {V} v */
+  validate(v) { }
   valueOf() {
-    if (this.type === Property.Type.Percent) return this.value / 100;
     return this.value;
   }
   toString() {
-    switch (this.type) {
-      case Property.Type.Toggle:
-      case Property.Type.Integer:
-      case Property.Type.Number:
-      case Property.Type.Text:
-      case Property.Type.Option:
-        return this.value.toString();
-      case Property.Type.Percent: return this.value.toString() + '%';
-      case Property.Type.Color: return '#' + this.value.toString(16).toUpperCase().padStart(8, '0');
-      case Property.Type.Action: return '';
-    }
+    return this.value.toString();
   }
   parse(str) {
-    const v = this._parse(str);
+    const v = this._parse(str.trim());
     this.validate(v);
     return v;
   }
+  /**
+   * @param {string} str
+   * @returns {V}
+   */
   _parse(str) {
-    str = str.trim();
+    throw 'not implemented';
+  }
+  /**
+   * @param {(this: Property, wasFromGui: boolean) => void} cb
+   */
+  onAction(cb) {
+    this.actionListeners.push(cb);
+  }
+
+  getMessage(parity, module, name = this.name) {
+    const c = parity ? ['&7', '&6', '&5', '&4', '&3', '&2', '&8'] : ['&f', '&e', '&d', '&c', '&b', '&a', '&7'];
+    const comps = [this.desc ? new TextComponent(`${c[0]}${name}`).setHover('show_text', this.desc) : `${c[0]}${name}`];
+    if (this.type === Property.Type.Action) comps.unshift(new TextComponent(`${c[6]}[  ${c[2]}RUN${c[6]}   ]&r `).setClick('run_command', `/${module} config_ edit ${this.name}`));
+    else {
+      comps.unshift(
+        new TextComponent(`${c[6]}[ ${c[3]}RESET${c[6]} ]&r `).setClick('run_command', `/${module} config_ edit ${this.name}`),
+        new TextComponent(`${c[6]}[  ${c[5]}EDIT${c[6]}  ]&r `).setClick('run_command', `/${module} config_edit ${this.name} ${this.toString()}`)
+      );
+      comps.push(`${c[6]}:${c[1]} ${this.toString()}`);
+    }
+    if (this.type === Property.Type.Toggle) comps[1] = new TextComponent(`${c[6]}[${c[4]}TOGGLE${c[6]}]&r `).setClick('run_command', `/${module} config_ edit ${this.name} TOGGLE`);
+    return new Message(...comps);
+  }
+}
+
+/** @extends Property<boolean> */
+export class PropertyToggle extends Property {
+  /**
+   * @param {string} name
+   * @param {boolean} defaultValue
+   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   */
+  constructor(name, defaultValue, opts) {
+    super(name, 0, 0, Property.Type.Toggle, defaultValue, opts ?? {});
+  }
+
+  toString() {
+    return this.value.toString() + '%';
+  }
+
+  _parse(str) {
     const truthy = ['true', 'True', 'TRUE', 't', 'T', 'y', 'Y', '1'];
     const falsy = ['false', 'False', 'FALSE', 'f', 'F', 'n', 'N', '0'];
+    if (str === 'TOGGLE') return !this.value;
+    if (truthy.includes(str)) return true;
+    if (falsy.includes(str)) return false;
+    throw 'Invalid Boolean: ' + str;
+  }
+}
+
+/** @extends Property<number> */
+class PropertyGenericNumber extends Property {
+  /**
+   * @param {string} name
+   * @param {number} type
+   * @param {number} defaultValue
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   */
+  constructor(name, type, defaultValue, opts) {
+    super(name, 0, 0, type, defaultValue, opts ?? {});
+  }
+
+  validate(v) {
+    if (v < this.opts.min) throw 'value must not be below ' + this.opts.min;
+    if (v > this.opts.max) throw 'value must not be above ' + this.opts.max;
+  }
+}
+
+export class PropertyInteger extends PropertyGenericNumber {
+  /**
+   * @param {string} name
+   * @param {number} defaultValue
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   */
+  constructor(name, defaultValue, opts) {
+    super(name, Property.Type.Integer, defaultValue, opts);
+  }
+
+  _parse(str) {
+    if (!/^-?\d+$/.test(str)) throw 'Invalid Integer: ' + str;
+    return parseInt(str);
+  }
+}
+
+export class PropertyNumber extends PropertyGenericNumber {
+  /**
+   * @param {string} name
+   * @param {number} defaultValue
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   */
+  constructor(name, defaultValue, opts) {
+    super(name, Property.Type.Number, defaultValue, opts);
+  }
+
+  _parse(str) {
+    if (!/^-?\d*(?:\.\d+)?$/.test(str)) throw 'Invalid Number: ' + str;
+    return +str;
+  }
+}
+
+export class PropertyPercent extends PropertyGenericNumber {
+  /**
+   * @param {string} name
+   * @param {number} defaultValue
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   */
+  constructor(name, defaultValue, opts) {
+    super(name, Property.Type.Percent, defaultValue, opts);
+  }
+
+  valueOf() {
+    return this.value / 100;
+  }
+
+  _parse(str) {
+    if (/^-?\d*\.\d{1,2}$/.test(str)) return str * 100;
+    if (/^-?\d+%?$/.test(str)) return parseInt(str);
+    throw 'Invalid Percent: ' + str;
+  }
+}
+
+/** @extends Property<string> */
+export class PropertyText extends Property {
+  /**
+   * @param {string} name
+   * @param {string} defaultValue
+   * @param {{ desc?: string, len?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   */
+  constructor(name, defaultValue, opts) {
+    super(name, 0, 0, Property.Type.Text, defaultValue, opts ?? {});
+  }
+
+  validate(v) {
+    if (v.length > this.opts.len) throw 'length of string must not exceed ' + this.opts.len;
+  }
+
+  _parse(str) {
+    return str;
+  }
+}
+
+/** @extends Property<number> */
+export class PropertyColor extends Property {
+  /**
+   * @param {string} name
+   * @param {number} defaultValue
+   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   */
+  constructor(name, defaultValue, opts) {
+    super(name, 0, 0, Property.Type.Color, defaultValue, opts ?? {});
+  }
+
+  toString() {
+    return '#' + this.value.toString(16).toUpperCase().padStart(8, '0');
+  }
+
+  _parse(str) {
     const colors = {
       black: 0x000000FF,
       silver: 0xC0C0C0FF,
@@ -276,64 +398,61 @@ export class Property extends StateVar {
       yellow: 0xFFFF00FF,
       yellowgreen: 0x9ACD32FF
     };
-    switch (this.type) {
-      case Property.Type.Toggle:
-        if (str === 'TOGGLE') return !this.value;
-        if (truthy.includes(str)) return true;
-        if (falsy.includes(str)) return false;
-        throw 'Invalid Boolean: ' + str;
-      case Property.Type.Integer:
-        if (!/^-?\d+$/.test(str)) throw 'Invalid Integer: ' + str;
-        return parseInt(str);
-      case Property.Type.Number:
-        if (!/^-?\d*(?:\.\d+)?$/.test(str)) throw 'Invalid Number: ' + str;
-        return +str;
-      case Property.Type.Percent:
-        if (/^-?\d*\.\d{1,2}$/.test(str)) return str * 100;
-        if (/^-?\d+%?$/.test(str)) return parseInt(str);
-        throw 'Invalid Percent: ' + str;
-      case Property.Type.Text: return str;
-      case Property.Type.Option:
-        if (!this.opts.options.includes(str)) throw 'Invalid Option: ' + str;
-        return str;
-      case Property.Type.Color: {
-        if (str.toLowerCase() in colors) return colors[str.toLowerCase()];
-        if (/^#?(?:[0-9A-F]{6}|[0-9A-F]{8})$/i.test(str)) return parseInt(str.slice(str.length & 1).padEnd(8, 'F'), 16);
-        const m = str.match(/rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d{1,3})\s*)?\)/i);
-        if (m) {
-          let [_, r, g, b, a] = m;
-          if (!a) a = 255;
-          r = +r;
-          g = +g;
-          b = +b;
-          if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 || a < 0 || a > 255) throw 'Invalid RGB: ' + str;
-          return (r << 24) | (g << 16) | (b << 8) | (a << 0);
-        }
-        throw 'Invalid Color: ' + str;
-      }
-      case Property.Type.Action: return this.value;
+    if (str.toLowerCase() in colors) return colors[str.toLowerCase()];
+    if (/^#?(?:[0-9A-F]{6}|[0-9A-F]{8})$/i.test(str)) return parseInt(str.slice(str.length & 1).padEnd(8, 'F'), 16);
+    const m = str.match(/rgba?\s*\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:,\s*(\d{1,3})\s*)?\)/i);
+    if (m) {
+      let [_, r, g, b, a] = m;
+      if (!a) a = 255;
+      r = +r;
+      g = +g;
+      b = +b;
+      if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 || a < 0 || a > 255) throw 'Invalid RGB: ' + str;
+      return (r << 24) | (g << 16) | (b << 8) | (a << 0);
     }
+    throw 'Invalid Color: ' + str;
   }
+}
+
+/**
+ * @template {string} O
+ * @extends Property<O>
+ */
+export class PropertyOption extends Property {
   /**
-   * @param {(this: Property, wasFromGui: boolean) => void} cb
+   * @param {string} name
+   * @param {O} defaultValue
+   * @param {{ desc?: string, options?: O[], shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
-  onAction(cb) {
-    this.actionListeners.push(cb);
+  constructor(name, defaultValue, opts) {
+    super(name, 0, 0, Property.Type.Option, defaultValue, opts ?? {});
   }
 
-  getMessage(parity, module, name = this.name) {
-    const c = parity ? ['&7', '&6', '&5', '&4', '&3', '&2', '&8'] : ['&f', '&e', '&d', '&c', '&b', '&a', '&7'];
-    const comps = [this.desc ? new TextComponent(`${c[0]}${name}`).setHover('show_text', this.desc) : `${c[0]}${name}`];
-    if (this.type === Property.Type.Action) comps.unshift(new TextComponent(`${c[6]}[  ${c[2]}RUN${c[6]}   ]&r `).setClick('run_command', `/${module} config_ edit ${this.name}`));
-    else {
-      comps.unshift(
-        new TextComponent(`${c[6]}[ ${c[3]}RESET${c[6]} ]&r `).setClick('run_command', `/${module} config_ edit ${this.name}`),
-        new TextComponent(`${c[6]}[  ${c[5]}EDIT${c[6]}  ]&r `).setClick('run_command', `/${module} config_edit ${this.name} ${this.toString()}`)
-      );
-      comps.push(`${c[6]}:${c[1]} ${this.toString()}`);
-    }
-    if (this.type === Property.Type.Toggle) comps[1] = new TextComponent(`${c[6]}[${c[4]}TOGGLE${c[6]}]&r `).setClick('run_command', `/${module} config_ edit ${this.name} TOGGLE`);
-    return new Message(...comps);
+  validate(v) {
+    if (this.opts.options?.length && !this.opts.options.includes(v)) throw 'not a valid option';
+  }
+
+  _parse(str) {
+    return str;
+  }
+}
+
+/** @extends Property<null> */
+export class PropertyAction extends Property {
+  /**
+   * @param {string} name
+   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   */
+  constructor(name, opts) {
+    super(name, 0, 0, Property.Type.Action, null, opts ?? {});
+  }
+
+  set(v, force) { }
+  toString() {
+    return '';
+  }
+  _parse(str) {
+    return null;
   }
 }
 
@@ -559,7 +678,7 @@ export class Builder {
    * @param {string} name
    * @param {boolean} initial
    * @param {(p: P) => { desc?: string, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, Property<0, boolean>>>}
+   * @returns {Builder<P & Record<K, PropertyToggle>>}
    */
   addToggle(key, name, initial, getOpts) {
     this.addProperty(key, name, 0, initial, getOpts?.(this.props));
@@ -572,7 +691,7 @@ export class Builder {
    * @param {string} name
    * @param {number} initial
    * @param {(p: P) => { desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, Property<1, number>>>}
+   * @returns {Builder<P & Record<K, PropertyInteger>>}
    */
   addInteger(key, name, initial, getOpts) {
     this.addProperty(key, name, 1, initial, getOpts?.(this.props));
@@ -585,7 +704,7 @@ export class Builder {
    * @param {string} name
    * @param {number} initial
    * @param {(p: P) => { desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, Property<2, number>>>}
+   * @returns {Builder<P & Record<K, PropertyNumber>>}
    */
   addNumber(key, name, initial, getOpts) {
     this.addProperty(key, name, 2, initial, getOpts?.(this.props));
@@ -598,7 +717,7 @@ export class Builder {
    * @param {string} name
    * @param {number} initial
    * @param {(p: P) => { desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, Property<3, number>>>}
+   * @returns {Builder<P & Record<K, PropertyPercent>>}
   */
   addPercent(key, name, initial, getOpts) {
     this.addProperty(key, name, 3, initial, getOpts?.(this.props));
@@ -611,7 +730,7 @@ export class Builder {
    * @param {string} name
    * @param {string} initial
    * @param {(p: P) => { desc?: string, len?: number, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, Property<4, string>>>}
+   * @returns {Builder<P & Record<K, PropertyText>>}
   */
   addText(key, name, initial, getOpts) {
     this.addProperty(key, name, 4, initial, getOpts?.(this.props));
@@ -624,7 +743,7 @@ export class Builder {
    * @param {string} name
    * @param {number} initial
    * @param {(p: P) => { desc?: string, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, Property<5, number>>>}
+   * @returns {Builder<P & Record<K, PropertyColor>>}
   */
   addColor(key, name, initial, getOpts) {
     this.addProperty(key, name, 5, initial, getOpts?.(this.props));
@@ -638,7 +757,7 @@ export class Builder {
    * @param {string} name
    * @param {string} initial
    * @param {(p: P) => { desc?: string, options?: O[], shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, Property<6, string, O>>>}
+   * @returns {Builder<P & Record<K, PropertyOption<O>>>}
    */
   addOption(key, name, initial, getOpts) {
     this.addProperty(key, name, 6, initial, getOpts?.(this.props));
@@ -650,7 +769,7 @@ export class Builder {
    * @param {K} key
    * @param {string} name
    * @param {(p: P) => { desc?: string, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, Property<7, null>>>}
+   * @returns {Builder<P & Record<K, PropertyAction>>}
    */
   addAction(key, name, getOpts) {
     this.addProperty(key, name, 7, null, getOpts?.(this.props));
