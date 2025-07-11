@@ -116,10 +116,6 @@ export class PropertyToggle extends Property {
     super(name, 0, 0, Property.Type.Toggle, defaultValue, opts ?? {});
   }
 
-  toString() {
-    return this.value.toString() + '%';
-  }
-
   _parse(str) {
     const truthy = ['true', 'True', 'TRUE', 't', 'T', 'y', 'Y', '1'];
     const falsy = ['false', 'False', 'FALSE', 'f', 'F', 'n', 'N', '0'];
@@ -207,6 +203,10 @@ export class PropertyPercent extends PropertyGenericNumber {
 
   valueOf() {
     return this.value / 100;
+  }
+
+  toString() {
+    return this.value.toString() + '%';
   }
 
   _parse(str) {
@@ -779,13 +779,43 @@ export class Builder {
 
   /**
    * @private
+   * @returns {Property}
+   */
+  createProperty(name, type, initial, opts) {
+    const optsParsed = {
+      desc: opts?.desc,
+      min: opts?.min,
+      max: opts?.max,
+      len: opts?.len,
+      options: opts?.options,
+      shouldShow: opts && typeof opts?.shouldShow === 'function' ?
+        opts.shouldShow(this.props) :
+        opts?.shouldShow,
+      isNewSection: this.newSection
+    };
+    if (type === Property.Type.Action) return createActionProp(name, optsParsed);
+    return [
+      createToggleProp,
+      createIntegerProp,
+      createNumberProp,
+      createPercentProp,
+      createTextProp,
+      createColorProp,
+      createOptionProp
+    ][type](name, initial, optsParsed);
+  }
+
+  /**
+   * @private
    * @param {string} key
    * @param {string} name
    * @param {number} type
    * @returns {Property}
    */
   addProperty(key, name, type, initial, opts) {
-    const prop = new Property(name, this.page, this.sort, type, initial, { desc: opts?.desc, min: opts?.min, max: opts?.max, len: opts?.len, options: opts?.options, shouldShow: typeof opts?.shouldShow === 'function' ? opts.shouldShow() : opts?.shouldShow, isNewSection: this.newSection });
+    const prop = this.createProperty(name, type, initial, opts);
+    prop.page = this.page;
+    prop.sort = this.sort;
     this.props[key] = prop;
     this.sort++;
     this.newSection = false;
