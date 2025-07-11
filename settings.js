@@ -1,8 +1,8 @@
 import { Builder } from './settingsLib';
 import { StateProp } from './util/state';
 
-export const FONTS = new Map(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames().map(v => [v.replace(/\s/g, ''), v]));
-FONTS.set('Mojangles', 'Mojangles');
+export const $FONTS = new Map(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames().map(v => [v.replace(/\s/g, ''), v]));
+$FONTS.set('Mojangles', 'Mojangles');
 /** @param {import('./settingsLib').Property<boolean>} prop */
 const addDependency = prop => new StateProp(prop).and(prop.shouldShow);
 
@@ -13,7 +13,7 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('isDev', 'IsDev', false, { desc: 'negatively impacts loading performance and may spam your chat' })
   .addNumber('pingRefreshDelay', 'PingRefreshDelay', 10, { desc: 'how often (in seconds) to refresh ping. set to 0 to disable ping. requires skytils' })
   .addToggle('preferUseTracer', 'PreferUseTracer', true, { desc: 'when available, prefer to use a tracer rather than an arrow' })
-  .addOption('textGuiFont', 'TextGuiFont', 'Mojangles', { desc: 'font used for text guis', options: Array.from(FONTS.keys()) })
+  .addOption('textGuiFont', 'TextGuiFont', 'Mojangles', { desc: 'font used for text guis', options: Array.from($FONTS.keys()) })
 
   .addPage('Kuudra')
   .addToggle('enablekuudra', 'EnableKuudra', true, {})
