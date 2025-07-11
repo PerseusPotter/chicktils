@@ -39,8 +39,8 @@ export class StateVar {
 }
 
 /**
- * @template {StateVar} T
- * @typedef {T extends StateVar<infer U> ? U : never} ExtractStateVar
+ * @template T
+ * @typedef {import('../settingsLib').Property<T> | import('../settingsLib').PropertyOption<T>} MegaBigCringe
  */
 
 /**
@@ -70,7 +70,7 @@ export class StateProp extends StateVar {
     CUSTOMBINARY: 6
   };
   /**
-   * @param {StateVar<L> | L} val
+   * @param {L | StateVar<L> | MegaBigCringe<L>} val
    */
   constructor(val) {
     super();
