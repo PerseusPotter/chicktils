@@ -7,6 +7,7 @@ import { run } from './util/threading';
 
 /**
  * @template {string | number | boolean | null} V
+ * @template {{ [x: string]: Property }} R
  * @extends {StateVar<V>}
  */
 export class Property extends StateVar {
@@ -29,7 +30,7 @@ export class Property extends StateVar {
    * @param {number} pageSort
    * @param {number} type
    * @param {V} defaultValue
-   * @param {{ desc?: string, min?: number, max?: number, len?: number, options?: V[], shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, min?: number, max?: number, len?: number, options?: V[], shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, page, pageSort, type, defaultValue, { desc = '', min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY, len = Number.POSITIVE_INFINITY, options = [], shouldShow = new StateVar(true), isNewSection = false } = {}) {
     super(defaultValue);
@@ -101,12 +102,15 @@ export class Property extends StateVar {
   }
 }
 
-/** @extends Property<boolean> */
+/**
+ * @template {{ [x: string]: Property }} R
+ * @extends Property<boolean, R>
+ */
 export class PropertyToggle extends Property {
   /**
    * @param {string} name
    * @param {boolean} defaultValue
-   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, defaultValue, opts) {
     super(name, 0, 0, Property.Type.Toggle, defaultValue, opts ?? {});
@@ -126,13 +130,16 @@ export class PropertyToggle extends Property {
   }
 }
 
-/** @extends Property<number> */
+/**
+ * @template {{ [x: string]: Property }} R
+ * @extends Property<number, R>
+ */
 class PropertyGenericNumber extends Property {
   /**
    * @param {string} name
    * @param {number} type
    * @param {number} defaultValue
-   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, type, defaultValue, opts) {
     super(name, 0, 0, type, defaultValue, opts ?? {});
@@ -144,11 +151,15 @@ class PropertyGenericNumber extends Property {
   }
 }
 
+/**
+ * @template {{ [x: string]: Property }} R
+ * @extends PropertyGenericNumber<R>
+ */
 export class PropertyInteger extends PropertyGenericNumber {
   /**
    * @param {string} name
    * @param {number} defaultValue
-   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, defaultValue, opts) {
     super(name, Property.Type.Integer, defaultValue, opts);
@@ -160,11 +171,15 @@ export class PropertyInteger extends PropertyGenericNumber {
   }
 }
 
+/**
+ * @template {{ [x: string]: Property }} R
+ * @extends PropertyGenericNumber<R>
+ */
 export class PropertyNumber extends PropertyGenericNumber {
   /**
    * @param {string} name
    * @param {number} defaultValue
-   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, defaultValue, opts) {
     super(name, Property.Type.Number, defaultValue, opts);
@@ -176,11 +191,15 @@ export class PropertyNumber extends PropertyGenericNumber {
   }
 }
 
+/**
+ * @template {{ [x: string]: Property }} R
+ * @extends PropertyGenericNumber<R>
+ */
 export class PropertyPercent extends PropertyGenericNumber {
   /**
    * @param {string} name
    * @param {number} defaultValue
-   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, defaultValue, opts) {
     super(name, Property.Type.Percent, defaultValue, opts);
@@ -197,12 +216,15 @@ export class PropertyPercent extends PropertyGenericNumber {
   }
 }
 
-/** @extends Property<string> */
+/**
+ * @template {{ [x: string]: Property }} R
+ * @extends Property<string, R>
+ */
 export class PropertyText extends Property {
   /**
    * @param {string} name
    * @param {string} defaultValue
-   * @param {{ desc?: string, len?: number, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, len?: number, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, defaultValue, opts) {
     super(name, 0, 0, Property.Type.Text, defaultValue, opts ?? {});
@@ -217,12 +239,15 @@ export class PropertyText extends Property {
   }
 }
 
-/** @extends Property<number> */
+/**
+ * @template {{ [x: string]: Property }} R
+ * @extends Property<number, R>
+ */
 export class PropertyColor extends Property {
   /**
    * @param {string} name
    * @param {number} defaultValue
-   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, defaultValue, opts) {
     super(name, 0, 0, Property.Type.Color, defaultValue, opts ?? {});
@@ -416,13 +441,14 @@ export class PropertyColor extends Property {
 
 /**
  * @template {string} O
- * @extends Property<O>
+ * @template {{ [x: string]: Property }} R
+ * @extends Property<O, R>
  */
 export class PropertyOption extends Property {
   /**
    * @param {string} name
    * @param {O} defaultValue
-   * @param {{ desc?: string, options?: O[], shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, options?: O[], shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, defaultValue, opts) {
     super(name, 0, 0, Property.Type.Option, defaultValue, opts ?? {});
@@ -437,11 +463,14 @@ export class PropertyOption extends Property {
   }
 }
 
-/** @extends Property<null> */
+/**
+ * @template {{ [x: string]: Property }} R
+ * @extends Property<null, R>
+ */
 export class PropertyAction extends Property {
   /**
    * @param {string} name
-   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: Record<string, Property>) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
    */
   constructor(name, opts) {
     super(name, 0, 0, Property.Type.Action, null, opts ?? {});
@@ -454,6 +483,94 @@ export class PropertyAction extends Property {
   _parse(str) {
     return null;
   }
+}
+
+/**
+ * @template {{ [x: string]: Property }} R
+ * @param {string} name
+ * @param {boolean} defaultValue
+ * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+ * @returns {Property<boolean, R>}
+ */
+export function createToggleProp(name, defaultValue, opts) {
+  return new PropertyToggle(name, defaultValue, opts);
+}
+
+/**
+ * @template {{ [x: string]: Property }} R
+ * @param {string} name
+ * @param {number} defaultValue
+ * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+ * @returns {Property<number, R>}
+ */
+export function createIntegerProp(name, defaultValue, opts) {
+  return new PropertyInteger(name, defaultValue, opts);
+}
+
+/**
+ * @template {{ [x: string]: Property }} R
+ * @param {string} name
+ * @param {number} defaultValue
+ * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+ * @returns {Property<number, R>}
+ */
+export function createNumberProp(name, defaultValue, opts) {
+  return new PropertyNumber(name, defaultValue, opts);
+}
+
+/**
+ * @template {{ [x: string]: Property }} R
+ * @param {string} name
+ * @param {number} defaultValue
+ * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+ * @returns {Property<number, R>}
+ */
+export function createPercentProp(name, defaultValue, opts) {
+  return new PropertyPercent(name, defaultValue, opts);
+}
+
+/**
+ * @template {{ [x: string]: Property }} R
+ * @param {string} name
+ * @param {string} defaultValue
+ * @param {{ desc?: string, len?: number, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+ * @returns {Property<string, R>}
+ */
+export function createTextProp(name, defaultValue, opts) {
+  return new PropertyText(name, defaultValue, opts);
+}
+
+/**
+ * @template {{ [x: string]: Property }} R
+ * @param {string} name
+ * @param {number} defaultValue
+ * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+ * @returns {Property<number, R>}
+ */
+export function createColorProp(name, defaultValue, opts) {
+  return new PropertyColor(name, defaultValue, opts);
+}
+
+/**
+ * @template {string} O
+ * @template {{ [x: string]: Property }} R
+ * @param {string} name
+ * @param {string} defaultValue
+ * @param {{ desc?: string, options?: O[], shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+ * @returns {Property<O, R>}
+ */
+export function createOptionProp(name, defaultValue, opts) {
+  return new PropertyOption(name, defaultValue, opts);
+}
+
+/**
+ * @template {{ [x: string]: Property }} R
+ * @param {string} name
+ * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: R) => StateVar<boolean>, isNewSection?: boolean }} [opts]
+ * @returns {Property<null, R>}
+ */
+export function createActionProp(name, opts) {
+  return new PropertyAction(name, opts);
 }
 
 export class Settings {
@@ -644,7 +761,10 @@ export class Builder {
     return new Settings(this.module, this.path, this.props, this.pageNames);
   }
 
-  /** @param {string} page */
+  /**
+   * @param {string} page
+   * @returns {Builder<{ [x in keyof P]: P[x] }}
+   */
   addPage(page) {
     this.page++;
     this.sort = 0;
@@ -665,7 +785,7 @@ export class Builder {
    * @returns {Property}
    */
   addProperty(key, name, type, initial, opts) {
-    const prop = new Property(name, this.page, this.sort, type, initial, { desc: opts?.desc, min: opts?.min, max: opts?.max, len: opts?.len, options: opts?.options, shouldShow: opts?.shouldShow, isNewSection: this.newSection });
+    const prop = new Property(name, this.page, this.sort, type, initial, { desc: opts?.desc, min: opts?.min, max: opts?.max, len: opts?.len, options: opts?.options, shouldShow: typeof opts?.shouldShow === 'function' ? opts.shouldShow() : opts?.shouldShow, isNewSection: this.newSection });
     this.props[key] = prop;
     this.sort++;
     this.newSection = false;
@@ -677,11 +797,11 @@ export class Builder {
    * @param {K} key
    * @param {string} name
    * @param {boolean} initial
-   * @param {(p: P) => { desc?: string, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, PropertyToggle>>}
+   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean> }} [opts]
+   * @returns {Builder<P & { [x in K]: PropertyToggle }}
    */
-  addToggle(key, name, initial, getOpts) {
-    this.addProperty(key, name, 0, initial, getOpts?.(this.props));
+  addToggle(key, name, initial, opts) {
+    this.addProperty(key, name, 0, initial, opts);
     return this;
   }
 
@@ -690,11 +810,11 @@ export class Builder {
    * @param {K} key
    * @param {string} name
    * @param {number} initial
-   * @param {(p: P) => { desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, PropertyInteger>>}
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean> }} [opts]
+   * @returns {Builder<P & { [x in K]: PropertyInteger }}
    */
-  addInteger(key, name, initial, getOpts) {
-    this.addProperty(key, name, 1, initial, getOpts?.(this.props));
+  addInteger(key, name, initial, opts) {
+    this.addProperty(key, name, 1, initial, opts);
     return this;
   }
 
@@ -703,11 +823,11 @@ export class Builder {
    * @param {K} key
    * @param {string} name
    * @param {number} initial
-   * @param {(p: P) => { desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, PropertyNumber>>}
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean> }} [opts]
+   * @returns {Builder<P & { [x in K]: PropertyNumber }}
    */
-  addNumber(key, name, initial, getOpts) {
-    this.addProperty(key, name, 2, initial, getOpts?.(this.props));
+  addNumber(key, name, initial, opts) {
+    this.addProperty(key, name, 2, initial, opts);
     return this;
   }
 
@@ -716,11 +836,11 @@ export class Builder {
    * @param {K} key
    * @param {string} name
    * @param {number} initial
-   * @param {(p: P) => { desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, PropertyPercent>>}
+   * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean> }} [opts]
+   * @returns {Builder<P & { [x in K]: PropertyPercent }}
   */
-  addPercent(key, name, initial, getOpts) {
-    this.addProperty(key, name, 3, initial, getOpts?.(this.props));
+  addPercent(key, name, initial, opts) {
+    this.addProperty(key, name, 3, initial, opts);
     return this;
   }
 
@@ -729,11 +849,11 @@ export class Builder {
    * @param {K} key
    * @param {string} name
    * @param {string} initial
-   * @param {(p: P) => { desc?: string, len?: number, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, PropertyText>>}
+   * @param {{ desc?: string, len?: number, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean> }} [opts]
+   * @returns {Builder<P & { [x in K]: PropertyText }}
   */
-  addText(key, name, initial, getOpts) {
-    this.addProperty(key, name, 4, initial, getOpts?.(this.props));
+  addText(key, name, initial, opts) {
+    this.addProperty(key, name, 4, initial, opts);
     return this;
   }
 
@@ -742,11 +862,11 @@ export class Builder {
    * @param {K} key
    * @param {string} name
    * @param {number} initial
-   * @param {(p: P) => { desc?: string, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, PropertyColor>>}
+   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean> }} [opts]
+   * @returns {Builder<P & { [x in K]: PropertyColor }}
   */
-  addColor(key, name, initial, getOpts) {
-    this.addProperty(key, name, 5, initial, getOpts?.(this.props));
+  addColor(key, name, initial, opts) {
+    this.addProperty(key, name, 5, initial, opts);
     return this;
   }
 
@@ -756,11 +876,11 @@ export class Builder {
    * @param {K} key
    * @param {string} name
    * @param {string} initial
-   * @param {(p: P) => { desc?: string, options?: O[], shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, PropertyOption<O>>>}
+   * @param {{ desc?: string, options?: O[], shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean> }} [opts]
+   * @returns {Builder<P & { [x in K]: PropertyOption<O> }}
    */
-  addOption(key, name, initial, getOpts) {
-    this.addProperty(key, name, 6, initial, getOpts?.(this.props));
+  addOption(key, name, initial, opts) {
+    this.addProperty(key, name, 6, initial, opts);
     return this;
   }
 
@@ -768,16 +888,16 @@ export class Builder {
    * @template {string} K
    * @param {K} key
    * @param {string} name
-   * @param {(p: P) => { desc?: string, shouldShow?: StateVar<boolean> }} [getOpts]
-   * @returns {Builder<P & Record<K, PropertyAction>>}
+   * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean> }} [opts]
+   * @returns {Builder<P & { [x in K]: PropertyAction }}
    */
-  addAction(key, name, getOpts) {
-    this.addProperty(key, name, 7, null, getOpts?.(this.props));
+  addAction(key, name, opts) {
+    this.addProperty(key, name, 7, null, opts);
     return this;
   }
 
   /**
-   * @template {Record<string, Property>} R
+   * @template {{ [x: string]: Property<*, P> }} R
    * @param {R} props
    * @returns {Builder<P & R>}
    */
