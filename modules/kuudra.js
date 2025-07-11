@@ -9,6 +9,7 @@ import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';
 import { run, unrun } from '../util/threading';
 import { getRenderX, getRenderY, getRenderZ, renderBeacon, renderBillboardString, renderBoxOutlineMiter, renderLine } from '../../Apelles/index';
+import { setAccessible } from '../util/polyfill';
 const { intersectPL, fastDistance, normalize } = require('../util/math');
 
 const dropLocsStatic = [
@@ -178,15 +179,22 @@ const TICK_REMAINING_DICT = {
   33: 2,
   66: 1
 };
-const supplyPickReg = reg('packetReceived', pack => {
+const S45MessageF = setAccessible(net.minecraft.network.play.server.S45PacketTitle.class.getDeclaredField('field_179810_b'));
+const supplyPickReg = reg('packetReceived', (pack, evn) => {
+  if (settings.kuudraPickupTitle === 'None') return cancel(evn);
+  const txt = pack.func_179805_b()?.func_150254_d();
+  if (!txt) return;
+  const type = pack.func_179807_a();
+  if (settings.kuudraPickupTitle === 'Simplified' && type === TitleType.SUBTITLE && txt === '§cDon\'t Move!§r') return cancel(evn);
   if (pack.func_179807_a() !== TitleType.TITLE) return;
-  const m = pack.func_179805_b()?.func_150254_d()?.match(/^§8\[(?:§.\|*)+§8\] §b(\d+)%§r$/);
+  const m = txt?.match(/^§8\[(?:§.\|*)+§8\] §b(\d+)%§r$/);
   if (!m) return;
   const progress = +m[1];
+  if (settings.kuudraPickupTitle === 'Simplified') S45MessageF.set(pack, new TextComponent(colorForNumber(progress, 100) + progress).chatComponentText);
   unrun(() => {
     pickupTime = customRegs.serverTick.tick + 10 * TICK_REMAINING_DICT[progress in TICK_REMAINING_DICT ? progress : 0];
   });
-}).setFilteredClass(net.minecraft.network.play.server.S45PacketTitle).setEnabled(settings._kuudraRenderPearlTarget);
+}).setFilteredClass(net.minecraft.network.play.server.S45PacketTitle).setEnabled(new StateProp(settings._kuudraPickupTitle).notequals('Default').or(settings._kuudraRenderPearlTarget));
 
 const hideTitleReg = reg('renderTitle', (_, __, evn) => cancel(evn)).setEnabled(settings._kuudraDrawHpGui);
 const hpOverlayReg = reg('renderOverlay', () => {

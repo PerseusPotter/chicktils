@@ -51,8 +51,8 @@ const $Kuudra = {
 
   kuudraAutoRefillPearls: new PropertyToggle('KuudraAutoRefillPearls', true, { desc: 'automatically run /gfs at start of each run to replenish used pearls', shouldShow: p => addDependency(p.enablekuudra), isNewSection: true }),
   kuudraAutoRefillPearlsAmount: new PropertyInteger('KuudraAutoRefillPearlsAmount', 16, { desc: 'amount of pearls you want to start run with', min: 0, max: 560, shouldShow: p => addDependency(p.kuudraAutoRefillPearls) }),
-  kuudraAutoRefillPearls: new Property('KuudraAutoRefillPearls', 0, 0, Property.Type.Toggle, true, { desc: 'automatically run /gfs at start of each run to replenish used pearls', shouldShow: p => addDependency(p.enablekuudra), isNewSection: true }),
-  kuudraAutoRefillPearlsAmount: new Property('KuudraAutoRefillPearlsAmount', 0, 0, Property.Type.Integer, 16, { desc: 'amount of pearls you want to start run with', min: 0, max: 560, shouldShow: p => addDependency(p.kuudraAutoRefillPearls) }),
+
+  kuudraPickupTitle: new PropertyOption('KuudraPickupTitle', 'Default', { options: ['Default', 'Simplified', 'None'] }),
 };
 
 const $Dungeon = {
