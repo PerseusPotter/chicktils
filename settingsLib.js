@@ -602,6 +602,7 @@ export class Settings {
 
   load(isAutoLoad = false) {
     if (this.isMainSettings && isAutoLoad) return;
+    let possibleProblem = false;
     const obj = JSON.parse(FileLib.read(this.module, this.path) || '{}');
     Object.entries(obj).forEach(([k, v]) => {
       k = '_' + k;
@@ -609,11 +610,30 @@ export class Settings {
       try {
         this[k].set(this[k].parse(v), true);
       } catch (e) {
-        log(`error parsing value for setting ${this[k].name}, reverting to default`);
-        log(e);
+        if (this.isMainSettings) {
+          log(`error parsing value for setting ${this[k].name}, reverting to default`);
+          log(e);
+          possibleProblem = true;
+        }
       }
     });
     if (this.isMainSettings) {
+      if (possibleProblem) {
+        log('since there was an error, a backup of the old settings has been made');
+
+        const savePath = new java.io.File(`./config/ChatTriggers/modules/${this.module}/${this.path}-${Date.now()}.backup`);
+        let success = true;
+        try {
+          const src = new java.io.File(`./config/ChatTriggers/modules/${this.module}/${this.path}`).toPath();
+          const dst = savePath.toPath();
+
+          java.nio.file.Files.copy(src, dst, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        } catch (e) {
+          log('failed to save backup:', e);
+          success = false;
+        }
+        if (success) logMessage(new Message(new TextComponent('click here to open file').setClick('open_file', savePath.getAbsolutePath())));
+      }
       register('gameUnload', () => this.save());
       run(() => {
         this.amaterasu = convertToAmaterasu(this);
