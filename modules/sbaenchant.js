@@ -192,7 +192,7 @@ const ENCHANT_DICT = [
     type: 'Normal',
     nbtName: 'drain',
     loreName: 'Drain',
-    goodLevel: 4,
+    goodLevel: 3,
     maxLevel: 5
   },
   {
