@@ -403,7 +403,7 @@ ConnectionManager.registerPacketHandler(Java.type('gg.essential.connectionmanage
 }));
 function onEssentialMessage(ign, msg) {
   essentialChatCb(ign, msg);
-  if (settings.chatTilsEssentialForwardPartyDms && isLeader() && msg.startsWith('/pc ')) {
+  if (settings.chatTilsEssentialForwardPartyDms && msg.startsWith('/pc ')) {
     const lign = ign.toLowerCase();
     if (Array.from(getMembers().keys()).some(v => v.toLowerCase() === lign)) ChatLib.command(`pc "${msg.slice('/pc '.length)}" -${ign}`);
   }

@@ -351,7 +351,7 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('chatTilsEssentialPing', 'ChatTilsEssentialPing', true, { desc: 'send chat pings on recieve message', shouldShow: p => addDependency(p.chatTilsEssential) })
   .addToggle('chatTilsEssentialNotif', 'ChatTilsEssentialNotification', false, { desc: 'send Essential notification on recieve message', shouldShow: p => addDependency(p.chatTilsEssential) })
   .addToggle('chatTilsEssentialOverrideCommands', 'ChatTilsBetterEssentialOverrideCommands', false, { desc: 'override the /w, /t, /r, and /f commands to be Essential ones', shouldShow: p => addDependency(p.chatTilsEssential) })
-  .addToggle('chatTilsEssentialForwardPartyDms', 'ChatTilsEssentialForwardPartyDms', false, { desc: 'when leader in a party, any essential dms from party members will be forwarded to party chat', shouldShow: p => addDependency(p.chatTilsEssential) })
+  .addToggle('chatTilsEssentialForwardPartyDms', 'ChatTilsEssentialForwardPartyDms', false, { desc: 'any essential dms from party members will be forwarded to party chat', shouldShow: p => addDependency(p.chatTilsEssential) })
   .addToggle('chatTilsEssentialRedirectPartyChat', 'ChatTilsEssentialRedirectPartyChat', false, { desc: 'redirect /pc to message leader on essentials\nalso enables /chat p and /chat party', shouldShow: p => addDependency(p.chatTilsEssential) })
 
   .addPage('Diana')
