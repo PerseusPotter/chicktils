@@ -1,9 +1,11 @@
 import settings, { $FONTS } from '../settings';
 import { BufferedImageWrapper, drawOutlinedString, rgbaToJavaColor } from './draw';
 import GlStateManager2 from './glStateManager';
+import { log } from './log';
 import { ceilPow2 } from './math';
 import reg from './registerer';
 import { StateVar } from './state';
+import { wrap } from './threading';
 const EventEmitter = require('./events');
 
 /**
@@ -86,6 +88,8 @@ export const allDisplays = [];
     return a;
   }, {});
 }
+const threadPool = new java.util.concurrent.ThreadPoolExecutor(1, 8, 60, java.util.concurrent.TimeUnit.SECONDS, new java.util.concurrent.LinkedBlockingQueue());
+reg('gameUnload', () => threadPool.shutdownNow());
 /**
  * @typedef {{ s: string, a: any, b: any, o: [number, number, number][], w: number, vw: number, d: boolean }} Line
  */
@@ -188,36 +192,52 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
       }
 
       if (v.o.length) hasObf = true;
-      v.r = true;
       lineW = Math.max(lineW, v.w);
       lineVW = Math.max(lineVW, v.vw);
     });
 
     tmpG?.dispose();
   };
+  let prevFuture = null;
+  let bimgLock = new java.util.concurrent.locks.ReentrantLock();
+  let cbimg = null;
   const renderImage = () => {
     // extra spacing for hanging characters
     actW = lineW + (cb ? FONT_RENDER_SIZE.get() / 10 : 0);
     actH = FONT_RENDER_SIZE.get() * (lines.length + 1) + (cb ? FONT_RENDER_SIZE.get() / 10 : 0);
     imgW = ceilPow2(actW, 1);
     imgH = ceilPow2(actH, 2);
+
+    prevFuture?.cancel(false);
+    const _imgW = imgW;
+    const _imgH = imgH;
+    const _lineVW = lineVW;
+    const fMain = fonts[0];
+    const fSize = FONT_RENDER_SIZE.get();
+    const _lines = lines.map(v => ({ vw: v.vw, a: v.a, b: v.b }));
+    prevFuture = threadPool['submit(java.lang.Runnable)'](wrap(() => {
+      const bimg = renderImageImpl(_imgW, _imgH, _lineVW, fMain, fSize, _lines);
+      bimgLock.lock();
+      cbimg = bimg;
+      bimgLock.unlock();
+    }));
+  };
+  const renderImageImpl = (imgW, imgH, lineVW, fMain, fSize, lines) => {
     const raster = Raster.createInterleavedRaster(DataBufferByte.TYPE_BYTE, imgW, imgH, imgW * 4, 4, [0, 1, 2, 3], null);
     const bimg = new BufferedImage(colorModel, raster, false, null);
     const g = bimg.createGraphics();
-    g.setFont(fonts[0]);
+    g.setFont(fMain);
     const ascent = g.getFontMetrics().getAscent();
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     lines.forEach((v, i) => {
-      if (!v.r) return;
-      v.r = false;
-      const y = i * FONT_RENDER_SIZE.get() + ascent;
+      const y = i * fSize + ascent;
       let x = 0;
       if (cc === 1) x = lineVW - v.vw;
       else if (cc >= 2) x = (lineVW - v.vw) / 2;
       if (cb && v.b) {
         g.setColor(COLORS_SHADOW.f);
-        g.drawString(v.b.getIterator(), x + FONT_RENDER_SIZE.get() / 10, y + FONT_RENDER_SIZE.get() / 10);
+        g.drawString(v.b.getIterator(), x + fSize / 10, y + fSize / 10);
       }
       g.setColor(COLORS.f);
       g.drawString(v.a.getIterator(), x, y);
@@ -235,6 +255,19 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     GlStateManager2.tryBlendFuncSeparate(770, 1, 1, 0);
     GlStateManager2.color(1, 1, 1, 1);
     updateLocCache();
+    bimgLock.lock();
+    try {
+      if (cbimg) {
+        if (img) img = img.update(cbimg);
+        else img = new BufferedImageWrapper(cbimg);
+        cbimg = null;
+      }
+    } catch (e) {
+      if (settings.isDev) log(e);
+      console.log(e + '\n' + e.stack);
+    } finally {
+      bimgLock.unlock();
+    }
     if (!skipDraw) img?.draw(rx, ry, rw, rh);
     skipDraw = false;
     GlStateManager2.depthMask(true);
@@ -242,8 +275,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     if (!dirty) return;
 
     updateLines();
-    if (img) img = img.update(renderImage());
-    else img = new BufferedImageWrapper(renderImage());
+    renderImage();
     updateLocCache();
 
     // TODO: draw obf
