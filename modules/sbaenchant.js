@@ -194,6 +194,66 @@ const ENCHANT_DICT = [
     loreName: 'Drain',
     goodLevel: 4,
     maxLevel: 5
+  },
+  {
+    type: 'Stacking',
+    nbtName: 'absorb',
+    loreName: 'Absorb',
+    goodLevel: 0,
+    maxLevel: 10,
+    nbtNum: 'absorb_logs_chopped',
+    statLabel: 'absorbLogsChopped',
+    translation: 'Absorb Logs Chopped',
+    stackLevel: [0, 1_000, 5_000, 25_000, 100_000, 300_000, 1_500_000, 5_000_000, 25_000_000, 50_000_000]
+  },
+  {
+    type: 'Normal',
+    nbtName: 'arcane',
+    loreName: 'Arcane',
+    goodLevel: 4,
+    maxLevel: 5
+  },
+  {
+    type: 'Normal',
+    nbtName: 'forest_pledge',
+    loreName: 'Forest Pledge',
+    goodLevel: 3,
+    maxLevel: 5
+  },
+  {
+    type: 'Normal',
+    nbtName: 'respiration',
+    loreName: 'Respiration',
+    goodLevel: 3,
+    maxLevel: 4
+  },
+  {
+    type: 'Normal',
+    nbtName: 'scuba',
+    loreName: 'Scuba',
+    goodLevel: 3,
+    maxLevel: 5
+  },
+  {
+    type: 'Normal',
+    nbtName: 'stealth',
+    loreName: 'Stealth',
+    goodLevel: 0,
+    maxLevel: 1
+  },
+  {
+    type: 'Ultimate',
+    nbtName: 'ultimate_first_impression',
+    loreName: 'First Impression',
+    goodLevel: 0,
+    maxLevel: 5
+  },
+  {
+    type: 'Ultimate',
+    nbtName: 'ultimate_missile',
+    loreName: 'Missile',
+    goodLevel: 0,
+    maxLevel: 5
   }
 ];
 
