@@ -1,4 +1,5 @@
 import { removeElementMap, removeElementSet } from './helper';
+import { log } from './log';
 import { getBlockPos } from './mc';
 import { getOrPut, inherits, setAccessible } from './polyfill';
 import { endRender, endTick, PROFILER, start } from './profiler';
@@ -64,8 +65,22 @@ const createRegister = function(type, shit) {
       if (pack && Date.now() - createTime > 100) orig(pack, evn);
     };
   }
+
+  return hahaCreateRegister(type, shit);
+};
+const hahaCreateRegister = function(type, shit, secretShit = 2) {
   if (type in customRegs) return new (customRegs[type])(shit);
-  return register(type, shit).unregister();
+  if (typeof type === 'string') return register(type, shit).unregister();
+
+  // because ct doesn't care about thread safetey
+  try {
+    const r = register(type, shit).unregister();
+    return r;
+  } catch (_) {
+    if (secretShit > 0) return hahaCreateRegister(type, shit, secretShit - 1);
+    log('HAHAHA YOU UNLUCKY FUCK GET SHIT ON');
+    return register('gameLoad', () => { });
+  }
 };
 
 /**
