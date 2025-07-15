@@ -642,8 +642,9 @@ export class Deque {
   }
 
   /**
-   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
-   * @returns {Deque<T>}
+   * @template R
+   * @param {(v: T, i: number, a: Deque<T>) => R} func
+   * @returns {Deque<R>}
    */
   map(func, that = this) {
     const dq = new Deque();
@@ -658,8 +659,9 @@ export class Deque {
   }
 
   /**
-   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
-   * @returns {Deque<T>}
+   * @template R
+   * @param {(v: T, i: number, a: Deque<T>) => R} func
+   * @returns {Deque<R>}
    */
   mapFilter(func, that = this) {
     const dq = new Deque();
@@ -690,15 +692,20 @@ export class Deque {
   }
 
   /**
-   * @template U
-   * @param {(a: U, v: T, i: number, a: Deque<T>) => boolean} func
-   * @param {U} initial
-   * @returns {Deque<T>}
+   * @template [U=T]
+   * @param {(a: U, v: T, i: number, a: Deque<T>) => U} func
+   * @param {U} [initial]
+   * @returns {U}
    */
   reduce(func, initial) {
     let v = initial;
     let c = this.$head;
     let i = 0;
+    if (arguments.length === 1) {
+      v = c.v;
+      c = c.r;
+      i++;
+    }
     while (c) {
       if (v === undefined && i === 0) v = c.v;
       else v = func.call(this, v, c.v, i, this);
@@ -709,15 +716,20 @@ export class Deque {
   }
 
   /**
-   * @template U
-   * @param {(a: U, v: T, i: number, a: Deque<T>) => boolean} func
-   * @param {U} initial
-   * @returns {Deque<T>}
+   * @template [U=T]
+   * @param {(a: U, v: T, i: number, a: Deque<T>) => U} func
+   * @param {U} [initial]
+   * @returns {U}
    */
   reduceRight(func, initial) {
     let v = initial;
     let c = this.$tail;
     let i = this.$length - 1;
+    if (arguments.length === 1) {
+      v = c.v;
+      c = c.l;
+      i--;
+    }
     while (c) {
       if (v === undefined && i === this.$length - 1) v = c.v;
       else v = func.call(this, v, c.v, i, this);
