@@ -643,7 +643,9 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('darkMonolithPointTo', 'DarkMonolithPointTo', true, { shouldShow: p => addDependency(p.enabledarkmonolith) })
   .addToggle('darkMonolithTrackDrops', 'DarkMonolithTrackDrops', true, { shouldShow: p => addDependency(p.enabledarkmonolith) })
   .addAction('moveDarkMonolithDropsTracker', 'MoveDarkMonolithDropsTracker', null, { shouldShow: p => addDependency(p.darkMonolithTrackDrops) })
-  .addAction('resetDarkMonolithDropsTracker', 'ResetDarkMonolithDropsTracker', null, { shouldShow: p => addDependency(p.darkMonolithTrackDrops) });
+  .addAction('resetDarkMonolithDropsTracker', 'ResetDarkMonolithDropsTracker', null, { shouldShow: p => addDependency(p.darkMonolithTrackDrops) })
+
+  .addToggle('enablevoidgloomarmorstandfix', 'EnableVoidgloomArmorStandFix', true, { desc: 'fixes hypixel not deleting armor stands' });
 
 const settings = builder.build();
 export default settings;
