@@ -79,7 +79,7 @@ function format(name, tier) {
     ` * @param {string} str\n` +
     ` */\n` +
     `export function stripName(str) {\n` +
-    `  return str.toLowerCase().replace(/[^\s'-.a-z0-9]/g, '').trim();\n` +
+    `  return str.replace(/§\\w/g, '').toLowerCase().replace(/[^\s'-.a-z0-9]/g, '').trim();\n` +
     `};\n` +
     `export const ITEMS_NAME_MAP = new Map(ITEMS.map(v => [stripName(v.nameUF), v]));`
   );
