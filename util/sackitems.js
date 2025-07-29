@@ -2201,6 +2201,11 @@ export const ITEMS = [
     "id": "SHARK_FIN"
   },
   {
+    "nameF": "§aSilver Fang",
+    "nameUF": "Silver Fang",
+    "id": "SILVER_FANG"
+  },
+  {
     "nameF": "§aSinged Powder",
     "nameUF": "Singed Powder",
     "id": "SINGED_POWDER"
