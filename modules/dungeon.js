@@ -132,7 +132,8 @@ const getPlayersStep2Reg = reg('step', () => {
         player.me = v.entity;
       }
     });
-    const player = players.find(p => p.ign === Player.getName());
+    // const player = players.find(p => p.ign === Player.getName());
+    const player = players[0];
     if (player) {
       player.e = Player;
       player.me = Player.getPlayer();
@@ -144,10 +145,10 @@ const getPlayersStep2Reg = reg('step', () => {
 const sanityCheckReg = reg('step', () => {
   unrun(() => {
     World.getAllPlayers().forEach(v => {
-      const player = players.find(p => p.ign === v.getName());
-      if (player) {
-        player.e = v;
-        player.me = v.entity;
+      const player = players.findIndex(p => p.ign === v.getName());
+      if (player > 0) {
+        players[player].e = v;
+        players[player].me = v.entity;
       }
     });
   });
