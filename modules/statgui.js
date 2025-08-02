@@ -41,14 +41,16 @@ function editLocation(index, fromGui) {
   display.edit(fromGui);
 }
 
-stateIsland.listen(loc => {
-  if (!settings.enablestatgui) return;
-
+function updateLoc(loc) {
   currLoc = locs.indexOf(loc);
   if (currLoc >= 0 && settings['loc' + currLoc]) {
     updateReg.register();
     renderReg.register();
   } else unloadListeners();
+}
+stateIsland.listen(loc => {
+  if (!settings.enablestatgui) return;
+  updateLoc(loc);
 });
 
 function unloadListeners() {
@@ -56,7 +58,6 @@ function unloadListeners() {
   updateReg.unregister();
   renderReg.unregister();
 }
-const unloadReg = reg('worldUnload', unloadListeners);
 
 const renderReg = reg('renderOverlay', () => display.render());
 const updateReg = reg('step', () => {
@@ -75,14 +76,12 @@ const updateReg = reg('step', () => {
 
 export function init() {
   locs.forEach((_, i) => {
-    registerListenIsland(settings['_loc'] + i);
+    registerListenIsland(settings['_loc' + i]);
+    settings['_loc' + i].listen(v => currLoc === i && updateLoc(stateIsland.get()));
     settings['_moveLoc' + i].onAction(v => editLocation(i, v));
   });
 }
-export function load() {
-  unloadReg.register();
-}
+export function load() { }
 export function unload() {
-  unloadReg.unregister();
   unloadListeners();
 }
