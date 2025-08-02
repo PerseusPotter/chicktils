@@ -31,7 +31,7 @@ const tickReg = reg('tick', () => stateAtSS.set(
 function onSeaLantern(x, y, z) {
   if (x !== 111) return;
   const id = getButtonId(y, z);
-  if (id) solution.push(id);
+  if (id && !solution.includes(id)) solution.push(id);
   return !!id;
 }
 const blockChangeReg = reg('packetReceived', pack => {
