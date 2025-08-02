@@ -11,6 +11,7 @@ function reset() {
   bossMessageReg.unregister();
   entSpawnReg.unregister();
   getPlayersStep2Reg.unregister();
+  sanityCheckReg.unregister();
   playerItemReg.unregister();
 
   modules.forEach(v => v?.reset());
@@ -37,6 +38,7 @@ function start() {
 
   bossMessageReg.register();
   getPlayersStep2Reg.register();
+  sanityCheckReg.register();
   playerItemReg.register();
 
   modules.forEach(v => v?.start());
@@ -139,6 +141,17 @@ const getPlayersStep2Reg = reg('step', () => {
     getPlayersStep2Reg.unregister();
   }
 }).setFps(2);
+const sanityCheckReg = reg('step', () => {
+  unrun(() => {
+    World.getAllPlayers().forEach(v => {
+      const player = players.find(p => p.ign === v.getName());
+      if (player) {
+        player.e = v;
+        player.me = v.entity;
+      }
+    });
+  });
+}).setDelay(2);
 const playerItemReg = reg('serverTick', t => {
   unrun(() => {
     players.forEach(v => {
@@ -210,6 +223,7 @@ export function init() {
 
   entSpawnReg.setEnabled(stateTrackPlayers);
   getPlayersStep2Reg.setEnabled(stateTrackPlayers);
+  sanityCheckReg.setEnabled(stateTrackPlayers);
   playerItemReg.setEnabled(stateTrackHeldItem);
 
   {
