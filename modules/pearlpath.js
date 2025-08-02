@@ -127,13 +127,13 @@ const renderReg = reg('renderWorld', pt => {
   renderBoxFilled(
     settings.pearlPathDestColorFill,
     ex, ey, ez,
-    0.6, Player.isSneaking() ? 1.5 : 1.8,
+    0.6, (Player.isSneaking() ? 1.5 : 1.8) + 0.001,
     { phase: settings.pearlPathEsp }
   );
   renderBoxOutline(
     settings.pearlPathDestColorOutline,
     ex, ey, ez,
-    0.6, Player.isSneaking() ? 1.5 : 1.8,
+    0.6, (Player.isSneaking() ? 1.5 : 1.8) + 0.001,
     { phase: settings.pearlPathEsp }
   );
 }).setEnabled(stateHoldingPearl);
