@@ -8,7 +8,7 @@ import { centerMessage, cleanNumber } from './util/format';
 import { getPing, getAveragePing } from './util/ping';
 import { getRegs, simulate } from './util/registerer';
 import { calcMedian } from './util/math';
-import { Property } from './settingsLib';
+import { createIntegerProp, Property } from './settingsLib';
 settings.setMainInstance();
 setIsMainD();
 const VERSION = '0.11.1';
@@ -151,7 +151,7 @@ register('command', ...args => {
         else if (args[0] === 'view') {
           if (args.length === 1) args[1] = settings.minPage.toString();
           // how scuffed do you want it: yes
-          const p = new Property('pageHelper', 0, 0, Property.Type.Integer, 1, { min: settings.minPage, max: settings.maxPage });
+          const p = createIntegerProp('pageHelper', 1, { min: settings.minPage, max: settings.maxPage });
           const page = p.parse(args[1]);
           p.validate(page);
           settings.display(page);
