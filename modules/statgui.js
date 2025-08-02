@@ -4,7 +4,9 @@ import createTextGui from '../util/customtextgui';
 import reg from '../util/registerer';
 import { _setTimeout } from '../util/timers';
 import { unrun } from '../util/threading';
+import { registerListenIsland, stateIsland } from '../util/skyblock';
 
+/** @type {(typeof stateIsland extends import('../util/state').StateVar<infer U> ? U : never)[]} */
 const locs = [
   'Private Island',
   'Hub',
@@ -39,26 +41,15 @@ function editLocation(index, fromGui) {
   display.edit(fromGui);
 }
 
-function loadListeners(tries = 0) {
+stateIsland.listen(loc => {
   if (!settings.enablestatgui) return;
-  let loc;
-  try {
-    TabList.getNames().some(v => {
-      const m = v.match(/^§r§b§l(?:Area|Dungeon): §r§7(.+?)§r$/);
-      if (m) return loc = m[1];
-    });
-  } catch (e) {
-    // npe at com.chattriggers.ctjs.minecraft.wrappers.TabList.getNames(TabList.kt:37) whenever player gets kicked
-    return;
-  }
-  if (!loc) return (tries > 0) && _setTimeout(() => loadListeners(tries - 1), 1000);
+
   currLoc = locs.indexOf(loc);
   if (currLoc >= 0 && settings['loc' + currLoc]) {
     updateReg.register();
     renderReg.register();
   } else unloadListeners();
-}
-const loadReg = reg('worldLoad', () => _setTimeout(() => loadListeners(10), 1000));
+});
 
 function unloadListeners() {
   // currLoc = -1;
@@ -84,17 +75,14 @@ const updateReg = reg('step', () => {
 
 export function init() {
   locs.forEach((_, i) => {
-    settings['_loc' + i].listen(() => loadListeners());
+    registerListenIsland(settings['_loc'] + i);
     settings['_moveLoc' + i].onAction(v => editLocation(i, v));
   });
 }
 export function load() {
-  loadReg.register();
   unloadReg.register();
-  loadListeners();
 }
 export function unload() {
-  loadReg.unregister();
   unloadReg.unregister();
   unloadListeners();
 }
