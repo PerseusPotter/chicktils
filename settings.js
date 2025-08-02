@@ -20,6 +20,7 @@ const builder = new Builder('ChickTils', 'settings.json')
 
   .addToggle('kuudraRenderPearlTarget', 'KuudraRenderPearlTarget', true, { desc: 'render location to aim at for sky pearls\n(but not hardcoded + actually accurate + with timer)', shouldShow: p => addDependency(p.enablekuudra), isNewSection: true })
   .addColor('kuudraPearlTargetColor', 'KuudraPearlTargetColor', 0xFFFF00FF, { shouldShow: p => addDependency(p.kuudraRenderPearlTarget), shouldShow: p => addDependency(p.kuudraRenderPearlTarget) })
+  .addToggle('kuudraRenderPearlTargetDps', 'KuudraRenderPearlTargetDps', true, { desc: 'target for build -> p4 dps', shouldShow: p => addDependency(p.kuudraRenderPearlTarget) })
 
   .addToggle('kuudraRenderEmptySupplySpot', 'KuudraRenderEmptySupplySpot', true, { desc: 'render available supply dropoff location', shouldShow: p => addDependency(p.enablekuudra), isNewSection: true })
   .addColor('kuudraEmptySupplySpotColor', 'KuudraEmptySupplySpotColor', 0xFF0000FF, { shouldShow: p => addDependency(p.kuudraRenderEmptySupplySpot) })
