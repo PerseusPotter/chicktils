@@ -87,6 +87,9 @@ const nameChangeReg = reg('packetReceived', pack => {
 
   onNameChange(name, id);
 }).setFilteredClass(net.minecraft.network.play.server.S1CPacketEntityMetadata).setEnabled(stateBoxMob.and(new StateProp(stateIsInBoss).not()));
+const destroyEntReg = reg('packetReceived', pack => {
+  unrun(() => pack.func_149098_c().forEach(v => boxMobs.delete(v)));
+}).setFilteredClass(net.minecraft.network.play.server.S13PacketDestroyEntities).setEnabled(stateBoxMob);
 const renderEntPostReg = reg('postRenderEntity', (e, pos) => {
   const data = boxMobs.get(e.entity.func_145782_y());
   if (data) renderBoxOutline(
@@ -106,10 +109,12 @@ export function enter() {
 export function start() {
   entSpawnReg.register();
   nameChangeReg.register();
+  destroyEntReg.register();
   renderEntPostReg.register();
 }
 export function reset() {
   entSpawnReg.unregister();
   nameChangeReg.unregister();
+  destroyEntReg.unregister();
   renderEntPostReg.unregister();
 }
