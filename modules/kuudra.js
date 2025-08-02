@@ -30,16 +30,36 @@ let pickupTime = 0;
 let isOnCannon = false;
 let isT5 = new StateVar(false);
 let kuuder;
+let isBuild = false;
+let dpsPrePearl;
 const hpDisplay = createTextGui(() => data.kuudraHpLoc, () => ['&2240M']);
 const renderReg = reg('renderWorld', () => {
-  if (settings.kuudraRenderPearlTarget && pearlLocs.length > 0) {
+  if (settings.kuudraRenderPearlTarget) {
     const c = settings.kuudraPearlTargetColor;
-    const timeLeft = pickupTime - customRegs.serverTick.tick - getPartialServerTick();
-    pearlLocs.forEach(v => {
+    if (pearlLocs.length > 0) {
+      const timeLeft = pickupTime - customRegs.serverTick.tick - getPartialServerTick();
+      pearlLocs.forEach(v => {
+        const { x, y, z } = intersectPL(
+          Math.sin(v.phi) * Math.cos(v.theta),
+          Math.cos(v.phi),
+          Math.sin(v.phi) * Math.sin(v.theta),
+          getRenderX(),
+          getRenderY() + getEyeHeight(),
+          getRenderZ(),
+          0, 1, 0,
+          0, 140, 0
+        );
+        renderLine(c, [[x - 1, y, z - 1], [x + 1, y, z + 1]], { phase: true, lw: 2 });
+        renderLine(c, [[x - 1, y, z + 1], [x + 1, y, z - 1]], { phase: true, lw: 2 });
+        const offset = normalize({ x: x - getRenderX(), y: 0, z: z - getRenderZ() });
+        renderBillboardString(c, Math.max(0, (timeLeft - v.ticks) / 20).toFixed(2) + 's', x + offset.x, y, z + offset.z, { scale: 5, phase: true, blackBox: 0 });
+      });
+    }
+    if (isBuild && dpsPrePearl && !Number.isNaN(dpsPrePearl.phi)) {
       const { x, y, z } = intersectPL(
-        Math.sin(v.phi) * Math.cos(v.theta),
-        Math.cos(v.phi),
-        Math.sin(v.phi) * Math.sin(v.theta),
+        Math.sin(dpsPrePearl.phi) * Math.cos(dpsPrePearl.theta),
+        Math.cos(dpsPrePearl.phi),
+        Math.sin(dpsPrePearl.phi) * Math.sin(dpsPrePearl.theta),
         getRenderX(),
         getRenderY() + getEyeHeight(),
         getRenderZ(),
@@ -49,8 +69,8 @@ const renderReg = reg('renderWorld', () => {
       renderLine(c, [[x - 1, y, z - 1], [x + 1, y, z + 1]], { phase: true, lw: 2 });
       renderLine(c, [[x - 1, y, z + 1], [x + 1, y, z - 1]], { phase: true, lw: 2 });
       const offset = normalize({ x: x - getRenderX(), y: 0, z: z - getRenderZ() });
-      renderBillboardString(c, Math.max(0, (timeLeft - v.ticks) / 20).toFixed(2) + 's', x + offset.x, y, z + offset.z, { scale: 5, phase: true, blackBox: 0 });
-    });
+      renderBillboardString(c, Math.max(0, dpsPrePearl.ticks / 20).toFixed(2) + 's', x + offset.x, y, z + offset.z, { scale: 5, phase: true, blackBox: 0 });
+    }
   }
   if (settings.kuudraRenderEmptySupplySpot) dropLocs.forEach(v => renderBoxOutlineMiter(settings.kuudraEmptySupplySpotColor, v.x, v.y, v.z, 1, 1, 0.4, { phase: true, increase: true }));
   if (settings.kuudraBoxSupplies && supplies.length > 0) supplies.forEach(v => {
@@ -85,12 +105,14 @@ const renderReg = reg('renderWorld', () => {
 
 const PearlHelper = Java.type('com.perseuspotter.chicktilshelper.PearlHelper');
 const tickReg = reg('tick', () => {
+  if (dropLocs.length === 0 && !(isBuild && settings.kuudraRenderPearlTargetDps)) return;
+  const yaw = Player.getRawYaw() / 180 * Math.PI;
+  const px = Player.getX() - Math.cos(yaw) * 0.16;
+  const py = Player.getY() + getEyeHeight() - 0.1;
+  const pz = Player.getZ() - Math.sin(yaw) * 0.16;
   run(() => {
-    const yaw = Player.getRawYaw() / 180 * Math.PI;
-    const px = Player.getX() - Math.cos(yaw) * 0.16;
-    const py = Player.getY() + getEyeHeight() - 0.1;
-    const pz = Player.getZ() - Math.sin(yaw) * 0.16;
     pearlLocs = dropLocs.map(({ x, y, z }) => PearlHelper.solve(x - px, y - py, z - pz, 0.01)).filter(v => !Number.isNaN(v.phi));
+    if (isBuild) dpsPrePearl = PearlHelper.solve(-111.5 - px, 79 - py, -70.5 - pz, 0.01);
   });
 }).setEnabled(settings._kuudraRenderPearlTarget);
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
@@ -239,6 +261,7 @@ function onBuildStart() {
   chunks = [];
   pickupTime = 0;
   isOnCannon = false;
+  isBuild = true;
   supplyPickReg.unregister();
   cannonReg.register();
 }
@@ -265,6 +288,7 @@ function reset() {
 function start() {
   kuuder = null;
   isT5.set((Scoreboard.getLines().map(v => v.getName()).find(v => v.includes('⏣')) || '').slice(-2, -1) === '5');
+  isBuild = false;
   entSpawnReg.register();
   dropLocs = dropLocsStatic.slice();
   renderReg.register();
@@ -289,7 +313,10 @@ function start() {
 const kuudraStartReg = reg('chat', () => start()).setChatCriteria('&e[NPC] &cElle&f: &rOkay adventurers, I will go and fish up Kuudra!&r');
 // const supplyStartReg = reg('chat', () => kuudra.emit('supplyStart')).setChatCriteria('&e[NPC] &cElle&f: &rNot again!&r');
 const buildStartReg = reg('chat', () => onBuildStart()).setCriteria('&e[NPC] &cElle&f: &rOMG! Great work collecting my supplies!&r');
-const buildEndReg = reg('chat', () => hpOverlayReg.register()).setCriteria('&e[NPC] &cElle&f: &rPhew! The Ballista is finally ready! It should be strong enough to tank Kuudra\'s blows now!&r');
+const buildEndReg = reg('chat', () => {
+  hpOverlayReg.register();
+  isBuild = false;
+}).setCriteria('&e[NPC] &cElle&f: &rPhew! The Ballista is finally ready! It should be strong enough to tank Kuudra\'s blows now!&r');
 // const stunReg = reg('chat', () => kuudra.emit('stun')).setChatCriteria('&e[NPC] &cElle&f: &rThat looks like it hurt! Quickly, while &cKuudra is distracted, shoot him with the Ballista&f!&r');
 const dpsStartReg = reg('chat', () => {
   hideTitleReg.register();
