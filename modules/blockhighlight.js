@@ -2,7 +2,6 @@ import { getRenderX, getRenderY, getRenderZ, renderBoxFilled, renderBoxOutline }
 import settings from '../settings';
 import createTextGui from '../util/customtextgui';
 import { fastDistance } from '../util/math';
-import { getEyeHeight } from '../util/mc';
 import reg from '../util/registerer';
 import { getSbId } from '../util/skyblock';
 import { StateProp, StateVar } from '../util/state';
@@ -53,15 +52,8 @@ const tickReg = reg('tick', () => {
 
 const MovingObjectTypeBLOCK = Java.type('net.minecraft.util.MovingObjectPosition').MovingObjectType.BLOCK;
 const MovingObjectTypeENTITY = Java.type('net.minecraft.util.MovingObjectPosition').MovingObjectType.ENTITY;
-const MaterialAir = Java.type('net.minecraft.block.material.Material').field_151579_a;
-const BlocksAir = Java.type('net.minecraft.init.Blocks').field_150350_a;
-const BlocksCarpet = Java.type('net.minecraft.init.Blocks').field_150404_cg;
-const BlocksSkull = Java.type('net.minecraft.init.Blocks').field_150465_bP;
-const BlocksSnowLayer = Java.type('net.minecraft.init.Blocks').field_150431_aC;
-const BlocksFlowerPot = Java.type('net.minecraft.init.Blocks').field_150457_bL;
-const BlocksWallSign = Java.type('net.minecraft.init.Blocks').field_150444_as;
-const BlocksStandingSign = Java.type('net.minecraft.init.Blocks').field_150472_an;
-const BlocksDoublePlant = Java.type('net.minecraft.init.Blocks').field_150398_cm;
+const RaycastHelper = Java.type('com.perseuspotter.chicktilshelper.RaycastHelper');
+const BlockRegistry = Java.type('com.perseuspotter.chicktilshelper.BlockRegistry');
 const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent, evn => {
   cancel(evn);
 
@@ -86,54 +78,30 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
   }
 
   if (settings.blockHighlightCheckEther && etherDistance > 0 && (isConduit || Player.isSneaking())) {
-    let result = raycast(Player.getPlayer(), 1, 0, etherDistance, 0.1);
+    let result = RaycastHelper.raycast(Player.getPlayer(), Tessellator.partialTicks, 0, etherDistance);
     if (!result) {
       stateCanEther.set(false);
       etherReasonDisplay.setLine('&4Can\'t TP: Too far!');
-      result = raycast(Player.getPlayer(), 1, etherDistance, maxEtherDist, 0.1);
+      result = RaycastHelper.raycast(Player.getPlayer(), Tessellator.partialTicks, etherDistance, maxEtherDist);
     } else {
-      const [blockPos, state] = result;
-      const block = state.func_177230_c();
       const w = World.getWorld();
-      if (
-        !block.func_149703_v() ||
-        block === BlocksCarpet || block === BlocksSkull || block == BlocksSnowLayer || block === BlocksFlowerPot ||
-        (
-          block.func_180640_a(w, blockPos, state) === null &&
-          block !== BlocksWallSign && block !== BlocksStandingSign
-        )
-      ) {
+      const blockAbove = w.func_180495_p(result.pos.func_177982_a(0, 1, 0)).func_177230_c();
+      const twoBlockAbove = w.func_180495_p(result.pos.func_177982_a(0, 2, 0)).func_177230_c();
+      if (!BlockRegistry.isBasicallyAir(blockAbove) || !BlockRegistry.isBasicallyAir(twoBlockAbove)) {
         stateCanEther.set(false);
-        etherReasonDisplay.setLine('&4Can\'t TP: Not solid!');
-      } else {
-        const blockPosAbove = blockPos.func_177982_a(0, 1, 0);
-        const stateAbove = w.func_180495_p(blockPosAbove)
-        const blockAbove = stateAbove.func_177230_c();
-        const twoBlockAbove = w.func_180495_p(blockPos.func_177982_a(0, 2, 0)).func_177230_c();
-        if (
-          (
-            blockAbove !== BlocksAir && blockAbove !== BlocksCarpet && blockAbove !== BlocksSkull && blockAbove !== BlocksSnowLayer && blockAbove !== BlocksFlowerPot &&
-            blockAbove.func_149703_v() &&
-            blockAbove.func_180640_a(w, blockPosAbove, stateAbove) !== null
-          ) ||
-          blockAbove === BlocksWallSign || block === BlocksStandingSign ||
-          (twoBlockAbove !== BlocksAir && twoBlockAbove !== BlocksDoublePlant && twoBlockAbove !== BlocksCarpet && twoBlockAbove !== BlocksSkull && twoBlockAbove !== BlocksSnowLayer && twoBlockAbove !== BlocksFlowerPot)
-        ) {
-          stateCanEther.set(false);
-          etherReasonDisplay.setLine('&4Can\'t TP: No air above!');
-        } else stateCanEther.set(true);
-      }
+        etherReasonDisplay.setLine('&4Can\'t TP: No air above!');
+      } else stateCanEther.set(true);
     }
 
     if (stateCanEther.get()) tryHighlightBlock(
-      result[0],
+      result.pos,
       settings.blockHighlightEtherWireColor,
       settings.blockHighlightEtherFillColor,
       settings.blockHighlightEtherWireWidth,
       true
     );
     else if (result) tryHighlightBlock(
-      result[0],
+      result.pos,
       settings.blockHighlightCantEtherWireColor,
       settings.blockHighlightCantEtherFillColor,
       settings.blockHighlightCantEtherWireWidth,
@@ -155,41 +123,7 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
 
 const renderReg = reg('renderOverlay', () => etherReasonDisplay.render()).setEnabled(new StateProp(stateCanEther).not().and(settings._blockHighlightCantEtherShowReason).and(settings._blockHighlightCheckEther));
 
-const Vector3f = Java.type('org.lwjgl.util.vector.Vector3f');
-const MCBlockPos = Java.type('net.minecraft.util.BlockPos');
-/**
- * @link https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/70df0c0f96da20c0da74929e3e709121357b3fb9/src/main/java/io/github/moulberry/notenoughupdates/miscfeatures/CustomItemEffects.java#L578
- */
-function raycast(player, pt, minDist, maxDist, step) {
-  const pos = new Vector3f(player.field_70165_t, player.field_70163_u + getEyeHeight(player), player.field_70161_v);
-  const lookVec3 = player.func_70676_i(pt);
-  const look = new Vector3f(lookVec3.field_72450_a, lookVec3.field_72448_b, lookVec3.field_72449_c);
-  if (minDist > 0) {
-    look.scale(minDist / look.length());
-    Vector3f.add(pos, look, pos);
-  }
-  look.scale(step / look.length());
-  const stepCount = Math.ceil(maxDist / step);
-  const w = World.getWorld();
-  for (let i = 0; i < stepCount; i++) {
-    Vector3f.add(pos, look, pos);
-    let blockPos = new MCBlockPos(pos.x, pos.y, pos.z);
-    let state = w.func_180495_p(blockPos);
-    if (state.func_177230_c() !== BlocksAir) {
-      Vector3f.sub(pos, look, pos);
-      look.scale(0.1);
-      for (let j = 0; j < 10; j++) {
-        Vector3f.add(pos, look, pos);
-        let blockPos2 = new MCBlockPos(pos.x, pos.y, pos.z);
-        let state2 = w.func_180495_p(blockPos2);
-        if (state2.func_177230_c() !== BlocksAir) return [blockPos2, state2];
-      }
-      return [blockPos, state];
-    }
-  }
-  return null;
-}
-
+const MaterialAir = Java.type('net.minecraft.block.material.Material').field_151579_a;
 function tryHighlightBlock(blockPos, cw, cf, lw, isEther) {
   const w = World.getWorld();
   const block = w.func_180495_p(blockPos).func_177230_c();
