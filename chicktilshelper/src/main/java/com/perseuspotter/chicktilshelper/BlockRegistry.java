@@ -4,8 +4,209 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 
 public class BlockRegistry {
-    public static final boolean[] dict = new boolean[198];
+    public static final boolean[] solidDict = new boolean[198];
+    public static final boolean[] interactableDict = new boolean[198];
     static {
+        /*
+        // Blocks.air,
+        // Blocks.stone,
+        // Blocks.grass,
+        // Blocks.dirt,
+        // Blocks.cobblestone,
+        // Blocks.planks,
+        // Blocks.sapling,
+        // Blocks.bedrock,
+        // Blocks.flowing_water,
+        // Blocks.water,
+        // Blocks.flowing_lava,
+        // Blocks.lava,
+        // Blocks.sand,
+        // Blocks.gravel,
+        // Blocks.gold_ore,
+        // Blocks.iron_ore,
+        // Blocks.coal_ore,
+        // Blocks.log,
+        // Blocks.leaves,
+        // Blocks.sponge,
+        // Blocks.glass,
+        // Blocks.lapis_ore,
+        // Blocks.lapis_block,
+        // Blocks.dispenser,
+        // Blocks.sandstone,
+        // Blocks.noteblock,
+        // Blocks.bed,
+        // Blocks.golden_rail,
+        // Blocks.detector_rail,
+        // Blocks.sticky_piston,
+        // Blocks.web,
+        // Blocks.tallgrass,
+        // Blocks.deadbush,
+        // Blocks.piston,
+        // Blocks.piston_head,
+        // Blocks.wool,
+        // Blocks.piston_extension,
+        // Blocks.yellow_flower,
+        // Blocks.red_flower,
+        // Blocks.brown_mushroom,
+        // Blocks.red_mushroom,
+        // Blocks.gold_block,
+        // Blocks.iron_block,
+        // Blocks.double_stone_slab,
+        // Blocks.stone_slab,
+        // Blocks.brick_block,
+        // Blocks.tnt,
+        // Blocks.bookshelf,
+        // Blocks.mossy_cobblestone,
+        // Blocks.obsidian,
+        // Blocks.torch,
+        // Blocks.fire,
+        // Blocks.mob_spawner,
+        // Blocks.oak_stairs,
+        // Blocks.chest,
+        // Blocks.redstone_wire,
+        // Blocks.diamond_ore,
+        // Blocks.diamond_block,
+        // Blocks.crafting_table,
+        // Blocks.wheat,
+        // Blocks.farmland,
+        // Blocks.furnace,
+        // Blocks.lit_furnace,
+        // Blocks.standing_sign,
+        // Blocks.wooden_door,
+        // Blocks.ladder,
+        // Blocks.rail,
+        // Blocks.stone_stairs,
+        // Blocks.wall_sign,
+        // Blocks.lever,
+        // Blocks.stone_pressure_plate,
+        // Blocks.iron_door,
+        // Blocks.wooden_pressure_plate,
+        // Blocks.redstone_ore,
+        // Blocks.lit_redstone_ore,
+        // Blocks.unlit_redstone_torch,
+        // Blocks.redstone_torch,
+        // Blocks.stone_button,
+        // Blocks.snow_layer,
+        // Blocks.ice,
+        // Blocks.snow,
+        // Blocks.cactus,
+        // Blocks.clay,
+        // Blocks.reeds,
+        // Blocks.jukebox,
+        // Blocks.fence,
+        // Blocks.pumpkin,
+        // Blocks.netherrack,
+        // Blocks.soul_sand,
+        // Blocks.glowstone,
+        // Blocks.portal,
+        // Blocks.lit_pumpkin,
+        // Blocks.cake,
+        // Blocks.unpowered_repeater,
+        // Blocks.powered_repeater,
+        // Blocks.stained_glass,
+        // Blocks.trapdoor,
+        // Blocks.monster_egg,
+        // Blocks.stonebrick,
+        // Blocks.brown_mushroom_block,
+        // Blocks.red_mushroom_block,
+        // Blocks.iron_bars,
+        // Blocks.glass_pane,
+        // Blocks.melon_block,
+        // Blocks.pumpkin_stem,
+        // Blocks.melon_stem,
+        // Blocks.vine,
+        // Blocks.fence_gate,
+        // Blocks.brick_stairs,
+        // Blocks.stone_brick_stairs,
+        // Blocks.mycelium,
+        // Blocks.waterlily,
+        // Blocks.nether_brick,
+        // Blocks.nether_brick_fence,
+        // Blocks.nether_brick_stairs,
+        // Blocks.nether_wart,
+        // Blocks.enchanting_table,
+        // Blocks.brewing_stand,
+        // Blocks.cauldron,
+        // Blocks.end_portal,
+        // Blocks.end_portal_frame,
+        // Blocks.end_stone,
+        // Blocks.dragon_egg,
+        // Blocks.redstone_lamp,
+        // Blocks.lit_redstone_lamp,
+        // Blocks.double_wooden_slab,
+        // Blocks.wooden_slab,
+        // Blocks.cocoa,
+        // Blocks.sandstone_stairs,
+        // Blocks.emerald_ore,
+        // Blocks.ender_chest,
+        // Blocks.tripwire_hook,
+        // Blocks.tripwire,
+        // Blocks.emerald_block,
+        // Blocks.spruce_stairs,
+        // Blocks.birch_stairs,
+        // Blocks.jungle_stairs,
+        // Blocks.command_block,
+        // Blocks.beacon,
+        // Blocks.cobblestone_wall,
+        // Blocks.flower_pot,
+        // Blocks.carrots,
+        // Blocks.potatoes,
+        // Blocks.wooden_button,
+        // Blocks.skull,
+        // Blocks.anvil,
+        // Blocks.trapped_chest,
+        // Blocks.light_weighted_pressure_plate,
+        // Blocks.heavy_weighted_pressure_plate,
+        // Blocks.unpowered_comparator,
+        // Blocks.powered_comparator,
+        // Blocks.daylight_detector,
+        // Blocks.redstone_block,
+        // Blocks.quartz_ore,
+        // Blocks.hopper,
+        // Blocks.quartz_block,
+        // Blocks.quartz_stairs,
+        // Blocks.activator_rail,
+        // Blocks.dropper,
+        // Blocks.stained_hardened_clay,
+        // Blocks.stained_glass_pane,
+        // Blocks.leaves2,
+        // Blocks.log2,
+        // Blocks.acacia_stairs,
+        // Blocks.dark_oak_stairs,
+        // Blocks.slime,
+        // Blocks.barrier,
+        // Blocks.iron_trapdoor,
+        // Blocks.prismarine,
+        // Blocks.sea_lantern,
+        // Blocks.hay_block,
+        // Blocks.carpet,
+        // Blocks.hardened_clay,
+        // Blocks.coal_block,
+        // Blocks.packed_ice,
+        // Blocks.double_plant,
+        // Blocks.standing_banner,
+        // Blocks.wall_banner,
+        // Blocks.daylight_detector_inverted,
+        // Blocks.red_sandstone,
+        // Blocks.red_sandstone_stairs,
+        // Blocks.double_stone_slab2,
+        // Blocks.stone_slab2,
+        // Blocks.spruce_fence_gate,
+        // Blocks.birch_fence_gate,
+        // Blocks.jungle_fence_gate,
+        // Blocks.dark_oak_fence_gate,
+        // Blocks.acacia_fence_gate,
+        // Blocks.spruce_fence,
+        // Blocks.birch_fence,
+        // Blocks.jungle_fence,
+        // Blocks.dark_oak_fence,
+        // Blocks.acacia_fence,
+        // Blocks.spruce_door,
+        // Blocks.birch_door,
+        // Blocks.jungle_door,
+        // Blocks.acacia_door,
+        // Blocks.dark_oak_door,
+         */
         Block[] basicallyAir = new Block[] {
             Blocks.air,
             Blocks.sapling,
@@ -57,22 +258,76 @@ public class BlockRegistry {
             Blocks.double_plant,
         };
         for (Block b : basicallyAir) {
-            dict[Block.getIdFromBlock(b)] = true;
+            solidDict[Block.getIdFromBlock(b)] = true;
+        }
+        Block[] interactable = new Block[] {
+            Blocks.dispenser,
+            Blocks.chest,
+            Blocks.crafting_table,
+            Blocks.furnace,
+            Blocks.lit_furnace,
+            Blocks.oak_door,
+            Blocks.lever,
+            Blocks.iron_door,
+            Blocks.stone_button,
+            Blocks.trapdoor,
+            Blocks.oak_fence_gate,
+            Blocks.enchanting_table,
+            Blocks.brewing_stand,
+            Blocks.cauldron,
+            Blocks.end_portal_frame,
+            Blocks.dragon_egg,
+            Blocks.ender_chest,
+            Blocks.command_block,
+            Blocks.wooden_button,
+            Blocks.anvil,
+            Blocks.trapped_chest,
+            Blocks.hopper,
+            Blocks.dropper,
+            Blocks.iron_trapdoor,
+            Blocks.spruce_fence_gate,
+            Blocks.birch_fence_gate,
+            Blocks.jungle_fence_gate,
+            Blocks.dark_oak_fence_gate,
+            Blocks.acacia_fence_gate,
+            Blocks.spruce_door,
+            Blocks.birch_door,
+            Blocks.jungle_door,
+            Blocks.acacia_door,
+            Blocks.dark_oak_door,
+        };
+        for (Block b : interactable) {
+            interactableDict[Block.getIdFromBlock(b)] = true;
         }
     }
 
     public static boolean isSolid(int id) {
-        if (id < 0 || id >= dict.length) return true;
-        return !dict[id];
+        if (id < 0 || id >= solidDict.length) return true;
+        return !solidDict[id];
     }
     public static boolean isSolid(Block b) {
         return isSolid(Block.getIdFromBlock(b));
     }
     public static boolean isBasicallyAir(int id) {
-        if (id < 0 || id >= dict.length) return false;
-        return dict[id];
+        if (id < 0 || id >= solidDict.length) return false;
+        return solidDict[id];
     }
     public static boolean isBasicallyAir(Block b) {
         return isBasicallyAir(Block.getIdFromBlock(b));
+    }
+
+    public static boolean isInert(int id) {
+        if (id < 0 || id >= interactableDict.length) return true;
+        return !interactableDict[id];
+    }
+    public static boolean isInert(Block b) {
+        return isInert(Block.getIdFromBlock(b));
+    }
+    public static boolean isInteractable(int id) {
+        if (id < 0 || id >= interactableDict.length) return false;
+        return interactableDict[id];
+    }
+    public static boolean isInteractable(Block b) {
+        return isInteractable(Block.getIdFromBlock(b));
     }
 }

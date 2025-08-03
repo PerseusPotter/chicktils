@@ -77,14 +77,14 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
     return;
   }
 
+  const w = World.getWorld();
   if (settings.blockHighlightCheckEther && etherDistance > 0 && (isConduit || Player.isSneaking())) {
     let result = RaycastHelper.raycast(Player.getPlayer(), Tessellator.partialTicks, 0, etherDistance);
     if (!result) {
-      stateCanEther.set(false);
       etherReasonDisplay.setLine('&4Can\'t TP: Too far!');
       result = RaycastHelper.raycast(Player.getPlayer(), Tessellator.partialTicks, etherDistance, maxEtherDist);
+      stateCanEther.set(!result);
     } else {
-      const w = World.getWorld();
       const blockAbove = w.func_180495_p(result.pos.func_177982_a(0, 1, 0)).func_177230_c();
       const twoBlockAbove = w.func_180495_p(result.pos.func_177982_a(0, 2, 0)).func_177230_c();
       if (!BlockRegistry.isBasicallyAir(blockAbove) || !BlockRegistry.isBasicallyAir(twoBlockAbove)) {
@@ -93,23 +93,26 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
       } else stateCanEther.set(true);
     }
 
-    if (stateCanEther.get()) tryHighlightBlock(
-      result.pos,
-      settings.blockHighlightEtherWireColor,
-      settings.blockHighlightEtherFillColor,
-      settings.blockHighlightEtherWireWidth,
-      true
-    );
-    else if (result) tryHighlightBlock(
-      result.pos,
-      settings.blockHighlightCantEtherWireColor,
-      settings.blockHighlightCantEtherFillColor,
-      settings.blockHighlightCantEtherWireWidth,
-      true
-    );
-
-    return;
-  } else stateCanEther.set(true);
+    if (
+      settings.blockHighlightEtherCheeto ||
+      evn.target.field_72313_a !== MovingObjectTypeBLOCK ||
+      BlockRegistry.isInert(w.func_180495_p(evn.target.func_178782_a()).func_177230_c())) {
+      if (stateCanEther.get()) tryHighlightBlock(
+        result.pos,
+        settings.blockHighlightEtherWireColor,
+        settings.blockHighlightEtherFillColor,
+        settings.blockHighlightEtherWireWidth,
+        true
+      );
+      else if (result) tryHighlightBlock(
+        result.pos,
+        settings.blockHighlightCantEtherWireColor,
+        settings.blockHighlightCantEtherFillColor,
+        settings.blockHighlightCantEtherWireWidth,
+        true
+      );
+    }
+  }
 
   if (evn.target.field_72313_a !== MovingObjectTypeBLOCK) return;
   tryHighlightBlock(
