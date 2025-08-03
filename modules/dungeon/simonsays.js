@@ -1,6 +1,5 @@
 import settings from '../../settings';
 import reg from '../../util/registerer';
-import { compareFloat } from '../../util/math';
 import { StateProp, StateVar } from '../../util/state';
 import { getBlockId, getBlockPos } from '../../util/mc';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
@@ -24,9 +23,9 @@ function getButtonPos(id) {
 }
 
 const tickReg = reg('tick', () => stateAtSS.set(
-  compareFloat(Player.getY(), 121, 1.1) === 0 &&
-  compareFloat(Player.getX(), 108, 5) === 0 &&
-  compareFloat(Player.getZ(), 94, 5) === 0
+  90 <= Player.getX() && Player.getX() <= 115 &&
+  100 <= Player.getY() && Player.getY() <= 140 &&
+  50 <= Player.getZ() && Player.getZ() <= 125
 )).setEnabled(stateSimonSays);
 function onSeaLantern(x, y, z) {
   if (x !== 111) return;

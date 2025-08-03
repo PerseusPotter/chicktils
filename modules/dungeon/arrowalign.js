@@ -1,6 +1,5 @@
 import settings from '../../settings';
 import reg from '../../util/registerer';
-import { compareFloat } from '../../util/math';
 import { StateProp, StateVar } from '../../util/state';
 import { stateBossName, stateFloor, stateIsInBoss } from '../dungeon.js';
 import { getItemId } from '../../util/mc';
@@ -43,9 +42,9 @@ const solutions = [
 ];
 
 const tickReg = reg('tick', () => stateAtAA.set(
-  compareFloat(Player.getY(), 121, 1.1) === 0 &&
-  compareFloat(Player.getX(), 0, 5) === 0 &&
-  compareFloat(Player.getZ(), 77, 5) === 0
+  -2 <= Player.getX() && Player.getX() <= 20 &&
+  100 <= Player.getY() && Player.getY() <= 140 &&
+  50 <= Player.getZ() && Player.getZ() <= 125
 )).setEnabled(stateArrowAlign);
 const EntityItemFrame = net.minecraft.entity.item.EntityItemFrame;
 const calcReg = reg('tick', () => {
