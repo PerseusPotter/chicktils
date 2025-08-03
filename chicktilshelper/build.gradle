@@ -54,10 +54,6 @@ repositories {
     maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
 }
 
-jar {
-    enabled = false
-}
-
 shadowJar {
     archiveClassifier.set("")
 
