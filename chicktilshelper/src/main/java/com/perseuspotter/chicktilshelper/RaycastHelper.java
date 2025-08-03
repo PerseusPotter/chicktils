@@ -39,9 +39,9 @@ public class RaycastHelper {
             tdx = Math.abs(1.0 / dx1);
             tdy = Math.abs(1.0 / dy1);
             tdz = Math.abs(1.0 / dz1);
-            tmx = dx1 == 0.0 ? Double.POSITIVE_INFINITY : Math.abs(((dx1 > 0.0 ? 1.0 : 0.0) - x + this.x) / dx1);
-            tmy = dy1 == 0.0 ? Double.POSITIVE_INFINITY : Math.abs(((dy1 > 0.0 ? 1.0 : 0.0) - y + this.y) / dy1);
-            tmz = dz1 == 0.0 ? Double.POSITIVE_INFINITY : Math.abs(((dz1 > 0.0 ? 1.0 : 0.0) - z + this.z) / dz1);
+            tmx = dx1 == 0.0 ? Double.POSITIVE_INFINITY : ((dx1 > 0.0 ? (this.x + 1.0 - x) : (x - this.x)) / Math.abs(dx1));
+            tmy = dy1 == 0.0 ? Double.POSITIVE_INFINITY : ((dy1 > 0.0 ? (this.y + 1.0 - y) : (y - this.y)) / Math.abs(dy1));
+            tmz = dz1 == 0.0 ? Double.POSITIVE_INFINITY : ((dz1 > 0.0 ? (this.z + 1.0 - z) : (z - this.z)) / Math.abs(dz1));
         }
 
         private double t = 0.0;
