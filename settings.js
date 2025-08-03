@@ -459,6 +459,9 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addNumber('crosshairBreadth', 'CustomCrosshairBreadth', 1, { min: 0, shouldShow: p => addDependency(p.enablecrosshair) })
   .addToggle('crosshairRenderInGui', 'CustomCrosshairRenderInGuis', false, { shouldShow: p => addDependency(p.enablecrosshair) })
 
+  .addToggle('enablewithershieldtimer', 'EnableWitherShieldTimer', true, { isNewSection: true })
+  .addAction('moveWitherShieldTimer', 'MoveWitherShieldTimer')
+
   .addPage('Avarice Addons')
   .addToggle('enableavarice', 'EnableAvariceAddons', false, { desc: 'things for avarice' })
 
