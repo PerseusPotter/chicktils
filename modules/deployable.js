@@ -418,7 +418,7 @@ const equipmentReg = reg('packetReceived', (pack, doDupe) => {
       range: data.range,
       stats,
       ttl: data.duration,
-      isOwn: ownDeployLoc && ownDeployLoc.isFlux && dist(ownDeployLoc.x, ent.field_70165_t) < 1 && dist(ownDeployLoc.y - 1, ent.field_70163_u) < 1 && dist(ownDeployLoc.z, ent.field_70161_v) < 1,
+      isOwn: ownDeployLoc && ownDeployLoc.isFlux && dist(ownDeployLoc.x, ent.field_70165_t) < 3 && dist(ownDeployLoc.y - 1, ent.field_70163_u) < 3 && dist(ownDeployLoc.z, ent.field_70161_v) < 3,
       y: ent.field_70163_u + 1
     });
     return;
@@ -439,31 +439,32 @@ const equipmentReg = reg('packetReceived', (pack, doDupe) => {
     range: data.range,
     stats,
     ttl: data.duration,
-    isOwn: ownDeployLoc && !ownDeployLoc.isFlux && dist(ownDeployLoc.x, ent.field_70165_t) < 1 && ownDeployLoc.y - 2 < ent.field_70163_u && ownDeployLoc + 10 > ent.field_70163_u && dist(ownDeployLoc.z, ent.field_70161_v) < 1,
+    isOwn: ownDeployLoc && !ownDeployLoc.isFlux && dist(ownDeployLoc.x, ent.field_70165_t) < 3 && ownDeployLoc.y - 2 < ent.field_70163_u && ownDeployLoc.y + 10 > ent.field_70163_u && dist(ownDeployLoc.z, ent.field_70161_v) < 3,
     y: ent.field_70163_u
   });
 }).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment);
-const soundReg = reg('soundPlay', (pos, name, vol, pit) => {
+const soundReg = reg('packetReceived', pack => {
+  const name = pack.func_149212_c();
   if (name === 'random.wood_click') {
-    if (vol !== 0.5) return;
-    if (compareFloat(pit, 0.841269850730896, 1e-10) !== 0) return;
+    if (pack.func_149208_g() !== 0.5) return;
+    if (compareFloat(pack.func_149209_h(), 0.841269850730896, 1e-10) !== 0) return;
     if (
-      dist(Player.getX(), pos.x) > 1 ||
-      dist(Player.getY(), pos.y) > 1 ||
-      dist(Player.getZ(), pos.z) > 1
+      dist(Player.getPlayer().field_175172_bI / 32, pack.func_149207_d()) > 1 ||
+      dist(Player.getPlayer().field_175166_bJ / 32, pack.func_149211_e()) > 1 ||
+      dist(Player.getPlayer().field_175167_bK / 32, pack.func_149210_f()) > 1
     ) return;
-    ownDeployLoc = { x: pos.x, y: pos.y, z: pos.z, isFlux: true };
+    ownDeployLoc = { x: pack.func_149207_d(), y: pack.func_149211_e(), z: pack.func_149210_f(), isFlux: true };
   } else if (name === 'fireworks.launch') {
-    if (vol !== 3) return;
-    if (pit !== 1) return;
+    if (pack.func_149208_g() !== 3) return;
+    if (pack.func_149209_h() !== 1) return;
     if (
-      dist(Player.getX(), pos.x) > 1 ||
-      dist(Player.getY() + 1.5, pos.y) > 1 ||
-      dist(Player.getZ(), pos.z) > 1
+      dist(Player.getPlayer().field_175172_bI / 32, pack.func_149207_d()) > 1 ||
+      dist(Player.getPlayer().field_175166_bJ / 32 + 1.5, pack.func_149211_e()) > 1 ||
+      dist(Player.getPlayer().field_175167_bK / 32, pack.func_149210_f()) > 1
     ) return;
-    ownDeployLoc = { x: pos.x, y: pos.y, z: pos.z, isFlux: false };
+    ownDeployLoc = { x: pack.func_149207_d(), y: pack.func_149211_e(), z: pack.func_149210_f(), isFlux: false };
   }
-});
+}).setFilteredClass(net.minecraft.network.play.server.S29PacketSoundEffect);
 const unloadReg = reg('worldUnload', () => {
   deployables = [];
   ownDeployLoc = null;
