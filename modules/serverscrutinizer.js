@@ -7,7 +7,7 @@ import { getAveragePing, getPing } from '../util/ping';
 import { Deque } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
-import { DelayTimer, FrameTimer } from '../util/timers';
+import { DelayTimer } from '../util/timers';
 
 class TickInfo {
   /** @type {Deque<number>} */
@@ -37,24 +37,23 @@ class TickInfo {
     this.maxSpan = maxSpan;
     if (cap) this.cap = cap;
   }
-  _mark() {
-    this.dirty = true;
-    return this;
-  }
   add(val) {
     if (!val) return;
     this.arr.unshift(val);
     this.cspan++;
-    this._mark();
+    this.dirty = true;
   }
   clear() {
     this.arr = new Deque();
-    this._mark();
+    this.dirty = true;
   }
   calc() {
     const d = Date.now();
     // WHY ARE THERE UNDEFINEDS IN MY ARRAY HOLY SHIT GONNA LOSE MY MIND FUCK YOU RHINO
-    while (this.arr.length > 0 && (!this.arr.getLast() || d - this.arr.getLast() > this.maxAge)) this._mark().arr.pop();
+    while (this.arr.length > 0 && (!this.arr.getLast() || d - this.arr.getLast() > this.maxAge)) {
+      this.arr.pop();
+      this.dirty = true;
+    }
     if (!this.dirty) return;
     this.dirty = false;
     if (this.arr.length === 0) return void (this.cspan = this.avg = this.minspan = this.maxspan = 0);
@@ -171,12 +170,9 @@ function formatTps(curr, avg, min, max) {
   return lines;
 }
 const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11, 21));
-const tpsLimiter = new FrameTimer(4);
 const rendOvTps = reg('renderOverlay', () => {
-  if (tpsLimiter.shouldRender()) {
-    ticks.calc();
-    tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin(), ticks.getMax()));
-  }
+  ticks.calc();
+  tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin(), ticks.getMax()));
   tpsDisplay.render();
 }).setEnabled(settings._serverScrutinizerTPSDisplay);
 
@@ -206,12 +202,9 @@ function formatFps(curr, avg, min, max) {
   return lines;
 }
 const fpsDisplay = createTextGui(() => data.serverScrutinizerFPSDisplay, () => formatFps(217, 213.1, 180, 240));
-const fpsLimiter = new FrameTimer(4);
 const rendOvFps = reg('renderOverlay', () => {
-  if (fpsLimiter.shouldRender()) {
-    frames.calc();
-    fpsDisplay.setLines(formatFps(frames.getCur(), frames.getAvg(), frames.getMin(), frames.getMax()));
-  }
+  frames.calc();
+  fpsDisplay.setLines(formatFps(frames.getCur(), frames.getAvg(), frames.getMin(), frames.getMax()));
   fpsDisplay.render();
 }).setEnabled(settings._serverScrutinizerFPSDisplay);
 
@@ -259,12 +252,9 @@ function formatPps(curr, avg, min, max) {
   return lines;
 }
 const ppsDisplay = createTextGui(() => data.serverScrutinizerPPSDisplay, () => formatPps(42, 42.2, 41, 45));
-const ppsLimiter = new FrameTimer(4);
 const rendOvPps = reg('renderOverlay', () => {
-  if (ppsLimiter.shouldRender()) {
-    packets.calc();
-    ppsDisplay.setLines(formatPps(packets.getCur(), packets.getAvg(), packets.getMin(), packets.getMax()));
-  }
+  packets.calc();
+  ppsDisplay.setLines(formatPps(packets.getCur(), packets.getAvg(), packets.getMin(), packets.getMax()));
   ppsDisplay.render();
 }).setEnabled(settings._serverScrutinizerPPSDisplay);
 
