@@ -17,15 +17,17 @@ const spotifyNames = {
   'NOT OPENED': '&cNot Opened'
 };
 /**
+ * @param {string} artist
  * @param {string} song
  */
-function formatSong(song) {
-  return spotifyNames[song] ?? '&a' + song.replace(/&([\da-fk-or])/g, '&​$1').replace(' - ', ' &7-&b ');
+function formatSong(artist, song) {
+  return settings.spotifyFormat
+    .replace('%ARTIST%', artist.replace(/&([\da-fk-or])/g, '&​$1'))
+    .replace('%SONG%', song.replace(/&([\da-fk-or])/g, '&​$1'));
 }
 
 // const stateSpotifyPID = new StateVar(-1);
 const stateSpotifyOpen = new StateVar(false);
-const spotifyPrefix = '&2Spotify &7>&r ';
 let spotifyPrefixDisplay = '';
 function updatePrefix(d = 1) {
   // lmao i give up
@@ -33,7 +35,7 @@ function updatePrefix(d = 1) {
   spotifyGui.setLine(' ');
   spotifyGui._forceUpdate();
   const spaceWidth = spotifyGui.getWidth();
-  spotifyPrefixDisplay = spotifyPrefix + ' '.repeat(settings.spotifyMaxSongLength / spaceWidth);
+  spotifyPrefixDisplay = settings.spotifyPrefix + ' '.repeat(settings.spotifyMaxSongLength / spaceWidth);
   spotifyGui.setLine(spotifyPrefixDisplay);
 }
 const spotifyGui = createTextGui(() => data.spotifyDisplayLoc, () => [spotifyPrefixDisplay]);
@@ -41,11 +43,13 @@ unrun(() => updatePrefix());
 spotifyGui.on('editRender', () => {
   updatePrefix();
   const loc = editDisplay.getTrueLoc();
-  songMarquee.setText(formatSong('Rick Astley - Never Gonna Give You Up'));
+  songMarquee.setText(formatSong('Rick Astley', 'Never Gonna Give You Up'));
   songMarquee.render(loc.x + editDisplay.getVisibleWidth() + 4, loc.y, loc.s, editDisplay.getLoc().b);
 });
-const songMarquee = new Marquee('Rick Astley - Never Gonna Give You Up', 0.05);
+const songMarquee = new Marquee(formatSong('Rick Astley', 'Never Gonna Give You Up'));
 songMarquee.setMaxLen(settings.spotifyMaxSongLength);
+songMarquee.setScrollSpeed(settings.spotifyScrollSpeed);
+songMarquee.setAlternate(settings.spotifyAlternateScrolling);
 spotifyGui.on('editClose', () => updateReg.forceTrigger());
 
 const renderReg = reg('renderOverlay', () => {
@@ -75,11 +79,16 @@ const updateReg = reg('step', () => {
     let parts = line.split('","');
     let name = parts.slice(8).join('","').slice(0, -1);
     if (name === 'N/A') continue;
-    songMarquee.setText(formatSong(name.trim()));
+    name = name.trim();
+    if (name in spotifyNames) songMarquee.setText(spotifyNames[name]);
+    else {
+      const i = name.indexOf(' - ');
+      songMarquee.setText(formatSong(name.slice(0, i), name.slice(i + 3)));
+    }
     stateSpotifyOpen.set(true);
     return;
   }
-  songMarquee.setText(formatSong('NOT OPENED'));
+  songMarquee.setText(spotifyNames['NOT OPENED']);
   stateSpotifyOpen.set(false);
   // proc.waitFor();
 }).setDelay(2);
@@ -90,6 +99,9 @@ export function init() {
     songMarquee.setMaxLen(v);
     updatePrefix();
   });
+  settings._spotifyPrefix.listen(() => updatePrefix());
+  settings._spotifyScrollSpeed.listen(v => songMarquee.setScrollSpeed(v));
+  settings._spotifyAlternateScrolling.listen(v => songMarquee.setAlternate(v));
 }
 export function load() {
   // stateSpotifyPID.set(-1);
