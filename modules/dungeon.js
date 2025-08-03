@@ -198,6 +198,7 @@ export function init() {
     require('./dungeon/dragonhelper'),
     require('./dungeon/goldordpsalert'),
     require('./dungeon/goldorfrenzytimer'),
+    require('./dungeon/guessmimic'),
     require('./dungeon/hecatomb'),
     require('./dungeon/hidefallingblocks'),
     require('./dungeon/hidehealerfairy'),
