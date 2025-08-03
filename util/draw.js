@@ -499,7 +499,7 @@ export class BufferedImageWrapper {
         buf.flip();
 
         GlStateManager2.bindTexture(this.textureId);
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, this.w, this.h, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
+        GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, this.w, this.h, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
       }
     } else {
       this._internalDestroy();
