@@ -9,13 +9,13 @@ const timer = createTextGui(() => data.witherShieldTimer, () => ['&6Shield: &aRE
 
 let useTime = 0;
 let cooldown = 0;
+let isCooldownPending = false;
 
 const renderReg = reg('renderOverlay', () => {
   let str = '&aREADY';
   if (cooldown > 0) {
     const ticksRemaining = useTime + cooldown - customRegs.serverTick.tick - getPartialServerTick();
-    if (ticksRemaining < 0) cooldown = 0;
-    else str = `${colorForNumber(ticksRemaining, cooldown)}${(ticksRemaining / 20).toFixed(2)}s`;
+    str = `${colorForNumber(ticksRemaining, cooldown)}${(Math.max(ticksRemaining, 0) / 20).toFixed(2)}s`;
   }
 
   timer.setLine('&6Shield: ' + str);
@@ -40,8 +40,20 @@ const rcReg = reg('playerInteract', () => {
 
   useTime = customRegs.serverTick.tick;
   cooldown = type === 2 ? 100 : 200;
+  isCooldownPending = true;
 });
-const unloadReg = reg('worldUnload', () => cooldown = 0);
+const soundReg = reg('packetReceived', pack => {
+  const name = pack.func_149212_c();
+  if (isCooldownPending && name === 'random.explode' && pack.func_149208_g() === 1 && pack.func_149209_h() === 1) {
+    isCooldownPending = false;
+    useTime = customRegs.serverTick.tick;
+  }
+  if (name === 'random.levelup' && pack.func_149208_g() === 1 && pack.func_149209_h() === 3) cooldown = 0;
+}).setFilteredClass(net.minecraft.network.play.server.S29PacketSoundEffect);
+const unloadReg = reg('worldUnload', () => {
+  cooldown = 0;
+  isCooldownPending = false;
+});
 
 export function init() {
   settings._moveWitherShieldTimer.onAction(() => timer.edit());
@@ -49,10 +61,12 @@ export function init() {
 export function load() {
   renderReg.register();
   rcReg.register();
+  soundReg.register();
   unloadReg.register();
 }
 export function unload() {
   renderReg.unregister();
   rcReg.unregister();
+  soundReg.unregister();
   unloadReg.unregister();
 }
