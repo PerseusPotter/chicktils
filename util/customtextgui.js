@@ -337,7 +337,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     return this;
   };
   obj.getVisibleWidth = function() {
-    return MC_FONT_SIZE / FONT_RENDER_SIZE.get() * lineVW * this.getLoc().s;
+    return MC_FONT_SIZE / FONT_RENDER_SIZE.get() * (lineVW + (cb ? FONT_RENDER_SIZE.get() * 0.1 : 0)) * this.getLoc().s;
   };
   obj.getWidth = function() {
     return MC_FONT_SIZE / FONT_RENDER_SIZE.get() * lineW * this.getLoc().s;

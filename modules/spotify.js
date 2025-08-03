@@ -40,9 +40,9 @@ const spotifyGui = createTextGui(() => data.spotifyDisplayLoc, () => [spotifyPre
 unrun(() => updatePrefix());
 spotifyGui.on('editRender', () => {
   updatePrefix();
-  const loc = spotifyGui.getTrueLoc();
+  const loc = editDisplay.getTrueLoc();
   songMarquee.setText(formatSong('Rick Astley - Never Gonna Give You Up'));
-  songMarquee.render(loc.x + editDisplay.getVisibleWidth() + 4, loc.y, loc.s, spotifyGui.getLoc().b);
+  songMarquee.render(loc.x + editDisplay.getVisibleWidth() + 4, loc.y, loc.s, editDisplay.getLoc().b);
 });
 const songMarquee = new Marquee('Rick Astley - Never Gonna Give You Up', 0.05);
 songMarquee.setMaxLen(settings.spotifyMaxSongLength);
