@@ -1,15 +1,12 @@
 import createTextGui from './customtextgui';
-import { compareFloat } from './math';
 
 export default class Marquee {
   text = '';
-  pos = 0;
-  frozenTime = 0;
   maxLen = 0;
-  lastRender = 0;
-  scrollSpeed = 0.1;
-  isEnd = false;
+  scrollSpeed = 20;
   freezeTime = 1500;
+  alternate = false;
+  startTime = 0;
   px = 0;
   py = 0;
   ps = 1;
@@ -18,16 +15,13 @@ export default class Marquee {
 
   /**
    * @param {string} text
-   * @param {number?} scrollSpeed (0.1) pixels per ms
    */
-  constructor(text, scrollSpeed) {
+  constructor(text) {
     this.setText(text);
-    if (scrollSpeed) this.scrollSpeed = scrollSpeed;
   }
+
   reset() {
-    this.pos = 0;
-    this.frozenTime = this.freezeTime;
-    this.isEnd = false;
+    this.startTime = Date.now();
   }
   /**
    * @param {string} text
@@ -42,7 +36,33 @@ export default class Marquee {
    * @param {number} maxLen
    */
   setMaxLen(maxLen) {
+    if (maxLen === this.maxLen) return;
     this.maxLen = maxLen;
+    this.reset();
+  }
+  /**
+   * @param {number} scrollSpeed
+   */
+  setScrollSpeed(scrollSpeed) {
+    if (scrollSpeed === this.scrollSpeed) return;
+    this.scrollSpeed = scrollSpeed;
+    this.reset();
+  }
+  /**
+   * @param {number} freezeTime
+   */
+  setFreezeTime(freezeTime) {
+    if (freezeTime === this.freezeTime) return;
+    this.freezeTime = freezeTime;
+    this.reset();
+  }
+  /**
+   * @param {number} alternate
+   */
+  setAlternate(alternate) {
+    if (alternate === this.alternate) return;
+    this.alternate = alternate;
+    this.reset();
   }
   /**
    * @param {number} x
@@ -66,32 +86,19 @@ export default class Marquee {
         20 * scale * ss
       );
 
-      const d = Date.now();
-      let dt = d - this.lastRender;
-      this.lastRender = d;
-      if (dt > this.freezeTime * 2) this.reset();
-      else {
-        let a = Math.min(dt, this.frozenTime);
-        dt -= a;
-        this.frozenTime -= a;
-        if (this.frozenTime === 0 && this.isEnd) {
-          this.reset();
-          a = Math.min(dt, this.frozenTime);
-          dt -= a;
-          this.frozenTime -= a;
-        }
+      const scrollLength = Math.max(this.textGui.getVisibleWidth() - this.maxLen, 0);
+      const scrollTime = scrollLength * 1000 / this.scrollSpeed;
+      const cycleTime = this.freezeTime + scrollTime + this.freezeTime + (this.alternate ? scrollTime : 0);
 
-        const maxPos = Math.max(this.textGui.getVisibleWidth() - this.maxLen, 0);
-        a = Math.min(dt, (maxPos - this.pos) / this.scrollSpeed);
-        dt -= a;
-        this.pos += a * this.scrollSpeed;
+      const time = Date.now() - this.startTime;
+      const cycleOffset = time % cycleTime;
 
-        const oIsEnd = this.isEnd;
-        this.isEnd = compareFloat(this.pos, maxPos) >= 0;
-        if (this.isEnd && !oIsEnd) this.frozenTime = this.freezeTime;
-      }
+      const pos = cycleOffset < this.freezeTime ? 0 :
+        cycleOffset < this.freezeTime + scrollTime ? (cycleOffset - this.freezeTime) / scrollTime :
+          cycleOffset < this.freezeTime + scrollTime + this.freezeTime ? 1 :
+            1 - (cycleOffset - this.freezeTime - scrollTime - this.freezeTime) / scrollTime;
 
-      this.px -= this.pos;
+      this.px -= scrollLength * pos;
       this.textGui.render();
 
       GL11.glDisable(GL11.GL_SCISSOR_TEST);
