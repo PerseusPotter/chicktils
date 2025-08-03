@@ -231,6 +231,7 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     lines.forEach((v, i) => {
+      if (!v.a) return;
       const y = i * fSize + ascent;
       let x = 0;
       if (cc === 1) x = lineVW - v.vw;
