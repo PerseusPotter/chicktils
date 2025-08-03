@@ -782,6 +782,13 @@ export class Builder {
   }
 
   /**
+   * @returns {Builder<{ [x in keyof P]: P[x] }}
+   */
+  collapse() {
+    return this;
+  }
+
+  /**
    * @param {string} page
    * @returns {Builder<{ [x in keyof P]: P[x] }}
    */
