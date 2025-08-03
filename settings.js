@@ -222,7 +222,7 @@ const builder = new Builder('ChickTils', 'settings.json')
 
   .addToggle('dungeonStormClearLaser', 'DungeonStormClearLaserChecker', false, { desc: 'warn when someone is using laser in storm clear', shouldShow: p => addDependency(p.enabledungeon), isNewSection: true })
 
-  .addToggle('dungeonHideSoulweaverSkulls', 'DungeonHideSoulweaverSkulls', true, {})
+  .addToggle('dungeonHideSoulweaverSkulls', 'DungeonHideSoulweaverSkulls', true, { shouldShow: p => addDependency(p.enabledungeon) })
 
   .addPage('Stat Gui')
   .addToggle('enablestatgui', 'EnableStatGUI', false, { desc: 'render stats from tab onto hud' })
@@ -646,7 +646,9 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addAction('moveDarkMonolithDropsTracker', 'MoveDarkMonolithDropsTracker', null, { shouldShow: p => addDependency(p.darkMonolithTrackDrops) })
   .addAction('resetDarkMonolithDropsTracker', 'ResetDarkMonolithDropsTracker', null, { shouldShow: p => addDependency(p.darkMonolithTrackDrops) })
 
-  .addToggle('enablevoidgloomarmorstandfix', 'EnableVoidgloomArmorStandFix', true, { desc: 'fixes hypixel not deleting armor stands' });
+  .addToggle('enablevoidgloomarmorstandfix', 'EnableVoidgloomArmorStandFix', true, { desc: 'fixes hypixel not deleting armor stands' })
+
+  .collapse();
 
 const settings = builder.build();
 export default settings;
