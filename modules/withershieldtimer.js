@@ -15,14 +15,20 @@ const renderReg = reg('renderOverlay', () => {
   let str = '&aREADY';
   if (cooldown > 0) {
     const ticksRemaining = useTime + cooldown - customRegs.serverTick.tick - getPartialServerTick();
-    str = `${colorForNumber(ticksRemaining, cooldown)}${(Math.max(ticksRemaining, 0) / 20).toFixed(2)}s`;
+    if (ticksRemaining < 0 && isCooldownPending) {
+      cooldown = 0;
+      isCooldownPending = false;
+    } else str = `${colorForNumber(ticksRemaining, cooldown)}${(Math.max(ticksRemaining, 0) / 20).toFixed(2)}s`;
   }
 
   timer.setLine('&6Shield: ' + str);
   timer.render();
 });
 const isWitherShield = new (Java.type('java.util.WeakHashMap'))();
-const rcReg = reg('playerInteract', () => {
+const PlayerInteractAction = Java.type('com.chattriggers.ctjs.minecraft.listeners.ClientListener').PlayerInteractAction;
+const MCBlockPos = Java.type('net.minecraft.util.BlockPos');
+const BlockRegistry = Java.type('com.perseuspotter.chicktilshelper.BlockRegistry');
+const rcReg = reg('playerInteract', (action, pos) => {
   if (cooldown > 0) return;
 
   const item = Player.getHeldItem();
@@ -38,6 +44,11 @@ const rcReg = reg('playerInteract', () => {
   });
   if (!type) return;
 
+  if (action.equals(PlayerInteractAction.RIGHT_CLICK_BLOCK)) {
+    const block = World.getWorld().func_180495_p(new MCBlockPos(pos.x, pos.y, pos.z)).func_177230_c();
+    if (BlockRegistry.isInteractable(block)) return;
+  }
+
   useTime = customRegs.serverTick.tick;
   cooldown = type === 2 ? 100 : 200;
   isCooldownPending = true;
@@ -48,7 +59,10 @@ const soundReg = reg('packetReceived', pack => {
     isCooldownPending = false;
     useTime = customRegs.serverTick.tick;
   }
-  if (name === 'random.levelup' && pack.func_149208_g() === 1 && pack.func_149209_h() === 3) cooldown = 0;
+  if (name === 'random.levelup' && pack.func_149208_g() === 1 && pack.func_149209_h() === 3) {
+    cooldown = 0;
+    isCooldownPending = false;
+  }
 }).setFilteredClass(net.minecraft.network.play.server.S29PacketSoundEffect);
 const unloadReg = reg('worldUnload', () => {
   cooldown = 0;
