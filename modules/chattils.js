@@ -27,7 +27,7 @@ const worldRenderReg = reg('renderWorld', () => {
       if (settings.chatTilsWaypointType === 'Box') renderWaypoint(v.x, v.y, v.z, 1, 1, settings.chatTilsWaypointColor, true, false);
       else renderBoxOutline(settings.chatTilsWaypointColor, v.x, v.y, v.z, 1, 1, { phase: true, centered: false });
     }
-    if (settings.chatTilsWaypointBeacon) renderBeacon(settings.chatTilsWaypointColor, v.x, v.y + 1, v.z, { phase: true, centered: false });
+    if (settings.chatTilsWaypointBeacon) renderBeacon(settings.chatTilsWaypointColor, v.x, v.y + 1, v.z, { phase: true, centered: false, increase: true });
     if (settings.chatTilsWaypointName) renderBillboardString(0xFFFFFFFF, v.n, v.x + 0.5, v.y + 1.5, v.z + 0.5, { increase: true, phase: true });
   });
 });
