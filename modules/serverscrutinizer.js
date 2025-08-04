@@ -178,6 +178,7 @@ const rendOvTps = reg('renderOverlay', () => {
 
 const lastTickDisplay = createTextGui(() => data.serverScrutinizerLastPacketDisplay, () => ['zzz for &469.42s']);
 const rendOvLTD = reg('renderOverlay', () => {
+  if (Server.getIP() === 'localhost') return;
   const t = Date.now() - lastTickTime;
   if (t < settings.serverScrutinizerLastTickThreshold) return;
   lastTickDisplay.setLine(`zzz for ${colorForNumber(2000 - t, 2000)}${(t / 1000).toFixed(2)}s`);
