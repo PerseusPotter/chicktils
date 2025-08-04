@@ -15,7 +15,7 @@ const renderReg = reg('renderOverlay', () => {
   let str = '&aREADY';
   if (cooldown > 0) {
     const ticksRemaining = useTime + cooldown - customRegs.serverTick.tick - getPartialServerTick();
-    if (ticksRemaining < 0 && isCooldownPending) {
+    if (ticksRemaining < 0 && (isCooldownPending || ticksRemaining < -20)) {
       cooldown = 0;
       isCooldownPending = false;
     } else str = `${colorForNumber(ticksRemaining, cooldown)}${(Math.max(ticksRemaining, 0) / 20).toFixed(2)}s`;
@@ -29,13 +29,14 @@ const PlayerInteractAction = Java.type('com.chattriggers.ctjs.minecraft.listener
 const MCBlockPos = Java.type('net.minecraft.util.BlockPos');
 const BlockRegistry = Java.type('com.perseuspotter.chicktilshelper.BlockRegistry');
 const rcReg = reg('playerInteract', (action, pos) => {
-  if (cooldown > 0) return;
+  if (cooldown > 0 && customRegs.serverTick.tick < cooldown + useTime) return;
 
   const item = Player.getHeldItem();
   if (!item) return;
 
   const type = isWitherShield.computeIfAbsent(item.itemStack, v => {
     const scrolls = v.func_77978_p()?.func_74775_l('ExtraAttributes')?.func_150295_c('ability_scroll', 8);
+    if (!scrolls) return 0;
     const count = scrolls.func_74745_c();
     for (let i = 0; i < count; i++) {
       if (scrolls.func_150307_f(0) === 'WITHER_SHIELD_SCROLL') return count === 3 ? 2 : 1;
