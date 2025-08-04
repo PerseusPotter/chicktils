@@ -3,6 +3,7 @@ import { log } from '../../util/log';
 import { JavaTypeOrNull } from '../../util/polyfill';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
+import { stateIsInBoss } from '../dungeon';
 
 const ScoreCalculation = JavaTypeOrNull('gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation')?.INSTANCE;
 let princeKilled = false;
@@ -51,7 +52,7 @@ const scoreUpdateReg = reg('packetReceived', pack => {
 
     if (diff !== 0) log(`&4Discrepancy of ${diff} between actual and estimated scores`);
   });
-}).setFilteredClass(net.minecraft.network.play.server.S3EPacketTeams).setEnabled(new StateProp(ScoreCalculation).and(settings._dungeonGuessMimic));
+}).setFilteredClass(net.minecraft.network.play.server.S3EPacketTeams).setEnabled(new StateProp(stateIsInBoss).not().and(ScoreCalculation).and(settings._dungeonGuessMimic));
 
 export function start() {
   princeKilled = false;
