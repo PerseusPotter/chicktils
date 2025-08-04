@@ -30,7 +30,7 @@ export function init() {
 }
 export function enter() {
   stateInGoldor.set(false);
-  ticksInvul = 90;
+  ticksInvul = 99;
 }
 export function start() {
   renderReg.register();
