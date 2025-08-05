@@ -673,6 +673,159 @@
           "desc": "diana"
         }
       ]
+    },
+    {
+      "version": "0.12.0",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "hidehealerpowerups"
+        },
+        {
+          "type": "change",
+          "desc": "diana stuff i forgot"
+        },
+        {
+          "type": "feat",
+          "desc": "storm term laser warning"
+        },
+        {
+          "type": "fix",
+          "desc": "server ticks now start sending instantly"
+        },
+        {
+          "type": "misc",
+          "desc": "reopen settings gui after editing text position"
+        },
+        {
+          "type": "feat",
+          "desc": "toggling settings will now hide dependents"
+        },
+        {
+          "type": "fix",
+          "desc": "spacing issue with chatting (issue on their end) :("
+        },
+        {
+          "type": "fix",
+          "desc": "pearlpath on snow layers"
+        },
+        {
+          "type": "fix",
+          "desc": "dungeon now reactivates when reconnecting"
+        },
+        {
+          "type": "feat",
+          "desc": "entityreducer to cull useless entities"
+        },
+        {
+          "type": "fix",
+          "desc": "parsing names in sacktils"
+        },
+        {
+          "type": "misc",
+          "desc": "update sack list"
+        },
+        {
+          "type": "fix",
+          "desc": "chattils waypoint not capitalizing name in chat message"
+        },
+        {
+          "type": "misc",
+          "desc": "more melody messages!"
+        },
+        {
+          "type": "feat",
+          "desc": "hide soulweaver gloves skulls"
+        },
+        {
+          "type": "misc",
+          "desc": "update sba enchant list"
+        },
+        {
+          "type": "misc",
+          "desc": "move kuudra skypearl timer"
+        },
+        {
+          "type": "misc",
+          "desc": "change backend rendering"
+        },
+        {
+          "type": "feat",
+          "desc": "kuudra simplify pickup title"
+        },
+        {
+          "type": "misc",
+          "desc": "settings/data will create backup if fail to parse"
+        },
+        {
+          "type": "misc",
+          "desc": "improve text rendering performance"
+        },
+        {
+          "type": "change",
+          "desc": "remove party leader req from echat forwarding"
+        },
+        {
+          "type": "feat",
+          "desc": "delete undeleted entities from voidgloom laser"
+        },
+        {
+          "type": "fix",
+          "desc": "duplicate buttons in simon says when prematurely clicking sea lanterns"
+        },
+        {
+          "type": "fix",
+          "desc": "z-fighting in pearlpath"
+        },
+        {
+          "type": "misc",
+          "desc": "update warp list"
+        },
+        {
+          "type": "feat",
+          "desc": "skypearl for build -> p4 dps"
+        },
+        {
+          "type": "misc",
+          "desc": "do not box ghost mobs (dungeons)"
+        },
+        {
+          "type": "feat",
+          "desc": "guess state of prince/mimic/paul from scoreboard"
+        },
+        {
+          "type": "change",
+          "desc": "expand trigger boxes of simon says/arrow align"
+        },
+        {
+          "type": "change",
+          "desc": "goldor frenzy timer shows time until first tick"
+        },
+        {
+          "type": "misc",
+          "desc": "update etherwarp calculator and move to jar"
+        },
+        {
+          "type": "fix",
+          "desc": "own flux detection"
+        },
+        {
+          "type": "change",
+          "desc": "remove fps limiter from serverscrutinizers"
+        },
+        {
+          "type": "feat",
+          "desc": "more options in spotify display"
+        },
+        {
+          "type": "feat",
+          "desc": "lag-proof wither shield timer"
+        },
+        {
+          "type": "fix",
+          "desc": "dont complain about no packets in singleplayer (lastpacket)"
+        }
+      ]
     }
   ]
 }
