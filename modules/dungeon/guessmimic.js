@@ -3,7 +3,7 @@ import { log } from '../../util/log';
 import { JavaTypeOrNull } from '../../util/polyfill';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
-import { stateIsInBoss } from '../dungeon';
+import { stateIsInBoss } from '../dungeon.js';
 
 const ScoreCalculation = JavaTypeOrNull('gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation')?.INSTANCE;
 let princeKilled = false;
