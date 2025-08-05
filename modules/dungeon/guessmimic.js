@@ -16,7 +16,7 @@ const scoreUpdateReg = reg('packetReceived', pack => {
   if (!pack.func_149311_e().startsWith('Cleared:')) return;
 
   // '§8(18)'
-  const score = parseInt(pack.func_149309_f().slice(3, -1)) + 28;
+  const score = parseInt(pack.func_149309_f().slice(3, -1)) + (stateIsInBoss.get() ? 0 : 28);
   if (score < 280) return;
 
   // hopefully so that tablist updates
@@ -57,7 +57,7 @@ const scoreUpdateReg = reg('packetReceived', pack => {
 
     if (diff !== 0) log(`&4Discrepancy of ${diff} between actual and estimated scores`);
   });
-}).setFilteredClass(net.minecraft.network.play.server.S3EPacketTeams).setEnabled(new StateProp(stateIsInBoss).not().and(ScoreCalculation).and(settings._dungeonGuessMimic));
+}).setFilteredClass(net.minecraft.network.play.server.S3EPacketTeams).setEnabled(new StateProp(ScoreCalculation).and(settings._dungeonGuessMimic));
 
 export function start() {
   princeKilled = false;
