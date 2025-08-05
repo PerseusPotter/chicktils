@@ -17,6 +17,7 @@ const scoreUpdateReg = reg('packetReceived', pack => {
 
   // '§8(18)'
   const score = parseInt(pack.func_149309_f().slice(3, -1)) + (stateIsInBoss.get() ? 0 : 28);
+  if (score === 0 || Number.isNaN(score)) return;
   if (score < 280) return;
 
   // hopefully so that tablist updates
