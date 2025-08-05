@@ -55,7 +55,7 @@ function onMobName(name, id) {
 function onNameChange(name, id) {
   let v;
   if (name === '§c§cBlood Key' || name === '§6§8Wither Key') v = { yO: -1, h: 1, c: 0 };
-  else if (name.startsWith('§6✯ ')) {
+  else if (name.includes('§6✯ ')) {
     const c = getBoxMobType(name);
     const h = c === 2 || c === 4 ? 3 : 2;
     id -= name.includes('Withermancer', 6) ? 3 : 1;
