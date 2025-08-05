@@ -826,6 +826,19 @@
           "desc": "dont complain about no packets in singleplayer (lastpacket)"
         }
       ]
+    },
+    {
+      "version": "0.12.1",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "box mobs not detecting starred mobs (because of mob types)"
+        },
+        {
+          "type": "misc",
+          "desc": "add gravity enchant to sba list"
+        }
+      ]
     }
   ]
 }
