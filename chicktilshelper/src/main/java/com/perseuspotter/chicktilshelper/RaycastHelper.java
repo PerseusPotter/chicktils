@@ -26,9 +26,9 @@ public class RaycastHelper {
         private double tmz;
 
         public DDA(double x, double y, double z, double dx, double dy, double dz) {
-            this.x = (int)x;
-            this.y = (int)y;
-            this.z = (int)z;
+            this.x = (int)Math.floor(x);
+            this.y = (int)Math.floor(y);
+            this.z = (int)Math.floor(z);
             mag = Math.sqrt(dx * dx + dy * dy + dz * dz);
             double dx1 = dx / mag;
             double dy1 = dy / mag;
@@ -36,12 +36,12 @@ public class RaycastHelper {
             sx = (int)Math.signum(dx1);
             sy = (int)Math.signum(dy1);
             sz = (int)Math.signum(dz1);
-            tdx = Math.abs(1.0 / dx1);
-            tdy = Math.abs(1.0 / dy1);
-            tdz = Math.abs(1.0 / dz1);
-            tmx = dx1 == 0.0 ? Double.POSITIVE_INFINITY : ((dx1 > 0.0 ? (this.x + 1.0 - x) : (x - this.x)) / Math.abs(dx1));
-            tmy = dy1 == 0.0 ? Double.POSITIVE_INFINITY : ((dy1 > 0.0 ? (this.y + 1.0 - y) : (y - this.y)) / Math.abs(dy1));
-            tmz = dz1 == 0.0 ? Double.POSITIVE_INFINITY : ((dz1 > 0.0 ? (this.z + 1.0 - z) : (z - this.z)) / Math.abs(dz1));
+            tdx = sx / dx1;
+            tdy = sy / dy1;
+            tdz = sz / dz1;
+            tmx = dx1 == 0.0 ? Double.POSITIVE_INFINITY : (this.x + (dx1 > 0.0 ? 1.0 : 0.0) - x) / dx1;
+            tmy = dy1 == 0.0 ? Double.POSITIVE_INFINITY : (this.y + (dy1 > 0.0 ? 1.0 : 0.0) - y) / dy1;
+            tmz = dz1 == 0.0 ? Double.POSITIVE_INFINITY : (this.z + (dz1 > 0.0 ? 1.0 : 0.0) - z) / dz1;
         }
 
         private double t = 0.0;
