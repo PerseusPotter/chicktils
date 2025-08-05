@@ -254,6 +254,13 @@ const ENCHANT_DICT = [
     loreName: 'Missile',
     goodLevel: 0,
     maxLevel: 5
+  },
+  {
+    type: 'Normal',
+    nbtName: 'dragon_hunter',
+    loreName: 'Gravity',
+    goodLevel: 5,
+    maxLevel: 6
   }
 ];
 
