@@ -84,10 +84,12 @@ export default class Grid {
     return this._getById(this._getId(x, z));
   }
   clear() {
+    this._lock.lock();
     if (this.locked) this.hm = new (Java.type('java.util.HashMap'))();
     else this.hm.clear();
     this.arrs = [];
     this.age = new Deque();
+    this._lock.unlock();
   }
   freeze() {
     if (this.locked) return;
