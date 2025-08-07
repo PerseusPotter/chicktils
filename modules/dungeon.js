@@ -212,6 +212,7 @@ export function init() {
     require('./dungeon/map'),
     require('./dungeon/necrondrag'),
     require('./dungeon/playsoundkey'),
+    require('./dungeon/princekilled'),
     require('./dungeon/silverfishhastetimer'),
     require('./dungeon/simonsays'),
     require('./dungeon/spiritbear'),
