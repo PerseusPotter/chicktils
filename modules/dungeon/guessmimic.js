@@ -4,9 +4,9 @@ import { JavaTypeOrNull } from '../../util/polyfill';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
 import { stateIsInBoss } from '../dungeon.js';
+import { princeKilled } from './princekilled';
 
 const ScoreCalculation = JavaTypeOrNull('gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation')?.INSTANCE;
-let princeKilled = false;
 const notifs = [false, false, false, false, false];
 
 const scoreUpdateReg = reg('packetReceived', pack => {
@@ -61,7 +61,6 @@ const scoreUpdateReg = reg('packetReceived', pack => {
 }).setFilteredClass(net.minecraft.network.play.server.S3EPacketTeams).setEnabled(new StateProp(ScoreCalculation).and(settings._dungeonGuessMimic));
 
 export function start() {
-  princeKilled = false;
   for (let i = 0; i < notifs.length; i++) notifs[i] = false;
 
   scoreUpdateReg.register();

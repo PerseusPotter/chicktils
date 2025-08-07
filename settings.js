@@ -226,6 +226,8 @@ const builder = new Builder('ChickTils', 'settings.json')
 
   .addToggle('dungeonGuessMimic', 'DungeonGuessMimic', true, { desc: 'requires skytils\nattempts to guess state of mimic + prince', shouldShow: p => addDependency(p.enabledungeon) })
 
+  .addToggle('dungeonPrinceKilledMessage', 'DungeonPrinceKilled', true, { desc: 'send message on prince death', shouldShow: p => addDependency(p.enabledungeon) })
+
   .addPage('Stat Gui')
   .addToggle('enablestatgui', 'EnableStatGUI', false, { desc: 'render stats from tab onto hud' })
   .addToggle('loc0', 'EnablePrivateIslandGUI', true, { shouldShow: p => addDependency(p.enablestatgui) })
