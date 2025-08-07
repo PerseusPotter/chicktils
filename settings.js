@@ -464,6 +464,9 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('enablewithershieldtimer', 'EnableWitherShieldTimer', true, { isNewSection: true })
   .addAction('moveWitherShieldTimer', 'MoveWitherShieldTimer', { shouldShow: p => addDependency(p.enablewithershieldtimer) })
 
+  .addToggle('enableneuitempreloadprogress', 'EnableNEUItemPreloaderProgressDisplay', false, { desc: 'progress indicator for neu preloading its items on launching game', isNewSection: true })
+  .addAction('moveNeuItemPreloadProgress', 'MoveNEUItemPreloaderProgressDisplay', { shouldShow: p => addDependency(p.enableneuitempreloadprogress) })
+
   .addPage('Avarice Addons')
   .addToggle('enableavarice', 'EnableAvariceAddons', false, { desc: 'things for avarice' })
 
