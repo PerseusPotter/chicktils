@@ -7,7 +7,6 @@ import { getAveragePing, getPing } from '../util/ping';
 import { Deque } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
-import { DelayTimer } from '../util/timers';
 
 class TickInfo {
   /** @type {Deque<number>} */
@@ -226,9 +225,8 @@ function formatPing(c, a) {
   return [];
 }
 const pingDisplay = createTextGui(() => data.serverScrutinizerPingDisplay, () => formatPing(69.42, 42.69));
-const pingLimiter = new DelayTimer(1000);
 const rendOvPing = reg('renderOverlay', () => {
-  if (pingLimiter.shouldTick()) pingDisplay.setLines(formatPing(getPing(), getAveragePing()));
+  pingDisplay.setLines(formatPing(getPing(), getAveragePing()));
   pingDisplay.render();
 }).setEnabled(settings._serverScrutinizerPingDisplay);
 
