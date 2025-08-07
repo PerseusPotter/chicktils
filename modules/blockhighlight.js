@@ -78,7 +78,16 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
   }
 
   const w = World.getWorld();
-  if (settings.blockHighlightCheckEther && etherDistance > 0 && (isConduit || Player.isSneaking())) {
+  if (
+    settings.blockHighlightCheckEther &&
+    etherDistance > 0 &&
+    (isConduit || Player.isSneaking()) &&
+    (
+      settings.blockHighlightEtherCheeto ||
+      evn.target.field_72313_a !== MovingObjectTypeBLOCK ||
+      BlockRegistry.isInert(w.func_180495_p(evn.target.func_178782_a()).func_177230_c())
+    )
+  ) {
     let result = RaycastHelper.raycast(Player.getPlayer(), Tessellator.partialTicks, 0, etherDistance);
     if (!result) {
       stateCanEther.set(false);
@@ -93,25 +102,20 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
       } else stateCanEther.set(true);
     }
 
-    if (
-      settings.blockHighlightEtherCheeto ||
-      evn.target.field_72313_a !== MovingObjectTypeBLOCK ||
-      BlockRegistry.isInert(w.func_180495_p(evn.target.func_178782_a()).func_177230_c())) {
-      if (stateCanEther.get()) tryHighlightBlock(
-        result.pos,
-        settings.blockHighlightEtherWireColor,
-        settings.blockHighlightEtherFillColor,
-        settings.blockHighlightEtherWireWidth,
-        true
-      );
-      else if (result) tryHighlightBlock(
-        result.pos,
-        settings.blockHighlightCantEtherWireColor,
-        settings.blockHighlightCantEtherFillColor,
-        settings.blockHighlightCantEtherWireWidth,
-        true
-      );
-    }
+    if (stateCanEther.get()) tryHighlightBlock(
+      result.pos,
+      settings.blockHighlightEtherWireColor,
+      settings.blockHighlightEtherFillColor,
+      settings.blockHighlightEtherWireWidth,
+      true
+    );
+    else if (result) tryHighlightBlock(
+      result.pos,
+      settings.blockHighlightCantEtherWireColor,
+      settings.blockHighlightCantEtherFillColor,
+      settings.blockHighlightCantEtherWireWidth,
+      true
+    );
   } else stateCanEther.set(true);
 
   if (evn.target.field_72313_a !== MovingObjectTypeBLOCK) return;
