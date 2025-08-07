@@ -48,6 +48,7 @@ export function setIsMain() {
  *  monolithCount: number;
  *  monolithTracker: TextLocation;
  *  witherShieldTimer: TextLocation;
+ *  neuItemPreloadDisplay: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -100,6 +101,7 @@ function verifyTextLocation(value) {
   'terracottaRespawnTimer',
   'monolithTracker',
   'witherShieldTimer',
+  'neuItemPreloadDisplay',
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v);
