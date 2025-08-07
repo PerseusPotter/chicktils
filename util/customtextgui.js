@@ -181,14 +181,24 @@ function createTextGui(getLoc, getEditText, customEditMsg = '') {
           tmpG.setFont(fonts[0]);
         }
 
-        const data = FontHelper.processString(v.s.replace(/(&|§)k/g, '').replace(/§[^0-9a-fk-or]/g, ''), cb, tmpG, fonts[0], fonts[1], fonts[2], FONT_RENDER_SIZE.get());
+        const s = v.s.replace(/(&|§)k/g, '').replace(/§[^0-9a-fk-or]/g, '');
+        if (s.replace(/(&|§)[0-9a-fk-or]/g, '').length) {
+          const data = FontHelper.processString(s, cb, tmpG, fonts[0], fonts[1], fonts[2], FONT_RENDER_SIZE.get());
 
-        v.a = data.a;
-        v.b = data.b;
-        v.o = data.o;
-        v.w = data.w;
-        v.vw = data.vw;
-        v.d = false;
+          v.a = data.a;
+          v.b = data.b;
+          v.o = data.o;
+          v.w = data.w;
+          v.vw = data.vw;
+          v.d = false;
+        } else {
+          v.a = null;
+          v.b = null;
+          v.o = [];
+          v.w = 0;
+          v.vw = 0;
+          v.d = false;
+        }
       }
 
       if (v.o.length) hasObf = true;
