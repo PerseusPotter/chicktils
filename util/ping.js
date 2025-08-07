@@ -3,8 +3,8 @@ import { getBlockPos } from './mc';
 import { Deque } from './polyfill';
 import reg from './registerer';
 
-const MAX_PING = 60_000;
-const MAX_PING_AGE = 120_000;
+const MAX_PING = 10_000;
+const MAX_PING_AGE = 30_000;
 
 /** @type {Deque<{ t: number, v: number, w: number }>} */
 const pingSamples = new Deque();
@@ -27,7 +27,7 @@ function trimSamples() {
   try {
     while (pingSamples.length > 0 && pingSamples.getFirst().t < t) {
       let sample = pingSamples.shift();
-      pingSum -= sample.v;
+      pingSum -= sample.v * sample.w;
       pingWeightSum -= sample.w;
     }
   } finally {
