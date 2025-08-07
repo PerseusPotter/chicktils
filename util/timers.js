@@ -23,6 +23,7 @@ export class FrameTimer {
     this.fps = new Deque();
   }
   shouldRender() {
+    if (Number.isNaN(this.target) || !Number.isFinite(this.target)) return true;
     const t = Date.now();
     while (this.fps.length > 0 && this.fps.getFirst() < t - 1000) this.fps.shift();
     this.fps.push(t);
