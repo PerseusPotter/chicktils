@@ -54,18 +54,22 @@ const createAlert = (function() {
      * @type {Alert}
      */
     let obj = Object.create(proto);
-    obj._display = createTextGui(() => ({ a: 0, c: 3, s: scale, x: Renderer.screen.getWidth() / 2, y: Renderer.screen.getHeight() / 2 - 30, b: true }));
-    obj._display.setLine('&c' + txt);
+    obj._display = createTextGui(() => ({ a: 0, c: 3, s: obj._scale, x: Renderer.screen.getWidth() / 2, y: Renderer.screen.getHeight() / 2 - 30, b: true }));
     obj.sound = sound;
+    obj.scale = scale;
     Object.defineProperty(obj, 'text', {
       get() {
-        return txt;
+        return this._txt;
       },
       set(v) {
-        txt = v;
-        obj._display.setLine('&c' + v);
+        this._txt = txt;
+        this._display.setLine('&c' + v);
+        this._scale = 1;
+        this._display._forceUpdate();
+        this._scale = Math.min(Renderer.screen.getWidth() * 0.7 / this._display.getWidth(), this.scale);
       }
     });
+    obj.text = txt;
     return obj;
   };
 }());
