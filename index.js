@@ -136,8 +136,8 @@ register('command', ...args => {
         }).start();
         break;
       case 'ping':
-        log('ping:', getPing());
-        log('avg ping:', getAveragePing());
+        log('ping:', getPing().toFixed(2));
+        log('avg ping:', getAveragePing().toFixed(2));
         break;
       case 'config_edit':
         World.playSound('gui.button.press', 1, 1);
