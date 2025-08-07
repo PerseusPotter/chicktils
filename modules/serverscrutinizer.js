@@ -7,6 +7,7 @@ import { getAveragePing, getPing } from '../util/ping';
 import { Deque } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
+import { FrameTimer } from '../util/timers';
 
 class TickInfo {
   /** @type {Deque<number>} */
@@ -169,9 +170,12 @@ function formatTps(curr, avg, min, max) {
   return lines;
 }
 const tpsDisplay = createTextGui(() => data.serverScrutinizerTPSDisplay, () => formatTps(20, 18.4, 11, 21));
+const tpsLimiter = new FrameTimer(settings.serverScrutinizerTPSDisplayFpsCap);
 const rendOvTps = reg('renderOverlay', () => {
-  ticks.calc();
-  tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin(), ticks.getMax()));
+  if (tpsLimiter.shouldRender()) {
+    ticks.calc();
+    tpsDisplay.setLines(formatTps(ticks.getCur(), ticks.getAvg(), ticks.getMin(), ticks.getMax()));
+  }
   tpsDisplay.render();
 }).setEnabled(settings._serverScrutinizerTPSDisplay);
 
@@ -202,9 +206,12 @@ function formatFps(curr, avg, min, max) {
   return lines;
 }
 const fpsDisplay = createTextGui(() => data.serverScrutinizerFPSDisplay, () => formatFps(217, 213.1, 180, 240));
+const fpsLimiter = new FrameTimer(settings.serverScrutinizerFPSDisplayFpsCap);
 const rendOvFps = reg('renderOverlay', () => {
-  frames.calc();
-  fpsDisplay.setLines(formatFps(frames.getCur(), frames.getAvg(), frames.getMin(), frames.getMax()));
+  if (fpsLimiter.shouldRender()) {
+    frames.calc();
+    fpsDisplay.setLines(formatFps(frames.getCur(), frames.getAvg(), frames.getMin(), frames.getMax()));
+  }
   fpsDisplay.render();
 }).setEnabled(settings._serverScrutinizerFPSDisplay);
 
@@ -225,8 +232,9 @@ function formatPing(c, a) {
   return [];
 }
 const pingDisplay = createTextGui(() => data.serverScrutinizerPingDisplay, () => formatPing(69.42, 42.69));
+const pingLimiter = new FrameTimer(settings.serverScrutinizerPingDisplayFpsCap);
 const rendOvPing = reg('renderOverlay', () => {
-  pingDisplay.setLines(formatPing(getPing(), getAveragePing()));
+  if (pingLimiter.shouldRender()) pingDisplay.setLines(formatPing(getPing(), getAveragePing()));
   pingDisplay.render();
 }).setEnabled(settings._serverScrutinizerPingDisplay);
 
@@ -251,22 +259,29 @@ function formatPps(curr, avg, min, max) {
   return lines;
 }
 const ppsDisplay = createTextGui(() => data.serverScrutinizerPPSDisplay, () => formatPps(42, 42.2, 41, 45));
+const ppsLimiter = new FrameTimer(settings.serverScrutinizerPPSDisplayFpsCap);
 const rendOvPps = reg('renderOverlay', () => {
-  packets.calc();
-  ppsDisplay.setLines(formatPps(packets.getCur(), packets.getAvg(), packets.getMin(), packets.getMax()));
+  if (ppsLimiter.shouldRender()) {
+    packets.calc();
+    ppsDisplay.setLines(formatPps(packets.getCur(), packets.getAvg(), packets.getMin(), packets.getMax()));
+  }
   ppsDisplay.render();
 }).setEnabled(settings._serverScrutinizerPPSDisplay);
 
 export function init() {
-  settings._moveTPSDisplay.onAction(v => tpsDisplay.edit(v));
-  settings._moveLastTickDisplay.onAction(v => lastTickDisplay.edit(v));
-  settings._serverScrutinizerTPSMaxAge.listen(v => ticks.maxAge = v);
+  settings._moveTPSDisplay.onAction(v => tpsDisplay.edit(v));;
+  settings._serverScrutinizerTPSDisplayFpsCap.listen(v => tpsLimiter.target = 1000 / v);
   settings._serverScrutinizerTPSDisplayCap20.listen(v => ticks.cap = v ? 20 : Number.POSITIVE_INFINITY);
+  settings._serverScrutinizerTPSMaxAge.listen(v => ticks.maxAge = v);
+  settings._moveLastTickDisplay.onAction(v => lastTickDisplay.edit(v))
   settings._moveFPSDisplay.onAction(v => fpsDisplay.edit(v));
+  settings._serverScrutinizerFPSDisplayFpsCap.listen(v => fpsLimiter.target = 1000 / v);
   settings._serverScrutinizerFPSMaxAge.listen(v => frames.maxAge = v);
   settings._movePingDisplay.onAction(v => pingDisplay.edit(v));
-  settings._serverScrutinizerPPSMaxAge.listen(v => packets.maxAge = v);
+  settings._serverScrutinizerPingDisplayFpsCap.listen(v => pingLimiter.target = 1000 / v);
   settings._movePPSDisplay.onAction(v => ppsDisplay.edit(v));
+  settings._serverScrutinizerPPSDisplayFpsCap.listen(v => ppsLimiter.target = 1000 / v);
+  settings._serverScrutinizerPPSMaxAge.listen(v => packets.maxAge = v);
 }
 export function load() {
   ticks.clear();
