@@ -43,12 +43,14 @@ const getTimeMS = (function() {
 let lastHeartbeat = 0;
 let didBeat = true;
 const awaitingBlockUpdates = new Map();
+const awaitingAckReceipts = new Map();
 
 const EnumFacing = Java.type('net.minecraft.util.EnumFacing');
 
 const C16PacketClientStatus = Java.type('net.minecraft.network.play.client.C16PacketClientStatus');
 const C07PacketPlayerDigging = Java.type('net.minecraft.network.play.client.C07PacketPlayerDigging');
 const C08PacketPlayerBlockPlacement = Java.type('net.minecraft.network.play.client.C08PacketPlayerBlockPlacement');
+const C0EPacketClickWindow = Java.type('net.minecraft.network.play.client.C0EPacketClickWindow');
 reg('packetSent', pack => {
   if (pack instanceof C16PacketClientStatus) {
     if (pack.func_149435_c() === C16PacketClientStatus.EnumState.REQUEST_STATS) {
@@ -72,10 +74,16 @@ reg('packetSent', pack => {
       awaitingBlockUpdates.set(`${pos1.x},${pos1.y},${pos1.z}`, t);
       awaitingBlockUpdates.set(`${pos2.x},${pos2.y},${pos2.z}`, t);
     }
+  } else if (pack instanceof C0EPacketClickWindow) {
+    const windowId = pack.func_149548_c();
+    const actionId = pack.func_149547_f();
+    const hash = windowId * 65536 + actionId;
+    awaitingAckReceipts.set(hash, getTimeMS());
   }
-}).setFilteredClasses([C16PacketClientStatus, C07PacketPlayerDigging, C08PacketPlayerBlockPlacement]).register();
+}).setFilteredClasses([C16PacketClientStatus, C07PacketPlayerDigging, C08PacketPlayerBlockPlacement, C0EPacketClickWindow]).register();
 const S37PacketStatistics = Java.type('net.minecraft.network.play.server.S37PacketStatistics');
 const S23PacketBlockChange = Java.type('net.minecraft.network.play.server.S23PacketBlockChange');
+const S32PacketConfirmTransaction = Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction');
 reg('packetReceived', pack => {
   if (pack instanceof S37PacketStatistics) {
     if (!didBeat && lastHeartbeat) {
@@ -89,12 +97,23 @@ reg('packetReceived', pack => {
       addSample(getTimeMS() - awaitingBlockUpdates.get(key), 1);
       awaitingBlockUpdates.delete(key);
     }
+  } else if (pack instanceof S32PacketConfirmTransaction) {
+    const windowId = pack.func_148889_c();
+    const actionId = pack.func_148890_d();
+    if (actionId > 0) {
+      const hash = windowId * 65536 + actionId;
+      if (awaitingAckReceipts.has(hash)) {
+        addSample(getTimeMS() - awaitingAckReceipts.get(hash), 10);
+        awaitingAckReceipts.delete(hash);
+      }
+    }
   }
-}).setFilteredClasses([S37PacketStatistics, S23PacketBlockChange]).register();
+}).setFilteredClasses([S37PacketStatistics, S23PacketBlockChange, S32PacketConfirmTransaction]).register();
 reg('worldUnload', () => {
   lastHeartbeat = 0;
   didBeat = true;
   awaitingBlockUpdates.clear();
+  awaitingAckReceipts.clear();
 }).register();
 reg('step', () => {
   samplesLock.lock();
