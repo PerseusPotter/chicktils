@@ -261,6 +261,13 @@ const ENCHANT_DICT = [
     loreName: 'Gravity',
     goodLevel: 5,
     maxLevel: 6
+  },
+  {
+    type: 'Normal',
+    nbtName: 'impaling',
+    loreName: 'Impaling',
+    goodLevel: 5,
+    maxLevel: 5
   }
 ];
 
