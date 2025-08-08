@@ -39,7 +39,7 @@ const rcReg = reg('playerInteract', (action, pos) => {
     if (!scrolls) return 0;
     const count = scrolls.func_74745_c();
     for (let i = 0; i < count; i++) {
-      if (scrolls.func_150307_f(0) === 'WITHER_SHIELD_SCROLL') return count === 3 ? 2 : 1;
+      if (scrolls.func_150307_f(i) === 'WITHER_SHIELD_SCROLL') return count === 3 ? 2 : 1;
     }
     return 0;
   });
