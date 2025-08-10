@@ -268,6 +268,13 @@ const ENCHANT_DICT = [
     loreName: 'Impaling',
     goodLevel: 5,
     maxLevel: 5
+  },
+  {
+    type: 'Normal',
+    nbtName: 'great_spook',
+    loreName: 'Great Spook',
+    goodLevel: 0,
+    maxLevel: 1
   }
 ];
 
