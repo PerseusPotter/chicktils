@@ -209,9 +209,9 @@ const ENCHANT_DICT = [
   {
     type: 'Normal',
     nbtName: 'arcane',
-    loreName: 'Arcane',
-    goodLevel: 4,
-    maxLevel: 5
+    loreName: 'Woodsplitter',
+    goodLevel: 5,
+    maxLevel: 6
   },
   {
     type: 'Normal',
