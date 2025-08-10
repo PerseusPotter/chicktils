@@ -21,6 +21,8 @@ function enter() {
   stateIsInBoss.set(false);
   statePlayerClass.set('Unknown');
   stateFloor.set('');
+  stateBossName.set('');
+  statePrinceKilled.set(false);
 
   dungeonStartReg.register();
   entSpawnReg.register();
@@ -53,7 +55,9 @@ const bossCbs = [];
 
 export const stateIsInBoss = new StateVar(false);
 export const statePlayerClass = new StateVar('Unknown');
+export const stateFloor = new StateVar('');
 export const stateBossName = new StateVar('');
+export const statePrinceKilled = new StateVar(false);
 let stateTrackPlayers = new StateProp(false);
 export function registerTrackPlayers(cond) {
   stateTrackPlayers = stateTrackPlayers.or(cond);
@@ -65,7 +69,6 @@ export function registerTrackHeldItem(cond) {
 export function getPlayers() {
   return players;
 }
-export const stateFloor = new StateVar('');
 export function listenBossMessages(cb) {
   bossCbs.push(cb);
 }

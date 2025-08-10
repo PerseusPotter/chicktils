@@ -1,16 +1,14 @@
 import settings from '../../settings';
 import reg from '../../util/registerer';
-
-export let princeKilled = false;
+import { StateProp } from '../../util/state';
+import { statePrinceKilled } from '../dungeon';
 
 const chatReg = reg('chat', () => {
-  if (!princeKilled && settings.dungeonPrinceKilledMessage) ChatLib.command('pc Prince Killed!');
-  princeKilled = true;
-}).setCriteria('&r&eA Prince falls. &r&a+1 Bonus Score&r');
+  if (settings.dungeonPrinceKilledMessage) ChatLib.command('pc Prince Killed!');
+  statePrinceKilled.set(true);
+}).setCriteria('&r&eA Prince falls. &r&a+1 Bonus Score&r').setEnabled(new StateProp(statePrinceKilled).not());
 
 export function start() {
-  princeKilled = false;
-
   chatReg.register();
 }
 export function reset() {

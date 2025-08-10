@@ -3,8 +3,7 @@ import { log } from '../../util/log';
 import { JavaTypeOrNull } from '../../util/polyfill';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
-import { stateIsInBoss } from '../dungeon.js';
-import { princeKilled } from './princekilled';
+import { stateIsInBoss, statePrinceKilled } from '../dungeon.js';
 
 const ScoreCalculation = JavaTypeOrNull('gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation')?.INSTANCE;
 const notifs = [false, false, false, false, false];
@@ -49,10 +48,10 @@ const scoreUpdateReg = reg('packetReceived', pack => {
       ScoreCalculation.getMimicKilled().set(true);
       diff -= 2;
     }
-    if (diff >= 1 && !princeKilled) {
+    if (diff >= 1 && !statePrinceKilled.get()) {
       if (!notifs[4]) log(`&dGuessing that a prince has been killed (score difference of ${diff})`);
       notifs[4] = true;
-      princeKilled = true;
+      statePrinceKilled.set(true);
       diff--;
     }
 
