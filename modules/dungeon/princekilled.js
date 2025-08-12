@@ -1,7 +1,7 @@
 import settings from '../../settings';
 import reg from '../../util/registerer';
 import { StateProp } from '../../util/state';
-import { statePrinceKilled } from '../dungeon';
+import { statePrinceKilled } from '../dungeon.js';
 
 const chatReg = reg('chat', () => {
   if (settings.dungeonPrinceKilledMessage) ChatLib.command('pc Prince Killed!');
