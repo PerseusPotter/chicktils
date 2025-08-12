@@ -51,10 +51,10 @@ const C16PacketClientStatus = Java.type('net.minecraft.network.play.client.C16Pa
 const C07PacketPlayerDigging = Java.type('net.minecraft.network.play.client.C07PacketPlayerDigging');
 const C08PacketPlayerBlockPlacement = Java.type('net.minecraft.network.play.client.C08PacketPlayerBlockPlacement');
 const C0EPacketClickWindow = Java.type('net.minecraft.network.play.client.C0EPacketClickWindow');
-reg('packetSent', pack => {
+reg('packetSent', (pack, evn) => {
   if (pack instanceof C16PacketClientStatus) {
     if (pack.func_149435_c() === C16PacketClientStatus.EnumState.REQUEST_STATS) {
-      if (!didBeat && lastHeartbeat && getTimeMS() < lastHeartbeat + 1000 * settings.pingRefreshDelay) cancel(pack);
+      if (!didBeat && lastHeartbeat && getTimeMS() < lastHeartbeat + 1000 * settings.pingRefreshDelay) cancel(evn);
       else lastHeartbeat = getTimeMS();
     }
   } else if (pack instanceof C07PacketPlayerDigging) {
