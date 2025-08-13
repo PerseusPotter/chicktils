@@ -21,7 +21,7 @@ const scoreUpdateReg = reg('packetReceived', pack => {
 
   // hopefully so that tablist updates
   Client.scheduleTask(2, () => {
-    const stScore = ScoreCalculation.getTotalScore().get();
+    const stScore = ScoreCalculation.getTotalScore().get() + (statePrinceKilled.get() ? 1 : 0);
 
     let diff = score - stScore;
     if (diff > 4 && !ScoreCalculation.isPaul().get()) {
