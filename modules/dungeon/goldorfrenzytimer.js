@@ -23,6 +23,7 @@ const renderReg = reg('renderOverlay', () => {
 }).setEnabled(stateGoldorTimer.and(stateInGoldor));
 const serverTickReg = reg('serverTick', () => ticksInvul = ticksInvul > 1 ? ticksInvul - 1 : 60).setEnabled(stateGoldorTimer.and(stateInGoldor));
 const goldorStartReg = reg('chat', () => stateInGoldor.set(true)).setCriteria('&r&4[BOSS] Storm&r&c: &r&cAt least my son died by your hands.&r').setEnabled(stateGoldorTimer);
+const goldorFallbackReg = reg('chat', () => ticksInvul = 60).setCriteria('&r&4[BOSS] Goldor&r&c: &r&cWho dares trespass into my domain?&r').setEnabled(stateGoldorTimer);
 const goldorEndReg = reg('chat', () => stateInGoldor.set(false)).setCriteria('&r&aThe Core entrance is opening!&r').setEnabled(stateGoldorTimer);
 
 export function init() {
@@ -36,11 +37,13 @@ export function start() {
   renderReg.register();
   serverTickReg.register();
   goldorStartReg.register();
+  goldorFallbackReg.register();
   goldorEndReg.register();
 }
 export function reset() {
   renderReg.unregister();
   serverTickReg.unregister();
   goldorStartReg.unregister();
+  goldorFallbackReg.unregister();
   goldorEndReg.unregister();
 }
