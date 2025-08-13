@@ -58,6 +58,7 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
   cancel(evn);
 
   if (evn.target.field_72313_a === MovingObjectTypeENTITY) {
+    stateCanEther.set(true);
     if (!settings.blockHighlightBoxEntity) return;
     const ent = evn.target.field_72308_g;
     renderBlockHighlight(
