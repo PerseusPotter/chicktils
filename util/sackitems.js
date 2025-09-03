@@ -66,6 +66,11 @@ export const ITEMS = [
     "id": "BLAZE_ROD"
   },
   {
+    "nameF": "Blaze Rod",
+    "nameUF": "Blaze Rod",
+    "id": "BLAZE_ROD"
+  },
+  {
     "nameF": "§9Blaze Rod Distillate",
     "nameUF": "Blaze Rod Distillate",
     "id": "BLAZE_ROD_DISTILLATE"
@@ -186,8 +191,8 @@ export const ITEMS = [
     "id": "CHUM"
   },
   {
-    "nameF": "Clay",
-    "nameUF": "Clay",
+    "nameF": "Clay Ball",
+    "nameUF": "Clay Ball",
     "id": "CLAY_BALL"
   },
   {
@@ -301,6 +306,11 @@ export const ITEMS = [
     "id": "DIGESTED_MUSHROOMS"
   },
   {
+    "nameF": "§9Emperor's Skull",
+    "nameUF": "Emperor's Skull",
+    "id": "DIVER_FRAGMENT"
+  },
+  {
     "nameF": "Sunflower",
     "nameUF": "Sunflower",
     "id": "DOUBLE_PLANT"
@@ -371,7 +381,12 @@ export const ITEMS = [
     "id": "ENCHANTED_ACACIA_LOG"
   },
   {
-    "nameF": "§aEnchanted Baked Potato",
+    "nameF": "§5Enchanted Ancient Claw",
+    "nameUF": "Enchanted Ancient Claw",
+    "id": "ENCHANTED_ANCIENT_CLAW"
+  },
+  {
+    "nameF": "§9Enchanted Baked Potato",
     "nameUF": "Enchanted Baked Potato",
     "id": "ENCHANTED_BAKED_POTATO"
   },
@@ -386,7 +401,7 @@ export const ITEMS = [
     "id": "ENCHANTED_BLAZE_POWDER"
   },
   {
-    "nameF": "§aEnchanted Blaze Rod",
+    "nameF": "§9Enchanted Blaze Rod",
     "nameUF": "Enchanted Blaze Rod",
     "id": "ENCHANTED_BLAZE_ROD"
   },
@@ -426,8 +441,13 @@ export const ITEMS = [
     "id": "ENCHANTED_CARROT"
   },
   {
-    "nameF": "§aEnchanted Clay",
-    "nameUF": "Enchanted Clay",
+    "nameF": "§aEnchanted Charcoal",
+    "nameUF": "Enchanted Charcoal",
+    "id": "ENCHANTED_CHARCOAL"
+  },
+  {
+    "nameF": "§aEnchanted Clay Ball",
+    "nameUF": "Enchanted Clay Ball",
     "id": "ENCHANTED_CLAY_BALL"
   },
   {
@@ -436,8 +456,8 @@ export const ITEMS = [
     "id": "ENCHANTED_CLAY_BLOCK"
   },
   {
-    "nameF": "§aEnchanted Clownfish",
-    "nameUF": "Enchanted Clownfish",
+    "nameF": "§aEnchanted Tropical Fish",
+    "nameUF": "Enchanted Tropical Fish",
     "id": "ENCHANTED_CLOWNFISH"
   },
   {
@@ -461,14 +481,19 @@ export const ITEMS = [
     "id": "ENCHANTED_COCOA"
   },
   {
-    "nameF": "§9Enchanted Cooked Fish",
-    "nameUF": "Enchanted Cooked Fish",
+    "nameF": "§9Enchanted Cooked Cod",
+    "nameUF": "Enchanted Cooked Cod",
     "id": "ENCHANTED_COOKED_FISH"
   },
   {
     "nameF": "§9Enchanted Cooked Mutton",
     "nameUF": "Enchanted Cooked Mutton",
     "id": "ENCHANTED_COOKED_MUTTON"
+  },
+  {
+    "nameF": "§9Enchanted Cooked Rabbit",
+    "nameUF": "Enchanted Cooked Rabbit",
+    "id": "ENCHANTED_COOKED_RABBIT"
   },
   {
     "nameF": "§9Enchanted Cooked Salmon",
@@ -566,8 +591,8 @@ export const ITEMS = [
     "id": "ENCHANTED_GLOWSTONE_DUST"
   },
   {
-    "nameF": "§aEnchanted Gold",
-    "nameUF": "Enchanted Gold",
+    "nameF": "§aEnchanted Gold Ingot",
+    "nameUF": "Enchanted Gold Ingot",
     "id": "ENCHANTED_GOLD"
   },
   {
@@ -576,13 +601,13 @@ export const ITEMS = [
     "id": "ENCHANTED_GOLD_BLOCK"
   },
   {
-    "nameF": "§aEnchanted Golden Carrot",
+    "nameF": "§9Enchanted Golden Carrot",
     "nameUF": "Enchanted Golden Carrot",
     "id": "ENCHANTED_GOLDEN_CARROT"
   },
   {
-    "nameF": "§9Enchanted Grilled Pork",
-    "nameUF": "Enchanted Grilled Pork",
+    "nameF": "§9Enchanted Cooked Porkchop",
+    "nameUF": "Enchanted Cooked Porkchop",
     "id": "ENCHANTED_GRILLED_PORK"
   },
   {
@@ -631,8 +656,8 @@ export const ITEMS = [
     "id": "ENCHANTED_INK_SACK"
   },
   {
-    "nameF": "§aEnchanted Iron",
-    "nameUF": "Enchanted Iron",
+    "nameF": "§aEnchanted Iron Ingot",
+    "nameUF": "Enchanted Iron Ingot",
     "id": "ENCHANTED_IRON"
   },
   {
@@ -651,8 +676,8 @@ export const ITEMS = [
     "id": "ENCHANTED_LAPIS_LAZULI"
   },
   {
-    "nameF": "§9Enchanted Lapis Block",
-    "nameUF": "Enchanted Lapis Block",
+    "nameF": "§9Enchanted Lapis Lazuli Block",
+    "nameUF": "Enchanted Lapis Lazuli Block",
     "id": "ENCHANTED_LAPIS_LAZULI_BLOCK"
   },
   {
@@ -671,13 +696,13 @@ export const ITEMS = [
     "id": "ENCHANTED_MANGROVE_LOG"
   },
   {
-    "nameF": "§aEnchanted Melon",
-    "nameUF": "Enchanted Melon",
+    "nameF": "§aEnchanted Melon Slice",
+    "nameUF": "Enchanted Melon Slice",
     "id": "ENCHANTED_MELON"
   },
   {
-    "nameF": "§9Enchanted Melon Block",
-    "nameUF": "Enchanted Melon Block",
+    "nameF": "§9Enchanted Melon",
+    "nameUF": "Enchanted Melon",
     "id": "ENCHANTED_MELON_BLOCK"
   },
   {
@@ -686,8 +711,8 @@ export const ITEMS = [
     "id": "ENCHANTED_MITHRIL"
   },
   {
-    "nameF": "§aEnchanted Mutton",
-    "nameUF": "Enchanted Mutton",
+    "nameF": "§aEnchanted Raw Mutton",
+    "nameUF": "Enchanted Raw Mutton",
     "id": "ENCHANTED_MUTTON"
   },
   {
@@ -741,8 +766,8 @@ export const ITEMS = [
     "id": "ENCHANTED_POPPY"
   },
   {
-    "nameF": "§aEnchanted Pork",
-    "nameUF": "Enchanted Pork",
+    "nameF": "§aEnchanted Raw Porkchop",
+    "nameUF": "Enchanted Raw Porkchop",
     "id": "ENCHANTED_PORK"
   },
   {
@@ -771,8 +796,8 @@ export const ITEMS = [
     "id": "ENCHANTED_PUMPKIN"
   },
   {
-    "nameF": "§aEnchanted Quartz",
-    "nameUF": "Enchanted Quartz",
+    "nameF": "§aEnchanted Nether Quartz",
+    "nameUF": "Enchanted Nether Quartz",
     "id": "ENCHANTED_QUARTZ"
   },
   {
@@ -806,8 +831,8 @@ export const ITEMS = [
     "id": "ENCHANTED_RAW_CHICKEN"
   },
   {
-    "nameF": "§aEnchanted Raw Fish",
-    "nameUF": "Enchanted Raw Fish",
+    "nameF": "§aEnchanted Raw Cod",
+    "nameUF": "Enchanted Raw Cod",
     "id": "ENCHANTED_RAW_FISH"
   },
   {
@@ -831,8 +856,8 @@ export const ITEMS = [
     "id": "ENCHANTED_RED_SAND_CUBE"
   },
   {
-    "nameF": "§aEnchanted Redstone",
-    "nameUF": "Enchanted Redstone",
+    "nameF": "§aEnchanted Redstone Dust",
+    "nameUF": "Enchanted Redstone Dust",
     "id": "ENCHANTED_REDSTONE"
   },
   {
@@ -986,8 +1011,8 @@ export const ITEMS = [
     "id": "ENDER_STONE"
   },
   {
-    "nameF": "§9Endstone Rose",
-    "nameUF": "Endstone Rose",
+    "nameF": "§9End Stone Rose",
+    "nameUF": "End Stone Rose",
     "id": "ENDSTONE_ROSE"
   },
   {
@@ -1621,8 +1646,13 @@ export const ITEMS = [
     "id": "MANGROVE_LOG"
   },
   {
-    "nameF": "Melon",
-    "nameUF": "Melon",
+    "nameF": "§9Match-Sticks",
+    "nameUF": "Match-Sticks",
+    "id": "MATCH_STICKS"
+  },
+  {
+    "nameF": "Melon Slice",
+    "nameUF": "Melon Slice",
     "id": "MELON"
   },
   {
@@ -1671,8 +1701,8 @@ export const ITEMS = [
     "id": "MUTATED_BLAZE_ASHES"
   },
   {
-    "nameF": "Mutton",
-    "nameUF": "Mutton",
+    "nameF": "Raw Mutton",
+    "nameUF": "Raw Mutton",
     "id": "MUTTON"
   },
   {
@@ -1931,8 +1961,8 @@ export const ITEMS = [
     "id": "RAW_CHICKEN"
   },
   {
-    "nameF": "Raw Fish",
-    "nameUF": "Raw Fish",
+    "nameF": "Raw Cod",
+    "nameUF": "Raw Cod",
     "id": "RAW_FISH"
   },
   {
@@ -1941,8 +1971,8 @@ export const ITEMS = [
     "id": "RAW_FISH-1"
   },
   {
-    "nameF": "§fClownfish",
-    "nameUF": "Clownfish",
+    "nameF": "§fTropical Fish",
+    "nameUF": "Tropical Fish",
     "id": "RAW_FISH-2"
   },
   {
@@ -2016,8 +2046,8 @@ export const ITEMS = [
     "id": "RED_ROSE-8"
   },
   {
-    "nameF": "Redstone",
-    "nameUF": "Redstone",
+    "nameF": "Redstone Dust",
+    "nameUF": "Redstone Dust",
     "id": "REDSTONE"
   },
   {
@@ -2416,9 +2446,19 @@ export const ITEMS = [
     "id": "SUPERLITE_MOTOR"
   },
   {
+    "nameF": "§9Suspicious Scrap",
+    "nameUF": "Suspicious Scrap",
+    "id": "SUSPICIOUS_SCRAP"
+  },
+  {
     "nameF": "§9Synthetic Heart",
     "nameUF": "Synthetic Heart",
     "id": "SYNTHETIC_HEART"
+  },
+  {
+    "nameF": "§5Tarantula Catalyst",
+    "nameUF": "Tarantula Catalyst",
+    "id": "TARANTULA_CATALYST"
   },
   {
     "nameF": "§aTarantula Web",
@@ -2441,8 +2481,8 @@ export const ITEMS = [
     "id": "THORN_FRAGMENT"
   },
   {
-    "nameF": "§5Thunder Shards",
-    "nameUF": "Thunder Shards",
+    "nameF": "§5Thunder Fragment",
+    "nameUF": "Thunder Fragment",
     "id": "THUNDER_SHARDS"
   },
   {
