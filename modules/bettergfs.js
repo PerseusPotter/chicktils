@@ -54,7 +54,11 @@ function fix(args, multiple = true) {
   }
   args = args.map(v => sanitizeName(v));
   const possNames = new Set();
-  names.forEach((v, k) => v.length >= args.length && args.every((a, i) => v[i].startsWith(a)) && possNames.add(k));
+  names.forEach((v, k) => {
+    for (let o = 0; o <= v.length - args.length; o++) {
+      if (args.every((a, i) => v[i + o].startsWith(a))) possNames.add(k);
+    }
+  });
   // names.forEach((v, k) => v.length >= args.length && args.every((a, i) => v[i][i === args.length - 1 ? 'startsWith' : 'includes'](a)) && possNames.add(k));
   // names.forEach((v, k) => v.length >= args.length && args.every((a, i) => v[i].includes(a)) && possNames.add(k));
   arr.push([]);
