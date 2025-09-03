@@ -41,6 +41,7 @@ const warpLocs = {
   'carnival': 2,
   'stonks': 2,
   'elizabeth': 2,
+  'taylor': 2,
   'dungeon_hub': 3,
   'dungeons': 3,
   'dhub': 3,
