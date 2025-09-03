@@ -233,7 +233,7 @@ const genImgArtReg = (function() {
       return settings.chatTilsImageArtInvert ? p >= 0 : p <= 0;
     };
 
-    for (let y = 0; y < mh; y += 4) {
+    for (let y = 0; y < mh - 4; y += 4) {
       output.push([]);
       for (let x = 0; x < w; x += 2) {
         let i = y * w + x;
