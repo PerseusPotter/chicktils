@@ -56,12 +56,12 @@ export function start() {
   startTime = nanoTime();
 }
 export function endRender(key) {
-  if (Thread.currentThread() !== $mainThread) return;
+  // if (Thread.currentThread() !== $mainThread) return;
   const t = nanoTime() - startTime;
   getOrPut($rendData, key, () => []).push(t);
 }
 export function endTick(key) {
-  if (Thread.currentThread() !== $mainThread) return;
+  // if (Thread.currentThread() !== $mainThread) return;
   const t = nanoTime() - startTime;
   getOrPut($tickData, key, () => []).push(t);
 }
