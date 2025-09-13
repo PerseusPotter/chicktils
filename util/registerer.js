@@ -29,7 +29,7 @@ export const customRegs = {};
 const createRegister = function(type, shit) {
   if (PROFILER) {
     const stack = Thread.currentThread().getStackTrace();
-    let fileName = '<unknown>';
+    let fileName;
     let lineNum = 0;
     for (let i = stack.length - 1; i >= 0; i--) {
       let fn = stack[i].getFileName();
@@ -44,9 +44,13 @@ const createRegister = function(type, shit) {
           fileName = 'util/registerer.js';
           lineNum = stack[i - 2].getLineNumber();
         }
-        else console.error('error parsing stack: ' + fn1);
+        else continue;
         break;
       }
+    }
+    if (!fileName) {
+      console.error('error parsing stack: ' + stack.map(v => v.getFileName()).join(','));
+      fileName = '<unknown>';
     }
     const typeName = typeof type === 'string' ? type : type.class.getSimpleName();
     const id = `${fileName}:${lineNum}|${typeName}`;
