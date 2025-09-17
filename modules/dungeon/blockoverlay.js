@@ -15,6 +15,9 @@ const overlayReg = reg(net.minecraftforge.client.event.RenderBlockOverlayEvent, 
 
   if (settings.dungeonBlockOverlaySize === 0) return;
 
+  glStateManager.enableBlend();
+  glStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+
   const s = 1 - settings.dungeonBlockOverlaySize;
   const atlas = Client.getMinecraft().func_175602_ab().func_175023_a().func_178122_a(evn.blockForOverlay);
   Client.getMinecraft().func_110434_K().func_110577_a(TextureMap.field_110575_b);
