@@ -148,6 +148,7 @@ const getPlayersStep2Reg = reg('step', () => {
 const sanityCheckReg = reg('step', () => {
   unrun(() => {
     World.getAllPlayers().forEach(v => {
+      if (v.isDead()) return;
       const player = players.findIndex(p => p.ign === v.getName());
       if (player > 0) {
         players[player].e = v;
