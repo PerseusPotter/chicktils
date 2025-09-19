@@ -246,6 +246,7 @@ export function init() {
         list.add('Health VIII Splash Potion');
         list.add('Health 8 Splash Potion');
         list.add('Architect\'s First Draft');
+        list.add('Candycomb');
         f.set(SecretSounds, list);
       }
     }
