@@ -9,7 +9,7 @@ const chatReg = reg('chat', () => {
   statePrinceKilled.set(true);
 }).setCriteria('&r&eA Prince falls. &r&a+1 Bonus Score&r').setEnabled(stateNoPrince);
 const partyReg = reg('chat', (ign, msg) => {
-  statePrinceKilled.set(true);
+  if (msg === 'Prince Killed!') statePrinceKilled.set(true);
 }).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(stateNoPrince);
 
 export function start() {
