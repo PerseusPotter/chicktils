@@ -1,24 +1,57 @@
 import settings from '../settings';
 import { getBlockPos } from './mc';
-import { Deque } from './polyfill';
+import { Deque, HeapSet } from './polyfill';
 import reg from './registerer';
 
 const MAX_PING = 10_000;
 const MAX_PING_AGE = 30_000;
 
-/** @type {Deque<{ t: number, v: number, w: number }>} */
+/** @typedef {{ t: number, v: number, w: number }} PingSample */
+/** @type {Deque<PingSample>} */
 const pingSamples = new Deque();
 const samplesLock = new (Java.type('java.util.concurrent.locks.ReentrantLock'))();
 let pingSum = 0;
 let pingWeightSum = 0;
+/** @type {HeapSet<PingSample>} */
+const pingMedianMin = new HeapSet((a, b) => a.v - b.v);
+/** @type {HeapSet<PingSample>} */
+const pingMedianMax = new HeapSet((a, b) => b.v - a.v);
 function addSample(ping, weight) {
   samplesLock.lock();
   try {
-    pingSamples.push({ t: getTimeMS(), v: ping, w: weight });
+    const sample = { t: getTimeMS(), v: ping, w: weight };
+    pingSamples.push(sample);
     pingSum += ping * weight;
     pingWeightSum += weight;
+
+    let median = 0;
+    const minL = pingMedianMin.size();
+    const maxL = pingMedianMax.size();
+    if (minL > maxL) median = pingMedianMin.root().v;
+    else if (maxL > minL) median = pingMedianMax.root().v;
+    else if (minL !== 0) median = (pingMedianMin.root().v + pingMedianMax.root().v) / 2;
+    else median = ping;
+
+    if (ping > median) pingMedianMin.push(sample);
+    else pingMedianMax.push(sample);
+
+    rebalanceMedian();
   } finally {
     samplesLock.unlock();
+  }
+}
+function rebalanceMedian() {
+  let minL = pingMedianMin.size();
+  let maxL = pingMedianMax.size();
+  while (minL - maxL > 1) {
+    pingMedianMax.push(pingMedianMin.pop());
+    minL--;
+    maxL++;
+  }
+  while (maxL - minL > 1) {
+    pingMedianMin.push(pingMedianMax.pop());
+    maxL--;
+    minL++;
   }
 }
 function trimSamples() {
@@ -29,7 +62,10 @@ function trimSamples() {
       let sample = pingSamples.shift();
       pingSum -= sample.v * sample.w;
       pingWeightSum -= sample.w;
+      if (!pingMedianMin.remove(sample)) pingMedianMax.remove(sample);
     }
+
+    rebalanceMedian();
   } finally {
     samplesLock.unlock();
   }
@@ -148,6 +184,20 @@ export function getAveragePing() {
   samplesLock.lock();
   try {
     ping = pingSamples.length === 0 ? 0 : pingSum / pingWeightSum;
+  } finally {
+    samplesLock.unlock();
+  }
+  return ping;
+}
+export function getMedianPing() {
+  let ping = 0;
+  samplesLock.lock();
+  try {
+    const minL = pingMedianMin.size();
+    const maxL = pingMedianMax.size();
+    if (minL > maxL) ping = pingMedianMin.root().v;
+    else if (maxL > minL) ping = pingMedianMax.root().v;
+    else if (minL !== 0) ping = (pingMedianMin.root().v + pingMedianMax.root().v) / 2;
   } finally {
     samplesLock.unlock();
   }
