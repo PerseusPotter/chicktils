@@ -3,7 +3,7 @@ import data from '../../data';
 import { getPartialServerTick } from '../../util/draw';
 import reg, { customRegs } from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
-import { getAveragePing } from '../../util/ping';
+import { getMedianPing } from '../../util/ping';
 import createTextGui from '../../util/customtextgui';
 import { dist, lerp, linReg } from '../../util/math';
 import { StateProp, StateVar } from '../../util/state';
@@ -144,16 +144,16 @@ const renderWorldReg = reg('renderWorld', () => {
       y = lerp(lastEstY, estY, smoothFactor);
       z = lerp(lastEstZ, estZ, smoothFactor);
     }
-    const m = Math.min(1, (maxTtl - ttl + getPartialServerTick() + getAveragePing() / 50) / maxTtl);
+    const m = Math.min(1, (maxTtl - ttl + getPartialServerTick() + getMedianPing() / 50) / maxTtl);
     renderBoxOutline(settings.dungeonCampWireColor, x, y + 1.5, z, 1, 2, { phase: settings.dungeonCampBoxEsp, lw: 3 });
     renderBoxFilled(settings.dungeonCampBoxColor, x, y + 2.5 - m, z, m, 2 * m, { phase: settings.dungeonCampBoxEsp });
 
-    if (settings.dungeonCampTimer) renderBillboardString(0xFFFFFFFF, ((ttl - getPartialServerTick() - getAveragePing() / 50) / 20).toFixed(2), x, y + 1, z, { phase: settings.dungeonCampBoxEsp, increase: true });
+    if (settings.dungeonCampTimer) renderBillboardString(0xFFFFFFFF, ((ttl - getPartialServerTick() - getMedianPing() / 50) / 20).toFixed(2), x, y + 1, z, { phase: settings.dungeonCampBoxEsp, increase: true });
   });
 }).setEnabled(stateCampFinal);
 const renderOverlayReg = reg('renderOverlay', () => {
   if (skipKillTime > 0) {
-    const d = (skipKillTime - getPartialServerTick() - getAveragePing() / 50) * 50;
+    const d = (skipKillTime - getPartialServerTick() - getMedianPing() / 50) * 50;
     dialogueSkipTimer.setLine(`§l${colorForNumber(d, 4000)}${(d / 1000).toFixed(2)}s`.toString());
     dialogueSkipTimer.render();
   }

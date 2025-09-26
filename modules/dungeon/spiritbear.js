@@ -3,7 +3,7 @@ import data from '../../data';
 import { getPartialServerTick } from '../../util/draw';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
-import { getAveragePing } from '../../util/ping';
+import { getMedianPing } from '../../util/ping';
 import createTextGui from '../../util/customtextgui';
 import { fastDistance, lerp, linReg } from '../../util/math';
 import { log } from '../../util/log';
@@ -104,14 +104,14 @@ const renderWorldReg = reg('renderWorld', () => {
     y = lerp(estPrev.y, est.y, smoothFactor);
     z = lerp(estPrev.z, est.z, smoothFactor);
   }
-  const m = Math.min(1, (bearSpawnTicks - ticks.get() + getPartialServerTick() + getAveragePing() / 50) / bearSpawnTicks);
+  const m = Math.min(1, (bearSpawnTicks - ticks.get() + getPartialServerTick() + getMedianPing() / 50) / bearSpawnTicks);
   renderBoxOutline(settings.dungeonSpiritBearWireColor, x, y, z, 1, 2, { phase: settings.dungeonSpiritBearBoxEsp, lw: 3 });
   renderBoxFilled(settings.dungeonSpiritBearBoxColor, x, y + 1 - m, z, m, 2 * m, { phase: settings.dungeonSpiritBearBoxEsp });
 
-  if (settings.dungeonSpiritBearTimer) renderBillboardString(0xFFFFFFFF, ((ticks.get() - getPartialServerTick() - getAveragePing() / 50) / 20).toFixed(2), x, y + 2.5, z, { phase: settings.dungeonSpiritBearBoxEsp, increase: true });
+  if (settings.dungeonSpiritBearTimer) renderBillboardString(0xFFFFFFFF, ((ticks.get() - getPartialServerTick() - getMedianPing() / 50) / 20).toFixed(2), x, y + 2.5, z, { phase: settings.dungeonSpiritBearBoxEsp, increase: true });
 }).setEnabled(stateBearSpawning);
 const renderOvlyReg = reg('renderOverlay', () => {
-  const d = (ticks.get() - getPartialServerTick() - getAveragePing() / 50) * 50;
+  const d = (ticks.get() - getPartialServerTick() - getMedianPing() / 50) * 50;
   spiritBearTimer.setLine(`§l${colorForNumber(d, bearSpawnTicks * 50)}${(d / 1000).toFixed(2)}s`.toString());
   spiritBearTimer.render();
 }).setEnabled(new StateProp(settings._dungeonSpiritBearTimerHud).and(stateBearSpawning));
