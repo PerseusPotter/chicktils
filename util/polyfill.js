@@ -1079,7 +1079,7 @@ export class HeapSet {
     this.locs.delete(root);
     this.arr[0] = this.arr[this.arr.length - 1];
     this.arr.pop();
-    this._siftDown(0);
+    if (this.arr.length > 0) this._siftDown(0);
 
     return root;
   }
@@ -1108,7 +1108,7 @@ export class HeapSet {
     if (pI >= 0) {
       if (this.compFunc(this.arr[pI], e) > 0) this._bubbleUp(i);
       else this._siftDown(i);
-    }
+    } else this.locs.set(this.arr[i], i);
 
     return true;
   }
