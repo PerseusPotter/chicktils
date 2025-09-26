@@ -5,7 +5,7 @@ import { load, unload, postInit } from './loader';
 import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
 import { centerMessage, cleanNumber } from './util/format';
-import { getPing, getAveragePing } from './util/ping';
+import { getPing, getAveragePing, getMedianPing } from './util/ping';
 import { getRegs, simulate } from './util/registerer';
 import { calcMedian } from './util/math';
 import { createIntegerProp, Property } from './settingsLib';
@@ -138,6 +138,7 @@ register('command', ...args => {
       case 'ping':
         log('ping:', getPing().toFixed(2));
         log('avg ping:', getAveragePing().toFixed(2));
+        log('median ping:', getMedianPing().toFixed(2));
         break;
       case 'config_edit':
         World.playSound('gui.button.press', 1, 1);
