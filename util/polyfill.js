@@ -957,3 +957,159 @@ export function toArrayList(arr) {
   arr.forEach(v => list.add(v));
   return list;
 }
+
+/**
+ * @template E
+ */
+export class HeapSet {
+  /** @param {(a: E, b: E) => number} compFunc */
+  constructor(compFunc) {
+    /** @type {(a: E, b: E) => number} */
+    this.compFunc = compFunc;
+    /** @type {E[]} */
+    this.arr = [];
+    /** @type {Map<E, number>} */
+    this.locs = new Map();
+  }
+
+  /** @returns {E | undefined} */
+  root() {
+    return this.arr[0];
+  }
+
+  size() {
+    return this.arr.length;
+  }
+
+  clear() {
+    this.arr = [];
+    this.locs.clear();
+  }
+
+  /**
+   * @private
+   * @param {number} pI
+   * @param {number} cI
+   * @returns {boolean}
+   */
+  _shouldSwap(pI, cI) {
+    if (pI < 0 || pI >= this.arr.length) return false;
+    if (cI < 0 || cI >= this.arr.length) return false;
+
+    return this.compFunc(this.arr[pI], this.arr[cI]) > 0;
+  }
+
+  /**
+   * @private
+   * @param {number} i
+   * @param {number} j
+   */
+  _swap(i, j) {
+    const tmp = this.arr[i];
+    this.arr[i] = this.arr[j];
+    this.arr[j] = tmp;
+  }
+
+  /**
+   * @private
+   * @param {number} pI
+   * @returns {number}
+   */
+  _getChild(pI) {
+    const lcI = (pI << 1) + 1;
+    const rcI = (pI << 1) + 2;
+
+    if (lcI >= this.arr.length) return -1;
+    if (rcI >= this.arr.length) return lcI;
+
+    return this.compFunc(this.arr[lcI], this.arr[rcI]) > 0 ? rcI : lcI;
+  }
+
+  /**
+   * @private
+   * @param {number} i
+   */
+  _bubbleUp(i) {
+    const v = this.arr[i];
+
+    let cI = i;
+    let pI = (cI - 1) >> 1;
+
+    while (this._shouldSwap(pI, cI)) {
+      this._swap(pI, cI);
+      this.locs.set(this.arr[cI], cI);
+      cI = pI;
+      pI = (cI - 1) >> 1;
+    }
+
+    this.locs.set(v, cI);
+  }
+
+  /**
+   * @private
+   * @param {number} i
+   */
+  _siftDown(i) {
+    const v = this.arr[i];
+
+    let pI = i;
+    let cI = this._getChild(pI);
+
+    while (this._shouldSwap(pI, cI)) {
+      this._swap(pI, cI);
+      this.locs.set(this.arr[pI], pI);
+      pI = cI;
+      cI = this._getChild(pI);
+    }
+
+    this.locs.set(v, pI);
+  }
+
+  /** @param {E} value */
+  push(value) {
+    this.arr.push(value);
+    this._bubbleUp(this.arr.length - 1);
+  }
+
+  /** @returns {E | undefined} */
+  pop() {
+    if (this.arr.length === 0) return;
+
+    const root = this.arr[0];
+    this.locs.delete(root);
+    this.arr[0] = this.arr[this.arr.length - 1];
+    this.arr.pop();
+    this._siftDown(0);
+
+    return root;
+  }
+
+  /**
+   * @param {E} e
+   * @returns {boolean}
+   */
+  contains(e) {
+    return this.locs.has(e);
+  }
+
+  /**
+   * @param {E} e
+   * @returns {boolean}
+   */
+  remove(e) {
+    const i = this.locs.get(e);
+    if (i === undefined) return false;
+
+    this.locs.delete(e);
+    this.arr[i] = this.arr[this.arr.length - 1];
+    this.arr.pop();
+
+    const pI = (i - 1) >> 1;
+    if (pI >= 0) {
+      if (this.compFunc(this.arr[pI], e) > 0) this._bubbleUp(i);
+      else this._siftDown(i);
+    }
+
+    return true;
+  }
+}
