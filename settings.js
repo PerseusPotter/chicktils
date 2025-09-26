@@ -415,6 +415,7 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addInteger('serverScrutinizerPingDisplayFpsCap', 'ServerScrutinizerPingDisplayFpsCap', 4, { desc: '0 for uncapped', min: 0, shouldShow: p => addDependency(p.serverScrutinizerPingDisplay) })
   .addToggle('serverScrutinizerPingDisplayCurr', 'ServerScrutinizerDisplayCurrentPing', true, { desc: 'show current ping', shouldShow: p => addDependency(p.serverScrutinizerPingDisplay) })
   .addToggle('serverScrutinizerPingDisplayAvg', 'ServerScrutinizerDisplayAveragePing', true, { desc: 'show average ping', shouldShow: p => addDependency(p.serverScrutinizerPingDisplay) })
+  .addToggle('serverScrutinizerPingDisplayMedian', 'ServerScrutinizerDisplayMedianPing', true, { desc: 'show median ping', shouldShow: p => addDependency(p.serverScrutinizerPingDisplay) })
 
   .addToggle('serverScrutinizerPPSDisplay', 'ServerScrutinizerPPSDisplay', false, { desc: 'tracks PPS (packets [send] per second)', shouldShow: p => addDependency(p.enableserverscrutinizer), isNewSection: true })
   .addAction('movePPSDisplay', 'MovePPSDisplay', null, { shouldShow: p => addDependency(p.serverScrutinizerPPSDisplay) })

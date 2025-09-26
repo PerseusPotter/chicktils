@@ -3,7 +3,7 @@ import settings from '../settings';
 import createTextGui from '../util/customtextgui';
 import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
-import { getAveragePing, getPing } from '../util/ping';
+import { getAveragePing, getMedianPing, getPing } from '../util/ping';
 import { Deque } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp } from '../util/state';
@@ -222,19 +222,22 @@ function formatPingN(n) {
   if (n < 200) return `&6${n.toFixed(2)} &7ms`;
   return `&c${n.toFixed(2)} &7ms`;
 }
-function formatPing(c, a) {
-  if (settings.serverScrutinizerPingDisplayCurr && settings.serverScrutinizerPingDisplayAvg) return [
-    'Current Ping: ' + formatPingN(c),
-    'Average Ping: ' + formatPingN(a)
-  ];
-  if (settings.serverScrutinizerPingDisplayCurr) return ['Ping: ' + formatPingN(c)];
-  if (settings.serverScrutinizerPingDisplayAvg) return ['Ping: ' + formatPingN(a)];
-  return [];
+function formatPing(c, a, m) {
+  if (settings.serverScrutinizerPingDisplayCurr + settings.serverScrutinizerPingDisplayAvg + settings.serverScrutinizerPingDisplayMedian === 1) {
+    if (settings.serverScrutinizerPingDisplayCurr) return ['Ping: ' + formatPingN(c)];
+    if (settings.serverScrutinizerPingDisplayAvg) return ['Ping: ' + formatPingN(a)];
+    if (settings.serverScrutinizerPingDisplayMedian) return ['Ping: ' + formatPingN(m)];
+  }
+  const lines = [];
+  if (settings.serverScrutinizerPingDisplayCurr) lines.push('Current Ping: ' + formatPingN(c));
+  if (settings.serverScrutinizerPingDisplayAvg) lines.push('Average Ping: ' + formatPingN(a));
+  if (settings.serverScrutinizerPingDisplayMedian) lines.push('Median Ping: ' + formatPingN(m));
+  return lines;
 }
 const pingDisplay = createTextGui(() => data.serverScrutinizerPingDisplay, () => formatPing(69.42, 42.69));
 const pingLimiter = new FrameTimer(settings.serverScrutinizerPingDisplayFpsCap);
 const rendOvPing = reg('renderOverlay', () => {
-  if (pingLimiter.shouldRender()) pingDisplay.setLines(formatPing(getPing(), getAveragePing()));
+  if (pingLimiter.shouldRender()) pingDisplay.setLines(formatPing(getPing(), getAveragePing(), getMedianPing()));
   pingDisplay.render();
 }).setEnabled(settings._serverScrutinizerPingDisplay);
 
