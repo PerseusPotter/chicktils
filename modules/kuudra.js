@@ -103,7 +103,7 @@ const renderReg = reg('renderWorld', () => {
   if (settings.kuudraBoxKuudra && kuuder) renderBoxOutlineMiter(settings.kuudraBoxKuudraColor, kuuder.getX(), kuuder.getY(), kuuder.getZ(), 15, 15, 2, { phase: settings.kuudraBoxKuudraEsp, increase: true });
 }).setEnabled(new StateProp(settings._kuudraRenderPearlTarget).or(settings._kuudraRenderEmptySupplySpot).or(settings._kuudraBoxSupplies).or(settings._kuudraBoxChunks).or(settings._kuudraShowCannonAim).or(settings._kuudraBoxKuudra));
 
-const PearlHelper = Java.type('com.perseuspotter.chicktilshelper.PearlHelper');
+const ProjectileHelper = Java.type('com.perseuspotter.chicktilshelper.ProjectileHelper');
 const tickReg = reg('tick', () => {
   if (dropLocs.length === 0 && !(isBuild && settings.kuudraRenderPearlTargetDps)) return;
   const yaw = Player.getRawYaw() / 180 * Math.PI;
@@ -111,8 +111,8 @@ const tickReg = reg('tick', () => {
   const py = Player.getY() + getEyeHeight() - 0.1;
   const pz = Player.getZ() - Math.sin(yaw) * 0.16;
   run(() => {
-    pearlLocs = dropLocs.map(({ x, y, z }) => PearlHelper.solve(x - px, y - py, z - pz, 0.01)).filter(v => !Number.isNaN(v.phi));
-    if (isBuild) dpsPrePearl = PearlHelper.solve(-111.5 - px, 79 - py, -70.5 - pz, 0.01);
+    pearlLocs = dropLocs.map(({ x, y, z }) => ProjectileHelper.solve(x - px, y - py, z - pz, 0.01, -0.03, 1.5, 0.99, true)).filter(v => !Number.isNaN(v.phi));
+    if (isBuild) dpsPrePearl = ProjectileHelper.solve(-111.5 - px, 79 - py, -70.5 - pz, 0.01, -0.03, 1.5, 0.99, true);
   });
 }).setEnabled(settings._kuudraRenderPearlTarget);
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
