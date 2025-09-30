@@ -718,24 +718,32 @@ export class Settings {
   }
 
   /**
+   * @param {Property} prop
+   * @param {string} val
+   */
+  updateProp(prop, val) {
+    if (prop.type === Property.Type.Action) prop.actionListeners.forEach(v => v(false));
+    else {
+      const old = prop.toString();
+      if (val) prop.set(prop.parse(val));
+      else prop.set(prop.defaultValue);
+      this.save();
+      logMessage(new Message(
+        `Set ${prop.name} to ${prop.toString()} `,
+        new TextComponent('&7[REVERT]').setClick('run_command', `/${this.module} config_ edit ${prop.name} ${old}`)
+      ));
+      this.refresh();
+    }
+  }
+
+  /**
    * @param {string} prop
    * @param {string} val
    */
   update(prop, val) {
     const p = this.props.find(v => v.name.toLowerCase() === prop.toLowerCase());
     if (!p) throw 'Invalid Property: ' + prop;
-    if (p.type === Property.Type.Action) p.actionListeners.forEach(v => v(false));
-    else {
-      const old = p.toString();
-      if (val) p.set(p.parse(val));
-      else p.set(p.defaultValue);
-      this.save();
-      logMessage(new Message(
-        `Set ${p.name} to ${p.toString()} `,
-        new TextComponent('&7[REVERT]').setClick('run_command', `/${this.module} config_ edit ${p.name} ${old}`)
-      ));
-      this.refresh();
-    }
+    this.updateProp(p, val);
   }
 
   triggerAll() {
