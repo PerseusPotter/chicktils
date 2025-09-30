@@ -188,6 +188,19 @@ const bossMessageReg = reg('chat', (name, msg) => {
 }).setCriteria(/^&r&(?:c|4)\[BOSS\] (.+?)&r&(?:f|c): (?:&.)*(.+?)&r$/);
 // const dungeonEndReg = reg('chat', () => dungeon.emit('dungeonEnd')).setChatCriteria('&r&f                            &r&fTeam Score:').setParameter('START');
 
+const testFloorReg = reg('command', f => {
+  enter();
+  if (f) Client.scheduleTask(100, () => {
+    start();
+    stateFloor.set(f);
+  });
+}).setName('chicktilstestfloor');
+
+const testEnterBossReg = reg('command', name => {
+  stateIsInBoss.set(true);
+  stateBossName.set(name ?? '');
+}).setName('chicktilstestenterboss');
+
 export function init() {
   modules = [
     require('./dungeon/arrowalign'),
@@ -261,7 +274,12 @@ export function init() {
     else if (o === 'Catacombs') reset();
   });
 }
-export function load() { }
+export function load() {
+  testFloorReg.register();
+  testEnterBossReg.register();
+}
 export function unload() {
   reset();
+  testFloorReg.unregister();
+  testEnterBossReg.unregister();
 }
