@@ -7,6 +7,7 @@ import { unrun } from '../util/threading';
 import settings from '../settings';
 
 function reset() {
+  if (!settings.enabledungeon) return;
   dungeonStartReg.unregister();
   bossMessageReg.unregister();
   entSpawnReg.unregister();
@@ -17,6 +18,7 @@ function reset() {
   modules.forEach(v => v?.reset());
 }
 function enter() {
+  if (!settings.enabledungeon) return;
   players = [];
   stateIsInBoss.set(false);
   statePlayerClass.set('Unknown');
