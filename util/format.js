@@ -79,15 +79,6 @@ export function centerMessage(msg) {
   return ' '.repeat(getCenteredTextLen(msg)) + msg;
 }
 
-
-/**
- * @param {string} cmd
- */
-export function execCmd(cmd) {
-  log('&2Executing command: &7/' + cmd);
-  ChatLib.command(cmd);
-}
-
 /**
  * @param {string} name
  */

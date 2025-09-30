@@ -2,8 +2,8 @@ import { drawArrow2D, getPartialServerTick, renderWaypoint } from '../util/draw'
 import settings from '../settings';
 import data from '../data';
 import createTextGui from '../util/customtextgui';
-import { colorForNumber, execCmd } from '../util/format';
-import reg, { customRegs } from '../util/registerer';
+import { colorForNumber } from '../util/format';
+import reg, { customRegs, execCmd } from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
 import { createBossBar, getEyeHeight, setBossBar } from '../util/mc';
 import { countItems } from '../util/skyblock';

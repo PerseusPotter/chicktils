@@ -1,7 +1,6 @@
 import settings from '../../settings';
 import createAlert from '../../util/alert';
-import reg from '../../util/registerer';
-import { execCmd } from '../../util/format';
+import reg, { execCmd } from '../../util/registerer';
 import { StateProp } from '../../util/state';
 import { stateIsInBoss } from '../dungeon.js';
 

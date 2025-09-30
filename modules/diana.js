@@ -1,11 +1,10 @@
 import settings from '../settings';
 import data from '../data';
-import reg, { customRegs } from '../util/registerer';
+import reg, { customRegs, execCmd } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
 import { drawArrow3DPos } from '../util/draw';
 import { compareFloat, convergeHalfInterval, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, rescale, toPolynomial } from '../util/math';
-import { execCmd } from '../util/format';
 import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
 import { unrun } from '../util/threading';

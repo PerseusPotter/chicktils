@@ -645,3 +645,11 @@ export default reg;
 export function simulate(msg) {
   customRegs.chat.processMessage(msg, customRegs.chat.list, 1, new TextComponent(msg).chatComponentText);
 }
+
+/**
+ * @param {string} cmd
+ */
+export function execCmd(cmd) {
+  log('&2Executing command: &7/' + cmd);
+  ChatLib.command(cmd);
+}

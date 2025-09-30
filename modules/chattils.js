@@ -1,10 +1,10 @@
 import settings from '../settings';
 import data from '../data';
 import { renderWaypoint } from '../util/draw';
-import { execCmd, getPlayerName } from '../util/format';
+import { getPlayerName } from '../util/format';
 import { getLeader, getMembers, isInParty, isLeader, listen, unlisten } from '../util/party';
 import { log, logMessage } from '../util/log';
-import reg from '../util/registerer';
+import reg, { execCmd } from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
 import { run } from '../util/threading';
 import { dither, fromImage, fromURL, grayscale, guassian, resize, sharpen, sobel } from '../util/image';
