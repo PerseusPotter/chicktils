@@ -36,7 +36,7 @@ export function removeCertCheck(url) {
  * @returns {boolean}
  **/
 export function removeLastElement(f, o) {
-  if (!hasHelper) return;
+  if (!hasHelper) return false;
   return helper.removeLastElement(f, o);
 }
 
@@ -45,7 +45,7 @@ export function removeLastElement(f, o) {
  * @returns {boolean}
  **/
 export function removeElementSet(f, o, r) {
-  if (!hasHelper) return;
+  if (!hasHelper) return false;
   return helper.removeElementSet(f, o, r);
 }
 
@@ -54,7 +54,7 @@ export function removeElementSet(f, o, r) {
  * @returns {boolean}
  **/
 export function removeElementMap(f, o, r) {
-  if (!hasHelper) return;
+  if (!hasHelper) return false;
   return helper.removeElementMap(f, o, r);
 }
 
@@ -63,6 +63,6 @@ export function removeElementMap(f, o, r) {
  * @returns {boolean}
  **/
 export function addElementList(f, o, v) {
-  if (!hasHelper) return;
+  if (!hasHelper) return false;
   return helper.addElementList(f, o, v);
 }
