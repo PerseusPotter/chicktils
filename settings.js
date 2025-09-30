@@ -592,6 +592,10 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('logDamageCurse', 'LogDamageCurse', true, { desc: 'gaia construct lightning', shouldShow: p => addDependency(p.enablelogdamage) })
   .addToggle('logDamageCombo', 'LogDamageCombo', true, { desc: 'blaze dagger repeat', shouldShow: p => addDependency(p.enablelogdamage) })
 
+  .addToggle('enableshowserverlocation', 'EnableShowServerLocation', false, { desc: 'render where the last reported position to the server is', isNewSection: true })
+  .addColor('showServerLocationColor', 'ShowServerLocationColor', 0x808080FF, { shouldShow: p => addDependency(p.enableshowserverlocation) })
+  .addColor('showServerLookColor', 'ShowServerLookColor', 0x6D2B2BFF, { shouldShow: p => addDependency(p.enableshowserverlocation) })
+
   .addPage('Misc.')
   .addToggle('enableexcavatorsolver', 'EnableExcavatorSolver', false, { desc: 'find fossils' })
   .addToggle('excavatorSolverOnlyShowBest', 'ExcavatorSolverOnlyHighlightBest', true, { desc: 'only highlight the best move', shouldShow: p => addDependency(p.enableexcavatorsolver) })
