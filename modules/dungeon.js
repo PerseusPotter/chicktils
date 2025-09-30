@@ -56,6 +56,7 @@ let modules = [];
 const bossCbs = [];
 
 export const stateIsInBoss = new StateVar(false);
+/** @type {'Unknown' | 'Archer' | 'Berserk' | 'Healer' | 'Mage' | 'Tank'} */
 export const statePlayerClass = new StateVar('Unknown');
 export const stateFloor = new StateVar('');
 export const stateBossName = new StateVar('');
