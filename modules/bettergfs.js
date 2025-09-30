@@ -1,6 +1,5 @@
 import settings from '../settings';
-import { execCmd } from '../util/format';
-import reg from '../util/registerer';
+import reg, { execCmd } from '../util/registerer';
 import { ITEMS } from '../util/sackitems';
 
 function sanitizeName(str) {

@@ -1,6 +1,5 @@
 import settings from '../settings';
-import { execCmd } from '../util/format';
-import reg from '../util/registerer';
+import reg, { execCmd } from '../util/registerer';
 
 // rhino :clown:
 // java.lang.IllegalStateException at org.mozilla.javascript.ScriptRuntime.getTopCallScope(ScriptRuntime.java:3926)

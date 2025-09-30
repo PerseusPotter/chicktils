@@ -1,6 +1,5 @@
 import settings from '../../settings';
-import reg from '../../util/registerer';
-import { execCmd } from '../../util/format';
+import reg, { execCmd } from '../../util/registerer';
 import { StateProp } from '../../util/state';
 import { DelayTimer } from '../../util/timers';
 import { countItems, getSbId } from '../../util/skyblock';
