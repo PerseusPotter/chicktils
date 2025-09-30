@@ -3,11 +3,12 @@ import { JavaTypeOrNull } from './polyfill';
 
 /**
  * @param {number} t
+ * @param {number} [ms = 0]
  * @returns {string}
  */
-export function timeToStr(t) {
+export function timeToStr(t, ms = 0) {
   t /= 1000; // t is in seconds
-  if (t < 60) return t.toFixed(0) + 's';
+  if (t < 60) return t.toFixed(ms) + 's';
   if (t < 60 * 5) return `${(t / 60).toFixed(0)}m ${(t % 60).toFixed(0)}s`;
   t /= 60; // t is in minutes
   if (t < 60) return t.toFixed(0) + 'm';
