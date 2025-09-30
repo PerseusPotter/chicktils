@@ -10,6 +10,13 @@ export function getItemId(item) {
   if (!i) return '';
   return itemIdDict.func_177774_c(i).toString();
 }
+/**
+ * @param {import ('../../@types/External').JavaClass<'net.minecraft.item.Item'>} item
+ * @returns {string}
+ */
+export function getItemIdI(item) {
+  return itemIdDict.func_177774_c(item).toString();
+}
 
 const lowerInvF = setAccessible(Java.type('net.minecraft.client.gui.inventory.GuiChest').class.getDeclaredField('field_147015_w'));
 /**
