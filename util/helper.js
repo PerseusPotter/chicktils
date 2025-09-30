@@ -66,3 +66,25 @@ export function addElementList(f, o, v) {
   if (!hasHelper) return false;
   return helper.addElementList(f, o, v);
 }
+
+/**
+ * @param {import('../../@types/External').JavaClass<'java.lang.reflect.Method'>} m
+ * @param {any} o
+ * @param {any[]} args
+ * @returns {string}
+ */
+export function base64Encode(m, o, args) {
+  if (!hasHelper) return '';
+  return helper.base64Encode(m, o, args);
+}
+
+/**
+ * @param {import('../../@types/External').JavaClass<'java.lang.reflect.Method'>} m
+ * @param {any} o
+ * @param {any[]} args
+ * @returns {string}
+ */
+export function base64EncodeInt(m, o, args) {
+  if (!hasHelper) return '';
+  return helper.base64EncodeInt(m, o, args);
+}

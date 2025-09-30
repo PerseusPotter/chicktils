@@ -175,4 +175,25 @@ public class ChickTilsHelper {
       return false;
     }
   }
+
+  public static String base64Encode(Method m, Object o, Object[] args) {
+      try {
+          Object r = m.invoke(o, args);
+          return Base64.getEncoder().encodeToString((byte[]) r);
+      } catch (Exception e) {
+        return "";
+      }
+  }
+
+  public static String base64EncodeInt(Method m, Object o, Object[] args) {
+    try {
+      Object r = m.invoke(o, args);
+      int[] arr = (int[]) r;
+      ByteBuffer buf = ByteBuffer.allocate(arr.length * 4);
+      for (int n : arr) buf.putInt(n);
+      return Base64.getEncoder().encodeToString(buf.array());
+    } catch (Exception e) {
+      return "";
+    }
+  }
 }
