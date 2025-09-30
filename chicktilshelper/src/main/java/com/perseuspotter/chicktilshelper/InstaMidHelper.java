@@ -1,10 +1,10 @@
 package com.perseuspotter.chicktilshelper;
 
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.swing.*;
 
 public class InstaMidHelper {
 
