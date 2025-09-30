@@ -42,5 +42,6 @@
   "entityreducer",
   "voidgloomarmorstandfix",
   "withershieldtimer",
-  "neuitempreloadprogress"
+  "neuitempreloadprogress",
+  "showserverlocation",
 ]
