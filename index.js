@@ -95,6 +95,7 @@ register('command', () => {
 
 function loadMod() {
   log('&7Loading ChickTils...');
+  register('gameUnload', () => unload());
   load();
   settings.triggerAll();
   postInit();
