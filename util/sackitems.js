@@ -76,12 +76,12 @@ export const ITEMS = [
     "id": "BLAZE_ROD_DISTILLATE"
   },
   {
-    "nameF": "§fBlobfish§r §l§8§LBRONZE",
+    "nameF": "§fBlobfish§r §8§lBRONZE",
     "nameUF": "Blobfish BRONZE",
     "id": "BLOBFISH_BRONZE"
   },
   {
-    "nameF": "§fBlobfish§r §l§7§LSILVER",
+    "nameF": "§fBlobfish§r §7§lSILVER",
     "nameUF": "Blobfish SILVER",
     "id": "BLOBFISH_SILVER"
   },
@@ -1181,12 +1181,12 @@ export const ITEMS = [
     "id": "FLINT"
   },
   {
-    "nameF": "§aFlyfish§r §l§8§LBRONZE",
+    "nameF": "§aFlyfish§r §8§lBRONZE",
     "nameUF": "Flyfish BRONZE",
     "id": "FLYFISH_BRONZE"
   },
   {
-    "nameF": "§f§f§aFlyfish§r §l§7§LSILVER",
+    "nameF": "§aFlyfish§r §7§lSILVER",
     "nameUF": "Flyfish SILVER",
     "id": "FLYFISH_SILVER"
   },
@@ -1316,12 +1316,12 @@ export const ITEMS = [
     "id": "GOLDEN_CARROT"
   },
   {
-    "nameF": "§6Golden Fish §8§LBRONZE",
+    "nameF": "§6Golden Fish §8§lBRONZE",
     "nameUF": "Golden Fish BRONZE",
     "id": "GOLDEN_FISH_BRONZE"
   },
   {
-    "nameF": "§f§f§6Golden Fish§r §l§7§LSILVER",
+    "nameF": "§6Golden Fish§r §7§lSILVER",
     "nameUF": "Golden Fish SILVER",
     "id": "GOLDEN_FISH_SILVER"
   },
@@ -1361,12 +1361,12 @@ export const ITEMS = [
     "id": "GRIFFIN_FEATHER"
   },
   {
-    "nameF": "§fGusher§r §l§8§LBRONZE",
+    "nameF": "§fGusher§r §8§lBRONZE",
     "nameUF": "Gusher BRONZE",
     "id": "GUSHER_BRONZE"
   },
   {
-    "nameF": "§f§f§fGusher§r §l§7§LSILVER",
+    "nameF": "§fGusher§r §7§lSILVER",
     "nameUF": "Gusher SILVER",
     "id": "GUSHER_SILVER"
   },
@@ -1486,12 +1486,12 @@ export const ITEMS = [
     "id": "KADA_LEAD"
   },
   {
-    "nameF": "§5Karate Fish§r §l§8§LBRONZE",
+    "nameF": "§5Karate Fish§r §8§lBRONZE",
     "nameUF": "Karate Fish BRONZE",
     "id": "KARATE_FISH_BRONZE"
   },
   {
-    "nameF": "§5Karate Fish§r §l§7§LSILVER",
+    "nameF": "§5Karate Fish§r §7§lSILVER",
     "nameUF": "Karate Fish SILVER",
     "id": "KARATE_FISH_SILVER"
   },
@@ -1506,12 +1506,12 @@ export const ITEMS = [
     "id": "KUUDRA_TEETH"
   },
   {
-    "nameF": "§f§f§9Lavahorse§r §l§8§LBRONZE",
+    "nameF": "§9Lavahorse§r §8§lBRONZE",
     "nameUF": "Lavahorse BRONZE",
     "id": "LAVA_HORSE_BRONZE"
   },
   {
-    "nameF": "§9Lavahorse§r §l§7§LSILVER",
+    "nameF": "§9Lavahorse§r §7§lSILVER",
     "nameUF": "Lavahorse SILVER",
     "id": "LAVA_HORSE_SILVER"
   },
@@ -1626,12 +1626,12 @@ export const ITEMS = [
     "id": "MAGMAG"
   },
   {
-    "nameF": "§9Mana Ray§r §l§8§LBRONZE",
+    "nameF": "§9Mana Ray§r §8§lBRONZE",
     "nameUF": "Mana Ray BRONZE",
     "id": "MANA_RAY_BRONZE"
   },
   {
-    "nameF": "§9Mana Ray§r §l§7§LSILVER",
+    "nameF": "§9Mana Ray§r §7§lSILVER",
     "nameUF": "Mana Ray SILVER",
     "id": "MANA_RAY_SILVER"
   },
@@ -1676,12 +1676,12 @@ export const ITEMS = [
     "id": "MITHRIL_ORE"
   },
   {
-    "nameF": "§f§f§5Moldfin§r §l§8§LBRONZE",
+    "nameF": "§5Moldfin§r §8§lBRONZE",
     "nameUF": "Moldfin BRONZE",
     "id": "MOLDFIN_BRONZE"
   },
   {
-    "nameF": "§f§f§5Moldfin§r §l§7§LSILVER",
+    "nameF": "§5Moldfin§r §7§lSILVER",
     "nameUF": "Moldfin SILVER",
     "id": "MOLDFIN_SILVER"
   },
@@ -1766,32 +1766,32 @@ export const ITEMS = [
     "id": "NURSE_SHARK_TOOTH"
   },
   {
-    "nameF": "§f§f§f§kObfuscated 1§r §l§8§LBRONZE",
+    "nameF": "§f§kObfuscated 1§r §8§lBRONZE",
     "nameUF": "Obfuscated 1 BRONZE",
     "id": "OBFUSCATED_FISH_1_BRONZE"
   },
   {
-    "nameF": "§f§f§f§kObfuscated 1§r §l§7§LSILVER",
+    "nameF": "§f§kObfuscated 1§r §7§lSILVER",
     "nameUF": "Obfuscated 1 SILVER",
     "id": "OBFUSCATED_FISH_1_SILVER"
   },
   {
-    "nameF": "§a§kObfuscated 2§r §l§8§LBRONZE",
+    "nameF": "§a§kObfuscated 2§r §8§lBRONZE",
     "nameUF": "Obfuscated 2 BRONZE",
     "id": "OBFUSCATED_FISH_2_BRONZE"
   },
   {
-    "nameF": "§a§kObfuscated 2§r §l§7§LSILVER",
+    "nameF": "§a§kObfuscated 2§r §7§lSILVER",
     "nameUF": "Obfuscated 2 SILVER",
     "id": "OBFUSCATED_FISH_2_SILVER"
   },
   {
-    "nameF": "§9§kObfuscated 3§r §l§8§LBRONZE",
+    "nameF": "§9§kObfuscated 3§r §8§lBRONZE",
     "nameUF": "Obfuscated 3 BRONZE",
     "id": "OBFUSCATED_FISH_3_BRONZE"
   },
   {
-    "nameF": "§9§kObfuscated 3§r §l§7§LSILVER",
+    "nameF": "§9§kObfuscated 3§r §7§lSILVER",
     "nameUF": "Obfuscated 3 SILVER",
     "id": "OBFUSCATED_FISH_3_SILVER"
   },
@@ -2241,12 +2241,12 @@ export const ITEMS = [
     "id": "SINGED_POWDER"
   },
   {
-    "nameF": "§5Skeleton Fish§r §l§8§LBRONZE",
+    "nameF": "§5Skeleton Fish§r §8§lBRONZE",
     "nameUF": "Skeleton Fish BRONZE",
     "id": "SKELETON_FISH_BRONZE"
   },
   {
-    "nameF": "§f§f§5Skeleton Fish§r §l§7§LSILVER",
+    "nameF": "§5Skeleton Fish§r §7§lSILVER",
     "nameUF": "Skeleton Fish SILVER",
     "id": "SKELETON_FISH_SILVER"
   },
@@ -2261,12 +2261,12 @@ export const ITEMS = [
     "id": "SLUDGE_JUICE"
   },
   {
-    "nameF": "§f§f§aSlugfish§r §l§8§LBRONZE",
+    "nameF": "§aSlugfish§r §8§lBRONZE",
     "nameUF": "Slugfish BRONZE",
     "id": "SLUGFISH_BRONZE"
   },
   {
-    "nameF": "§f§f§aSlugfish§r §l§7§LSILVER",
+    "nameF": "§aSlugfish§r §7§lSILVER",
     "nameUF": "Slugfish SILVER",
     "id": "SLUGFISH_SILVER"
   },
@@ -2296,12 +2296,12 @@ export const ITEMS = [
     "id": "SORROW"
   },
   {
-    "nameF": "§f§f§5Soul Fish§r §l§8§LBRONZE",
+    "nameF": "§5Soul Fish§r §8§lBRONZE",
     "nameUF": "Soul Fish BRONZE",
     "id": "SOUL_FISH_BRONZE"
   },
   {
-    "nameF": "§f§f§5Soul Fish§r §l§7§LSILVER",
+    "nameF": "§5Soul Fish§r §7§lSILVER",
     "nameUF": "Soul Fish SILVER",
     "id": "SOUL_FISH_SILVER"
   },
@@ -2366,12 +2366,12 @@ export const ITEMS = [
     "id": "STARFALL"
   },
   {
-    "nameF": "§f§f§fSteaming-Hot Flounder§r §l§8§LBRONZE",
+    "nameF": "§fSteaming-Hot Flounder§r §8§lBRONZE",
     "nameUF": "Steaming-Hot Flounder BRONZE",
     "id": "STEAMING_HOT_FLOUNDER_BRONZE"
   },
   {
-    "nameF": "§f§f§fSteaming-Hot Flounder§r §l§7§LSILVER",
+    "nameF": "§fSteaming-Hot Flounder§r §7§lSILVER",
     "nameUF": "Steaming-Hot Flounder SILVER",
     "id": "STEAMING_HOT_FLOUNDER_SILVER"
   },
@@ -2411,12 +2411,12 @@ export const ITEMS = [
     "id": "SULPHUR_ORE"
   },
   {
-    "nameF": "§f§f§fSulphur Skitter§r §l§8§LBRONZE",
+    "nameF": "§fSulphur Skitter§r §8§lBRONZE",
     "nameUF": "Sulphur Skitter BRONZE",
     "id": "SULPHUR_SKITTER_BRONZE"
   },
   {
-    "nameF": "§f§f§fSulphur Skitter§r §l§7§LSILVER",
+    "nameF": "§fSulphur Skitter§r §7§lSILVER",
     "nameUF": "Sulphur Skitter SILVER",
     "id": "SULPHUR_SKITTER_SILVER"
   },
@@ -2541,12 +2541,12 @@ export const ITEMS = [
     "id": "UNSTABLE_FRAGMENT"
   },
   {
-    "nameF": "§f§f§9Vanille§r §l§8§LBRONZE",
+    "nameF": "§9Vanille§r §8§lBRONZE",
     "nameUF": "Vanille BRONZE",
     "id": "VANILLE_BRONZE"
   },
   {
-    "nameF": "§f§f§9Vanille§r §l§7§LSILVER",
+    "nameF": "§9Vanille§r §7§lSILVER",
     "nameUF": "Vanille SILVER",
     "id": "VANILLE_SILVER"
   },
@@ -2566,12 +2566,12 @@ export const ITEMS = [
     "id": "VOLCANIC_ROCK"
   },
   {
-    "nameF": "§9Volcanic Stonefish§r §l§8§LBRONZE",
+    "nameF": "§9Volcanic Stonefish§r §8§lBRONZE",
     "nameUF": "Volcanic Stonefish BRONZE",
     "id": "VOLCANIC_STONEFISH_BRONZE"
   },
   {
-    "nameF": "§9Volcanic Stonefish§r §l§7§LSILVER",
+    "nameF": "§9Volcanic Stonefish§r §7§lSILVER",
     "nameUF": "Volcanic Stonefish SILVER",
     "id": "VOLCANIC_STONEFISH_SILVER"
   },
