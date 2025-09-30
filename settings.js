@@ -666,7 +666,7 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addAction('moveDarkMonolithDropsTracker', 'MoveDarkMonolithDropsTracker', null, { shouldShow: p => addDependency(p.darkMonolithTrackDrops) })
   .addAction('resetDarkMonolithDropsTracker', 'ResetDarkMonolithDropsTracker', null, { shouldShow: p => addDependency(p.darkMonolithTrackDrops) })
 
-  .addToggle('enablevoidgloomarmorstandfix', 'EnableVoidgloomArmorStandFix', true, { desc: 'fixes hypixel not deleting armor stands' })
+  .addToggle('enablevoidgloomarmorstandfix', 'EnableVoidgloomArmorStandFix', true, { desc: 'fixes hypixel not deleting armor stands', isNewSection: true })
 
   .collapse();
 
