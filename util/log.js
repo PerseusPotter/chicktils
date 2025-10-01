@@ -33,7 +33,7 @@ export function logMessage(msg) {
  * @param {{ precision?: number }?} options ({ precision: 3 })
  */
 export function logDebug(obj, depth, options) {
-  let str = Object.entries(obj).map(([k, v]) => k + ': ' + serialize(v, depth, options)).join('\n');
+  let str = Object.entries(obj).map(([k, v]) => k + ': ' + require('./format').serialize(v, depth, options)).join('\n');
   log(str);
 }
 
