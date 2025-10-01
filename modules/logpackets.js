@@ -19,13 +19,11 @@ let printWriter;
 let ioThread;
 let startTime = 0;
 
-const formatWatcher = w => serialize(
-  w?.map(v => ({
-    id: v.func_75672_a(),
-    type: v.func_75674_c(),
-    value: v.func_75669_b()
-  }))
-);
+const formatWatcher = w => w?.map(v => ({
+  id: v.func_75672_a(),
+  type: v.func_75674_c(),
+  value: v.func_75669_b()
+}));
 
 const ByteBuf$array = Java.type('io.netty.buffer.ByteBuf').class.getDeclaredMethod('array');
 const S21PacketChunkData$getData = net.minecraft.network.play.server.S21PacketChunkData.class.getDeclaredMethod('func_149272_d');
@@ -170,7 +168,7 @@ const clientReg = reg('packetSent', pack => {
   }
 
   const fieldsS = fields.length ? '\n' + fields.map(v => `  ${v[0]}: ${serialize(v[1])}`).join('\n') + '\n' : '';
-  logger(`${name} {${fieldsS}} ${timeToStr(t - startTime, 3)}`);
+  logger(`${name} {${fieldsS}} ${t - startTime} ${timeToStr(t - startTime, 3)}`);
 }).setPriority(Priority.HIGHEST).setEnabled(settings._logPacketClient);
 
 const S0APacketUseBed$playerId = setAccessible(net.minecraft.network.play.server.S0APacketUseBed.class.getDeclaredField('field_149097_a'));
@@ -722,7 +720,7 @@ const serverReg = reg('packetReceived', pack => {
       fields.push(['state', pack.func_149138_c()]);
       switch (pack.func_149138_c()) {
         case 0:
-          fields.push(['state_', 'Bed Missing Messaeg']);
+          fields.push(['state_', 'Bed Missing Message']);
           break;
         case 1:
           fields.push(['state_', 'Toggle Rain On']);
@@ -989,7 +987,7 @@ const serverReg = reg('packetReceived', pack => {
   }
 
   const fieldsS = fields.length ? '\n' + fields.map(v => `  ${v[0]}: ${serialize(v[1])}`).join('\n') + '\n' : '';
-  logger(`${name} {${fieldsS}} ${timeToStr(t - startTime, 3)}`);
+  logger(`${name} {${fieldsS}} ${t - startTime} ${timeToStr(t - startTime, 3)}`);
 }).setPriority(Priority.HIGHEST).setEnabled(settings._logPacketServer);
 
 export function init() {
