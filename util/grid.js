@@ -14,7 +14,7 @@ export default class Grid {
   oldArrs;
   locked = false;
   _lock = new (Java.type('java.util.concurrent.locks.ReentrantLock'))();
-  queue = [];
+  queue = new (Java.type('java.util.concurrent.LinkedBlockingQueue'))();
   /** @type {Deque<number>} */
   age;
   constructor({ size = 1, key = 631, addNeighbors = 0, maxSize = Number.POSITIVE_INFINITY } = {}) {
@@ -57,7 +57,7 @@ export default class Grid {
    */
   add(x, z, item) {
     if (this._lock.isLocked()) {
-      this.queue.push([x, z, item]);
+      this.queue.offer([x, z, item]);
       return;
     }
     const id = this._getId(x, z);
@@ -108,9 +108,9 @@ export default class Grid {
   }
   unlock() {
     this._lock.unlock();
-    if (this.queue.length > 0) {
-      this.queue.forEach(v => this.add(v[0], v[1], v[2]));
-      this.queue = [];
+    let c;
+    while (c = this.queue.poll()) {
+      this.add(c[0], c[1], c[2]);
     }
   }
 }
