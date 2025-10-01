@@ -10,9 +10,9 @@ import { run } from '../util/threading';
 import { dither, fromImage, fromURL, grayscale, guassian, resize, sharpen, sobel } from '../util/image';
 import { getImage } from '../util/clipboard';
 import { _setTimeout } from '../util/timers';
-import { deleteMessages } from '../util/helper';
-import { setAccessible } from '../util/polyfill';
+import { getOrPut, randInt, setAccessible } from '../util/polyfill';
 import { renderBeacon, renderBillboardString, renderBoxOutline } from '../../Apelles/index';
+import { printChatComponent } from '../util/mc';
 
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
@@ -70,9 +70,18 @@ function processMessageWaypoint(ign, msg) {
   ));
 }
 
+function hideMessage(option, evn) {
+  if (option === 'False') return;
+  stateCancelNextPing.set(true);
+  if (option === 'Both') cancel(evn);
+}
+
 const melodyMessages = new Map();
-const lastMessages = new Map();
+const prevMelodyMessage = new Map();
 const fixedMelodies = [
+  ['melody'],
+  ['Melody Terminal start'],
+  ['Melody Terminal Start'],
   [
     'Melody terminal is at 25%',
     'Melody terminal is at 50%',
@@ -89,38 +98,10 @@ const fixedMelodies = [
     'Melody 75%'
   ]
 ];
-function hideMessage(option, evn) {
-  if (option === 'False') return;
-  stateCancelNextPing.set(true);
-  if (option === 'Both') cancel(evn);
-}
-function tryMelody(ign, msg, evn, mel) {
-  if (mel.trim() === msg) hideMessage(settings.chatTilsHideMelody, evn);
-  else if (msg.startsWith(mel) && msg.endsWith('/4')) {
-    hideMessage(settings.chatTilsHideMelody, evn);
-    if (settings.chatTilsCompactMelody) {
-      const prog = +msg.slice(-3, -2);
-      const prev = prog === 1 ? mel : `${mel} ${prog - 1}/4`;
-      deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
-    }
-  } else {
-    let i = -1;
-    let arr;
-    for (let j = 0; j < fixedMelodies.length; j++) {
-      i = fixedMelodies[j].indexOf(msg);
-      if (i >= 0) {
-        arr = fixedMelodies[j];
-        break;
-      }
-    }
-    if (i >= 0) {
-      hideMessage(settings.chatTilsHideMelody, evn);
-      if (settings.chatTilsCompactMelody) {
-        const prev = i === 0 ? mel : arr[i - 1];
-        deleteMessages([new Message(`§r§9Party §8> ${ign}§f: §r${prev}§r`.toString()).getFormattedText()]);
-      }
-    }
-  }
+function isMelodyMessage(msg) {
+  if (fixedMelodies.some(v => v.includes(msg))) return true;
+
+  return /\b([0-3])\/4\b/.test(msg) || /\b((?:2|7)5|(?:5|0)?0)%(?=[\s\W]|$)/.test(msg);
 }
 
 const allChatReg = reg('chat', (ign, msg) => {
@@ -133,23 +114,24 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
   if (settings.chatTilsHidePhoenix !== 'False' && msg.startsWith('Phoenix Procced')) return hideMessage(settings.chatTilsHidePhoenix, evn);
   if (settings.chatTilsHideSpirit !== 'False' && msg.startsWith('Spirit Procced')) return hideMessage(settings.chatTilsHideSpirit, evn);
   if (settings.chatTilsHideLeap !== 'False' && ['Leaped to ', 'Leaping to ', 'I\'m leaping to ', '[Leaped]: ➜'].some(v => msg.startsWith(v))) return hideMessage(settings.chatTilsHideLeap, evn);
+
   if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
-    const lIgn = ign.toLowerCase();
-    let mel = melodyMessages.get(lIgn);
-    if (mel) return tryMelody(ign, msg, evn, mel);
-    if (msg === 'melody' || msg === 'Melody Terminal start!') {
-      melodyMessages.set(lIgn, msg);
-      hideMessage(settings.chatTilsHideMelody, evn);
-    } else if (msg.endsWith(' 1/4')) {
-      mel = msg.slice(0, -4);
-      melodyMessages.set(lIgn, mel);
-      tryMelody(ign, msg, evn, mel);
-    } else {
-      const start = fixedMelodies.find(v => v[0] === msg);
-      if (start) {
-        melodyMessages.set(lIgn, lastMessages.get(lIgn));
-        tryMelody(ign, msg, evn, lastMessages.get(lIgn));
-      } else lastMessages.set(lIgn, msg);
+    if (getOrPut(melodyMessages, msg, isMelodyMessage)) {
+      if (settings.chatTilsCompactMelody) {
+        const lIgn = ign.toLowerCase();
+        if (prevMelodyMessage.has(lIgn)) ChatLib.deleteChat(prevMelodyMessage.get(lIgn));
+
+        cancel(evn);
+        if (settings.chatTilsHideMelody !== 'False') stateCancelNextPing.set(true);
+        if (settings.chatTilsHideMelody !== 'Both') {
+          const id = randInt();
+          Client.scheduleTask(() => printChatComponent(evn.message, id));
+          prevMelodyMessage.set(lIgn, id);
+        }
+      } else {
+        stateCancelNextPing.set(true);
+        if (settings.chatTilsHideMelody === 'Both') cancel(evn);
+      }
     }
   }
 }).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
@@ -321,7 +303,7 @@ const genImgArtReg = (function() {
     });
   }).setName('printimage').setEnabled(settings._chatTilsImageArt);
 }());
-const nextArtLineMsg = new Message(new TextComponent('&a[NEXT]').setClick('run_command', '/printimageline'), ' ', new TextComponent('&4[CANCEL]').setClick('run_command', '/printimagecancel'));
+const nextArtLineMsg = new Message(new TextComponent('&a[NEXT]').setClick('run_command', '/printimageline'), ' ', new TextComponent('&4[CANCEL]').setClick('run_command', '/printimagecancel')).setChatLineId(randInt());
 function printNextLine() {
   let l = imgArtLines.shift();
   if (!l) return log('&cno more lines left');
@@ -333,7 +315,6 @@ function printNextLine() {
   if (settings.chatTilsImageArtParty) l = '/pc ' + l;
   ChatLib.say(l);
   _setTimeout(() => {
-    deleteMessages([nextArtLineMsg.getFormattedText()]);
     if (imgArtLines.length) {
       if (settings.chatTilsImageArtAutoPrint) printNextLine();
       else nextArtLineMsg.chat();

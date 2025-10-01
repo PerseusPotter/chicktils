@@ -19,10 +19,13 @@ export function addTooltip(evn, str) {
   helper.addTooltip(evn, str);
 }
 
-/** @param {string[]} str */
-export function deleteMessages(str) {
+/**
+ * @param {number} start
+ * @param {number} end
+ */
+export function deleteChatIds(start, end) {
   if (!hasHelper) return;
-  helper.deleteMessages(str);
+  helper.deleteChatIds(start, end);
 }
 
 /** @param {import('../../@types/External').JavaClass<'java.net.URLConnection'>} url */
