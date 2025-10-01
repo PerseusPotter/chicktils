@@ -1,5 +1,5 @@
-import { deleteMessages } from '../util/helper';
 import { logMessage } from '../util/log';
+import { randInt } from '../util/polyfill';
 import reg from '../util/registerer';
 
 const cakes = [
@@ -41,22 +41,23 @@ const colors = [
 
 let lastEatTime = 0;
 let lastEat = new Set();
-let prevMsg;
+const msgId = randInt();
 function onEat(cake) {
   const t = Date.now();
   if (t - lastEatTime > 5 * 60 * 1000) lastEat = new Set(cakes);
   lastEatTime = t;
-  if (prevMsg) deleteMessages([prevMsg.getFormattedText()]);
 
   lastEat.delete(cake);
-  if (lastEat.size === 0) prevMsg = new Message('&aAll cakes eaten!');
-  else prevMsg = new Message(
-    new TextComponent(`&bEaten ${cakes.length - lastEat.size}/${cakes.length} cakes.`)
-      .setHover('show_text', [
-        '&aMissing:',
-        ...Array.from(lastEat.values()).map(v => `${v} &r&7(${colors[cakes.indexOf(v)]}&7)`)
-      ].join('\n'))
-  );
+  const msg = lastEat.size === 0 ?
+    new Message('&aAll cakes eaten!') :
+    new Message(
+      new TextComponent(`&bEaten ${cakes.length - lastEat.size}/${cakes.length} cakes.`)
+        .setHover('show_text', [
+          '&aMissing:',
+          ...Array.from(lastEat.values()).map(v => `${v} &r&7(${colors[cakes.indexOf(v)]}&7)`)
+        ].join('\n'))
+    );
+  msg.setChatLineId(msgId);
   logMessage(prevMsg);
 }
 const eatReg = reg('chat', onEat).setCriteria('&r&d&lYum! &r&eYou gain &r${cake} &r&efor &r&a48 &r&ehours!&r');

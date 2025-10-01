@@ -1,7 +1,8 @@
 import convertToAmaterasu from './settingsAmaterasu';
 import { centerMessage } from './util/format';
-import { deleteMessages } from './util/helper';
+import { deleteChatIds } from './util/helper';
 import { log, logMessage } from './util/log';
+import { randInt } from './util/polyfill';
 import { StateVar } from './util/state';
 import { run } from './util/threading';
 
@@ -592,6 +593,8 @@ export class Settings {
     this.minPage = Math.min.apply(null, this.props.map(v => v.page));
     this.maxPage = Math.max.apply(null, this.props.map(v => v.page));
 
+    this.chatLineId = randInt();
+
     // this.load();
     Client.scheduleTask(20, () => this.load(true));
   }
@@ -662,27 +665,50 @@ export class Settings {
   }
 
   lastDisplay = { type: 'none', args: [], time: 0 };
-  prevMsgs = [];
+  prevMsgId = 1 << 31;
   /**
    * @param {number} page
    */
   display(page) {
-    const props = this.props.filter(v => v.page === page);
-    props.sort((a, b) => a.sort - b.sort);
-    const msgs = props.filter(v => v.shouldShow.get()).map((p, i) => {
-      const m = p.getMessage(i & 1, this.module);
-      if (p.isNewSection) m.addTextComponent(0, '\n');
-      return m;
-    });
-    const pageNav = new Message(page === this.minPage ? '   ' : new TextComponent('&a<- ').setClick('run_command', `/${this.module} config_ view ${page - 1}`), `&fPage &6${page} &fof &6${this.maxPage}`, page === this.maxPage ? '   ' : new TextComponent('&a ->').setClick('run_command', `/${this.module} config_ view ${page + 1}`));
-    centerMessage(pageNav);
+    const msgs = this.props
+      .filter(v => v.shouldShow.get() && v.page === page)
+      .sort((a, b) => a.sort - b.sort)
+      .map((p, i) => {
+        const m = p.getMessage(i & 1, this.module);
+        if (p.isNewSection) m.addTextComponent(0, '\n');
+        m.setChatLineId(this.chatLineId + i + 1);
+        return m;
+      });
+
+    msgs.unshift(
+      new Message(centerMessage(`&d&l${this.module} &b&l${this.pageNames[page]} &d&lSettings`))
+        .setChatLineId(this.chatLineId)
+    );
+    const pageNav = new Message(
+      page === this.minPage ?
+        '   ' :
+        new TextComponent('&a<- ')
+          .setClick(
+            'run_command',
+            `/${this.module} config_ view ${page - 1}`
+          ),
+      `&fPage &6${page} &fof &6${this.maxPage}`,
+      page === this.maxPage ?
+        '   ' :
+        new TextComponent('&a ->')
+          .setClick(
+            'run_command',
+            `/${this.module} config_ view ${page + 1}`
+          )
+    );
+    pageNav.setChatLineId(this.chatLineId + msgs.length);
     // msgs.unshift(pageNav.clone());
-    msgs.unshift(new Message(centerMessage(`&d&l${this.module} &b&l${this.pageNames[page]} &d&lSettings`)));
+    centerMessage(pageNav);
     msgs.push(pageNav);
-    // this.prevMsgs.forEach(v => ChatLib.deleteChat(v));
-    deleteMessages(this.prevMsgs.map(v => v.getFormattedText()));
+
     msgs.forEach(v => v.chat());
-    this.prevMsgs = msgs;
+    deleteChatIds(this.chatLineId + msgs.length, this.prevMsgId);
+    this.prevMsgId = this.chatLineId + msgs.length;
     this.lastDisplay = {
       type: 'display',
       args: [page],
@@ -696,20 +722,24 @@ export class Settings {
   displaySearch(str) {
     str = str.toLowerCase();
     const re = new RegExp(`(${str.replace(/[^A-Z]/gi, '')})`, 'gi');
-    const props = this.props
+    const msgs = this.props
       .filter(v => v.name.toLowerCase().includes(str))
-      .map(v => ({ s: v.name.replace(re, '§d$1§r'), i: v.name.toLowerCase().indexOf(str), p: v }));
-    // .sort((a, b) => {
-    //   const i = a.i - b.i;
-    //   if (i !== 0) return i;
-    //   return a.p.name.toLowerCase().localeCompare(b.p.name.toLowerCase(), ['en-US']);
-    // });
-    const msgs = props.map(({ s, p }, i) => p.getMessage(i & 1, this.module, s));
-    msgs.unshift(new Message(centerMessage(`&d&l${this.module} &b&l"${str}" &d&lSettings`)));
-    // this.prevMsgs.forEach(v => ChatLib.deleteChat(v));
-    deleteMessages(this.prevMsgs.map(v => v.getFormattedText()));
+      .map(v => ({ s: v.name.replace(re, '§d$1§r'), i: v.name.toLowerCase().indexOf(str), p: v }))
+      // .sort((a, b) => {
+      //   const i = a.i - b.i;
+      //   if (i !== 0) return i;
+      //   return a.p.name.toLowerCase().localeCompare(b.p.name.toLowerCase(), ['en-US']);
+      // })
+      .map(({ s, p }, i) => p.getMessage(i & 1, this.module, s).setChatLineId(this.chatLineId + i + 1));
+
+    msgs.unshift(
+      new Message(centerMessage(`&d&l${this.module} &b&l"${str}" &d&lSettings`))
+        .setChatLineId(this.chatLineId)
+    );
+
     msgs.forEach(v => v.chat());
-    this.prevMsgs = msgs;
+    deleteChatIds(this.chatLineId + msgs.length, this.prevMsgId);
+    this.prevMsgId = this.chatLineId + msgs.length;
     this.lastDisplay = {
       type: 'displaySearch',
       args: [str],

@@ -2,7 +2,7 @@ import settings from '../settings';
 import reg from '../util/registerer';
 import { DelayTimer } from '../util/timers';
 import { getItemId, getLowerContainer, listenInventory } from '../util/mc';
-import { deleteMessages } from '../util/helper';
+import { randInt } from '../util/polyfill';
 
 const guiReg = reg('guiOpened', evn => {
   if (!settings.rabbitShowBestUpgrade) return;
@@ -84,14 +84,14 @@ const guiReg = reg('guiOpened', evn => {
   });
 }).setEnabled(settings._rabbitShowBestUpgrade);
 
-const prevMessages = {};
+const rabbitIds = {};
 const promoteReg = reg('chat', (name, lvl, status, evn) => {
   const n = name.removeFormatting();
+  if (!rabbitIds[n]) rabbitIds[n] = randInt();
   cancel(evn);
-  deleteMessages([prevMessages[n]]);
   const msg = new Message(`${name}&7 -> Lvl &b${lvl} ${status}`);
+  msg.setChatLineId(rabbitIds[n]);
   msg.chat();
-  prevMessages[n] = msg.getFormattedText();
 }).setCriteria('&r${name} &r&7has been promoted to &r&7[${lvl}&r&7] &r${status}&r&7!&r').setEnabled(settings._rabbitCondenseChat);
 
 export function init() { }
