@@ -1113,3 +1113,9 @@ export class HeapSet {
     return true;
   }
 }
+
+export function randInt() {
+  // thanks rhino
+  // return (Math.random() * (~0 >>> 0)) | 0;
+  return (Math.random() * 4294967295) | 0;
+}
