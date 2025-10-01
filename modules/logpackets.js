@@ -1068,6 +1068,7 @@ export function init() {
   ]));
   settings._logPacketEnablePresetS5.onAction(() => addWhitelist([
     'S02PacketChat',
+    'S32PacketConfirmTransaction',
     'S38PacketPlayerListItem',
     'S3BPacketScoreboardObjective',
     'S3CPacketUpdateScore',
