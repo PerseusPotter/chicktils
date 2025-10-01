@@ -271,3 +271,11 @@ const MCBlock = Java.type('net.minecraft.block.Block');
 export function getBlockId(block) {
   return MCBlock.func_149682_b(block);
 }
+
+/**
+ * @param {import('../../@types/External').JavaClass<'net.minecraft.util.IChatComponent'>} comp
+ * @param {number} id
+ */
+export function printChatComponent(comp, id) {
+  Client.getMinecraft().field_71456_v.func_146158_b().func_146234_a(comp, id);
+}
