@@ -14,7 +14,7 @@ export function timeToStr(t, ms = 0) {
   if (t < 60 * 5) return `${(t / 60).toFixed(0)}m ${(t % 60).toFixed(0)}s`;
   t /= 60; // t is in minutes
   if (t < 60) return t.toFixed(0) + 'm';
-  if (t < 60 * 5) return `${(t / 60).toFixed(0)}h ${(t % 60).toFixed(0)}m`;
+  if (t < 60 * 10) return `${(t / 60).toFixed(0)}h ${(t % 60).toFixed(0)}m`;
   t /= 60; // t is in hours
   if (t < 24) return t.toFixed(0) + 'h';
   if (t < 48) return `1d ${(t - 24).toFixed(0)}h`;
