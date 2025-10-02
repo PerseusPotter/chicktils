@@ -2,11 +2,11 @@ package com.perseuspotter.chicktilshelper;
 
 public class ProjectileHelper {
     public static class ProjectileData {
-        public final float theta;
-        public final float phi;
-        public final float ticks;
+        public final double theta;
+        public final double phi;
+        public final double ticks;
 
-        ProjectileData(float theta, float phi, float ticks) {
+        ProjectileData(double theta, double phi, double ticks) {
             this.theta = theta;
             this.phi = phi;
             this.ticks = ticks;
@@ -27,71 +27,93 @@ public class ProjectileHelper {
     // summation simplifies to (V0 + a / (d - 1)) (d^t - 1) / (d - 1) - a * t / (d - 1) where d != 1
     // closed form of inverse can be found using lambert W
     // more math
-    public static ProjectileData solve(float dx, float dy, float dz, float eps, float a, float v, float d, boolean high) {
-        if (d == 1f) throw new IllegalArgumentException("sorry");
-        final float theta = (float) Math.atan2(dz, dx);
-        final float R = MathHelper.fastSqrt(dx * dx + dz * dz);
+    public static ProjectileData solve(double dx, double dy, double dz, double eps, double a, double v, double d, boolean high) {
+        if (d == 1.0) throw new IllegalArgumentException("sorry");
+        final double theta = Math.atan2(dz, dx);
+        final double R = Math.sqrt(dx * dx + dz * dz);
 
-        final float f = 1f / (d - 1f);
-        final float lnd = MathHelper.fastLog(d);
-        final float inv_a = 1f / a;
-        final float inv_lnd = 1f / lnd;
+        final double f = 1.0 / (d - 1.0);
+        final double lnd = Math.log(d);
+        final double inv_a = 1.0 / a;
+        final double inv_lnd = 1.0 / lnd;
 
-        float A = v + a * f;
-        float r = -(dy * (d - 1) + A) * inv_a;
-        float B = -A * lnd * MathHelper.fastExp(lnd * r) * inv_a;
-        if (B < NEG_INV_E) return new ProjectileData(Float.NaN, Float.NaN, Float.NaN);
+        double A = v + a * f;
+        double r = -(dy * (d - 1) + A) * inv_a;
+        double B = -A * lnd * Math.exp(lnd * r) * inv_a;
+        if (B < NEG_INV_E) return new ProjectileData(Double.NaN, Double.NaN, Double.NaN);
 
-        float maxDomain = (float) (dy > 0f ? Math.PI / 2.0 : Math.PI);
-        float searchL = 0f;
-        float searchR = maxDomain;
-        float x1 = 0f;
-        float x2 = 0f;
+        if (dy > 0.0 && !high) {
+            double searchL = 0.0;
+            double searchR = Math.PI / 2.0;
+            double t = 0.0;
+
+            while (searchR - searchL > eps) {
+                final double m = (searchL + searchR) / 2.0;
+                A = v * Math.cos(m) + a * f;
+                r = -(dy * (d - 1) + A) * inv_a;
+                B = -A * lnd * Math.exp(lnd * r) * inv_a;
+                if (B < NEG_INV_E) searchR = m;
+                else {
+                    t = r - inv_lnd * MathHelper.lambertW1(B);
+                    final double x = v * Math.sin(m) * (Math.exp(lnd * t) - 1) * f;
+                    if (x < R) searchL = m;
+                    else searchR = m;
+                }
+            }
+
+            return new ProjectileData(theta, (searchL + searchR) / 2.0, t);
+        }
+
+        double maxDomain = dy > 0.0 ? Math.PI / 2.0 : Math.PI;
+        double searchL = 0.0;
+        double searchR = maxDomain;
+        double x1 = 0.0;
+        double x2 = 0.0;
 
         while (true) {
-            final float windowSize = searchR - searchL;
+            final double windowSize = searchR - searchL;
             if (windowSize < eps) break;
-            final float m1 = windowSize / 3f + searchL;
-            A = v * (float) Math.cos(m1) + a * f;
+            final double m1 = windowSize / 3.0 + searchL;
+            A = v * Math.cos(m1) + a * f;
             r = -(dy * (d - 1) + A) * inv_a;
-            B = -A * lnd * MathHelper.fastExp(lnd * r) * inv_a;
+            B = -A * lnd * Math.exp(lnd * r) * inv_a;
             if (B < NEG_INV_E) searchR = maxDomain = m1;
             else {
-                x1 = v * (float) Math.sin(m1) * (MathHelper.fastExp(lnd * (r - inv_lnd * MathHelper.fastLambertW0(B))) - 1) * f;
-                final float m2 = windowSize * 2f / 3f + searchL;
-                A = v * (float) Math.cos(m2) + a * f;
+                x1 = v * Math.sin(m1) * (Math.exp(lnd * (r - inv_lnd * MathHelper.lambertW0(B))) - 1) * f;
+                final double m2 = windowSize * 2.0 / 3.0 + searchL;
+                A = v * Math.cos(m2) + a * f;
                 r = -(dy * (d - 1) + A) * inv_a;
-                B = -A * lnd * MathHelper.fastExp(lnd * r) * inv_a;
+                B = -A * lnd * Math.exp(lnd * r) * inv_a;
                 if (B < NEG_INV_E) searchR = maxDomain = m2;
                 else {
-                    x2 = v * (float) Math.sin(m2) * (MathHelper.fastExp(lnd * (r - inv_lnd * MathHelper.fastLambertW0(B))) - 1) * f;
+                    x2 = v * Math.sin(m2) * (Math.exp(lnd * (r - inv_lnd * MathHelper.lambertW0(B))) - 1) * f;
                     if (x1 < x2) searchL = m1;
                     else searchR = m2;
                 }
             }
         }
 
-        if (R > (x1 + x2) / 2f) return new ProjectileData(Float.NaN, Float.NaN, Float.NaN);
+        if (R > (x1 + x2) / 2.0) return new ProjectileData(Double.NaN, Double.NaN, Double.NaN);
 
-        final float peak = (searchL + searchR) / 2f;
-        searchL = high ? 0f : peak;
+        final double peak = (searchL + searchR) / 2.0;
+        searchL = high ? 0.0 : peak;
         searchR = high ? peak : maxDomain;
-        float t = Float.NaN;
+        double t = Double.NaN;
 
         while (searchR - searchL > eps) {
-            final float m = (searchL + searchR) / 2f;
-            A = v * (float) Math.cos(m) + a * f;
+            final double m = (searchL + searchR) / 2.0;
+            A = v * Math.cos(m) + a * f;
             r = -(dy * (d - 1) + A) * inv_a;
-            B = -A * lnd * MathHelper.fastExp(lnd * r) * inv_a;
+            B = -A * lnd * Math.exp(lnd * r) * inv_a;
             if (B < NEG_INV_E) searchR = m;
             else {
-                t = r - inv_lnd * MathHelper.fastLambertW0(B);
-                x1 = v * (float) Math.sin(m) * (MathHelper.fastExp(lnd * t) - 1) * f;
+                t = r - inv_lnd * MathHelper.lambertW0(B);
+                x1 = v * Math.sin(m) * (Math.exp(lnd * t) - 1) * f;
                 if (x1 < R == high) searchL = m;
                 else searchR = m;
             }
         }
 
-        return new ProjectileData(theta, (searchL + searchR) / 2f, t);
+        return new ProjectileData(theta, (searchL + searchR) / 2.0, t);
     }
 }
