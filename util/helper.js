@@ -1,4 +1,5 @@
 import { log } from './log';
+import { unrun } from './threading';
 
 const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
 const hasHelper = helper.MODID === 'chicktilshelper';
@@ -25,7 +26,15 @@ export function addTooltip(evn, str) {
  */
 export function deleteChatIds(start, end) {
   if (!hasHelper) return;
-  helper.deleteChatIds(start, end);
+  unrun(() => helper.deleteChatIds(start, end));
+}
+
+/**
+ * @param {number} target
+ */
+export function deleteChatId(target) {
+  if (!hasHelper) return;
+  unrun(() => helper.deleteChatId(target));
 }
 
 /** @param {import('../../@types/External').JavaClass<'java.net.URLConnection'>} url */
