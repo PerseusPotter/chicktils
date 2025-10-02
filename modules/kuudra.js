@@ -111,8 +111,8 @@ const tickReg = reg('tick', () => {
   const py = Player.getY() + getEyeHeight() - 0.1;
   const pz = Player.getZ() - Math.sin(yaw) * 0.16;
   run(() => {
-    pearlLocs = dropLocs.map(({ x, y, z }) => ProjectileHelper.solve(x - px, y - py, z - pz, 0.01, -0.03, 1.5, 0.99, true)).filter(v => !Number.isNaN(v.phi));
-    if (isBuild) dpsPrePearl = ProjectileHelper.solve(-111.5 - px, 79 - py, -70.5 - pz, 0.01, -0.03, 1.5, 0.99, true);
+    pearlLocs = dropLocs.map(({ x, y, z }) => ProjectileHelper.solve(x - px, y - py, z - pz, 0.001, -0.03, 1.5, 0.99, true)).filter(v => !Number.isNaN(v.phi));
+    if (isBuild) dpsPrePearl = ProjectileHelper.solve(-111.5 - px, 79 - py, -70.5 - pz, 0.001, -0.03, 1.5, 0.99, true);
   });
 }).setEnabled(settings._kuudraRenderPearlTarget);
 const EntityArmorStand = Java.type('net.minecraft.entity.item.EntityArmorStand');
