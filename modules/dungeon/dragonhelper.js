@@ -1,15 +1,18 @@
 import settings from '../../settings';
 import data from '../../data';
-import { getPartialServerTick } from '../../util/draw';
+import { drawArrow3DPos, getPartialServerTick } from '../../util/draw';
 import createAlert from '../../util/alert';
 import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import createTextGui from '../../util/customtextgui';
 import { log } from '../../util/log';
 import { StateProp, StateVar } from '../../util/state';
-import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss } from '../dungeon.js';
-import { fastDistance } from '../../util/math';
-import { renderBillboardString } from '../../../Apelles/index';
+import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss, statePlayerClass } from '../dungeon.js';
+import { fastDistance, lerp } from '../../util/math';
+import { getRenderX, getRenderY, getRenderZ, renderBillboardString, renderBoxFilled, renderTracer } from '../../../Apelles/index';
+import { getMedianPing } from '../../util/ping';
+import { getEyeHeight } from '../../util/mc';
+import { setAccessible } from '../../util/polyfill';
 
 const stateDragonHelper = new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonDragonHelper);
 const stateInP5 = new StateVar(false);
@@ -17,6 +20,10 @@ const stateDragonHelperActive = stateDragonHelper.and(stateInP5);
 const stateDragonHelperHits = stateDragonHelperActive.and(new StateProp(settings._dungeonDragonHelperTrackHits).notequals('None'));
 const stateDragon = new StateVar();
 const stateDragonHelperTrackHits = stateDragonHelperHits.and(stateDragon);
+const stateDragonHelperAim = stateDragonHelperActive.and(settings._dungeonDragonHelperShowStackAimer).and(new StateProp(statePlayerClass).customBinary(settings._dungeonDragonHelperShowStackClass, (c, s) => c === 'Unknown' || s.includes(c[0].toLowerCase())));
+/** @type {StateVar<[number, number]?>} */
+const stateAimPosition = new StateVar();
+const stateDragonHelperAimRender = stateDragonHelperAim.and(stateAimPosition);
 
 /** @typedef {'r' | 'o' | 'b' | 'p' | 'g'} DragonType */
 /** @type {Map<DragonType, number>} */
@@ -30,33 +37,200 @@ const DRAGONS = {
   r: {
     color: '&c',
     pos: [32, 20, 59],
-    name: 'POWER'
+    name: 'POWER',
+    path: [
+      [864, 448, 1888],
+      [879, 467, 1880],
+      [886, 476, 1876],
+      [894, 486, 1872],
+      [902, 495, 1868],
+      [909, 505, 1865],
+      [917, 514, 1861],
+      [925, 524, 1857],
+      [932, 533, 1853],
+      [940, 543, 1849],
+      [947, 552, 1846],
+      [963, 572, 1838],
+      [978, 591, 1830],
+      [987, 591, 1821],
+      [995, 592, 1811],
+      [1004, 592, 1802],
+      [1013, 593, 1793],
+      [1021, 593, 1783],
+      [1030, 594, 1774],
+      [1038, 594, 1764],
+      [1047, 595, 1755],
+      [1056, 595, 1745],
+      [1064, 596, 1736],
+      [1073, 597, 1726],
+      [1082, 597, 1717],
+      [1090, 598, 1708],
+      [1099, 598, 1698],
+      [1107, 599, 1689],
+      [1116, 599, 1679],
+      [1125, 600, 1670],
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
   },
   o: {
     color: '&6',
     pos: [80, 20, 56],
-    name: 'FLAME'
+    name: 'FLAME',
+    path: [
+      [2720, 448, 1792],
+      [2710, 455, 1796],
+      [2700, 462, 1800],
+      [2690, 469, 1804],
+      [2680, 476, 1808],
+      [2670, 483, 1813],
+      [2660, 490, 1817],
+      [2651, 497, 1821],
+      [2641, 504, 1825],
+      [2631, 511, 1829],
+      [2621, 518, 1834],
+      [2611, 525, 1838],
+      [2601, 532, 1842],
+      [2592, 539, 1846],
+      [2582, 546, 1851],
+      [2572, 553, 1855],
+      [2562, 560, 1859],
+      [2552, 567, 1863],
+      [2542, 574, 1867],
+      [2533, 581, 1872],
+      [2523, 588, 1876],
+      [2513, 595, 1880],
+      [2516, 595, 1892],
+      [2520, 596, 1905],
+      [2523, 596, 1917],
+      [2527, 596, 1929],
+      [2530, 597, 1942],
+      [2533, 597, 1954],
+      [2537, 597, 1966],
+      [2540, 597, 1979],
+      [2543, 598, 1991],
+      [2547, 598, 2003],
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
   },
   b: {
     color: '&b',
     pos: [79, 20, 94],
-    name: 'ICE'
+    name: 'ICE',
+    path: [
+      [2688, 448, 3008],
+      [2683, 452, 3019],
+      [2678, 457, 3030],
+      [2674, 461, 3041],
+      [2669, 466, 3052],
+      [2665, 470, 3063],
+      [2660, 475, 3074],
+      [2655, 480, 3085],
+      [2651, 484, 3096],
+      [2646, 489, 3107],
+      [2642, 493, 3118],
+      [2637, 498, 3129],
+      [2632, 503, 3140],
+      [2628, 507, 3151],
+      [2623, 512, 3162],
+      [2619, 516, 3173],
+      [2614, 521, 3184],
+      [2609, 526, 3195],
+      [2605, 530, 3206],
+      [2600, 535, 3217],
+      [2596, 539, 3228],
+      [2591, 544, 3239],
+      [2586, 549, 3250],
+      [2582, 553, 3261],
+      [2577, 558, 3272],
+      [2573, 562, 3283],
+      [2568, 567, 3294],
+      [2563, 572, 3305],
+      [2559, 576, 3316],
+      [2554, 581, 3327],
+      [2550, 585, 3338],
+      [2545, 590, 3349],
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
   },
   p: {
     color: '&d',
     pos: [56, 20, 128],
-    name: 'SOUL'
+    name: 'SOUL',
+    path: [
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+      [1792, 448, 4000],
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
   },
   g: {
     color: '&a',
     pos: [32, 20, 94],
-    name: 'APEX'
+    name: 'APEX',
+    path: [
+      [864, 448, 3008],
+      [858, 456, 2984],
+      [855, 461, 2972],
+      [853, 465, 2961],
+      [850, 470, 2949],
+      [847, 474, 2937],
+      [845, 479, 2926],
+      [842, 483, 2914],
+      [839, 488, 2902],
+      [837, 492, 2891],
+      [834, 497, 2879],
+      [831, 501, 2867],
+      [828, 506, 2856],
+      [826, 510, 2844],
+      [823, 515, 2832],
+      [820, 519, 2821],
+      [818, 524, 2809],
+      [815, 528, 2797],
+      [812, 533, 2786],
+      [810, 537, 2774],
+      [807, 542, 2762],
+      [804, 546, 2751],
+      [802, 551, 2739],
+      [799, 555, 2727],
+      [796, 560, 2716],
+      [793, 564, 2704],
+      [791, 569, 2692],
+      [788, 573, 2680],
+      [785, 578, 2669],
+      [783, 582, 2657],
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
   }
 };
 /** @type {DragonType} */
 let currDragPrio;
 let isHighDragon = false;
 let hitTimes = [0];
+let prevBestTarget = 0;
+/** @type {[number, number]?} */
+let prevAimPosition;
 
 const tickReg = reg('tick', () => stateInP5.set(Player.getY() < 30)).setEnabled(stateDragonHelper);
 /**
@@ -77,6 +251,9 @@ function getSplitDrag(d1, d2, bersTeam, prio, role) {
 function addDragon(c) {
   if (spawnedDrags.has(c)) return;
   spawnedDrags.set(c, 100);
+  prevBestTarget = 0;
+  stateAimPosition.set(null);
+  prevAimPosition = null;
 
   let dragD = DRAGONS[c];
   currDragPrio = c;
@@ -206,6 +383,101 @@ const serverTickHitReg = reg('serverTick', () => {
   hitTimes.push(0);
 }).setEnabled(stateDragonHelperTrackHits);
 const bowHitReg = reg('soundPlay', () => hitTimes[hitTimes.length - 1]++).setCriteria('random.successful_hit').setEnabled(stateDragonHelperTrackHits);
+const ProjectileHelper = Java.type('com.perseuspotter.chicktilshelper.ProjectileHelper');
+const lastReportedPosX = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175172_bI'));
+const lastReportedPosY = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175166_bJ'));
+const lastReportedPosZ = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175167_bK'));
+const serverTickAimReg = reg('serverTick', () => {
+  let ticksRemaining = spawnedDrags.get(currDragPrio);
+  // only the position of the first 30 ticks are defined
+  if (ticksRemaining === undefined || ticksRemaining < -30) return stateAimPosition.set(null);
+  ticksRemaining -= getMedianPing() / 50;
+
+  const path = DRAGONS[currDragPrio].path;
+  const visited = new Set([]);
+  const p = Player.getPlayer();
+  const x = lastReportedPosX.get(p);
+  const y = lastReportedPosY.get(p) + getEyeHeight(p);
+  const z = lastReportedPosZ.get(p);
+  let { theta, phi, ticks } = ProjectileHelper.solve(
+    path[prevBestTarget][0] - x,
+    path[prevBestTarget][1] - y + (isHighDragon ? 8 : 0),
+    path[prevBestTarget][2] - z,
+    0.001, -0.05, 2.92, 0.99, false
+  );
+  // assumes this relationship is roughly monotonic
+  let bestI = prevBestTarget;
+  let bestT = theta;
+  let bestP = phi;
+  let bestO = Math.abs(ticks - ticksRemaining - prevBestTarget);
+  if (Number.isNaN(bestO)) bestO = Number.POSITIVE_INFINITY;
+  let dir = 1;
+  let swapped = false;
+  let i = prevBestTarget;
+  while (true) {
+    let next = i + dir;
+    let shouldSwap = false;
+    if (next >= 0 && next < path.length && visited.add(next)) {
+      ({ theta, phi, ticks } = ProjectileHelper.solve(
+        path[next][0] - x,
+        path[next][1] - y + (isHighDragon ? 8 : 0),
+        path[next][2] - z,
+        0.001, -0.05, 2.92, 0.99, false
+      ));
+      let o = Math.abs(ticks - ticksRemaining - next);
+      if (o < bestO) {
+        bestI = next;
+        bestO = o;
+        bestT = theta;
+        bestP = phi;
+        i = next;
+      } else shouldSwap = true;
+    } else shouldSwap = true;
+    if (shouldSwap) {
+      if (swapped) break;
+      swapped = true;
+      dir = -dir;
+    }
+  }
+
+  prevBestTarget = Number.isFinite(bestO) ? bestI : 0;
+  prevAimPosition = stateAimPosition.get() ?? [bestT, bestP];
+  stateAimPosition.set([bestT, bestP]);
+}).setEnabled(stateDragonHelperAim);
+const worldRenAimReg = reg('renderWorld', () => {
+  const [ntheta, nphi] = stateAimPosition.get();
+  const [otheta, ophi] = prevAimPosition;
+  const theta = lerp(otheta, ntheta, getPartialServerTick());
+  const phi = lerp(ophi, nphi, getPartialServerTick());
+  renderBoxFilled(
+    settings.dungeonDragonHelperStackAimerColor,
+    getRenderX() + 50 * Math.sin(phi) * Math.cos(theta),
+    getRenderY() + 50 * Math.cos(phi) - 0.5,
+    getRenderZ() + 50 * Math.sin(phi) * Math.sin(theta),
+    1, 1,
+    { centered: true, phase: true }
+  );
+  if (settings.dungeonDragonHelperStackAimerPointTo && settings.preferUseTracer) renderTracer(
+    settings.dungeonDragonHelperStackAimerColor,
+    getRenderX() + 50 * Math.sin(phi) * Math.cos(theta),
+    getRenderY() + 50 * Math.cos(phi),
+    getRenderZ() + 50 * Math.sin(phi) * Math.sin(theta),
+    { lw: 5, smooth: true }
+  );
+}).setEnabled(stateDragonHelperAimRender);
+const renderOvAimReg = reg('renderOverlay', () => {
+  const [ntheta, nphi] = stateAimPosition.get();
+  const [otheta, ophi] = prevAimPosition;
+  const theta = lerp(otheta, ntheta, getPartialServerTick());
+  const phi = lerp(ophi, nphi, getPartialServerTick());
+  drawArrow3DPos(
+    settings.dungeonDragonHelper,
+    50 * Math.sin(phi) * Math.cos(theta),
+    50 * Math.cos(phi),
+    50 * Math.sin(phi) * Math.sin(theta),
+    false
+  );
+}).setEnabled(stateDragonHelperAimRender.and(settings.dungeonDragonHelperStackAimerPointTo).and(new StateProp(settings._preferUseTracer).not()));
 
 export function init() {
   registerTrackPlayers(stateDragonHelper);
@@ -219,11 +491,13 @@ export function init() {
   }
   settings._dungeonDragonHelperPrioS.listen(checkPrio);
   settings._dungeonDragonHelperPrioNS.listen(checkPrio);
-  settings._dungeonDragonHelperBersTeam.listen(function(v, o) {
+  function checkTeam(v, o) {
     if (!/[^bmhat]/.test(v)) return;
     log('&4invalid team, it should only contain the characters "bmhat" (case sensitive)');
     this.set(o);
-  });
+  }
+  settings._dungeonDragonHelperBersTeam.listen(checkTeam);
+  settings._dungeonDragonHelperShowStackClass.listen(checkTeam);
 }
 export function enter() {
   stateInP5.set(false);
@@ -241,6 +515,9 @@ export function start() {
   dragonSpawnReg.register();
   serverTickHitReg.register();
   bowHitReg.register();
+  serverTickAimReg.register();
+  worldRenAimReg.register();
+  renderOvAimReg.register();
 }
 export function reset() {
   tickReg.unregister();
@@ -251,4 +528,7 @@ export function reset() {
   dragonSpawnReg.unregister();
   serverTickHitReg.unregister();
   bowHitReg.unregister();
+  serverTickAimReg.unregister();
+  worldRenAimReg.unregister();
+  renderOvAimReg.unregister();
 }
