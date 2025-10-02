@@ -18,10 +18,14 @@ const stateDragonHelperHits = stateDragonHelperActive.and(new StateProp(settings
 const stateDragon = new StateVar();
 const stateDragonHelperTrackHits = stateDragonHelperHits.and(stateDragon);
 
+/** @typedef {'r' | 'o' | 'b' | 'p' | 'g'} DragonType */
+/** @type {Map<DragonType, number>} */
 const spawnedDrags = new Map();
 const spawnAlert = createAlert('', 5, settings.dungeonDragonHelperAlertSound);
 let dragonCount = 0;
 const timerHud = createTextGui(() => data.dragonHelperTimer, () => ['&24269']);
+/** @typedef {{ color: string, pos: number[], name: string, path: number[][] }} DragonInfo */
+/** @type {{ [k in DragonType]: DragonInfo }} */
 const DRAGONS = {
   r: {
     color: '&c',
@@ -49,17 +53,27 @@ const DRAGONS = {
     name: 'APEX'
   }
 };
-/** @type {'r' | 'o' | 'b' | 'p' | 'g'} */
+/** @type {DragonType} */
 let currDragPrio;
+let isHighDragon = false;
 let hitTimes = [0];
 
 const tickReg = reg('tick', () => stateInP5.set(Player.getY() < 30)).setEnabled(stateDragonHelper);
+/**
+ * @param {DragonType} d1
+ * @param {DragonType} d2
+ * @param {string} bersTeam
+ * @param {string} prio
+ * @param {string} role
+ * @returns {DragonType}
+ */
 function getSplitDrag(d1, d2, bersTeam, prio, role) {
   const i1 = prio.indexOf(d1);
   const i2 = prio.indexOf(d2);
   if (bersTeam.includes(role)) return i1 < i2 ? d1 : d2;
   return i1 > i2 ? d1 : d2;
 }
+/** @param {DragonType} c */
 function addDragon(c) {
   if (spawnedDrags.has(c)) return;
   spawnedDrags.set(c, 100);
@@ -81,14 +95,17 @@ function addDragon(c) {
     if (settings.dungeonDragonHelperAlert === 'None') return;
   } else if (settings.dungeonDragonHelperAlert !== 'All') return;
 
-  spawnAlert.text = `&l${dragD.color}${dragD.name}`;
+  spawnAlert.text = `&l${dragD.color}${dragD.name}` + (isHighDragon ? ' HIGH' : '');
   spawnAlert.show(settings.dungeonDragonHelperAlertTime);
 }
 const EnumParticleTypes = Java.type('net.minecraft.util.EnumParticleTypes');
 const partSpawnReg = reg('packetReceived', pack => {
   if (
     pack.func_149222_k() !== 20 ||
-    pack.func_149226_e() !== 19 ||
+    (
+      pack.func_149226_e() !== 19 &&
+      pack.func_149226_e() !== 27
+    ) ||
     !pack.func_179749_a().equals(EnumParticleTypes.FLAME) ||
     pack.func_149221_g() !== 2 ||
     pack.func_149224_h() !== 3 ||
@@ -96,6 +113,7 @@ const partSpawnReg = reg('packetReceived', pack => {
     pack.func_149227_j() !== 0 ||
     !pack.func_179750_b()
   ) return;
+  isHighDragon = pack.func_149226_e() === 27;
 
   const x = Math.trunc(pack.func_149220_d());
   const z = Math.trunc(pack.func_149225_f());
