@@ -394,7 +394,7 @@ const serverTickAimReg = reg('serverTick', () => {
   ticksRemaining -= getMedianPing() / 50;
 
   const path = DRAGONS[currDragPrio].path;
-  const visited = new Set([]);
+  const visited = new Set([prevBestTarget]);
   const p = Player.getPlayer();
   const x = lastReportedPosX.get(p);
   const y = lastReportedPosY.get(p) + getEyeHeight(p);
