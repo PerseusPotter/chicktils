@@ -83,7 +83,42 @@ public class MathHelper {
         return fastPow2(1.442695040f * p);
     }
 
-    public static float fastSqrt(float x) {
-        return fastPow2(0.5f * fastLog2(x));
+    // http://doi.org/10.1016/j.cpc.2012.07.008
+    // https://doi.org/10.1016/S0378-4754(02)00051-4
+
+    public static double lambertW0(double x) {
+        if (x < -1.0 / Math.E) return Double.NaN;
+        return x == 0.0 ? 0.0 : lambertWFritschIteration(x, fastLambertW0((float) x), 1, Double.MIN_VALUE);
+    }
+
+    public static double lambertW1(double x) {
+        if (x < -1.0 / Math.E || 0.0 <= x) return Double.NaN;
+        return lambertWFritschIteration(x, lambertW1Guess(x), 1, Double.MIN_VALUE);
+    }
+
+    public static double lambertWFritschIteration(double x, double W, double iter, double eps) {
+        double r = Math.abs(W - Math.log(Math.abs(x)) + Math.log(Math.abs(W)));
+
+        while (r > eps && --iter >= 0) {
+            final double z = Math.log(x / W) - W;
+            final double q = 2 * (1 + W) * (1 + W + (2.0 / 3.0) * z);
+            final double eps_term = z * (q - z) / ((1 + W) * (q - 2 * z));
+            W = W * (1 + eps_term);
+
+            r = Math.abs(W - Math.log(Math.abs(x)) + Math.log(Math.abs(W)));
+        }
+
+        return Double.isNaN(W) ? 0.0 : W;
+    }
+
+    public static double lambertW1Guess(double x) {
+        final double M1 = 0.3361;
+        final double M2 = -0.0042;
+        final double M3 = -0.0201;
+
+        final double sigma = -1 - Math.log(-x);
+        final double sqrt_sigma = Math.sqrt(sigma);
+        final double expr = (M1 * sqrt_sigma / 2) / (1 + M2 * sigma * Math.exp(M3 * sqrt_sigma));
+        return -1 - sigma - (2 / M1) * (1 - 1 / (1 + expr));
     }
 }
