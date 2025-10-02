@@ -134,13 +134,13 @@ export class DSU {
  * @template R
  * @param {Map<K, R>} m
  * @param {K} k
- * @param {() => R} d
+ * @param {(k: K) => R} d
  * @returns {R}
  */
 export function getOrPut(m, k, d) {
   let v;
   return m.get(k) ?? (
-    (v = d()),
+    (v = d(k)),
     m.set(k, v),
     v
   );
