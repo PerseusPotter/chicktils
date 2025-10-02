@@ -18,7 +18,6 @@ import java.lang.reflect.Method;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @Mod(modid = ChickTilsHelper.MODID, version = ChickTilsHelper.VERSION)
 public class ChickTilsHelper {
@@ -54,6 +53,27 @@ public class ChickTilsHelper {
             while (iter.hasPrevious()) {
                 int id = iter.previous().getChatLineID();
                 if (start <= id && id < end) iter.remove();
+            }
+
+            gui.refreshChat();
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+    }
+
+    public static void deleteChatId(int target) {
+        GuiNewChat gui = Minecraft.getMinecraft().ingameGUI.getChatGUI();
+        try {
+            Field prop = GuiNewChat.class.getDeclaredField("field_146252_h");
+            prop.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            List<ChatLine> lines = (List<ChatLine>) prop.get(gui);
+
+            ListIterator<ChatLine> iter = lines.listIterator(lines.size());
+            while (iter.hasPrevious()) {
+                int id = iter.previous().getChatLineID();
+                if (id == target) {
+                    iter.remove();
+                    break;
+                }
             }
 
             gui.refreshChat();
