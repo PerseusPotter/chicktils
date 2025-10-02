@@ -13,6 +13,7 @@ import { _setTimeout } from '../util/timers';
 import { getOrPut, randInt, setAccessible } from '../util/polyfill';
 import { renderBeacon, renderBillboardString, renderBoxOutline } from '../../Apelles/index';
 import { printChatComponent } from '../util/mc';
+import { deleteChatId } from '../util/helper';
 
 const blockedNames = new Set();
 const blockNameCmd = reg('command', ign => {
@@ -78,6 +79,7 @@ function hideMessage(option, evn) {
 
 const melodyMessages = new Map();
 const prevMelodyMessage = new Map();
+const lastMessage = new Map();
 const fixedMelodies = [
   ['melody'],
   ['Melody Terminal start'],
@@ -116,10 +118,14 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
   if (settings.chatTilsHideLeap !== 'False' && ['Leaped to ', 'Leaping to ', 'I\'m leaping to ', '[Leaped]: ➜'].some(v => msg.startsWith(v))) return hideMessage(settings.chatTilsHideLeap, evn);
 
   if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
+    const lIgn = ign.toLowerCase();
     if (getOrPut(melodyMessages, msg, isMelodyMessage)) {
+      if (lastMessage.has(lIgn)) melodyMessages.set(lastMessage.get(lIgn), true);
       if (settings.chatTilsCompactMelody) {
-        const lIgn = ign.toLowerCase();
-        if (prevMelodyMessage.has(lIgn)) ChatLib.deleteChat(prevMelodyMessage.get(lIgn));
+        if (prevMelodyMessage.has(lIgn)) {
+          deleteChatId(prevMelodyMessage.get(lIgn));
+          prevMelodyMessage.delete(lIgn);
+        }
 
         cancel(evn);
         if (settings.chatTilsHideMelody !== 'False') stateCancelNextPing.set(true);
@@ -132,7 +138,7 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
         stateCancelNextPing.set(true);
         if (settings.chatTilsHideMelody === 'Both') cancel(evn);
       }
-    }
+    } else lastMessage.set(lIgn, msg);
   }
 }).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
 const coopChatReg = reg('chat', (ign, msg) => {
