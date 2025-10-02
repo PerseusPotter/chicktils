@@ -1,6 +1,7 @@
 import { logMessage } from '../util/log';
 import { randInt } from '../util/polyfill';
 import reg from '../util/registerer';
+import { unrun } from '../util/threading';
 
 const cakes = [
   '&d+1♣ Pet Luck',
@@ -58,7 +59,7 @@ function onEat(cake) {
         ].join('\n'))
     );
   msg.setChatLineId(msgId);
-  logMessage(prevMsg);
+  unrun(() => logMessage(msg));
 }
 const eatReg = reg('chat', onEat).setCriteria('&r&d&lYum! &r&eYou gain &r${cake} &r&efor &r&a48 &r&ehours!&r');
 const refreshReg = reg('chat', onEat).setCriteria('&r&d&lBig Yum! &r&eYou refresh &r${cake} &r&efor &r&a48 &r&ehours!&r');
