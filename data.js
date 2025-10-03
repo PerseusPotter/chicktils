@@ -49,6 +49,7 @@ export function setIsMain() {
  *  monolithTracker: TextLocation;
  *  witherShieldTimer: TextLocation;
  *  neuItemPreloadDisplay: TextLocation;
+ *  dragonHelperStackRunTimer: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -102,6 +103,7 @@ function verifyTextLocation(value) {
   'monolithTracker',
   'witherShieldTimer',
   'neuItemPreloadDisplay',
+  'dragonHelperStackRunTimer',
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v);
