@@ -450,7 +450,9 @@ const serverTickAimReg = reg('serverTick', () => {
   stateAimPosition.set([bestT, bestP, bestD]);
 }).setEnabled(stateDragonHelperAim);
 const worldRenAimReg = reg('renderWorld', () => {
-  const [ntheta, nphi] = stateAimPosition.get();
+  const o = stateAimPosition.get();
+  if (!o) return;
+  const [ntheta, nphi] = o;
   const [otheta, ophi] = prevAimPosition;
   const theta = lerp(otheta, ntheta, getPartialServerTick());
   const phi = lerp(ophi, nphi, getPartialServerTick());
@@ -471,7 +473,9 @@ const worldRenAimReg = reg('renderWorld', () => {
   );
 }).setEnabled(stateDragonHelperAimRender);
 const renderOvAimReg = reg('renderOverlay', () => {
-  const [ntheta, nphi] = stateAimPosition.get();
+  const o = stateAimPosition.get();
+  if (!o) return;
+  const [ntheta, nphi] = o;
   const [otheta, ophi] = prevAimPosition;
   const theta = lerp(otheta, ntheta, getPartialServerTick());
   const phi = lerp(ophi, nphi, getPartialServerTick());
@@ -486,7 +490,9 @@ const renderOvAimReg = reg('renderOverlay', () => {
 const renderOvRunReg = reg('renderOverlay', () => {
   const ticks = spawnedDrags.values().next().value;
   if (ticks === undefined) return;
-  const arrowTime = stateAimPosition.get()[2];
+  const o = stateAimPosition.get();
+  if (!o) return;
+  const arrowTime = o[2];
   const remaining = (ticks - getPartialServerTick() - arrowTime) * 50 - getMedianPing();
   runTimerHud.setLine(remaining < 0 ? '&bNOW' : colorForNumber(remaining, 5000) + remaining.toFixed(0));
   runTimerHud.render();
