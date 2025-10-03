@@ -193,6 +193,8 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addText('dungeonDragonHelperShowStackClass', 'DungeonDragonHelperShowStackClasses', 'ab', { desc: 'what classes to show the aimer as', shouldShow: p => addDependency(p.dungeonDragonHelperShowStackAimer) })
   .addColor('dungeonDragonHelperStackAimerColor', 'DungeonDragonHelperStackAimerColor', 0x00FFFFFF, { shouldShow: p => addDependency(p.dungeonDragonHelperShowStackAimer) })
   .addToggle('dungeonDragonHelperStackAimerPointTo', 'DungeonDragonHelperStackAimerPointTo', true, { desc: 'whether should point to where to aim', shouldShow: p => addDependency(p.dungeonDragonHelperShowStackAimer) })
+  .addToggle('dungeonDragonHelperStackTimeUntilRun', 'DungeonDragonHelperStackTimeUntilRun', true, { desc: 'timer for when you should begin running', shouldShow: p => addDependency(p.dungeonDragonHelperShowStackAimer) })
+  .addAction('moveDragonHelperStackTimeUntilRun', 'MoveDragonHelperStackTimeUntilRun', true, { desc: 'timer for when you should begin running', shouldShow: p => addDependency(p.dungeonDragonHelperStackTimeUntilRun) })
 
   .addToggle('dungeonLBPullProgress', 'DungeonLBPullProgress', false, { desc: 'play sounds indicating bow pull progress (accounting for lag)', shouldShow: p => addDependency(p.enabledungeon), isNewSection: true })
   .addNumber('dungeonLBPullProgressVolume', 'DungeonLBPullProgressVolume', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.dungeonLBPullProgress) })

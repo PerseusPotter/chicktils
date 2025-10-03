@@ -21,9 +21,10 @@ const stateDragonHelperHits = stateDragonHelperActive.and(new StateProp(settings
 const stateDragon = new StateVar();
 const stateDragonHelperTrackHits = stateDragonHelperHits.and(stateDragon);
 const stateDragonHelperAim = stateDragonHelperActive.and(settings._dungeonDragonHelperShowStackAimer).and(new StateProp(statePlayerClass).customBinary(settings._dungeonDragonHelperShowStackClass, (c, s) => c === 'Unknown' || s.includes(c[0].toLowerCase())));
-/** @type {StateVar<[number, number]?>} */
+/** @type {StateVar<[number, number, number]?>} */
 const stateAimPosition = new StateVar();
 const stateDragonHelperAimRender = stateDragonHelperAim.and(stateAimPosition);
+const stateDragonHelperStackRunTimer = stateDragonHelperAimRender.and(settings._dungeonDragonHelperStackTimeUntilRun);
 
 /** @typedef {'r' | 'o' | 'b' | 'p' | 'g'} DragonType */
 /** @type {Map<DragonType, number>} */
@@ -31,6 +32,7 @@ const spawnedDrags = new Map();
 const spawnAlert = createAlert('', 5, settings.dungeonDragonHelperAlertSound);
 let dragonCount = 0;
 const timerHud = createTextGui(() => data.dragonHelperTimer, () => ['&24269']);
+const runTimerHud = createTextGui(() => data.dragonHelperStackRunTimer, () => ['&24269']);
 /** @typedef {{ color: string, pos: number[], name: string, path: number[][] }} DragonInfo */
 /** @type {{ [k in DragonType]: DragonInfo }} */
 const DRAGONS = {
@@ -247,6 +249,7 @@ function getSplitDrag(d1, d2, bersTeam, prio, role) {
   if (bersTeam.includes(role)) return i1 < i2 ? d1 : d2;
   return i1 > i2 ? d1 : d2;
 }
+register('command', c => addDragon(c)).setName('chicktilstestadddragon');
 /** @param {DragonType} c */
 function addDragon(c) {
   if (spawnedDrags.has(c)) return;
@@ -410,6 +413,7 @@ const serverTickAimReg = reg('serverTick', () => {
   let bestT = theta;
   let bestP = phi;
   let bestO = Math.abs(ticks - ticksRemaining - prevBestTarget);
+  let bestD = ticks;
   if (Number.isNaN(bestO)) bestO = Number.POSITIVE_INFINITY;
   let dir = 1;
   let swapped = false;
@@ -430,6 +434,7 @@ const serverTickAimReg = reg('serverTick', () => {
         bestO = o;
         bestT = theta;
         bestP = phi;
+        bestD = ticks;
         i = next;
       } else shouldSwap = true;
     } else shouldSwap = true;
@@ -442,7 +447,7 @@ const serverTickAimReg = reg('serverTick', () => {
 
   prevBestTarget = Number.isFinite(bestO) ? bestI : 0;
   prevAimPosition = stateAimPosition.get() ?? [bestT, bestP];
-  stateAimPosition.set([bestT, bestP]);
+  stateAimPosition.set([bestT, bestP, bestD]);
 }).setEnabled(stateDragonHelperAim);
 const worldRenAimReg = reg('renderWorld', () => {
   const [ntheta, nphi] = stateAimPosition.get();
@@ -478,6 +483,14 @@ const renderOvAimReg = reg('renderOverlay', () => {
     false
   );
 }).setEnabled(stateDragonHelperAimRender.and(settings.dungeonDragonHelperStackAimerPointTo).and(new StateProp(settings._preferUseTracer).not()));
+const renderOvRunReg = reg('renderOverlay', () => {
+  const ticks = spawnedDrags.values().next().value;
+  if (ticks === undefined) return;
+  const arrowTime = stateAimPosition.get()[2];
+  const remaining = (ticks - getPartialServerTick() - arrowTime) * 50 - getMedianPing();
+  runTimerHud.setLine(remaining < 0 ? '&bNOW' : colorForNumber(remaining, 5000) + remaining.toFixed(0));
+  runTimerHud.render();
+}).setEnabled(stateDragonHelperStackRunTimer);
 
 export function init() {
   registerTrackPlayers(stateDragonHelper);
@@ -498,6 +511,7 @@ export function init() {
   }
   settings._dungeonDragonHelperBersTeam.listen(checkTeam);
   settings._dungeonDragonHelperShowStackClass.listen(checkTeam);
+  settings._moveDragonHelperStackTimeUntilRun.onAction(() => runTimerHud.edit());
 }
 export function enter() {
   stateInP5.set(false);
@@ -518,6 +532,7 @@ export function start() {
   serverTickAimReg.register();
   worldRenAimReg.register();
   renderOvAimReg.register();
+  renderOvRunReg.register();
 }
 export function reset() {
   tickReg.unregister();
@@ -531,4 +546,5 @@ export function reset() {
   serverTickAimReg.unregister();
   worldRenAimReg.unregister();
   renderOvAimReg.unregister();
+  renderOvRunReg.unregister();
 }
