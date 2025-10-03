@@ -7,7 +7,7 @@ import { setAccessible } from '../util/polyfill';
 import reg from '../util/registerer';
 import { wrap } from '../util/threading';
 
-const serialize = o => _serialize(o, 4, { precision: -1 });
+const serialize = o => _serialize(o, -1, { precision: -1 });
 
 /** @type {Set<string>} */
 const whitelist = new Set();
