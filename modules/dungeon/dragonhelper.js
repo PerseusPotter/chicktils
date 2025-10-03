@@ -517,7 +517,7 @@ export function init() {
   }
   settings._dungeonDragonHelperBersTeam.listen(checkTeam);
   settings._dungeonDragonHelperShowStackClass.listen(checkTeam);
-  settings._moveDragonHelperStackTimeUntilRun.onAction(() => runTimerHud.edit());
+  settings._moveDragonHelperStackTimeUntilRun.onAction(v => runTimerHud.edit(v));
 }
 export function enter() {
   stateInP5.set(false);

@@ -31,7 +31,7 @@ const renderReg = reg('renderOverlay', () => {
 }).setEnabled(new StateProp(stateRemaining).customUnary(v => v > 0).and(NEUEventListener));
 
 export function init() {
-  settings._moveNeuItemPreloadProgress.onAction(() => display.edit());
+  settings._moveNeuItemPreloadProgress.onAction(v => display.edit(v));
 }
 export function load() {
   tickReg.register();

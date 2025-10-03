@@ -71,7 +71,7 @@ const unloadReg = reg('worldUnload', () => {
 });
 
 export function init() {
-  settings._moveWitherShieldTimer.onAction(() => timer.edit());
+  settings._moveWitherShieldTimer.onAction(v => timer.edit(v));
 }
 export function load() {
   renderReg.register();
