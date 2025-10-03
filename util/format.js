@@ -187,7 +187,7 @@ export const serialize = (function() {
         if (obj instanceof MCBlock) return `{Block|${serialize(obj.func_149732_F(), depth, options)}|${serialize(MCBlock.func_149682_b(obj), depth, options)}}`;
         if (obj instanceof MCIBlockState) return `{IBlockState|${serialize(obj.func_177230_c(), depth, options)}|meta=${serialize(obj.func_177230_c().func_176201_c(obj), depth, options)}}`;
         if (obj instanceof MCItem) return `{Item|${serialize(getItemIdI(obj), depth, options)}}`;
-        if (obj instanceof MCItemStack) return `{ItemStack|${serialize(obj.func_77973_b(), depth, options)}|damage=${serialize(obj.func_77952_i(), depth, options)}|count=${serialize(obj.field_77994_a, depth, options)}|sbid=${serialize(getSbId(obj), depth, options)}nbt=${serialize(obj.func_77978_p(), depth, options)}}`;
+        if (obj instanceof MCItemStack) return `{ItemStack|${serialize(obj.func_77973_b(), depth, options)}|damage=${serialize(obj.func_77952_i(), depth, options)}|count=${serialize(obj.field_77994_a, depth, options)}|sbid=${serialize(getSbId(obj), depth, options)}|nbt=${serialize(obj.func_77978_p(), depth, options)}}`;
         if (obj instanceof MCIChatComponent) return `{IChatComponent|${serialize(obj.func_150254_d(), depth, options)}}`;
 
         if (obj instanceof MCNBTBase) {
