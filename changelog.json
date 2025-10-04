@@ -896,6 +896,15 @@
           "desc": "message deletion now uses chat ids (as a side effect, compact melody may prevent other mods from receiving the message if they do not use packets to read chat)"
         }
       ]
+    },
+    {
+      "version": "0.13.1",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "neuitempreload"
+        }
+      ]
     }
   ]
 }
