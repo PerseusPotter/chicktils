@@ -249,7 +249,6 @@ function getSplitDrag(d1, d2, bersTeam, prio, role) {
   if (bersTeam.includes(role)) return i1 < i2 ? d1 : d2;
   return i1 > i2 ? d1 : d2;
 }
-register('command', c => addDragon(c)).setName('chicktilstestadddragon');
 /** @param {DragonType} c */
 function addDragon(c) {
   if (spawnedDrags.has(c)) return;
