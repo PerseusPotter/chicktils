@@ -27,8 +27,11 @@ const typesToAmat = [
 export default function convert(settings) {
   FileLib.delete('ChickTils', 'settings_amaterasu.json');
   const defaultConf = new DefaultConfig('ChickTils', 'settings_amaterasu.json');
-  settings.props.forEach((v, i) => propertyToAmaterasu(defaultConf, v, settings.propIds[i], settings.pageNames[v.page]));
-  return new Settings('ChickTils', defaultConf, 'ColorScheme.json');
+  let settingsInst;
+  let getSettingsInst = () => settingsInst;
+  settings.props.forEach((v, i) => propertyToAmaterasu(defaultConf, v, settings.propIds[i], settings.pageNames[v.page], getSettingsInst));
+  settingsInst = new Settings('ChickTils', defaultConf, 'ColorScheme.json');
+  return settingsInst;
 }
 
 const getSubcategory = (function() {
@@ -44,8 +47,9 @@ const getSubcategory = (function() {
  * @param {import('./settingsLib').Property} instance
  * @param {string} key
  * @param {string} pageName
+ * @param {() => Settings} getSettingsInst
  */
-function propertyToAmaterasu(defaultConf, instance, key, pageName) {
+function propertyToAmaterasu(defaultConf, instance, key, pageName, getSettingsInst) {
   let { page, name, type, value, defaultValue, desc, isNewSection } = instance;
   name = name.match(/[a-z]+|[A-Z](?:[a-z]+|[A-Z]*(?![a-z]))|[.\d]+/g).join(' ');
   let { min, max, len, options, shouldShow } = instance.opts;
@@ -63,6 +67,7 @@ function propertyToAmaterasu(defaultConf, instance, key, pageName) {
           value: value,
           registerListener(oldV, newV) {
             instance.set(newV);
+            getSettingsInst()?.categories?.forEach?.(v => v.createElementClass?._hideElement?.(getSettingsInst().settings));
           },
           shouldShow: () => instance.shouldShow.get()
         });
@@ -86,6 +91,7 @@ function propertyToAmaterasu(defaultConf, instance, key, pageName) {
           value: value,
           registerListener(oldV, newV) {
             instance.set(newV);
+            getSettingsInst()?.categories?.forEach?.(v => v.createElementClass?._hideElement?.(getSettingsInst().settings));
           },
           shouldShow: () => instance.shouldShow.get()
         });
@@ -102,6 +108,7 @@ function propertyToAmaterasu(defaultConf, instance, key, pageName) {
           value: value,
           registerListener(oldV, newV) {
             instance.set(newV);
+            getSettingsInst()?.categories?.forEach?.(v => v.createElementClass?._hideElement?.(getSettingsInst().settings));
           },
           shouldShow: () => instance.shouldShow.get()
         });
@@ -123,6 +130,7 @@ function propertyToAmaterasu(defaultConf, instance, key, pageName) {
           value: [r, g, b, a],
           registerListener(oldV, newV) {
             instance.set((newV[0] << 24) | (newV[1] << 16) | (newV[2] << 8) | (newV[3] << 0));
+            getSettingsInst()?.categories?.forEach?.(v => v.createElementClass?._hideElement?.(getSettingsInst().settings));
           },
           shouldShow: () => instance.shouldShow.get()
         });
@@ -141,6 +149,7 @@ function propertyToAmaterasu(defaultConf, instance, key, pageName) {
           value: options.indexOf(value),
           registerListener(oldV, newV) {
             instance.set(options[newV]);
+            getSettingsInst()?.categories?.forEach?.(v => v.createElementClass?._hideElement?.(getSettingsInst().settings));
           },
           shouldShow: () => instance.shouldShow.get()
         });
@@ -156,6 +165,7 @@ function propertyToAmaterasu(defaultConf, instance, key, pageName) {
           description: desc,
           onClick() {
             instance.actionListeners.forEach(v => v(true));
+            getSettingsInst()?.categories?.forEach?.(v => v.createElementClass?._hideElement?.(getSettingsInst().settings));
           },
           shouldShow: () => instance.shouldShow.get()
         });
