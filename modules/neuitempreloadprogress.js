@@ -8,7 +8,7 @@ import { StateProp, StateVar } from '../util/state';
 
 const listenersF = setAccessible(Java.type('net.minecraftforge.fml.common.eventhandler.EventBus').class.getDeclaredField('listeners'));
 let NEUEventListener = null;
-listenersF.get(MinecraftForge.EVENT_BUS).forEach(v => {
+listenersF.get(Java.type('net.minecraftforge.common.MinecraftForge').EVENT_BUS).forEach(v => {
   if (v.getClass().getName() === 'io.github.moulberry.notenoughupdates.listener.NEUEventListener') NEUEventListener = v;
 });
 const toPreloadF = NEUEventListener && setAccessible(NEUEventListener.getClass().getDeclaredField('toPreload'));
