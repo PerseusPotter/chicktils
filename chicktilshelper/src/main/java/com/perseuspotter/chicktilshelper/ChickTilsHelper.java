@@ -49,10 +49,14 @@ public class ChickTilsHelper {
             @SuppressWarnings("unchecked")
             List<ChatLine> lines = (List<ChatLine>) prop.get(gui);
 
+            int c = end - start;
             ListIterator<ChatLine> iter = lines.listIterator(lines.size());
             while (iter.hasPrevious()) {
                 int id = iter.previous().getChatLineID();
-                if (start <= id && id < end) iter.remove();
+                if (start <= id && id < end) {
+                    iter.remove();
+                    if (--c == 0) break;
+                }
             }
 
             gui.refreshChat();
