@@ -706,8 +706,8 @@ export class Settings {
     centerMessage(pageNav);
     msgs.push(pageNav);
 
+    deleteChatIds(this.chatLineId, this.prevMsgId);
     msgs.forEach(v => v.chat());
-    deleteChatIds(this.chatLineId + msgs.length, this.prevMsgId);
     this.prevMsgId = this.chatLineId + msgs.length;
     this.lastDisplay = {
       type: 'display',
@@ -737,8 +737,8 @@ export class Settings {
         .setChatLineId(this.chatLineId)
     );
 
+    deleteChatIds(this.chatLineId, this.prevMsgId);
     msgs.forEach(v => v.chat());
-    deleteChatIds(this.chatLineId + msgs.length, this.prevMsgId);
     this.prevMsgId = this.chatLineId + msgs.length;
     this.lastDisplay = {
       type: 'displaySearch',
