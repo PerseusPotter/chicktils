@@ -839,6 +839,63 @@
           "desc": "add gravity enchant to sba list"
         }
       ]
+    },
+    {
+      "version": "0.13.0",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "guess score things idk"
+        },
+        {
+          "type": "fix",
+          "desc": "random npes and conc mods (my favorite)"
+        },
+        {
+          "type": "feat",
+          "desc": "neu item preload countdown"
+        },
+        {
+          "type": "change",
+          "desc": "reimplement ping to track various player actions"
+        },
+        {
+          "type": "change",
+          "desc": "add back frame limiters to guis as settings"
+        },
+        {
+          "type": "misc",
+          "desc": "sba enchants"
+        },
+        {
+          "type": "misc",
+          "desc": "gfs list"
+        },
+        {
+          "type": "misc",
+          "desc": "add median ping"
+        },
+        {
+          "type": "fix",
+          "desc": "gui settings not updating whether to show properties"
+        },
+        {
+          "type": "feat",
+          "desc": "dragon stack aimer + run timer"
+        },
+        {
+          "type": "feat",
+          "desc": "show server location"
+        },
+        {
+          "type": "feat",
+          "desc": "debug packet logger"
+        },
+        {
+          "type": "change",
+          "desc": "message deletion now uses chat ids (as a side effect, compact melody may prevent other mods from receiving the message if they do not use packets to read chat)"
+        }
+      ]
     }
   ]
 }

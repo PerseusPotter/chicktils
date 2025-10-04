@@ -11,7 +11,7 @@ import { calcMedian } from './util/math';
 import { createIntegerProp, Property } from './settingsLib';
 settings.setMainInstance();
 setIsMainD();
-const VERSION = '0.12.1';
+const VERSION = '0.13.0';
 
 let sev;
 function tryUpdate(delay = 0) {
