@@ -29,6 +29,7 @@ const stateCamp = new StateProp(stateBloodClosed).not().and(settings._dungeonCam
 const stateCampFinal = new StateProp(stateIsInBoss).not().and(settings._dungeonCamp);
 
 function isSkull(e) {
+  if (!e) return;
   const i = e.func_71124_b(4);
   return i && getItemId(i) === 'minecraft:skull';
 }
