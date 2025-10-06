@@ -6,7 +6,7 @@ import reg from '../../util/registerer';
 import { colorForNumber } from '../../util/format';
 import createTextGui from '../../util/customtextgui';
 import { log } from '../../util/log';
-import { StateProp, StateVar } from '../../util/state';
+import { AtomicStateVar, StateProp, StateVar } from '../../util/state';
 import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss, statePlayerClass } from '../dungeon.js';
 import { fastDistance, lerp } from '../../util/math';
 import { getRenderX, getRenderY, getRenderZ, renderBillboardString, renderBoxFilled, renderTracer } from '../../../Apelles/index';
@@ -22,7 +22,7 @@ const stateDragon = new StateVar();
 const stateDragonHelperTrackHits = stateDragonHelperHits.and(stateDragon);
 const stateDragonHelperAim = stateDragonHelperActive.and(settings._dungeonDragonHelperShowStackAimer).and(new StateProp(statePlayerClass).customBinary(settings._dungeonDragonHelperShowStackClass, (c, s) => c === 'Unknown' || s.includes(c[0].toLowerCase())));
 /** @type {StateVar<[number, number, number]?>} */
-const stateAimPosition = new StateVar();
+const stateAimPosition = new AtomicStateVar();
 const stateDragonHelperAimRender = stateDragonHelperAim.and(stateAimPosition);
 const stateDragonHelperStackRunTimer = stateDragonHelperAimRender.and(settings._dungeonDragonHelperStackTimeUntilRun);
 
