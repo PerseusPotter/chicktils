@@ -1,4 +1,5 @@
 import { Builder } from './settingsLib';
+import { log } from './util/log';
 import { StateProp } from './util/state';
 
 export const $FONTS = new Map(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames().map(v => [v.replace(/\s/g, ''), v]));
@@ -337,10 +338,8 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('chatTilsWaypointShowOwn', 'ChatTilsWaypointShowOwn', true, { desc: 'show your own waypoints', shouldShow: p => addDependency(p.chatTilsWaypoint) })
   .addToggle('chatTilsWaypointPersist', 'ChatTilsWaypointPersist', false, { desc: 'whether to persist on swapping servers', shouldShow: p => addDependency(p.chatTilsWaypoint) })
 
-  .addOption('chatTilsHideBonzo', 'ChatTilsHidePartyChatBonzo', 'False', { desc: '"Bonzo Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'], shouldShow: p => addDependency(p.enablechattils), isNewSection: true })
-  .addOption('chatTilsHidePhoenix', 'ChatTilsHidePartyChatPhoenix', 'False', { desc: '"Phoenix Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'], shouldShow: p => addDependency(p.enablechattils) })
-  .addOption('chatTilsHideSpirit', 'ChatTilsHidePartyChatSpirit', 'False', { desc: '"Spirit Procced (3s)" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'], shouldShow: p => addDependency(p.enablechattils) })
-  .addOption('chatTilsHideLeap', 'ChatTilsHidePartyChatLeaps', 'False', { desc: '"Leaped/Leaping to plinkingndriving" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'], shouldShow: p => addDependency(p.enablechattils) })
+  .addText('chatTilsPartyMute', 'ChatTilsMutePartyChat', '', { desc: 'mutes chat pings from messages starting with these values\nseparated by %,%' })
+  .addText('chatTilsPartyHide', 'ChatTilsMutePartyHide', '', { desc: 'hides (and mutes) messages starting with these values\nseparated by %,%' })
   .addOption('chatTilsHideMelody', 'ChatTilsHidePartyChatMelody', 'False', { desc: '"melody (1/4)/25%" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'], shouldShow: p => addDependency(p.enablechattils) })
   .addToggle('chatTilsCompactMelody', 'ChatTilsCompactPartyChatMelody', true, { desc: 'only keep most recent melody message from a player', shouldShow: p => addDependency(p.enablechattils) })
 
@@ -705,6 +704,59 @@ const builder = new Builder('ChickTils', 'settings.json')
 
   .collapse();
 
-const settings = builder.build();
+const settings = builder.build({
+  chatTilsHideBonzo(v) {
+    switch (v) {
+      case 'False': return;
+      case 'Sound':
+        settings._chatTilsPartyMute.set(settings.chatTilsPartyMute + (settings.chatTilsPartyMute ? '%,%' : '') + 'Bonzo Procced');
+        log(`&6ChatTilsHidePartyChatBonzo&4 has been moved to &2ChatTilsMutePartyChat&4 automatically.`);
+        return;
+      case 'Both':
+        settings._chatTilsPartyHide.set(settings.chatTilsPartyMute + (settings.chatTilsPartyHide ? '%,%' : '') + 'Bonzo Procced');
+        log(`&6ChatTilsHidePartyChatBonzo&4 has been moved to &2ChatTilsMutePartyHide&4 automatically.`);
+        return;
+    }
+  },
+  chatTilsHidePhoenix(v) {
+    switch (v) {
+      case 'False': return;
+      case 'Sound':
+        settings._chatTilsPartyMute.set(settings.chatTilsPartyMute + (settings.chatTilsPartyMute ? '%,%' : '') + 'Phoenix Procced');
+        log(`&6ChatTilsHidePartyChatPhoenix&4 has been moved to &2ChatTilsMutePartyChat&4 automatically.`);
+        return;
+      case 'Both':
+        settings._chatTilsPartyHide.set(settings.chatTilsPartyMute + (settings.chatTilsPartyHide ? '%,%' : '') + 'Phoenix Procced');
+        log(`&6ChatTilsHidePartyChatPhoenix&4 has been moved to &2ChatTilsMutePartyHide&4 automatically.`);
+        return;
+    }
+  },
+  chatTilsHideSpirit(v) {
+    switch (v) {
+      case 'False': return;
+      case 'Sound':
+        settings._chatTilsPartyMute.set(settings.chatTilsPartyMute + (settings.chatTilsPartyMute ? '%,%' : '') + 'Spirit Procced');
+        log(`&6ChatTilsHidePartyChatSpirit&4 has been moved to &2ChatTilsMutePartyChat&4 automatically.`);
+        return;
+      case 'Both':
+        settings._chatTilsPartyHide.set(settings.chatTilsPartyMute + (settings.chatTilsPartyHide ? '%,%' : '') + 'Spirit Procced');
+        log(`&6ChatTilsHidePartyChatSpirit&4 has been moved to &2ChatTilsMutePartyHide&4 automatically.`);
+        return;
+    }
+  },
+  chatTilsHideLeap(v) {
+    switch (v) {
+      case 'False': return;
+      case 'Sound':
+        settings._chatTilsPartyMute.set(settings.chatTilsPartyMute + (settings.chatTilsPartyMute ? '%,%' : '') + 'Leaped to %,%Leaping to %,%I\'m leaping to %,%[Leaped]: ➜');
+        log(`&6ChatTilsHidePartyChatLeaps&4 has been moved to &2ChatTilsMutePartyChat&4 automatically.`);
+        return;
+      case 'Both':
+        settings._chatTilsPartyHide.set(settings.chatTilsPartyMute + (settings.chatTilsPartyHide ? '%,%' : '') + 'Leaped to %,%Leaping to %,%I\'m leaping to %,%[Leaped]: ➜');
+        log(`&6ChatTilsHidePartyChatLeaps&4 has been moved to &2ChatTilsMutePartyHide&4 automatically.`);
+        return;
+    }
+  }
+});
 export default settings;
 export const props = builder.props;
