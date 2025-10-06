@@ -575,9 +575,10 @@ export function createActionProp(name, opts) {
 }
 
 export class Settings {
-  constructor(module, path, props, pageNames) {
+  constructor(module, path, props, pageNames, oldProps) {
     this.module = module;
     this.path = path;
+    this.oldProps = oldProps;
     let p = Object.entries(props).filter(v => v[1] instanceof Property);
     this.propIds = p.map(v => v[0]);
     /**
@@ -609,7 +610,7 @@ export class Settings {
     const obj = JSON.parse(FileLib.read(this.module, this.path) || '{}');
     Object.entries(obj).forEach(([k, v]) => {
       k = '_' + k;
-      if (!this[k] || !(this[k] instanceof Property)) return;
+      if (!this[k] || !(this[k] instanceof Property)) return this.oldProps[k.slice(1)]?.(v);
       try {
         this[k].set(this[k].parse(v), true);
       } catch (e) {
@@ -813,10 +814,11 @@ export class Builder {
   }
 
   /**
+   * @param {{ [k: string]: (value: string) => void }} oldProps
    * @returns {Settings & { [x in keyof P]: P[x]['value'] } & { [x in keyof P as `_${x}`]: P[x] }}
    */
-  build() {
-    return new Settings(this.module, this.path, this.props, this.pageNames);
+  build(oldProps) {
+    return new Settings(this.module, this.path, this.props, this.pageNames, oldProps);
   }
 
   /**
