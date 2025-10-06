@@ -154,6 +154,7 @@ const sanityCheckReg = reg('step', () => {
       if (v.isDead()) return;
       const player = players.findIndex(p => p.ign === v.getName());
       if (player > 0) {
+        if (players[player].e && players[player].e.getAge() >= v.getAge()) return;
         players[player].e = v;
         players[player].me = v.entity;
       }
