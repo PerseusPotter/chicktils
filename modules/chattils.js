@@ -5,7 +5,7 @@ import { getPlayerName } from '../util/format';
 import { getLeader, getMembers, isInParty, isLeader, listen, unlisten } from '../util/party';
 import { log, logMessage } from '../util/log';
 import reg, { execCmd } from '../util/registerer';
-import { StateProp, StateVar } from '../util/state';
+import { AtomicStateVar, StateProp, StateVar } from '../util/state';
 import { run } from '../util/threading';
 import { dither, fromImage, fromURL, grayscale, guassian, resize, sharpen, sobel } from '../util/image';
 import { getImage } from '../util/clipboard';
@@ -71,12 +71,10 @@ function processMessageWaypoint(ign, msg) {
   ));
 }
 
-function hideMessage(option, evn) {
-  if (option === 'False') return;
-  stateCancelNextPing.set(true);
-  if (option === 'Both') cancel(evn);
-}
-
+/** @type {AtomicStateVar<string[]>} */
+const stateMuteMsgs = new AtomicStateVar([]);
+/** @type {AtomicStateVar<string[]>} */
+const stateHideMsgs = new AtomicStateVar([]);
 const melodyMessages = new Map();
 const prevMelodyMessage = new Map();
 const lastMessage = new Map();
@@ -112,10 +110,8 @@ const allChatReg = reg('chat', (ign, msg) => {
 const partyChatReg = reg('chat', (ign, msg, evn) => {
   processMessageWaypoint(ign, msg);
 
-  if (settings.chatTilsHideBonzo !== 'False' && msg.startsWith('Bonzo Procced')) return hideMessage(settings.chatTilsHideBonzo, evn);
-  if (settings.chatTilsHidePhoenix !== 'False' && msg.startsWith('Phoenix Procced')) return hideMessage(settings.chatTilsHidePhoenix, evn);
-  if (settings.chatTilsHideSpirit !== 'False' && msg.startsWith('Spirit Procced')) return hideMessage(settings.chatTilsHideSpirit, evn);
-  if (settings.chatTilsHideLeap !== 'False' && ['Leaped to ', 'Leaping to ', 'I\'m leaping to ', '[Leaped]: ➜'].some(v => msg.startsWith(v))) return hideMessage(settings.chatTilsHideLeap, evn);
+  let hide = stateHideMsgs.get().some(v => msg.startsWith(v));
+  let mute = hide || stateMuteMsgs.get().some(v => msg.startsWith(v));
 
   if (settings.chatTilsCompactMelody || settings.chatTilsHideMelody !== 'False') {
     const lIgn = ign.toLowerCase();
@@ -127,19 +123,22 @@ const partyChatReg = reg('chat', (ign, msg, evn) => {
           prevMelodyMessage.delete(lIgn);
         }
 
-        cancel(evn);
-        if (settings.chatTilsHideMelody !== 'False') stateCancelNextPing.set(true);
+        hide = true;
+        if (settings.chatTilsHideMelody !== 'False') mute = true;
         if (settings.chatTilsHideMelody !== 'Both') {
           const id = randInt();
           Client.scheduleTask(() => printChatComponent(evn.message, id));
           prevMelodyMessage.set(lIgn, id);
         }
       } else {
-        stateCancelNextPing.set(true);
-        if (settings.chatTilsHideMelody === 'Both') cancel(evn);
+        mute = true;
+        if (settings.chatTilsHideMelody === 'Both') hide = true;
       }
     } else lastMessage.set(lIgn, msg);
   }
+
+  if (mute) stateCancelNextPing.set(stateCancelNextPing.get() + 1);
+  if (hide) cancel(evn);
 }).setCriteria('&r&9Party &8> ${ign}&f: &r${msg}&r').setEnabled(new StateProp(settings._chatTilsWaypoint).or(new StateProp(settings._chatTilsHideBonzo).notequals('False')).or(new StateProp(settings._chatTilsHidePhoenix).notequals('False')).or(new StateProp(settings._chatTilsHideLeap).notequals('False')).or(new StateProp(settings._chatTilsHideMelody).notequals('False')).or(settings._chatTilsCompactMelody));
 const coopChatReg = reg('chat', (ign, msg) => {
   processMessageWaypoint(ign, msg);
@@ -160,12 +159,12 @@ function essentialChatCb(ign, msg) {
   processMessageWaypoint(ign, msg);
 }
 
-const stateCancelNextPing = new StateVar(false);
+const stateCancelNextPing = new AtomicStateVar(0);
 const chatPingReg = reg('soundPlay', (pos, name, vol, pitch, cat, evn) => {
   if (name !== 'random.orb' || vol !== 1 || pitch !== 1) return;
   cancel(evn);
-  stateCancelNextPing.set(false);
-}).setEnabled(new StateProp(stateCancelNextPing));
+  stateCancelNextPing.set(stateCancelNextPing.get() - 1);
+}).setEnabled(new StateProp(stateCancelNextPing).customUnary(v => v > 0));
 
 // https://github.com/bowser0000/SkyblockMod/blob/7f7ffca9cad7340ea08354b0a8a96eac4e88df88/src/main/java/me/Danker/features/FasterMaddoxCalling.java#L24
 let lastFollowTime = 0;
@@ -477,6 +476,8 @@ const sendMessageReg = reg('messageSent', (msg, evn) => {
 export function init() {
   settings._chatTilsWaypointDuration.listen(() => coords.length > 0 && log('Uh Oh! Looks like you are about to change the duration of waypoints with current ones active. Be wary that this may mess up the order that those waypoints disappear!'));
   (new StateProp(settings._chatTilsEssentialForwardPartyDms).or(settings._chatTilsEssentialRedirectPartyChat)).listen(v => v ? listen() : unlisten());
+  settings._chatTilsPartyMute.listen(v => stateMuteMsgs.set(v.split('%,%').filter(Boolean)));
+  settings._chatTilsPartyHide.listen(v => stateHideMsgs.set(v.split('%,%').filter(Boolean)));
 }
 export function load() {
   blockNameCmd.register();
