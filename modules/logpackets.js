@@ -2,6 +2,7 @@ import settings from '../settings';
 import { timeToStr } from '../util/format';
 import { serialize as _serialize } from '../util/format';
 import { base64Encode } from '../util/helper';
+import { log } from '../util/log';
 import { getBlockId } from '../util/mc';
 import { setAccessible } from '../util/polyfill';
 import reg from '../util/registerer';
@@ -990,6 +991,52 @@ const serverReg = reg('packetReceived', pack => {
   logger(`${name} {${fieldsS}} ${t - startTime} ${timeToStr(t - startTime, 3)}`);
 }).setPriority(Priority.HIGHEST).setEnabled(settings._logPacketServer);
 
+function startLogger() {
+  if (printWriter) return;
+  startTime = Date.now();
+
+  const fileStream = new java.io.FileOutputStream(`./config/ChatTriggers/modules/chicktils/packets-${startTime}.log.gz`);
+  const gzipStream = new java.util.zip.GZIPOutputStream(fileStream);
+  const buffStream = new java.io.BufferedOutputStream(gzipStream);
+  printWriter = new java.io.OutputStreamWriter(buffStream, 'UTF-8');
+  const ActualThread = Java.type('java.lang.Thread');
+  const queue = new java.util.concurrent.LinkedBlockingQueue();
+  ioThread = new ActualThread(wrap(() => {
+    while (!ActualThread.currentThread().isInterrupted()) {
+      try {
+        let data = queue.poll(100, java.util.concurrent.TimeUnit.MILLISECONDS);
+        if (data) printWriter.write(data + '\n');
+      } catch (e) {
+        if (!e.toString().startsWith('JavaException: java.lang.InterruptedException')) throw e;
+        ActualThread.currentThread().interrupt();
+        break;
+      }
+    }
+
+    let remaining;
+    while (remaining = queue.poll()) {
+      printWriter.write(remaining + '\n');
+    }
+  }), 'ChicktilsPacketLogger');
+  ioThread.start();
+  logger = s => queue.offer(s);
+
+  clientReg.register();
+  serverReg.register();
+}
+function stopLogger() {
+  clientReg.unregister();
+  serverReg.unregister();
+
+  if (printWriter) {
+    ioThread.interrupt();
+    ioThread.join(5000);
+    printWriter.close();
+    printWriter = null;
+    logger = Function.prototype;
+  }
+}
+
 export function init() {
   settings._logPacketWhitelist.listen(v => {
     whitelist.clear();
@@ -1140,48 +1187,22 @@ export function init() {
     'S34PacketMaps',
   ]));
   settings._logPacketClearWhitelist.onAction(() => settings.updateProp(settings._logPacketWhitelist, ''));
-}
-export function load() {
-  startTime = Date.now();
 
-  const fileStream = new java.io.FileOutputStream(`./config/ChatTriggers/modules/chicktils/packets-${startTime}.log.gz`);
-  const gzipStream = new java.util.zip.GZIPOutputStream(fileStream);
-  const buffStream = new java.io.BufferedOutputStream(gzipStream);
-  printWriter = new java.io.OutputStreamWriter(buffStream, 'UTF-8');
-  const ActualThread = Java.type('java.lang.Thread');
-  const queue = new java.util.concurrent.LinkedBlockingQueue();
-  ioThread = new ActualThread(wrap(() => {
-    while (!ActualThread.currentThread().isInterrupted()) {
-      try {
-        let data = queue.poll(100, java.util.concurrent.TimeUnit.MILLISECONDS);
-        if (data) printWriter.write(data + '\n');
-      } catch (e) {
-        if (!e.toString().startsWith('JavaException: java.lang.InterruptedException')) throw e;
-        ActualThread.currentThread().interrupt();
-        break;
-      }
+  settings._logPacketsStart.onAction(() => {
+    if (printWriter) log('&4Packet Logger already active.');
+    else {
+      startLogger();
+      log('&aStarted Packet Logger.');
     }
-
-    let remaining;
-    while (remaining = queue.poll()) {
-      printWriter.write(remaining + '\n');
-    }
-  }), 'ChicktilsPacketLogger');
-  ioThread.start();
-  logger = s => queue.offer(s);
-
-  clientReg.register();
-  serverReg.register();
+  });
+  settings._logPacketsStop.onAction(() => {
+    if (printWriter) {
+      stopLogger();
+      log('&aStopped Packet Logger.');
+    } else log('&4Packet Logger not active.');
+  });
 }
+export function load() { }
 export function unload() {
-  clientReg.unregister();
-  serverReg.unregister();
-
-  if (printWriter) {
-    ioThread.interrupt();
-    ioThread.join(5000);
-    printWriter.close();
-    printWriter = null;
-    logger = Function.prototype;
-  }
+  stopLogger();
 }
