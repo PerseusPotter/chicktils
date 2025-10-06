@@ -603,6 +603,8 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addColor('showServerLookColor', 'ShowServerLookColor', 0x6D2B2BFF, { shouldShow: p => addDependency(p.enableshowserverlocation) })
 
   .addToggle('enablelogpackets', 'EnablePacketLogger', false, { desc: 'logs packets to file', isNewSection: true })
+  .addAction('logPacketsStart', 'PacketLoggerStart', { shouldShow: p => addDependency(p.enablelogpackets) })
+  .addAction('logPacketsStop', 'PacketLoggerStop', { shouldShow: p => addDependency(p.enablelogpackets) })
   .addToggle('logPacketClient', 'PacketLoggerClientPackets', true, { desc: 'log client -> server packets', shouldShow: p => addDependency(p.enablelogpackets) })
   .addToggle('logPacketServer', 'PacketLoggerServerPackets', true, { desc: 'log server -> client packets', shouldShow: p => addDependency(p.enablelogpackets) })
   .addText('logPacketWhitelist', 'PacketLoggerWhitelist', '', { desc: 'comma separated class names, e.g. S02PacketChat', shouldShow: p => addDependency(p.enablelogpackets) })
