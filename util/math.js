@@ -319,17 +319,19 @@ export function fastDistance(dx, dy) {
 
 /**
  * index of highest number <= val
- * @param {number[]} arr sorted ascending
+ * @template T
+ * @param {T[]} arr sorted ascending
  * @param {number} val
+ * @param {(v: T) => number} [map]
  * @returns {number} [-1, arr.length)
  */
-export function binarySearch(arr, val) {
+export function binarySearch(arr, val, map = v => v) {
   let l = 0;
   let r = arr.length;
   let m = 0;
   while (l < r) {
     m = (l + r) >> 1;
-    if (arr[m] <= val) l = m + 1;
+    if (map(arr[m]) <= val) l = m + 1;
     else r = m;
   }
   return l - 1;
