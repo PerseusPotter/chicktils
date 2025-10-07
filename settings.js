@@ -707,6 +707,11 @@ const builder = new Builder('ChickTils', 'settings.json')
 
   .addToggle('enablevoidgloomarmorstandfix', 'EnableVoidgloomArmorStandFix', true, { desc: 'fixes hypixel not deleting armor stands', isNewSection: true })
 
+  .addToggle('enablecustomethersound', 'CustomEtherwarpSound', false, { isNewSection: true })
+  .addText('customEtherSoundName', 'CustomEtherwarpSoundName', 'note.harp', { desc: 'i am not validating this please input something real', shouldShow: p => addDependency(p.enablecustomethersound) })
+  .addNumber('customEtherSoundVolume', 'CustomEtherSoundVolume', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.enablecustomethersound) })
+  .addNumber('customEtherSoundPitch', 'CustomEtherSoundPitch', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.enablecustomethersound) })
+
   .collapse();
 
 const settings = builder.build({
