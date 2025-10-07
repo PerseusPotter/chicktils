@@ -44,5 +44,6 @@
   "withershieldtimer",
   "neuitempreloadprogress",
   "showserverlocation",
-  "logpackets"
+  "logpackets",
+  "customethersound"
 ]
