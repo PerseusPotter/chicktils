@@ -235,6 +235,11 @@ const builder = new Builder('ChickTils', 'settings.json')
 
   .addToggle('dungeonPrinceKilledMessage', 'DungeonPrinceKilled', true, { desc: 'send message on prince death', shouldShow: p => addDependency(p.enabledungeon) })
 
+  .addToggle('dungeonStonkSound', 'DungeonStonkSound', false, { desc: 'play a sound on successful swap stonk', shouldShow: p => addDependency(p.enabledungeon) })
+  .addText('dungeonStonkSoundName', 'DungeonStonkSoundName', 'note.harp', { desc: 'i am not validating this please input something real', shouldShow: p => addDependency(p.dungeonStonkSound) })
+  .addNumber('dungeonStonkSoundVolume', 'DungeonStonkSoundVolume', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.dungeonStonkSound) })
+  .addNumber('dungeonStonkSoundPitch', 'DungeonStonkSoundPitch', 1, { min: 0, max: 2, shouldShow: p => addDependency(p.dungeonStonkSound) })
+
   .addPage('Stat Gui')
   .addToggle('enablestatgui', 'EnableStatGUI', false, { desc: 'render stats from tab onto hud' })
   .addToggle('loc0', 'EnablePrivateIslandGUI', true, { shouldShow: p => addDependency(p.enablestatgui) })

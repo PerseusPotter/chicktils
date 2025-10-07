@@ -238,6 +238,7 @@ export function init() {
     require('./dungeon/simonsays'),
     require('./dungeon/spiritbear'),
     require('./dungeon/stairstonkhelper'),
+    require('./dungeon/stonksound'),
     require('./dungeon/stormlaser'),
     require('./dungeon/terminalbreakdown'),
     require('./dungeon/terminalshelper'),
