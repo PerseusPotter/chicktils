@@ -45,5 +45,6 @@
   "neuitempreloadprogress",
   "showserverlocation",
   "logpackets",
-  "customethersound"
+  "customethersound",
+  "hidenearparticles"
 ]
