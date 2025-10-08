@@ -1,4 +1,6 @@
+import data from '../data';
 import settings from '../settings';
+import createTextGui from '../util/customtextgui';
 import { timeToStr } from '../util/format';
 import { serialize as _serialize } from '../util/format';
 import { base64Encode } from '../util/helper';
@@ -6,6 +8,7 @@ import { log } from '../util/log';
 import { getBlockId } from '../util/mc';
 import { setAccessible } from '../util/polyfill';
 import reg from '../util/registerer';
+import { AtomicStateVar } from '../util/state';
 import { wrap } from '../util/threading';
 
 const serialize = o => _serialize(o, -1, { precision: -1 });
@@ -19,6 +22,9 @@ let logger = Function.prototype;
 let printWriter;
 let ioThread;
 let startTime = 0;
+
+const stateLastTick = new AtomicStateVar(0);
+const syncHud = createTextGui(() => data.packetLoggerLoc, () => ['packets-1759892130925.log', 'Last Tick: -69', 'Time: 6942']);
 
 const formatWatcher = w => w?.map(v => ({
   id: v.func_75672_a(),
@@ -200,6 +206,8 @@ const S44PacketWorldBorder$warningDistance = setAccessible(net.minecraft.network
 const S49PacketUpdateEntityNBT$entityId = setAccessible(net.minecraft.network.play.server.S49PacketUpdateEntityNBT.class.getDeclaredField('field_179766_a'));
 const serverReg = reg('packetReceived', pack => {
   const name = pack.getClass().getSimpleName();
+
+  if (name === 'S32PacketConfirmTransaction' && pack.func_148890_d() < 0) stateLastTick.set(pack.func_148890_d());
 
   if (whitelist.size > 0 && !whitelist.has(name)) return;
   if (blacklist.has(name)) return;
@@ -991,11 +999,19 @@ const serverReg = reg('packetReceived', pack => {
   logger(`${name} {${fieldsS}} ${t - startTime} ${timeToStr(t - startTime, 3)}`);
 }).setPriority(Priority.HIGHEST).setEnabled(settings._logPacketServer);
 
+const hudSyncReg = reg('renderOverlay', () => {
+  syncHud.replaceLine(`Last Tick: ${stateLastTick.get()}`, 1);
+  syncHud.replaceLine(`Time: ${Date.now() - startTime}`, 2);
+  syncHud.render();
+}).setEnabled(settings._logPacketHud);
+
 function startLogger() {
   if (printWriter) return;
   startTime = Date.now();
+  const name = `packets-${startTime}.log`;
+  syncHud.setLine(name);
 
-  const fileStream = new java.io.FileOutputStream(`./config/ChatTriggers/modules/chicktils/packets-${startTime}.log.gz`);
+  const fileStream = new java.io.FileOutputStream(`./config/ChatTriggers/modules/chicktils/${name}.gz`);
   const gzipStream = new java.util.zip.GZIPOutputStream(fileStream);
   const buffStream = new java.io.BufferedOutputStream(gzipStream);
   printWriter = new java.io.OutputStreamWriter(buffStream, 'UTF-8');
@@ -1023,10 +1039,12 @@ function startLogger() {
 
   clientReg.register();
   serverReg.register();
+  hudSyncReg.register();
 }
 function stopLogger() {
   clientReg.unregister();
   serverReg.unregister();
+  hudSyncReg.unregister();
 
   if (printWriter) {
     ioThread.interrupt();
@@ -1201,6 +1219,7 @@ export function init() {
       log('&aStopped Packet Logger.');
     } else log('&4Packet Logger not active.');
   });
+  settings._moveLogPacketHud.onAction(v => syncHud.edit(v));
 }
 export function load() { }
 export function unload() {
