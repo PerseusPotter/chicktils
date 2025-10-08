@@ -714,6 +714,9 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addNumber('customEtherSoundVolume', 'CustomEtherSoundVolume', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.enablecustomethersound) })
   .addNumber('customEtherSoundPitch', 'CustomEtherSoundPitch', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.enablecustomethersound) })
 
+  .addToggle('enablehidenearparticles', 'HideNearbyParticles', false, { desc: 'hide ALL particles nearby', isNewSection: true })
+  .addNumber('hideNearParticlesDistance', 'HideNearbyParticlesDistance', 5, { min: 0, desc: 'effective radius in blocks', shouldShow: p => addDependency(p.enablehidenearparticles) })
+
   .collapse();
 
 const settings = builder.build({
