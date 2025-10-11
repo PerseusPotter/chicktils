@@ -661,7 +661,7 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('enableassfangcheese', 'EnableAssfangCheeseHealth', false, { desc: 'show real assfang health\nobsolete', isNewSection: true })
   .addAction('moveAssfangCheese', 'MoveAssfangCheeseHealth', null, { shouldShow: p => addDependency(p.enableassfangcheese) })
 
-  .addToggle('enableblockhighlight', 'EnableBlockHighlight', false, { isNewSection: true })
+  .addToggle('enableblockhighlight', 'EnableBlockHighlight', false, { desc: 'highlights what you are looking at\nalso happens to be where etherwarp is located', isNewSection: true })
   .addToggle('blockHighlightBoxEntity', 'BlockHighlightBoxEntity', false, { desc: 'box the entity you are looking at', shouldShow: p => addDependency(p.enableblockhighlight) })
   .addColor('blockHighlightWireColor', 'BlockHighlightWireColor', 0x00000066, { shouldShow: p => addDependency(p.enableblockhighlight) })
   .addColor('blockHighlightFillColor', 'BlockHighlightFillColor', 0x00000000, { shouldShow: p => addDependency(p.enableblockhighlight) })

@@ -851,7 +851,7 @@ const serverReg = reg('packetReceived', pack => {
         uuid: v.func_179962_a().getId(),
         name: v.func_179962_a().getName(),
         ping: v.func_179963_b(),
-        gamemode: v.func_179960_c()?.name() ?? 'Unknown',
+        gamemode: v.func_179960_c()?.name() ?? null,
         displayName: v.func_179961_d()
       }))]);
       break;
