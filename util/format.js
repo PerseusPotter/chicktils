@@ -1,6 +1,6 @@
 import { base64Encode, base64EncodeInt } from './helper';
 import { getItemIdI } from './mc';
-import { JavaTypeOrNull } from './polyfill';
+import { JavaTypeOrNull, setAccessible } from './polyfill';
 import { getSbId } from './skyblock';
 
 /**
@@ -121,6 +121,18 @@ export const serialize = (function() {
   const MCItem = Java.type('net.minecraft.item.Item');
   const MCItemStack = Java.type('net.minecraft.item.ItemStack');
   const MCIChatComponent = Java.type('net.minecraft.util.IChatComponent');
+  const MCChatStyle = Java.type('net.minecraft.util.ChatStyle');
+  const MCChatStyle$color = setAccessible(MCChatStyle.class.getDeclaredField('field_150247_b'));
+  const MCChatStyle$bold = setAccessible(MCChatStyle.class.getDeclaredField('field_150248_c'));
+  const MCChatStyle$italic = setAccessible(MCChatStyle.class.getDeclaredField('field_150245_d'));
+  const MCChatStyle$underlined = setAccessible(MCChatStyle.class.getDeclaredField('field_150246_e'));
+  const MCChatStyle$strikethrough = setAccessible(MCChatStyle.class.getDeclaredField('field_150243_f'));
+  const MCChatStyle$obfuscated = setAccessible(MCChatStyle.class.getDeclaredField('field_150244_g'));
+  const MCChatStyle$insertion = setAccessible(MCChatStyle.class.getDeclaredField('field_179990_j'));
+  const MCChatStyle$chatClickEvent = setAccessible(MCChatStyle.class.getDeclaredField('field_150251_h'));
+  const MCChatStyle$chatHoverEvent = setAccessible(MCChatStyle.class.getDeclaredField('field_150252_i'));
+  const MCClickEvent = Java.type('net.minecraft.event.ClickEvent');
+  const MCHoverEvent = Java.type('net.minecraft.event.HoverEvent');
 
   const MCNBTBase = Java.type('net.minecraft.nbt.NBTBase');
   const MCNBTTagByte = Java.type('net.minecraft.nbt.NBTTagByte');
@@ -188,7 +200,24 @@ export const serialize = (function() {
         if (obj instanceof MCIBlockState) return `{IBlockState|${serialize(obj.func_177230_c(), depth, options)}|meta=${serialize(obj.func_177230_c().func_176201_c(obj), depth, options)}}`;
         if (obj instanceof MCItem) return `{Item|${serialize(getItemIdI(obj), depth, options)}}`;
         if (obj instanceof MCItemStack) return `{ItemStack|${serialize(obj.func_77973_b(), depth, options)}|damage=${serialize(obj.func_77952_i(), depth, options)}|count=${serialize(obj.field_77994_a, depth, options)}|sbid=${serialize(getSbId(obj), depth, options)}|nbt=${serialize(obj.func_77978_p(), depth, options)}}`;
-        if (obj instanceof MCIChatComponent) return `{IChatComponent|${serialize(obj.func_150254_d(), depth, options)}}`;
+        if (obj instanceof MCIChatComponent) return `{IChatComponent|ftext=${serialize(obj.func_150254_d(), depth, options)}|text=${serialize(obj.func_150261_e(), depth, options)}|style=${serialize(obj.func_150256_b(), depth, options)}|comps=${serialize(Array.from(obj.func_150253_a()), depth, options)}}`;
+        if (obj instanceof MCChatStyle) return `{ChatStyle|style=${serialize([
+          MCChatStyle$color.get(obj)?.toString(),
+          MCChatStyle$bold.get(obj) ? '§l' : '',
+          MCChatStyle$italic.get(obj) ? '§o' : '',
+          MCChatStyle$underlined.get(obj) ? '§n' : '',
+          MCChatStyle$strikethrough.get(obj) ? '§m' : '',
+          MCChatStyle$obfuscated.get(obj) ? '§k' : '',
+        ].filter(Boolean).join(''), depth, options)}|style_=${serialize(obj.func_150218_j(), depth, options)}${['', ...[
+          ['insertion', MCChatStyle$insertion.get(obj)],
+          ['insertion_', obj.func_179986_j()],
+          ['click', MCChatStyle$chatClickEvent.get(obj)],
+          ['click_', obj.func_150235_h()],
+          ['hover', MCChatStyle$chatHoverEvent.get(obj)],
+          ['hover_', obj.func_150210_i()],
+        ].filter(v => v[1] !== null).map(v => v[0] + '=' + serialize(v[1], depth, options))].join('|')}}`;
+        if (obj instanceof MCClickEvent) return `{ClickEvent|action=${obj.func_150669_a().name()}|value=${serialize(obj.func_150668_b(), depth, options)}}`;
+        if (obj instanceof MCHoverEvent) return `{HoverEvent|action=${obj.func_150701_a().name()}|value=${serialize(obj.func_150702_b(), depth, options)}}`;
 
         if (obj instanceof MCNBTBase) {
           if (obj instanceof MCNBTTagByte) return `{NBTTagByte|${serialize(obj.func_150290_f(), depth, options)}}`;
