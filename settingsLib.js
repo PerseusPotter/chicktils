@@ -92,9 +92,10 @@ export class Property extends StateVar {
     const comps = [this.desc ? new TextComponent(`${c[0]}${name}`).setHover('show_text', this.desc) : `${c[0]}${name}`];
     if (this.type === Property.Type.Action) comps.unshift(new TextComponent(`${c[6]}[  ${c[2]}RUN${c[6]}   ]&r `).setClick('run_command', `/${module} config_ edit ${this.name}`));
     else {
+      if (this.type === Property.Type.Text) comps.unshift(new TextComponent(`${c[6]}[ ${c[4]}OPEN${c[6]}  ]&r `).setClick('run_command', `/${module} config_ open ${this.name} ${this.toString()}`));
       comps.unshift(
         new TextComponent(`${c[6]}[ ${c[3]}RESET${c[6]} ]&r `).setClick('run_command', `/${module} config_ edit ${this.name}`),
-        new TextComponent(`${c[6]}[  ${c[5]}EDIT${c[6]}  ]&r `).setClick('run_command', `/${module} config_edit ${this.name} ${this.toString()}`)
+        new TextComponent(`${c[6]}[ ${c[5]}EDIT${c[6]}  ]&r `).setClick('run_command', `/${module} config_edit ${this.name} ${this.toString()}`)
       );
       comps.push(`${c[6]}:${c[1]} ${this.toString()}`);
     }
