@@ -6,9 +6,10 @@ import tabCompletion from './util/tabcompletion';
 import * as Updater from './updater';
 import { centerMessage, cleanNumber } from './util/format';
 import { getPing, getAveragePing, getMedianPing } from './util/ping';
-import { getRegs, simulate } from './util/registerer';
+import { execCmd, getRegs, simulate } from './util/registerer';
 import { calcMedian } from './util/math';
 import { createIntegerProp, Property } from './settingsLib';
+import getTextEditor from './util/textfromeditor';
 settings.setMainInstance();
 setIsMainD();
 const VERSION = '0.13.1';
@@ -386,3 +387,15 @@ register('command', () => {
     }).start();
   }).setName('ChickTilsStopTicker');
 }());
+
+register('command', () => {
+  getTextEditor((err, msg) => {
+    if (err) {
+      log('&4something went wrong: ', err);
+      console.log(err);
+    } else if (msg) {
+      if (msg.startsWith('/')) msg = msg.slice(1);
+      execCmd(msg, true);
+    }
+  }, '/');
+}).setName('longcmd');
