@@ -126,7 +126,8 @@ register('command', ...args => {
           ' &3/chicktils reload &l-> &breloads modules',
           ' &3/chicktils unload &l-> &bunloads modules',
           ' &3/chicktils config view [<page>] &l-> &bopens the settings',
-          ' &3/chicktils config edit <name> [<value>] &l-> &bopens the settings',
+          ' &3/chicktils config open <name> [<value>] &l-> &bopens a text editor for the property',
+          ' &3/chicktils config edit <name> [<value>] &l-> &bedits the value of a property',
           ' &3/chicktils config search <search term> &l-> &bsearches the settings',
           ' &3/chicktils stats &l-> &bshows stats',
           ' &3/chicktils simulate <message> &l-> &bsimulates chat message'
@@ -150,20 +151,46 @@ register('command', ...args => {
         World.playSound('gui.button.press', 1, 1);
       case 'config':
         if (args.length === 0) args[0] = 'view';
-        if (args[0] === 'gui') settings.amaterasu.openGui();
-        else if (args[0] === 'view') {
-          if (args.length === 1) args[1] = settings.minPage.toString();
-          // how scuffed do you want it: yes
-          const p = createIntegerProp('pageHelper', 1, { min: settings.minPage, max: settings.maxPage });
-          const page = p.parse(args[1]);
-          p.validate(page);
-          settings.display(page);
-        } else if (args[0] === 'search') {
-          settings.displaySearch(args[1] || '');
-        } else if (args[0] === 'edit') {
-          if (args.length === 1) throw 'missing arguments';
-          settings.update(args[1], args.slice(2).join(' '));
-        } else throw 'unknown argument: ' + args[0];
+        switch (args[0]) {
+          case 'gui':
+            settings.amaterasu.openGui();
+            break;
+          case 'view': {
+            if (args.length === 1) args[1] = settings.minPage.toString();
+            // how scuffed do you want it: yes
+            const p = createIntegerProp('pageHelper', 1, { min: settings.minPage, max: settings.maxPage });
+            const page = p.parse(args[1]);
+            p.validate(page);
+            settings.display(page);
+            break;
+          }
+          case 'search':
+            settings.displaySearch(args[1] || '');
+            break;
+          case 'edit':
+            if (args.length === 1) throw 'missing arguments';
+            settings.update(args[1], args.slice(2).join(' '));
+            break;
+          case 'open': {
+            if (args.length === 1) throw 'missing arguments';
+            const p = Object.values(props).find(v => v.name.toLowerCase() === args[1].toLowerCase());
+            if (!p) throw 'cannot find property';
+            const input = args.slice(2).join(' ') || p.toString();
+            getTextEditor((err, msg) => {
+              if (err) {
+                log('&4something went wrong:', err);
+                console.error(err);
+              } else {
+                const i = msg.indexOf('\n');
+                if (i >= 0) msg = msg.slice(i + 1);
+                if (msg !== input) ChatLib.command(`${settings.module} config edit ${p.name} ${msg}`, true);
+              }
+            }, 'this first line will be ignored. edit the value, save the file, and close the editor.\n' + input);
+            break;
+          }
+          default:
+            throw 'unknown argument: ' + args[0];
+        }
         break;
       case 'reload':
         unload();
@@ -223,6 +250,7 @@ register('command', ...args => {
   config: {
     search: [],
     view: [],
+    open: Object.values(props).map(p => p.name).reduce((a, v) => (a[v] = [], a), {}),
     edit: Object.values(props).map(p => [p.name, p.type === Property.Type.Option ? p.opts.options : p.type === Property.Type.Toggle ? ['true', 'false'] : []]).reduce((a, [k, v]) => (a[k] = v, a), {})
   },
   reload: [],
