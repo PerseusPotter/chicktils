@@ -648,8 +648,9 @@ export function simulate(msg) {
 
 /**
  * @param {string} cmd
+ * @param {boolean} [client = false]
  */
-export function execCmd(cmd) {
+export function execCmd(cmd, client = false) {
   log('&2Executing command: &7/' + cmd);
-  ChatLib.command(cmd);
+  ChatLib.command(cmd, client);
 }
