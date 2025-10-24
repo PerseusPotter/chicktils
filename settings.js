@@ -711,8 +711,8 @@ const builder = new Builder('ChickTils', 'settings.json')
 
   .addToggle('enablecustomethersound', 'CustomEtherwarpSound', false, { isNewSection: true })
   .addText('customEtherSoundName', 'CustomEtherwarpSoundName', 'note.harp', { desc: 'i am not validating this please input something real', shouldShow: p => addDependency(p.enablecustomethersound) })
-  .addNumber('customEtherSoundVolume', 'CustomEtherSoundVolume', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.enablecustomethersound) })
-  .addNumber('customEtherSoundPitch', 'CustomEtherSoundPitch', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.enablecustomethersound) })
+  .addNumber('customEtherSoundVolume', 'CustomEtherwarpSoundVolume', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.enablecustomethersound) })
+  .addNumber('customEtherSoundPitch', 'CustomEtherwarpSoundPitch', 1, { min: 0, max: 5, shouldShow: p => addDependency(p.enablecustomethersound) })
 
   .addToggle('enablehidenearparticles', 'HideNearbyParticles', false, { desc: 'hide ALL particles nearby', isNewSection: true })
   .addNumber('hideNearParticlesDistance', 'HideNearbyParticlesDistance', 5, { min: 0, desc: 'effective radius in blocks', shouldShow: p => addDependency(p.enablehidenearparticles) })
