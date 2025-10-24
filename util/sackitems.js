@@ -41,6 +41,11 @@ export const ITEMS = [
     "id": "ASCENSION_ROPE"
   },
   {
+    "nameF": "§fBamboo",
+    "nameUF": "Bamboo",
+    "id": "BAMBOO"
+  },
+  {
     "nameF": "§9Bezos",
     "nameUF": "Bezos",
     "id": "BEZOS"
@@ -289,6 +294,11 @@ export const ITEMS = [
     "nameF": "§9Dark Candy",
     "nameUF": "Dark Candy",
     "id": "DARK_CANDY"
+  },
+  {
+    "nameF": "§aDeep Root",
+    "nameUF": "Deep Root",
+    "id": "DEEP_ROOT"
   },
   {
     "nameF": "§aDerelict Ashe",
@@ -1176,6 +1186,11 @@ export const ITEMS = [
     "id": "FLAWED_TOPAZ_GEM"
   },
   {
+    "nameF": "§aFlexbone",
+    "nameUF": "Flexbone",
+    "id": "FLEXBONE"
+  },
+  {
     "nameF": "Flint",
     "nameUF": "Flint",
     "id": "FLINT"
@@ -1229,6 +1244,11 @@ export const ITEMS = [
     "nameF": "§5L.A.S.R.'s Eye",
     "nameUF": "L.A.S.R.'s Eye",
     "id": "GIANT_FRAGMENT_LASER"
+  },
+  {
+    "nameF": "§aGill Membrane",
+    "nameUF": "Gill Membrane",
+    "id": "GILL_MEMBRANE"
   },
   {
     "nameF": "§5Glacial Fragment",
@@ -1881,6 +1901,11 @@ export const ITEMS = [
     "id": "POTATO_ITEM"
   },
   {
+    "nameF": "§5Precursor Apparatus",
+    "nameUF": "Precursor Apparatus",
+    "id": "PRECURSOR_APPARATUS"
+  },
+  {
     "nameF": "Prismarine Crystals",
     "nameUF": "Prismarine Crystals",
     "id": "PRISMARINE_CRYSTALS"
@@ -2366,6 +2391,11 @@ export const ITEMS = [
     "id": "STARFALL"
   },
   {
+    "nameF": "§9Starlyn Prize",
+    "nameUF": "Starlyn Prize",
+    "id": "STARLYN_PRIZE"
+  },
+  {
     "nameF": "§fSteaming-Hot Flounder§r §8§lBRONZE",
     "nameUF": "Steaming-Hot Flounder BRONZE",
     "id": "STEAMING_HOT_FLOUNDER_BRONZE"
@@ -2376,9 +2406,19 @@ export const ITEMS = [
     "id": "STEAMING_HOT_FLOUNDER_SILVER"
   },
   {
+    "nameF": "Stick",
+    "nameUF": "Stick",
+    "id": "STICK"
+  },
+  {
     "nameF": "Stone",
     "nameUF": "Stone",
     "id": "STONE"
+  },
+  {
+    "nameF": "§aStretching Sticks",
+    "nameUF": "Stretching Sticks",
+    "id": "STRETCHING_STICKS"
   },
   {
     "nameF": "String",
@@ -2394,6 +2434,11 @@ export const ITEMS = [
     "nameF": "§9Stuffed Chili Pepper",
     "nameUF": "Stuffed Chili Pepper",
     "id": "STUFFED_CHILI_PEPPER"
+  },
+  {
+    "nameF": "§9Sturdy Bone",
+    "nameUF": "Sturdy Bone",
+    "id": "STURDY_BONE"
   },
   {
     "nameF": "Sugar Cane",
@@ -2611,6 +2656,11 @@ export const ITEMS = [
     "id": "WEREWOLF_SKIN"
   },
   {
+    "nameF": "§aWet Water",
+    "nameUF": "Wet Water",
+    "id": "WET_WATER"
+  },
+  {
     "nameF": "Wheat",
     "nameUF": "Wheat",
     "id": "WHEAT"
@@ -2711,6 +2761,6 @@ export const ITEMS_ID_MAP = new Map(ITEMS.map(v => [v.id, v]));
  * @param {string} str
  */
 export function stripName(str) {
-  return str.replace(/§\w/g, '').toLowerCase().replace(/[^s'-.a-z0-9]/g, '').trim();
+  return str.replace(/§\w/g, '').toLowerCase().replace(/[^s'-.a-z0-9_]/g, '').trim();
 };
 export const ITEMS_NAME_MAP = new Map(ITEMS.map(v => [stripName(v.nameUF), v]));
