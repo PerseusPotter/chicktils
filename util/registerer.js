@@ -113,6 +113,7 @@ reg = function reg(type, shit) {
   let isReg = false;
   let isAReg = false;
   let regReq = new StateVar(true);
+  let cPrio;
   const props = new Map();
   const prox = new Proxy({}, {
     get(t, p, r) {
@@ -125,6 +126,7 @@ reg = function reg(type, shit) {
         case 'setEnabled': return _setEnabled;
         case 'update': return _update;
         case 'forceTrigger': return shit;
+        case 'setPriority': return _setPriority;
       }
       if (!rr[p]) return void 0;
       return getOrPut(props, p, () => wrap(rr, prox, rr[p]));
@@ -135,7 +137,10 @@ reg = function reg(type, shit) {
     if (isReg) return;
     if (!isAReg && regReq.get()) {
       isAReg = true;
-      rr.register();
+      if (cPrio) {
+        rr.setPriority(cPrio);
+        cPrio = null;
+      } else rr.register();
     }
     isReg = true;
   });
@@ -159,12 +164,21 @@ reg = function reg(type, shit) {
   const _update = wrap(rr, prox, () => {
     if (!isReg) return;
     if (regReq.get()) {
-      if (!isAReg) rr.register();
+      if (!isAReg) {
+        if (cPrio) {
+          rr.setPriority(cPrio);
+          cPrio = null;
+        } else rr.register();
+      }
       isAReg = true;
     } else {
       if (isAReg) rr.unregister();
       isAReg = false;
     }
+  });
+  const _setPriority = wrap(rr, prox, prio => {
+    if (isReg) rr.setPriority(prio);
+    else cPrio = prio;
   });
   allRegs.push({ type: typeof type === 'string' ? type : type.class.getName(), reg: prox, getIsReg: () => isReg, getIsAReg: () => isAReg });
   return prox;
