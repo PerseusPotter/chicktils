@@ -344,7 +344,7 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('chatTilsWaypointPersist', 'ChatTilsWaypointPersist', false, { desc: 'whether to persist on swapping servers', shouldShow: p => addDependency(p.chatTilsWaypoint) })
 
   .addText('chatTilsPartyMute', 'ChatTilsMutePartyChat', '', { desc: 'mutes chat pings from messages starting with these values\nseparated by %,%' })
-  .addText('chatTilsPartyHide', 'ChatTilsMutePartyHide', '', { desc: 'hides (and mutes) messages starting with these values\nseparated by %,%' })
+  .addText('chatTilsPartyHide', 'ChatTilsHidePartyChay', '', { desc: 'hides (and mutes) messages starting with these values\nseparated by %,%' })
   .addOption('chatTilsHideMelody', 'ChatTilsHidePartyChatMelody', 'False', { desc: '"melody (1/4)/25%" ("Both" hides chat + sound)', options: ['False', 'Sound', 'Both'], shouldShow: p => addDependency(p.enablechattils) })
   .addToggle('chatTilsCompactMelody', 'ChatTilsCompactPartyChatMelody', true, { desc: 'only keep most recent melody message from a player', shouldShow: p => addDependency(p.enablechattils) })
 
