@@ -153,7 +153,7 @@ const renderOvReg = reg('renderOverlay', () => {
     egg[0] + 0.5, egg[1], egg[2] + 0.5,
     false
   );
-}).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateMonolithPosition));
+}).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateMonolithPosition).and(settings._darkMonolithPointTo));
 
 const trackerGui = createTextGui(() => data.monolithTracker, () => formatDrops());
 
