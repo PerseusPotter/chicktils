@@ -63,7 +63,7 @@ const clientReg = reg('packetSent', pack => {
       break;
     case 'C02PacketUseEntity':
       fields.push(['entityId', C02PacketUseEntity$entityId.get(pack)]);
-      fields.push(['action', pack.func_149565_c().name()]);
+      fields.push(['action', pack.func_149565_c()]);
       fields.push(['hitVec', pack.func_179712_b()]);
       break;
     case 'C03PacketPlayer':
@@ -85,8 +85,8 @@ const clientReg = reg('packetSent', pack => {
       break;
     case 'C07PacketPlayerDigging':
       fields.push(['position', pack.func_179715_a()]);
-      fields.push(['facing', pack.func_179714_b().name()]);
-      fields.push(['status', pack.func_180762_c().name()]);
+      fields.push(['facing', pack.func_179714_b()]);
+      fields.push(['status', pack.func_180762_c()]);
       break;
     case 'C08PacketPlayerBlockPlacement':
       fields.push(['position', pack.func_179724_a()]);
@@ -103,7 +103,7 @@ const clientReg = reg('packetSent', pack => {
     case 'C0APacketAnimation':
       break;
     case 'C0BPacketEntityAction':
-      fields.push(['action', pack.func_180764_b().name()]);
+      fields.push(['action', pack.func_180764_b()]);
       fields.push(['auxData', pack.func_149512_e()]);
       break;
     case 'C0CPacketInput':
@@ -154,12 +154,12 @@ const clientReg = reg('packetSent', pack => {
     case 'C15PacketClientSettings':
       fields.push(['language', pack.func_149524_c()]);
       fields.push(['renderDistance', C15PacketClientSettings$renderDistance.get(pack)]);
-      fields.push(['chatVisibility', pack.func_149523_e().name()]);
+      fields.push(['chatVisibility', pack.func_149523_e()]);
       fields.push(['colorsEnabled', pack.func_149520_f()]);
       fields.push(['modelPartFlags', pack.func_149521_d()]);
       break;
     case 'C16PacketClientStatus':
-      fields.push(['status', pack.func_149435_c().name()]);
+      fields.push(['status', pack.func_149435_c()]);
       break;
     case 'C17PacketCustomPayload':
       fields.push(['channel', pack.func_149559_c()]);
@@ -170,7 +170,7 @@ const clientReg = reg('packetSent', pack => {
       break;
     case 'C19PacketResourcePackStatus':
       fields.push(['hash', C19PacketResourcePackStatus$hash.get(pack)]);
-      fields.push(['status', C19PacketResourcePackStatus$status.get(pack).name()]);
+      fields.push(['status', C19PacketResourcePackStatus$status.get(pack)]);
       break;
   }
 
@@ -224,9 +224,9 @@ const serverReg = reg('packetReceived', pack => {
     case 'S01PacketJoinGame':
       fields.push(['entityId', pack.func_149197_c()]);
       fields.push(['hardcore', pack.func_149195_d()]);
-      fields.push(['gamemode', pack.func_149198_e().name()]);
+      fields.push(['gamemode', pack.func_149198_e()]);
       fields.push(['dimension', pack.func_149194_f()]);
-      fields.push(['difficulty', pack.func_149192_g().name()]);
+      fields.push(['difficulty', pack.func_149192_g()]);
       fields.push(['maxPlayers', pack.func_149193_h()]);
       fields.push(['worldType', pack.func_149196_i().func_77127_a()]);
       fields.push(['reducedDebugInfo', pack.func_179744_h()]);
@@ -255,8 +255,8 @@ const serverReg = reg('packetReceived', pack => {
       break;
     case 'S07PacketRespawn':
       fields.push(['dimension', pack.func_149082_c()]);
-      fields.push(['difficulty', pack.func_149081_d().name()]);
-      fields.push(['gamemode', pack.func_149083_e().name()]);
+      fields.push(['difficulty', pack.func_149081_d()]);
+      fields.push(['gamemode', pack.func_149083_e()]);
       fields.push(['worldType', pack.func_149080_f().func_77127_a()]);
       break;
     case 'S08PacketPlayerPosLook':
@@ -394,7 +394,7 @@ const serverReg = reg('packetReceived', pack => {
     case 'S10PacketSpawnPainting':
       fields.push(['entityId', pack.func_148965_c()]);
       fields.push(['position', pack.func_179837_b()]);
-      fields.push(['facing', pack.func_179836_c().name()]);
+      fields.push(['facing', pack.func_179836_c()]);
       fields.push(['title', pack.func_148961_h()]);
       break;
     case 'S11PacketSpawnExperienceOrb':
@@ -656,7 +656,7 @@ const serverReg = reg('packetReceived', pack => {
       fields.push(['pitch_', pack.func_149209_h()]);
       break;
     case 'S2APacketParticles':
-      fields.push(['type', pack.func_179749_a().name()]);
+      fields.push(['type', pack.func_179749_a()]);
       fields.push(['longDistance', pack.func_179750_b()]);
       fields.push(['count', pack.func_149222_k()]);
       fields.push(['x', pack.func_149220_d()]);
@@ -740,7 +740,7 @@ const serverReg = reg('packetReceived', pack => {
         case 3:
           fields.push(['state_', 'Change Gamemode']);
           fields.push(['gamemode', pack.func_149137_d()]);
-          fields.push(['gamemode_', net.minecraft.world.WorldSettings.GameType.func_77146_a(Math.floor(pack.func_149137_d() + 0.5)).name()]);
+          fields.push(['gamemode_', net.minecraft.world.WorldSettings.GameType.func_77146_a(Math.floor(pack.func_149137_d() + 0.5))]);
           break;
         case 4:
           fields.push(['state_', 'Display Credits']);
@@ -846,12 +846,12 @@ const serverReg = reg('packetReceived', pack => {
       }))]);
       break;
     case 'S38PacketPlayerListItem':
-      fields.push(['action', pack.func_179768_b().name()]);
+      fields.push(['action', pack.func_179768_b()]);
       fields.push(['entries', pack.func_179767_a().map(v => ({
         uuid: v.func_179962_a().getId(),
         name: v.func_179962_a().getName(),
         ping: v.func_179963_b(),
-        gamemode: v.func_179960_c()?.name() ?? null,
+        gamemode: v.func_179960_c() ?? null,
         displayName: v.func_179961_d()
       }))]);
       break;
@@ -871,10 +871,10 @@ const serverReg = reg('packetReceived', pack => {
       fields.push(['action_', ['Add Objective', 'Remove Objective', 'Update Objective'][pack.func_149338_e()] ?? 'Unknown']);
       fields.push(['objectiveName', pack.func_149339_c()]);
       fields.push(['objectiveDisplayName', pack.func_149337_d()]);
-      if ([0, 2].includes(pack.func_149338_e())) fields.push(['objectiveRenderType', pack.func_179817_d().name()]);
+      if ([0, 2].includes(pack.func_149338_e())) fields.push(['objectiveRenderType', pack.func_179817_d()]);
       break;
     case 'S3CPacketUpdateScore':
-      fields.push(['action', pack.func_180751_d().name()]);
+      fields.push(['action', pack.func_180751_d()]);
       fields.push(['playerName', pack.func_149324_c()]);
       fields.push(['objectiveName', pack.func_149321_d()]);
       if (pack.func_180751_d().name() === 'CHANGE') fields.push(['objectiveValue', pack.func_149323_e()]);
@@ -899,7 +899,7 @@ const serverReg = reg('packetReceived', pack => {
         }]);
         fields.push(['nametagVisibility', pack.func_179814_i()]);
         fields.push(['color', pack.func_179813_h()]);
-        fields.push(['color_', net.minecraft.util.EnumChatFormatting.func_175744_a(pack.func_179813_h())?.name() ?? 'Unknown']);
+        fields.push(['color_', net.minecraft.util.EnumChatFormatting.func_175744_a(pack.func_179813_h()) ?? 'Unknown']);
       }
       if ([0, 3, 4].includes(pack.func_149307_h())) fields.push(['players', pack.func_149310_g()]);
       break;
@@ -915,7 +915,7 @@ const serverReg = reg('packetReceived', pack => {
       fields.push(['isLocked', pack.func_179830_a()]);
       break;
     case 'S42PacketCombatEvent':
-      fields.push(['type', pack.field_179776_a.name()]);
+      fields.push(['type', pack.field_179776_a]);
       switch (pack.field_179776_a.name()) {
         case 'END_COMBAT':
           fields.push(['trackerId', pack.field_179772_d]);
@@ -932,7 +932,7 @@ const serverReg = reg('packetReceived', pack => {
       fields.push(['entityId', pack.field_179781_a]);
       break;
     case 'S44PacketWorldBorder':
-      fields.push(['action', S44PacketWorldBorder$action.get(pack).name()]);
+      fields.push(['action', S44PacketWorldBorder$action.get(pack)]);
       switch (S44PacketWorldBorder$action.get(pack).name()) {
         case 'SET_SIZE':
           fields.push(['targetSize', S44PacketWorldBorder$targetSize.get(pack)]);
@@ -965,7 +965,7 @@ const serverReg = reg('packetReceived', pack => {
       }
       break;
     case 'S45PacketTitle':
-      fields.push(['type', pack.func_179807_a().name()]);
+      fields.push(['type', pack.func_179807_a()]);
       switch (pack.func_179807_a().name()) {
         case 'TITLE':
         case 'SUBTITLE':
