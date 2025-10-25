@@ -53,7 +53,7 @@ const renderReg = reg('renderWorld', () => {
     { phase: true }
   );
 
-  if (settings.lookAtPointTo) renderTracer(
+  if (settings.lookAtPointTo && settings.preferUseTracer) renderTracer(
     settings.lookAtColor,
     getRenderX() + dx,
     getRenderY() + dy + getEyeHeight(),
