@@ -15,9 +15,9 @@ import { StateProp, StateVar } from './state';
  */
 const activeAlert = new StateVar(null);
 const renderReg = reg('renderOverlay', () => activeAlert.get()?._display?.render()).setEnabled(new StateProp(activeAlert).notequals(null));
+export const alertSound = new Sound({ source: 'orb.ogg', priority: true, attenuation: 0, pitch: 0.5, volume: 1 });
 
 const createAlert = (function() {
-  let alertSound;
   const proto = {
     text: '',
     _timeout: undefined,
@@ -32,7 +32,7 @@ const createAlert = (function() {
       }
       try {
         if (this.sound) {
-          if (!alertSound) alertSound = new Sound({ source: 'orb.ogg', priority: true, attenuation: 0, pitch: 0.5, volume: 1 });
+          alertSound.stop();
           alertSound.play();
         }
       } catch (e) { }
