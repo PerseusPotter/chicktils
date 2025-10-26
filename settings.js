@@ -572,6 +572,25 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('entityReducerMines', 'ReduceDwarvenMinesEntities', true, { isNewSection: true, shouldShow: p => addDependency(p.enableentityreducer) })
   .addOption('entityReducerMinesFossil', 'ReduceDwarvenFossilCenter', 'Remove', { desc: 'fossil research center in tunnels', options: ['Normal', 'Hide', 'Remove'], shouldShow: p => addDependency(p.entityReducerMines) })
 
+  .addPage('GolemTils')
+  .addToggle('enablegolemtils', 'EnableGolemTils', false, { desc: 'various endstone protector stuff' })
+
+  .addToggle('golemTilsEsp', 'GolemTilsEsp', true, { shouldShow: p => addDependency(p.enablegolemtils), isNewSection: true })
+  .addColor('golemTilsColor', 'GolemTilsColor', 0x00FFFFFF, { shouldShow: p => addDependency(p.enablegolemtils) })
+  .addColor('golemTilsPossibleColor', 'GolemTilsPossibleColor', 0x55FF55FF, { shouldShow: p => addDependency(p.enablegolemtils) })
+  .addColor('golemTilsScannedColor', 'GolemTilsScannedColor', 0xFF5555FF, { shouldShow: p => addDependency(p.enablegolemtils) })
+  .addOption('golemTilsPointTo', 'GolemTilsPointTo', 'Spawning', { options: ['Always', 'Spawning', 'Never'], shouldShow: p => addDependency(p.enablegolemtils) })
+
+  .addToggle('golemTilsSpawnAlert', 'GolemTilsSpawnAlert', true, { desc: 'alerts when golem spawns', shouldShow: p => addDependency(p.enablegolemtils) })
+  .addInteger('golemTilsSpawnAlertTime', 'GolemTilsSpawnAlertTime', 2000, { desc: 'in ms', min: 0, shouldShow: p => addDependency(p.golemTilsSpawnAlert) })
+  .addInteger('golemTilsSpawnAlertSound', 'GolemTilsSpawnAlertSound', 5, { desc: 'number of times to play sound with the alert', min: 0, shouldShow: p => addDependency(p.golemTilsSpawnAlert) })
+
+  .addToggle('golemTilsSpawnTimer', 'GolemTilsSpawnTimer', true, { desc: 'timer until golem spawns', isNewSection: true, shouldShow: p => addDependency(p.enablegolemtils) })
+  .addAction('moveGolemTilsSpawnTimer', 'MoveGolemTilsSpawnTimer', { shouldShow: p => addDependency(p.golemTilsSpawnTimer) })
+
+  .addToggle('golemTilsPrefireAim', 'GolemTilsPrefireAim', true, { desc: 'show where to aim to prefire', shouldShow: p => addDependency(p.enablegolemtils), isNewSection: true })
+  .addColor('golemTilsPrefireAimColor', 'GolemTilsPrefireAimColor', 0xFF0000FF, { shouldShow: p => addDependency(p.golemTilsPrefireAim) })
+
   .addPage('Testing')
   .addToggle('enableboxallentities', 'EnableBoxAllEntities', false, { desc: 'mostly for debugging' })
   .addToggle('boxAllEntitiesInvis', 'BoxAllEntitiesInvisible', false, { desc: 'box invisible entities', shouldShow: p => addDependency(p.enableboxallentities) })
