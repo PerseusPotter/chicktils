@@ -51,6 +51,7 @@ export function setIsMain() {
  *  neuItemPreloadDisplay: TextLocation;
  *  dragonHelperStackRunTimer: TextLocation;
  *  packetLoggerLoc: TextLocation;
+ *  golemTilsSpawnLoc: TextLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -106,6 +107,7 @@ function verifyTextLocation(value) {
   'neuItemPreloadDisplay',
   'dragonHelperStackRunTimer',
   'packetLoggerLoc',
+  'golemTilsSpawnLoc',
 ].forEach(v => {
   if (!verifyLocation(data[v])) resetLocation(v);
   if (!verifyTextLocation(data[v])) resetTextLocation(v);
