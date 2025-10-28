@@ -10,7 +10,7 @@ import { getBlockId, getEyeHeight } from '../util/mc';
 import createPointer from '../util/pointto';
 import { Deque } from '../util/polyfill';
 import reg, { customRegs } from '../util/registerer';
-import { stateIsland } from '../util/skyblock';
+import { registerListenIsland, stateIsland } from '../util/skyblock';
 import { AtomicStateVar, StateProp, StateVar } from '../util/state';
 
 const MCBlockPos = Java.type('net.minecraft.util.BlockPos');
@@ -194,6 +194,7 @@ const pointPrefireReg = createPointer(
 );
 
 export function init() {
+  registerListenIsland(settings._enablegolemtils);
   settings._moveGolemTilsSpawnTimer.onAction(v => spawnTimerHud.edit(v));
 }
 export function load() {
