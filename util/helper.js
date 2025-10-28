@@ -1,13 +1,13 @@
 import { log } from './log';
+import { JavaTypeOrNull } from './polyfill';
 import { unrun } from './threading';
 
-const helper = Java.type('com.perseuspotter.chicktilshelper.ChickTilsHelper');
-const hasHelper = helper.MODID === 'chicktilshelper';
-if (!hasHelper) log('&4helper mod not found, some features may not work');
+const helper = JavaTypeOrNull('com.perseuspotter.chicktilshelper.ChickTilsHelper');
+if (!helper) log('&4helper mod not found, some features may not work. to fix please redownload from the github (https://github.com/PerseusPotter/chicktils/blob/master/chicktilshelper/build/libs/chicktilshelper-1.0.jar) and replace in /ct files -> modules -> chicktils -> chicktilshelper -> build -> libs. if attempting to delete the old jar results in "file in use", please close mc, and force close any launcher instances using task manager (or system monitor) and try again');
 
 /** @param {import('../../@types/External').JavaClass<'net.minecraftforge.event.entity.player.ItemTooltipEvent'>} evn */
 export function clearTooltip(evn) {
-  if (!hasHelper) return;
+  if (!helper) return;
   helper.clearTooltip(evn);
 }
 
@@ -16,7 +16,7 @@ export function clearTooltip(evn) {
  * @param {string} str
  * */
 export function addTooltip(evn, str) {
-  if (!hasHelper) return;
+  if (!helper) return;
   helper.addTooltip(evn, str);
 }
 
@@ -25,7 +25,7 @@ export function addTooltip(evn, str) {
  * @param {number} end
  */
 export function deleteChatIds(start, end) {
-  if (!hasHelper) return;
+  if (!helper) return;
   unrun(() => helper.deleteChatIds(start, end));
 }
 
@@ -33,13 +33,13 @@ export function deleteChatIds(start, end) {
  * @param {number} target
  */
 export function deleteChatId(target) {
-  if (!hasHelper) return;
+  if (!helper) return;
   unrun(() => helper.deleteChatId(target));
 }
 
 /** @param {import('../../@types/External').JavaClass<'java.net.URLConnection'>} url */
 export function removeCertCheck(url) {
-  if (!hasHelper) return;
+  if (!helper) return;
   helper.removeCertCheck(url);
 }
 
@@ -48,7 +48,7 @@ export function removeCertCheck(url) {
  * @returns {boolean}
  **/
 export function removeLastElement(f, o) {
-  if (!hasHelper) return false;
+  if (!helper) return false;
   return helper.removeLastElement(f, o);
 }
 
@@ -57,7 +57,7 @@ export function removeLastElement(f, o) {
  * @returns {boolean}
  **/
 export function removeElementSet(f, o, r) {
-  if (!hasHelper) return false;
+  if (!helper) return false;
   return helper.removeElementSet(f, o, r);
 }
 
@@ -66,7 +66,7 @@ export function removeElementSet(f, o, r) {
  * @returns {boolean}
  **/
 export function removeElementMap(f, o, r) {
-  if (!hasHelper) return false;
+  if (!helper) return false;
   return helper.removeElementMap(f, o, r);
 }
 
@@ -75,7 +75,7 @@ export function removeElementMap(f, o, r) {
  * @returns {boolean}
  **/
 export function addElementList(f, o, v) {
-  if (!hasHelper) return false;
+  if (!helper) return false;
   return helper.addElementList(f, o, v);
 }
 
@@ -86,7 +86,7 @@ export function addElementList(f, o, v) {
  * @returns {string}
  */
 export function base64Encode(m, o, args) {
-  if (!hasHelper) return '';
+  if (!helper) return '';
   return helper.base64Encode(m, o, args);
 }
 
@@ -97,6 +97,6 @@ export function base64Encode(m, o, args) {
  * @returns {string}
  */
 export function base64EncodeInt(m, o, args) {
-  if (!hasHelper) return '';
+  if (!helper) return '';
   return helper.base64EncodeInt(m, o, args);
 }
