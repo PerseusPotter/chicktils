@@ -29,7 +29,7 @@ export default function createPointer(color, position, {
       pos[0], pos[1], pos[2],
       { lw, phase: phase.get() }
     );
-  }).setPriority(Priority.LOW).setEnabled(new StateProp(settings._preferUseTracer).and(enabled));
+  }).setEnabled(new StateProp(settings._preferUseTracer).and(enabled));
   const ovlyReg = reg('renderOverlay', () => {
     if (!req()) return;
     const pos = position();
