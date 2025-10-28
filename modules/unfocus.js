@@ -2,8 +2,15 @@ import reg from '../util/registerer';
 
 const isActive = org.lwjgl.opengl.Display.isActive;
 const START = net.minecraftforge.fml.common.gameevent.TickEvent.Phase.START;
+const LWJGLMouse = org.lwjgl.input.Mouse;
 let p = null;
 const renderReg = reg(net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent, evn => {
+  // if the game is "frozen" (not rendering), consume all mouse events to prevent unwanted movement
+  if (p) {
+    while (LWJGLMouse.next());
+    LWJGLMouse.getDX();
+    LWJGLMouse.getDY();
+  }
   /*
   field_71454_w is checked twice per render tick
   first in the Minecraft class, and again in EntityRenderer
