@@ -77,7 +77,7 @@ const renderReg = reg('renderWorld', () => {
     const x = v.getRenderX();
     const y = v.getRenderY();
     const z = v.getRenderZ();
-    renderWaypoint(x, y, z, 3.6, 11.7, settings.kuudraBoxSuppliesGiantColor, settings.kuudraBoxSuppliesEsp, false);
+    renderWaypoint(x, y, z, 3.6, 10.8, settings.kuudraBoxSuppliesGiantColor, settings.kuudraBoxSuppliesEsp);
     renderBoxOutlineMiter(settings.kuudraBoxSuppliesColor, x - 3.25, y + 8, z + 2, 2.5, 2.5, 0.6, { phase: settings.kuudraBoxSuppliesEsp, centered: false, increase: true });
     renderBeacon(settings.kuudraBoxSuppliesColor, x - 2.5, y + 11, z + 2.75, { phase: settings.kuudraBoxSuppliesEsp, centered: false });
   });
