@@ -1,12 +1,13 @@
-import { getRenderX, getRenderY, getRenderZ, renderBeacon, renderBillboard, renderTracer } from '../../Apelles/index';
+import { getRenderX, getRenderY, getRenderZ, renderBeacon, renderBillboard } from '../../Apelles/index';
 import data from '../data';
 import settings from '../settings';
 import createAlert, { alertSound } from '../util/alert';
 import createTextGui from '../util/customtextgui';
-import { drawArrow3DPos, getPartialServerTick, renderWaypoint } from '../util/draw';
+import { getPartialServerTick, renderWaypoint } from '../util/draw';
 import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
 import { getBlockId, getEyeHeight } from '../util/mc';
+import createPointer from '../util/pointto';
 import { Deque } from '../util/polyfill';
 import reg, { customRegs } from '../util/registerer';
 import { stateIsland } from '../util/skyblock';
@@ -124,25 +125,22 @@ const renderReg = reg('renderWorld', () => {
   if (pos) {
     renderWaypoint(pos[0], pos[1], pos[2], 1, 1, settings.golemTilsColor, settings.golemTilsEsp, false);
     renderBeacon(settings.golemTilsColor, pos[0], pos[1] + 1, pos[2], { centered: false, phase: settings.golemTilsEsp });
-
-    if (statePointTo.get() && settings.preferUseTracer) renderTracer(
-      settings.golemTilsColor,
-      pos[0] + 0.5, pos[1], pos[2] + 0.5,
-      { lw: 3, phase: settings.golemTilsEsp }
-    );
   } else {
     remaining.forEach(v => renderWaypoint(v[0], v[1], v[2], 1, 1, settings.golemTilsPossibleColor, settings.golemTilsEsp, false));
     checked.forEach(v => renderWaypoint(v[0], v[1], v[2], 1, 1, settings.golemTilsScannedColor, settings.golemTilsEsp, false));
   }
 }).setEnabled(stateCanHaveGolem);
-const renderOvReg = reg('renderOverlay', () => {
+const pointGolemReg = createPointer(
+  settings._golemTilsColor,
+  () => {
   const pos = stateGolemPosition.get();
-  drawArrow3DPos(
-    settings.golemTilsColor,
-    pos[0] + 0.5, pos[1], pos[2] + 0.5,
-    false
-  );
-}).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateGolemPosition).and(statePointTo).and(stateCanHaveGolem));
+    return [pos[0] + 0.5, pos[1], pos[2] + 0.5];
+  },
+  {
+    enabled: new StateProp(stateGolemPosition).and(statePointTo).and(stateCanHaveGolem),
+    phase: settings._golemTilsEsp
+  }
+);
 const renderTimerReg = reg('renderOverlay', () => {
   const ticks = spawnTime + 400 - customRegs.serverTick.tick;
   if (ticks < 0) return;
@@ -156,12 +154,12 @@ const renderTimerReg = reg('renderOverlay', () => {
 let prefireP = 0;
 let prefireT = 0;
 const ProjectileHelper = Java.type('com.perseuspotter.chicktilshelper.ProjectileHelper');
-const pointReg = reg('renderWorld', () => {
+const pointCalcReg = reg('renderWorld', () => {
   const pos = stateGolemPosition.get();
   const aim = ProjectileHelper.solve(
-    pos[0] - getRenderX(),
+    (pos[0] - 1) - getRenderX(),
     5 - (getRenderY() + getEyeHeight()),
-    pos[2] - getRenderZ(),
+    (pos[2] - 2) - getRenderZ(),
     0.001, -0.05, 2.92, 0.99, true
   );
   prefireP = aim.phi;
@@ -178,26 +176,19 @@ const pointReg = reg('renderWorld', () => {
     0.005, 0.005,
     { phase: true }
   );
-
-  if (settings.preferUseTracer) renderTracer(
-    settings.golemTilsPrefireAimColor,
-    x, y, z,
-    { lw: 3, phase: true }
-  );
 }).setEnabled(stateAim);
-const pointOvReg = reg('renderOverlay', () => {
-  if (Number.isNaN(prefireP)) return;
-
-  const x = Math.sin(prefireP) * Math.cos(prefireT);
-  const y = Math.cos(prefireP) + getEyeHeight();
-  const z = Math.sin(prefireP) * Math.sin(prefireT);
-
-  drawArrow3DPos(
-    settings.golemTilsPrefireAimColor,
-    x, y, z,
-    true
-  )
-}).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateAim));
+const pointPrefireReg = createPointer(
+  settings._golemTilsPrefireAimColor,
+  () => [
+    getRenderX() + Math.sin(prefireP) * Math.cos(prefireT),
+    getRenderY() + Math.cos(prefireP) + getEyeHeight(),
+    getRenderZ() + Math.sin(prefireP) * Math.sin(prefireT)
+  ],
+  {
+    enabled: stateAim,
+    req: () => !Number.isNaN(prefireP)
+  }
+);
 
 export function init() {
   settings._moveGolemTilsSpawnTimer.onAction(v => spawnTimerHud.edit(v));
@@ -208,10 +199,10 @@ export function load() {
   golemSpawnReg.register();
   leaveReg.register();
   renderReg.register();
-  renderOvReg.register();
+  pointGolemReg.register();
   renderTimerReg.register();
-  pointReg.register();
-  pointOvReg.register();
+  pointCalcReg.register();
+  pointPrefireReg.register();
 }
 export function unload() {
   reset();
@@ -223,8 +214,8 @@ export function unload() {
   golemSpawnReg.unregister();
   leaveReg.unregister();
   renderReg.unregister();
-  renderOvReg.unregister();
+  pointGolemReg.unregister();
   renderTimerReg.unregister();
-  pointReg.unregister();
-  pointOvReg.unregister();
+  pointCalcReg.unregister();
+  pointPrefireReg.unregister();
 }

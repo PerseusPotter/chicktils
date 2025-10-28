@@ -1,7 +1,7 @@
-import { renderBeacon, renderTracer } from '../../Apelles/index';
+import { renderBeacon } from '../../Apelles/index';
 import settings from '../settings';
-import { drawArrow3DPos } from '../util/draw';
 import { compareFloat } from '../util/math';
+import createPointer from '../util/pointto';
 import { DSU, JavaTypeOrNull, setAccessible } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
@@ -94,20 +94,13 @@ const hotspotRenderReg = reg('renderWorld', () => {
     );
   });
 }).setEnabled(stateInHotspotRange);
-const hotspotArrowOvlReg = reg('renderOverlay', () => {
-  drawArrow3DPos(
-    settings.fishingTilsHotspotWaypointColor,
-    stateNearestHotspot.get()[0], stateNearestHotspot.get()[1], stateNearestHotspot.get()[2],
-    false
-  );
-}).setEnabled(stateInHotspotRange.and(stateNearestHotspot).and(new StateProp(settings._preferUseTracer).not()));
-const hotspotArrowWrdReg = reg('renderWorld', () => {
-  renderTracer(
-    settings.fishingTilsHotspotWaypointColor,
-    stateNearestHotspot.get()[0], stateNearestHotspot.get()[1], stateNearestHotspot.get()[2],
-    { lw: 3, phase: true }
-  );
-}).setEnabled(stateInHotspotRange.and(stateNearestHotspot).and(settings._preferUseTracer));
+const hotspotPointReg = createPointer(
+  settings._fishingTilsHotspotWaypointColor,
+  () => [stateNearestHotspot.get()[0], stateNearestHotspot.get()[1], stateNearestHotspot.get()[2]],
+  {
+    enabled: stateInHotspotRange.and(stateNearestHotspot)
+  }
+);
 
 export function init() {
   const stateAddedSBA = new StateVar(false);
@@ -474,13 +467,11 @@ export function load() {
   hotspotUpdateReg.register();
   hotspotPartReg.register();
   hotspotRenderReg.register();
-  hotspotArrowOvlReg.register();
-  hotspotArrowWrdReg.register();
+  hotspotPointReg.register();
 }
 export function unload() {
   hotspotUpdateReg.unregister();
   hotspotPartReg.unregister();
   hotspotRenderReg.unregister();
-  hotspotArrowOvlReg.unregister();
-  hotspotArrowWrdReg.unregister();
+  hotspotPointReg.unregister();
 }

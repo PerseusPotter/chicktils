@@ -3,14 +3,13 @@ import data from '../data';
 import reg, { customRegs, execCmd } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { drawArrow3DPos } from '../util/draw';
 import { compareFloat, convergeHalfInterval, dist, geoMedian, gradientDescent, linReg, lineRectColl, ndRegression, newtonRaphson, rescale, toPolynomial } from '../util/math';
-import { StateProp } from '../util/state';
 import { getBlockPos, getItemId, getLowerContainer } from '../util/mc';
 import { unrun } from '../util/threading';
-import { renderBeacon, renderBillboardString, renderBoxOutline, renderLine, renderTracer } from '../../Apelles/index';
+import { renderBeacon, renderBillboardString, renderBoxOutline, renderLine } from '../../Apelles/index';
 import { toArrayList } from '../util/polyfill';
 import { getSbId } from '../util/skyblock';
+import createPointer from '../util/pointto';
 
 const warps = [
   {
@@ -466,12 +465,14 @@ const tickReg = reg('tick', () => {
 
   targetLoc = closest;
 });
-const renderArrowOvReg = reg('renderOverlay', () => {
-  if (targetLoc) drawArrow3DPos(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], false);
-}).setEnabled(new StateProp(settings._preferUseTracer).not().and(settings._dianaArrowToBurrow));
-const renderArrowWrldReg = reg('renderWorld', () => {
-  if (targetLoc) renderTracer(settings.dianaArrowToBurrowColor, targetLoc[0], targetLoc[1] + 1, targetLoc[2], { lw: 3, phase: true });
-}).setEnabled(new StateProp(settings._preferUseTracer).and(settings._dianaArrowToBurrow));
+const arrowPointReg = createPointer(
+  settings._dianaArrowToBurrowColor,
+  () => [targetLoc[0], targetLoc[1] + 1, targetLoc[2]],
+  {
+    enabled: settings._dianaArrowToBurrow,
+    req: () => targetLoc
+  }
+);
 
 const startBurrowReg = reg('chat', () => {
   if (unloadReg.isRegistered()) return;
@@ -485,8 +486,7 @@ const startBurrowReg = reg('chat', () => {
   spawnPartReg.register();
   renderGuessReg.register();
   tickReg.register();
-  renderArrowOvReg.register();
-  renderArrowWrldReg.register();
+  arrowPointReg.register();
   unloadReg.register();
 }).setCriteria('&r&eYou dug out a Griffin Burrow! &r&7(1/4)&r');
 const unloadReg = reg('worldUnload', () => {
@@ -499,8 +499,7 @@ const unloadReg = reg('worldUnload', () => {
   spawnPartReg.unregister();
   renderGuessReg.unregister();
   tickReg.unregister();
-  renderArrowOvReg.unregister();
-  renderArrowWrldReg.unregister();
+  arrowPointReg.unregister();
   unloadReg.unregister();
 
   targetLoc = null;
