@@ -137,7 +137,10 @@ function waypoint(col, x, y, z, p) {
 }
 const pointReg = createPointer(
   settings._darkMonolithColor,
-  () => [egg[0] + 0.5, egg[1], egg[2] + 0.5],
+  () => {
+    const egg = stateMonolithPosition.get();
+    return [egg[0] + 0.5, egg[1], egg[2] + 0.5];
+  },
   {
     phase: settings._darkMonolithEsp,
     enabled: new StateProp(stateHasMonolith).and(settings._darkMonolithPointTo)
