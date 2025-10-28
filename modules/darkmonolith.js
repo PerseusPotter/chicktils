@@ -4,12 +4,13 @@ import { log } from '../util/log';
 import { StateProp, StateVar } from '../util/state';
 import { getBlockId } from '../util/mc';
 import { unrun } from '../util/threading';
-import { drawArrow3DPos, normColor } from '../util/draw';
-import { renderBeacon, renderBoxFilled, renderBoxOutlineMiter, renderTracer } from '../../Apelles/index';
+import { normColor } from '../util/draw';
+import { renderBeacon, renderBoxFilled, renderBoxOutlineMiter } from '../../Apelles/index';
 import { Deque, flatMap } from '../util/polyfill';
 import data from '../data';
 import { commaNumber } from '../util/format';
 import createTextGui from '../util/customtextgui';
+import createPointer from '../util/pointto';
 
 /** @type {StateVar<[number, number, number]?} */
 const stateMonolithPosition = new StateVar();
@@ -130,30 +131,22 @@ function waypoint(col, x, y, z, p) {
     { centered: false, phase: p }
   );
 }
+const pointReg = createPointer(
+  settings._darkMonolithColor,
+  () => [egg[0] + 0.5, egg[1], egg[2] + 0.5],
+  {
+    phase: settings._darkMonolithEsp,
+    enabled: new StateProp(stateMonolithPosition).and(settings._darkMonolithPointTo)
+  }
+);
 const renderReg = reg('renderWorld', () => {
   const egg = stateMonolithPosition.get();
 
-  if (egg) {
-    waypoint(settings.darkMonolithColor, egg[0], egg[1], egg[2], settings.darkMonolithEsp);
-
-    if (settings.darkMonolithPointTo && settings.preferUseTracer) renderTracer(
-      settings.darkMonolithColor,
-      egg[0] + 0.5, egg[1], egg[2] + 0.5,
-      { lw: 3, phase: settings.darkMonolithEsp }
-    );
-  }
+  if (egg) waypoint(settings.darkMonolithColor, egg[0], egg[1], egg[2], settings.darkMonolithEsp);
 
   remaining.forEach(v => v[4] && waypoint(settings.darkMonolithPossibleColor, v[0], v[1], v[2], settings.darkMonolithEsp));
   checked.forEach(v => v[4] && waypoint(settings.darkMonolithScannedColor, v[0], v[1], v[2], settings.darkMonolithEsp));
 });
-const renderOvReg = reg('renderOverlay', () => {
-  const egg = stateMonolithPosition.get();
-  drawArrow3DPos(
-    settings.darkMonolithColor,
-    egg[0] + 0.5, egg[1], egg[2] + 0.5,
-    false
-  );
-}).setEnabled(new StateProp(settings._preferUseTracer).not().and(stateMonolithPosition).and(settings._darkMonolithPointTo));
 
 const trackerGui = createTextGui(() => data.monolithTracker, () => formatDrops());
 
@@ -192,7 +185,7 @@ export function load() {
   hitReg.register();
   leaveReg.register();
   renderReg.register();
-  renderOvReg.register();
+  pointReg.register();
   drop1Reg.register();
   drop2Reg.register();
   drop3Reg.register();
@@ -209,7 +202,7 @@ export function unload() {
   hitReg.unregister();
   leaveReg.unregister();
   renderReg.unregister();
-  renderOvReg.unregister();
+  pointReg.unregister();
   drop1Reg.unregister();
   drop2Reg.unregister();
   drop3Reg.unregister();

@@ -1,11 +1,11 @@
-import { getRenderX, getRenderY, getRenderZ, renderBoxOutline, renderTracer } from '../../Apelles/index';
+import { getRenderX, getRenderY, getRenderZ, renderBoxOutline } from '../../Apelles/index';
 import data from '../data';
 import settings from '../settings';
 import createTextGui from '../util/customtextgui';
-import { drawArrow3DPos } from '../util/draw';
 import { commaNumber } from '../util/format';
 import { lerp } from '../util/math';
 import { getItemId, getMaxHp } from '../util/mc';
+import createPointer from '../util/pointto';
 import { JavaTypeOrNull } from '../util/polyfill';
 import reg from '../util/registerer';
 import { StateProp, StateVar } from '../util/state';
@@ -124,24 +124,19 @@ const arachneRenderReg = reg('postRenderEntity', (ent, pos) => {
     { phase: settings.avariceArachneBoxSmallSpoodersEsp, lw: 5 }
   );
 }).setEnabled(stateDoArachne);
-const arachneTracerReg = reg('renderWorld', partial => {
-  if (arachneEnt && !arachneEnt.field_70128_L && arachneEnt.func_110143_aJ() > 0) renderTracer(
-    settings.avariceArachneBoxBigSpooderColor,
-    lerp(arachneEnt.field_70169_q, arachneEnt.field_70165_t, partial),
-    lerp(arachneEnt.field_70167_r, arachneEnt.field_70163_u, partial) + 0.5,
-    lerp(arachneEnt.field_70166_s, arachneEnt.field_70161_v, partial),
-    { lw: 3, phase: true }
-  );
-}).setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(settings._preferUseTracer));
-const arachnePointReg = reg('renderOverlay', () => {
-  if (arachneEnt && !arachneEnt.field_70128_L && arachneEnt.func_110143_aJ() > 0) drawArrow3DPos(
-    settings.avariceArachneBoxBigSpooderColor,
+const arachnePointReg = createPointer(
+  settings._avariceArachneBoxBigSpooderColor,
+  () => [
     lerp(arachneEnt.field_70169_q, arachneEnt.field_70165_t, Tessellator.partialTicks),
     lerp(arachneEnt.field_70167_r, arachneEnt.field_70163_u, Tessellator.partialTicks) + 0.5,
     lerp(arachneEnt.field_70166_s, arachneEnt.field_70161_v, Tessellator.partialTicks),
-    false, 5
-  );
-}).setEnabled(stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow).and(new StateProp(settings._preferUseTracer).not()));
+  ],
+  {
+    enabled: stateDoArachne.and(settings._avariceArachneBoxBigSpooderDrawArrow),
+    req: () => arachneEnt && !arachneEnt.field_70128_L && arachneEnt.func_110143_aJ() > 0,
+    lw: 3, size: 5
+  }
+);
 
 const stateDoingTara = new StateVar(false);
 const stateTaraStarted = new StateVar(0);
@@ -197,7 +192,6 @@ export function load() {
   arachneSpawnReg.register();
   arachneServerTick.register();
   arachneRenderReg.register();
-  arachneTracerReg.register();
   arachnePointReg.register();
   taraHitReg.register();
   taraStartReg.register();
@@ -216,7 +210,6 @@ export function unload() {
   arachneSpawnReg.unregister();
   arachneServerTick.unregister();
   arachneRenderReg.unregister();
-  arachneTracerReg.unregister();
   arachnePointReg.unregister();
   taraHitReg.unregister();
   taraStartReg.unregister();

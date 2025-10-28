@@ -3,10 +3,10 @@ import reg, { customRegs } from '../util/registerer';
 import settings from '../settings';
 import { getBlockId } from '../util/mc';
 import { Deque } from '../util/polyfill';
-import { renderBillboardString, renderLine, renderTracer } from '../../Apelles/index';
-import { drawArrow3DPos } from '../util/draw';
+import { renderBillboardString, renderLine } from '../../Apelles/index';
 import { colorForNumber } from '../util/format';
 import createTextGui from '../util/customtextgui';
+import createPointer from '../util/pointto';
 
 /** @type {StateVar<'' | 'Force' | 'Stamina' | 'Mastery' | 'Discipline' | 'Swiftness' | 'Control' | 'Tenacity'} */
 const stateCurrentChallenge = new StateVar('');
@@ -32,55 +32,48 @@ const masteryBlockReg = reg('blockChange', (pos, bs) => {
 }).setEnabled(stateMasteryEnabled);
 const masteryBlockRenderWorldReg = reg('renderWorld', () => {
   while (masteryBlocks.length > 0 && 135 < customRegs.serverTick.tick - masteryBlocks.getFirst().time) masteryBlocks.shift();
+  if (masteryBlocks.length < 2) return;
 
-  if (settings.dojoMasteryPointToLowest && masteryBlocks.length > 0 && settings.preferUseTracer) {
-    const first = masteryBlocks.getFirst();
-    if (settings.preferUseTracer) renderTracer(
-      settings.dojoMasteryPointToLowestColor,
+  const first = masteryBlocks.getFirst();
+  const next = masteryBlocks.at(1);
+  renderLine(
+    settings.dojoMasteryPointToNextColor,
+    [
+      [first.pos.x + 0.5, first.pos.y + 0.5, first.pos.z + 0.5],
+      [next.pos.x + 0.5, next.pos.y + 0.5, next.pos.z + 0.5]
+    ],
+    { lw: 3 }
+  );
+  if (settings.dojoMasteryPointToNextTimer) {
+    const timeRemaining = (125 - (customRegs.serverTick.tick - next.time)) * 50;
+    renderBillboardString(
+      0xFFFFFFFF,
+      `${colorForNumber(timeRemaining, 1000)}${~~(timeRemaining / 1000)}:${(timeRemaining % 1000).toString().padStart(3, '0')}`,
       first.pos.x + 0.5,
-      first.pos.y + 0.5,
+      first.pos.y + 1.5,
       first.pos.z + 0.5,
-      { lw: 3 }
+      { scale: 2, phase: true }
     );
   }
-  if (settings.dojoMasteryPointToNext && masteryBlocks.length >= 2) {
-    const first = masteryBlocks.getFirst();
-    const next = masteryBlocks.at(1);
-    renderLine(
-      settings.dojoMasteryPointToNextColor,
-      [
-        [first.pos.x + 0.5, first.pos.y + 0.5, first.pos.z + 0.5],
-        [next.pos.x + 0.5, next.pos.y + 0.5, next.pos.z + 0.5]
-      ],
-      { lw: 3 }
-    );
-    if (settings.dojoMasteryPointToNextTimer) {
-      const timeRemaining = (125 - (customRegs.serverTick.tick - next.time)) * 50;
-      renderBillboardString(
-        0xFFFFFFFF,
-        `${colorForNumber(timeRemaining, 1000)}${~~(timeRemaining / 1000)}:${(timeRemaining % 1000).toString().padStart(3, '0')}`,
-        first.pos.x + 0.5,
-        first.pos.y + 1.5,
-        first.pos.z + 0.5,
-        { scale: 2, phase: true }
-      );
-    }
-  }
-}).setEnabled(stateMasteryEnabled);
+}).setEnabled(stateMasteryEnabled.and(settings._dojoMasteryPointToNext));
 const masteryBlockRenderOvReg = reg('renderOverlay', () => {
   if (masteryBlocks.length === 0) return;
   const first = masteryBlocks.getFirst();
-  if (settings.dojoMasteryPointToLowest && !settings.preferUseTracer) drawArrow3DPos(
-    settings.dojoMasteryPointToLowestColor,
-    first.pos.x, first.pos.y, first.pos.z,
-    false
-  );
-  if (settings.dojoMasteryShowLowestTime) {
-    const timeRemaining = (125 - (customRegs.serverTick.tick - first.time)) * 50;
-    masteryTimerGui.setLine(`${colorForNumber(timeRemaining, 1000)}${~~(timeRemaining / 1000)}:${(timeRemaining % 1000).toString().padStart(3, '0')}`);
-    masteryTimerGui.render();
+  const timeRemaining = (125 - (customRegs.serverTick.tick - first.time)) * 50;
+  masteryTimerGui.setLine(`${colorForNumber(timeRemaining, 1000)}${~~(timeRemaining / 1000)}:${(timeRemaining % 1000).toString().padStart(3, '0')}`);
+  masteryTimerGui.render();
+}).setEnabled(stateMasteryEnabled.and(settings._dojoMasteryShowLowestTime));
+const masteryPointReg = createPointer(
+  settings._dojoMasteryPointToLowestColor,
+  () => {
+    const first = masteryBlocks.getFirst();
+    return [first.pos.x + 0.5, first.pos.y + 0.5, first.pos.z + 0.5];
+  },
+  {
+    enabled: stateMasteryEnabled,
+    req: () => masteryBlocks.length > 0
   }
-}).setEnabled(stateMasteryEnabled);
+);
 const masteryHideTitle = reg('renderTitle', (_, __, evn) => cancel(evn)).setEnabled(stateMasteryEnabled.and(settings._dojoMasteryHideTitles));
 
 export function init() { }
@@ -92,6 +85,7 @@ export function load() {
   masteryBlockReg.register();
   masteryBlockRenderWorldReg.register();
   masteryBlockRenderOvReg.register();
+  masteryPointReg.register();
   masteryHideTitle.register();
 }
 export function unload() {
@@ -102,5 +96,6 @@ export function unload() {
   masteryBlockReg.unregister();
   masteryBlockRenderWorldReg.unregister();
   masteryBlockRenderOvReg.unregister();
+  masteryPointReg.unregister();
   masteryHideTitle.unregister();
 }

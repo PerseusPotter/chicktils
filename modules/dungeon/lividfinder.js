@@ -1,11 +1,11 @@
 import settings from '../../settings';
-import { drawArrow3DPos } from '../../util/draw';
 import reg from '../../util/registerer';
 import { StateProp, StateVar } from '../../util/state';
 import { _setTimeout } from '../../util/timers';
 import { stateFloor, stateIsInBoss } from '../dungeon.js';
 import { run } from '../../util/threading';
-import { renderBoxOutline, renderTracer } from '../../../Apelles/index';
+import { renderBoxOutline } from '../../../Apelles/index';
+import createPointer from '../../util/pointto';
 
 const stateFindLivid = new StateProp(stateFloor).equalsmult('F5', 'M5').and(settings._dungeonBoxLivid).and(stateIsInBoss);
 const stateLivid = new StateVar();
@@ -59,12 +59,18 @@ const tickReg = reg('tick', () => {
 const rendWrldReg = reg('renderWorld', () => {
   const livid = stateLivid.get();
   renderBoxOutline(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY(), livid.getRenderZ(), 1, 2, { phase: settings.dungeonBoxLividEsp, lw: 5 });
-  if (settings.preferUseTracer) renderTracer(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ(), { lw: 3, phase: true });
 }).setEnabled(stateFindLivid.and(stateLivid));
-const rendOverReg = reg('renderOverlay', () => {
-  const livid = stateLivid.get();
-  drawArrow3DPos(settings.dungeonBoxLividColor, livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ(), false, 5);
-}).setEnabled(stateFindLivid.and(stateLivid).and(new StateProp(settings._preferUseTracer).not()));
+const pointReg = createPointer(
+  settings._dungeonBoxLividColor,
+  () => {
+    const livid = stateLivid.get();
+    return [livid.getRenderX(), livid.getRenderY() + 1, livid.getRenderZ()];
+  },
+  {
+    enabled: stateFindLivid.and(stateLivid),
+    size: 5
+  }
+);
 
 export function enter() {
   stateLivid.set(null);
@@ -74,11 +80,11 @@ export function start() {
   blockChangeReg.register();
   tickReg.register();
   rendWrldReg.register();
-  rendOverReg.register();
+  pointReg.register();
 }
 export function reset() {
   blockChangeReg.unregister();
   tickReg.unregister();
   rendWrldReg.unregister();
-  rendOverReg.unregister();
+  pointReg.unregister();
 }
