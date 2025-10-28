@@ -588,7 +588,7 @@ const builder = new Builder('ChickTils', 'settings.json')
   .addToggle('golemTilsSpawnTimer', 'GolemTilsSpawnTimer', true, { desc: 'timer until golem spawns', isNewSection: true, shouldShow: p => addDependency(p.enablegolemtils) })
   .addAction('moveGolemTilsSpawnTimer', 'MoveGolemTilsSpawnTimer', { shouldShow: p => addDependency(p.golemTilsSpawnTimer) })
 
-  .addToggle('golemTilsPrefireAim', 'GolemTilsPrefireAim', true, { desc: 'show where to aim to prefire', shouldShow: p => addDependency(p.enablegolemtils), isNewSection: true })
+  .addOption('golemTilsPrefireAim', 'GolemTilsPrefireAim', 'Spawning', { desc: 'show where to aim to prefire', options: ['Always', 'Spawning', 'Never'], shouldShow: p => addDependency(p.enablegolemtils), isNewSection: true })
   .addColor('golemTilsPrefireAimColor', 'GolemTilsPrefireAimColor', 0xFF0000FF, { shouldShow: p => addDependency(p.golemTilsPrefireAim) })
 
   .addPage('Testing')

@@ -30,8 +30,9 @@ const stateIsSpawning = new AtomicStateVar(false);
 const stateGolemPosition = new StateVar();
 const stateGolemHeight = new AtomicStateVar(0);
 const stateCanHaveGolem = new StateProp(stateGolemHeight).notequals(0).and(stateInEnd);
-const statePointTo = new StateProp(settings._golemTilsPointTo).customBinary(stateIsSpawning, (a, b) => a === 'Always' || (a === 'Spawning' && b));
-const stateAim = new StateProp(stateIsSpawning).and(settings._golemTilsPrefireAim).and(stateCanHaveGolem);
+const cmpShouldShowSpawning = (a, b) => a === 'Always' || (a === 'Spawning' && b);
+const statePointTo = new StateProp(settings._golemTilsPointTo).customBinary(stateIsSpawning, cmpShouldShowSpawning);
+const stateAim = new StateProp(settings._golemTilsPrefireAim).customBinary(stateIsSpawning, cmpShouldShowSpawning).and(stateCanHaveGolem);
 /** @type {[number, number, number][]} */
 let checked = [];
 let remaining = golemPositions.slice();
@@ -58,6 +59,7 @@ function reset() {
   if (remaining.length !== golemPositions.length) remaining = golemPositions.slice();
   checked = [];
   stateIsSpawning.set(false);
+  scanDelay = 2;
 }
 
 const golemHeights = {
@@ -91,7 +93,7 @@ const scanReg = reg('tick', () => {
   if (remaining.length === 0) {
     log('&4no valid locations found, resetting');
     reset();
-    scanDelay = 100;
+    scanDelay = 20;
     return;
   }
   const w = World.getWorld();
@@ -133,7 +135,7 @@ const renderReg = reg('renderWorld', () => {
 const pointGolemReg = createPointer(
   settings._golemTilsColor,
   () => {
-  const pos = stateGolemPosition.get();
+    const pos = stateGolemPosition.get();
     return [pos[0] + 0.5, pos[1], pos[2] + 0.5];
   },
   {
