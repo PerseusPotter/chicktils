@@ -158,6 +158,7 @@ let prefireT = 0;
 const ProjectileHelper = Java.type('com.perseuspotter.chicktilshelper.ProjectileHelper');
 const pointCalcReg = reg('renderWorld', () => {
   const pos = stateGolemPosition.get();
+  if (!pos) return;
   const aim = ProjectileHelper.solve(
     (pos[0] - 1) - getRenderX(),
     5 - (getRenderY() + getEyeHeight()),
@@ -188,7 +189,7 @@ const pointPrefireReg = createPointer(
   ],
   {
     enabled: stateAim,
-    req: () => !Number.isNaN(prefireP)
+    req: () => !Number.isNaN(prefireP) && stateGolemPosition.get()
   }
 );
 
