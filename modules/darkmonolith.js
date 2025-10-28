@@ -11,10 +11,14 @@ import data from '../data';
 import { commaNumber } from '../util/format';
 import createTextGui from '../util/customtextgui';
 import createPointer from '../util/pointto';
+import { registerListenIsland, stateIsland } from '../util/skyblock';
 
 /** @type {StateVar<[number, number, number]?} */
 const stateMonolithPosition = new StateVar();
-const stateScanMonolith = new StateProp(stateMonolithPosition).not();
+const stateInMines = new StateProp(stateIsland).equals('Dwarven Mines');
+const stateHasMonolith = new StateProp(stateInMines).and(stateMonolithPosition);
+const stateScanMonolith = new StateProp(stateMonolithPosition).not().and(stateInMines);
+const stateTrackDrops = new StateProp(stateInMines).and(settings._darkMonolithTrackDrops);
 
 const MCBlockPos = Java.type('net.minecraft.util.BlockPos');
 const offsets = flatMap(new Array(3).fill(0).map((_, i) => i - 1), v => new Array(3).fill(0).map((_, i) => [v, i - 1]));
@@ -98,18 +102,18 @@ const interactReg = reg('playerInteract', (action, pos) => {
     reset();
     disappearTime = customRegs.serverTick.tick;
   }
-}).setEnabled(stateMonolithPosition);
+}).setEnabled(stateHasMonolith);
 const hitReg = reg('hitBlock', block => {
   const egg = stateMonolithPosition.get();
   if (block.x === egg[0] && block.y === egg[1] && block.z === egg[2]) {
     reset();
     disappearTime = customRegs.serverTick.tick;
   }
-}).setEnabled(stateMonolithPosition);
+}).setEnabled(stateHasMonolith);
 const leaveReg = reg('worldUnload', () => {
   reset();
   disappearTime = -(eggRespawnTime - 20);
-});
+}).setEnabled(stateInMines);
 
 function waypoint(col, x, y, z, p) {
   const rgba = normColor(col);
@@ -136,7 +140,7 @@ const pointReg = createPointer(
   () => [egg[0] + 0.5, egg[1], egg[2] + 0.5],
   {
     phase: settings._darkMonolithEsp,
-    enabled: new StateProp(stateMonolithPosition).and(settings._darkMonolithPointTo)
+    enabled: new StateProp(stateHasMonolith).and(settings._darkMonolithPointTo)
   }
 );
 const renderReg = reg('renderWorld', () => {
@@ -146,15 +150,15 @@ const renderReg = reg('renderWorld', () => {
 
   remaining.forEach(v => v[4] && waypoint(settings.darkMonolithPossibleColor, v[0], v[1], v[2], settings.darkMonolithEsp));
   checked.forEach(v => v[4] && waypoint(settings.darkMonolithScannedColor, v[0], v[1], v[2], settings.darkMonolithEsp));
-});
+}).setEnabled(stateInMines);
 
 const trackerGui = createTextGui(() => data.monolithTracker, () => formatDrops());
 
-const drop1Reg = reg('chat', () => { data.monolithPowder += 100; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&2100 ᠅ Mithril Powder&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
-const drop2Reg = reg('chat', () => { data.monolithCoins += 50_000; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&650,000 Coins&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
-const drop3Reg = reg('chat', () => { data.monolithPowder += 1_000; data.monolithCoins += 2_500; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&62,500 Coins &r&aand &r&21,000 ᠅ Mithril Powder&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
-const drop4Reg = reg('chat', () => { data.monolithPowder += 3_000; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&23,000 ᠅ Mithril Powder&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
-const drop5Reg = reg('chat', () => { data.monolithFish++; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&cRock the Fish&r&a!&r').setEnabled(settings._darkMonolithTrackDrops);
+const drop1Reg = reg('chat', () => { data.monolithPowder += 100; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&2100 ᠅ Mithril Powder&r&a!&r').setEnabled(stateTrackDrops);
+const drop2Reg = reg('chat', () => { data.monolithCoins += 50_000; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&650,000 Coins&r&a!&r').setEnabled(stateTrackDrops);
+const drop3Reg = reg('chat', () => { data.monolithPowder += 1_000; data.monolithCoins += 2_500; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&62,500 Coins &r&aand &r&21,000 ᠅ Mithril Powder&r&a!&r').setEnabled(stateTrackDrops);
+const drop4Reg = reg('chat', () => { data.monolithPowder += 3_000; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&23,000 ᠅ Mithril Powder&r&a!&r').setEnabled(stateTrackDrops);
+const drop5Reg = reg('chat', () => { data.monolithFish++; data.monolithCount++; }).setCriteria('&r&5&lMONOLITH! &r&aYou found a mysterious &r&5Dark Monolith &r&aand were rewarded &r&cRock the Fish&r&a!&r').setEnabled(stateTrackDrops);
 function formatDrops() {
   return [
     `&6${commaNumber(data.monolithCoins)} Coins`,
@@ -170,6 +174,7 @@ const renderTrackerReg = reg('renderOverlay', () => {
 
 export function init() {
   settings._enabledarkmonolith.listen(v => v && Client.scheduleTask(() => log('seek therapy')));
+  registerListenIsland(settings._enabledarkmonolith);
   settings._moveDarkMonolithDropsTracker.onAction(v => trackerGui.edit(v));
   settings._resetDarkMonolithDropsTracker.onAction(() => {
     data.monolithCoins = 0;
