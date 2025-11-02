@@ -12,7 +12,7 @@ const swingReg = reg('packetReceived', pack => {
   if (pack.func_148977_d() !== 0) return;
   const id = pack.func_148978_c();
   unrun(() => {
-    const player = getPlayers().find(v => v.me.func_145782_y() === id);
+    const player = getPlayers().find(v => v.me?.func_145782_y() === id);
     if (!player) return;
     if (player.items.getFirst()?.id !== 'TERMINATOR') return;
     log(`&4&l${player.ign}&r &7(${player.class}) &cused term laser in storm clear ಠ╭╮ಠ`);
