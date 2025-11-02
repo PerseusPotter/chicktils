@@ -32,8 +32,10 @@ const nameDict = [
 ];
 
 function findLivid() {
-  const name = nameDict[currColor] + ' Livid';
-  stateLivid.set(World.getAllPlayers().find(v => v.getName() === name && !v.isDead()));
+  try {
+    const name = nameDict[currColor] + ' Livid';
+    stateLivid.set(World.getAllPlayers().find(v => v.getName() === name && !v.isDead()));
+  } catch (e) { }
 }
 function processBlockState(bs) {
   try {
