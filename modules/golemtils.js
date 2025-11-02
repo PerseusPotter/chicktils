@@ -163,7 +163,7 @@ const pointCalcReg = reg('renderWorld', () => {
     (pos[0] - 1) - getRenderX(),
     5 - (getRenderY() + getEyeHeight()),
     (pos[2] - 2) - getRenderZ(),
-    0.001, -0.05, 2.92, 0.99, true
+    0.001, -0.05, 3, 0.99, true
   );
   prefireP = aim.phi;
   prefireT = aim.theta;

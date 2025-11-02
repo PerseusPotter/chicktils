@@ -405,7 +405,7 @@ const serverTickAimReg = reg('serverTick', () => {
     path[prevBestTarget][0] - x,
     path[prevBestTarget][1] - y + (isHighDragon ? 8 : 0),
     path[prevBestTarget][2] - z,
-    0.001, -0.05, 2.92, 0.99, false
+    0.001, -0.05, 3, 0.99, false
   );
   // assumes this relationship is roughly monotonic
   let bestI = prevBestTarget;
@@ -425,7 +425,7 @@ const serverTickAimReg = reg('serverTick', () => {
         path[next][0] - x,
         path[next][1] - y + (isHighDragon ? 8 : 0),
         path[next][2] - z,
-        0.001, -0.05, 2.92, 0.99, false
+        0.001, -0.05, 3, 0.99, false
       ));
       let o = Math.abs(ticks - ticksRemaining - next);
       if (o < bestO) {
