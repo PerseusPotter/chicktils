@@ -260,11 +260,11 @@ const serverReg = reg('packetReceived', pack => {
       fields.push(['worldType', pack.func_149080_f().func_77127_a()]);
       break;
     case 'S08PacketPlayerPosLook':
-      fields.push(['deltaX', pack.func_148932_c()]);
-      fields.push(['deltaY', pack.func_148928_d()]);
-      fields.push(['deltaZ', pack.func_148933_e()]);
-      fields.push(['deltaYaw', pack.func_148931_f()]);
-      fields.push(['deltaPitch', pack.func_148930_g()]);
+      fields.push([pack.func_179834_f().some(v => v.name() === 'X') ? 'deltaX' : 'x', pack.func_148932_c()]);
+      fields.push([pack.func_179834_f().some(v => v.name() === 'Y') ? 'deltaY' : 'y', pack.func_148928_d()]);
+      fields.push([pack.func_179834_f().some(v => v.name() === 'Z') ? 'deltaZ' : 'z', pack.func_148933_e()]);
+      fields.push([pack.func_179834_f().some(v => v.name() === 'Y_ROT') ? 'deltaYaw' : 'yaw', pack.func_148931_f()]);
+      fields.push([pack.func_179834_f().some(v => v.name() === 'X_ROT') ? 'deltaPitch' : 'pitch', pack.func_148930_g()]);
       break;
     case 'S09PacketHeldItemChange':
       fields.push(['hotbarId', pack.func_149385_c()]);
