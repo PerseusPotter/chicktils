@@ -90,6 +90,7 @@ export default class Grid {
     this.arrs = [];
     this.age = new Deque();
     this._lock.unlock();
+    this.queue.clear();
   }
   freeze() {
     if (this.locked) return;

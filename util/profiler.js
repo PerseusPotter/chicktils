@@ -1,9 +1,17 @@
+import { log } from './log';
 import { getOrPut } from './polyfill';
 
 export const PROFILER = false;
 
+let enabled = false;
+
 const nanoTime = java.lang.System.nanoTime;
 if (PROFILER) {
+  register('command', () => {
+    enabled = !enabled;
+    log(`profiler is ${enabled ? '&aenabled' : '&cdisabled'}`);
+  }).setName('chicktilstoggleprofilerenabled');
+
   var $rendData = new Map();
   var $tickData = new Map();
   var $mainThread;
@@ -12,6 +20,7 @@ if (PROFILER) {
   register('gameUnload', () => writer.close());
   let rTickStart = 0;
   register(net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent, evn => {
+    if (!enabled) return $rendData.clear();
     if (evn.phase.toString() !== 'END') return rTickStart = nanoTime();
     writer.write('RENDER TICK START\n');
     const time = dumpData($rendData);
@@ -20,6 +29,7 @@ if (PROFILER) {
     $rendData.clear();
   });
   register(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, evn => {
+    if (!enabled) return $tickData.clear();
     if (evn.phase.toString() !== 'END') return;
     writer.write('CLIENT TICK START\n');
     const time = dumpData($tickData);
