@@ -183,7 +183,7 @@ register('command', ...args => {
               } else {
                 const i = msg.indexOf('\n');
                 if (i >= 0) msg = msg.slice(i + 1);
-                if (msg !== input) ChatLib.command(`${settings.module} config edit ${p.name} ${msg}`, true);
+                if (msg !== input) settings.updateProp(p, msg);
               }
             }, 'this first line will be ignored. edit the value, save the file, and close the editor.\n' + input);
             break;
