@@ -896,7 +896,7 @@ export class Builder {
    * @param {string} name
    * @param {boolean} initial
    * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean>, isNewSection?: boolean }} [opts]
-   * @returns {Builder<P & { [x in K]: PropertyToggle }}
+   * @returns {Builder<P & { [x in K]: PropertyToggle }>}
    */
   addToggle(key, name, initial, opts) {
     this.addProperty(key, name, 0, initial, opts);
@@ -909,7 +909,7 @@ export class Builder {
    * @param {string} name
    * @param {number} initial
    * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean>, isNewSection?: boolean }} [opts]
-   * @returns {Builder<P & { [x in K]: PropertyInteger }}
+   * @returns {Builder<P & { [x in K]: PropertyInteger }>}
    */
   addInteger(key, name, initial, opts) {
     this.addProperty(key, name, 1, initial, opts);
@@ -922,7 +922,7 @@ export class Builder {
    * @param {string} name
    * @param {number} initial
    * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean>, isNewSection?: boolean }} [opts]
-   * @returns {Builder<P & { [x in K]: PropertyNumber }}
+   * @returns {Builder<P & { [x in K]: PropertyNumber }>}
    */
   addNumber(key, name, initial, opts) {
     this.addProperty(key, name, 2, initial, opts);
@@ -935,7 +935,7 @@ export class Builder {
    * @param {string} name
    * @param {number} initial
    * @param {{ desc?: string, min?: number, max?: number, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean>, isNewSection?: boolean }} [opts]
-   * @returns {Builder<P & { [x in K]: PropertyPercent }}
+   * @returns {Builder<P & { [x in K]: PropertyPercent }>}
   */
   addPercent(key, name, initial, opts) {
     this.addProperty(key, name, 3, initial, opts);
@@ -948,7 +948,7 @@ export class Builder {
    * @param {string} name
    * @param {string} initial
    * @param {{ desc?: string, len?: number, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean>, isNewSection?: boolean }} [opts]
-   * @returns {Builder<P & { [x in K]: PropertyText }}
+   * @returns {Builder<P & { [x in K]: PropertyText }>}
   */
   addText(key, name, initial, opts) {
     this.addProperty(key, name, 4, initial, opts);
@@ -961,7 +961,7 @@ export class Builder {
    * @param {string} name
    * @param {number} initial
    * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean>, isNewSection?: boolean }} [opts]
-   * @returns {Builder<P & { [x in K]: PropertyColor }}
+   * @returns {Builder<P & { [x in K]: PropertyColor }>}
   */
   addColor(key, name, initial, opts) {
     this.addProperty(key, name, 5, initial, opts);
@@ -975,7 +975,7 @@ export class Builder {
    * @param {string} name
    * @param {string} initial
    * @param {{ desc?: string, options?: O[], shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean>, isNewSection?: boolean }} [opts]
-   * @returns {Builder<P & { [x in K]: PropertyOption<O> }}
+   * @returns {Builder<P & { [x in K]: PropertyOption<O> }>}
    */
   addOption(key, name, initial, opts) {
     this.addProperty(key, name, 6, initial, opts);
@@ -987,7 +987,7 @@ export class Builder {
    * @param {K} key
    * @param {string} name
    * @param {{ desc?: string, shouldShow?: StateVar<boolean> | (p: P) => StateVar<boolean>, isNewSection?: boolean }} [opts]
-   * @returns {Builder<P & { [x in K]: PropertyAction }}
+   * @returns {Builder<P & { [x in K]: PropertyAction }>}
    */
   addAction(key, name, opts) {
     this.addProperty(key, name, 7, null, opts);

@@ -279,3 +279,14 @@ export function getBlockId(block) {
 export function printChatComponent(comp, id) {
   Client.getMinecraft().field_71456_v.func_146158_b().func_146234_a(comp, id);
 }
+
+/**
+ * @param {number} ticks
+ * @returns {number}
+ */
+export function bowVelocity(ticks) {
+  // t = ticks / 20, f = (t^2 + 2t) / 3, v = 3f
+  const t = ticks / 20;
+  const v = t * t + 2 * t;
+  return v < 0.3 ? 0 : Math.min(3, v);
+}
