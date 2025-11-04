@@ -11,8 +11,7 @@ import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss, statePlaye
 import { fastDistance, lerp } from '../../util/math';
 import { getRenderX, getRenderY, getRenderZ, renderBillboardString, renderBoxFilled, renderTracer } from '../../../Apelles/index';
 import { getMedianPing } from '../../util/ping';
-import { getEyeHeight } from '../../util/mc';
-import { setAccessible } from '../../util/polyfill';
+import aim from '../../util/aimproj';
 
 const stateDragonHelper = new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonDragonHelper);
 const stateInP5 = new StateVar(false);
@@ -385,66 +384,21 @@ const serverTickHitReg = reg('serverTick', () => {
   hitTimes.push(0);
 }).setEnabled(stateDragonHelperTrackHits);
 const bowHitReg = reg('soundPlay', () => hitTimes[hitTimes.length - 1]++).setCriteria('random.successful_hit').setEnabled(stateDragonHelperTrackHits);
-const ProjectileHelper = Java.type('com.perseuspotter.chicktilshelper.ProjectileHelper');
-const lastReportedPosX = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175172_bI'));
-const lastReportedPosY = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175166_bJ'));
-const lastReportedPosZ = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175167_bK'));
 const serverTickAimReg = reg('serverTick', () => {
   let ticksRemaining = spawnedDrags.get(currDragPrio);
   // only the position of the first 30 ticks are defined
   if (ticksRemaining === undefined || ticksRemaining < -30) return stateAimPosition.set(null);
   ticksRemaining -= getMedianPing() / 50;
 
-  const path = DRAGONS[currDragPrio].path;
-  const visited = new Set([prevBestTarget]);
-  const p = Player.getPlayer();
-  const x = lastReportedPosX.get(p);
-  const y = lastReportedPosY.get(p) + getEyeHeight(p);
-  const z = lastReportedPosZ.get(p);
-  let { theta, phi, ticks } = ProjectileHelper.solve(
-    path[prevBestTarget][0] - x,
-    path[prevBestTarget][1] - y + (isHighDragon ? 8 : 0),
-    path[prevBestTarget][2] - z,
-    0.001, -0.05, 3, 0.99, false
+  const { bestTarget, bestT, bestP, bestD } = aim(
+    ticksRemaining,
+    DRAGONS[currDragPrio].path,
+    prevBestTarget,
+    0.001, -0.05, 3, 0.99, false,
+    0, isHighDragon ? 8 : 0, 0
   );
-  // assumes this relationship is roughly monotonic
-  let bestI = prevBestTarget;
-  let bestT = theta;
-  let bestP = phi;
-  let bestO = Math.abs(ticks - ticksRemaining - prevBestTarget);
-  let bestD = ticks;
-  if (Number.isNaN(bestO)) bestO = Number.POSITIVE_INFINITY;
-  let dir = 1;
-  let swapped = false;
-  let i = prevBestTarget;
-  while (true) {
-    let next = i + dir;
-    let shouldSwap = false;
-    if (next >= 0 && next < path.length && visited.add(next)) {
-      ({ theta, phi, ticks } = ProjectileHelper.solve(
-        path[next][0] - x,
-        path[next][1] - y + (isHighDragon ? 8 : 0),
-        path[next][2] - z,
-        0.001, -0.05, 3, 0.99, false
-      ));
-      let o = Math.abs(ticks - ticksRemaining - next);
-      if (o < bestO) {
-        bestI = next;
-        bestO = o;
-        bestT = theta;
-        bestP = phi;
-        bestD = ticks;
-        i = next;
-      } else shouldSwap = true;
-    } else shouldSwap = true;
-    if (shouldSwap) {
-      if (swapped) break;
-      swapped = true;
-      dir = -dir;
-    }
-  }
 
-  prevBestTarget = Number.isFinite(bestO) ? bestI : 0;
+  prevBestTarget = bestTarget;
   prevAimPosition = stateAimPosition.get() ?? [bestT, bestP];
   stateAimPosition.set([bestT, bestP, bestD]);
 }).setEnabled(stateDragonHelperAim);
@@ -511,7 +465,7 @@ export function init() {
   settings._dungeonDragonHelperPrioNS.listen(checkPrio);
   function checkTeam(v, o) {
     if (!/[^bmhat]/.test(v)) return;
-    log('&4invalid team, it should only contain the characters "bmhat" (case sensitive)');
+    log('&4invalid classes, it should only contain the characters "bmhat" (case sensitive)');
     this.set(o);
   }
   settings._dungeonDragonHelperBersTeam.listen(checkTeam);
