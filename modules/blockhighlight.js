@@ -95,8 +95,8 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
       etherReasonDisplay.setLine('&4Can\'t TP: Too far!');
       result = RaycastHelper.raycast(Player.getPlayer(), Tessellator.partialTicks, etherDistance, maxEtherDist);
     } else {
-      const blockAbove = w.func_180495_p(result.pos.func_177982_a(0, 1, 0)).func_177230_c();
-      const twoBlockAbove = w.func_180495_p(result.pos.func_177982_a(0, 2, 0)).func_177230_c();
+      const blockAbove = w.func_180495_p(result.func_177982_a(0, 1, 0)).func_177230_c();
+      const twoBlockAbove = w.func_180495_p(result.func_177982_a(0, 2, 0)).func_177230_c();
       if (!BlockRegistry.isBasicallyAir(blockAbove) || !BlockRegistry.isBasicallyAir(twoBlockAbove)) {
         stateCanEther.set(false);
         etherReasonDisplay.setLine('&4Can\'t TP: No air above!');
@@ -104,14 +104,14 @@ const highlightReg = reg(net.minecraftforge.client.event.DrawBlockHighlightEvent
     }
 
     if (stateCanEther.get()) tryHighlightBlock(
-      result.pos,
+      result,
       settings.blockHighlightEtherWireColor,
       settings.blockHighlightEtherFillColor,
       settings.blockHighlightEtherWireWidth,
       true
     );
     else if (result) tryHighlightBlock(
-      result.pos,
+      result,
       settings.blockHighlightCantEtherWireColor,
       settings.blockHighlightCantEtherFillColor,
       settings.blockHighlightCantEtherWireWidth,
