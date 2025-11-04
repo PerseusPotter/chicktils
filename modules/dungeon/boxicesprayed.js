@@ -2,11 +2,10 @@ import settings from '../../settings';
 import reg from '../../util/registerer';
 import { dot, lerp, negate, rotate } from '../../util/math';
 import Grid from '../../util/grid';
-import { fromVec3, getEyeHeight, getItemId } from '../../util/mc';
+import { fromVec3, getEyeHeight, getItemId, getLastReportedX, getLastReportedY, getLastReportedZ } from '../../util/mc';
 import { getPlayers, isMob, registerTrackHeldItem, registerTrackPlayers } from '../dungeon.js';
 import { run, unrun } from '../../util/threading';
 import { renderBoxFilled, renderBoxOutline } from '../../../Apelles/index';
-import { setAccessible } from '../../util/polyfill';
 
 let allMobs = [];
 const allMobsBucket = new Grid({ size: 3, addNeighbors: 2 });
@@ -36,9 +35,6 @@ const step2Reg = reg('step', () => {
   });
   allMobsBucket.unfreeze();
 }).setFps(2).setOffset(0).setEnabled(settings._dungeonBoxIceSprayed);
-const lastReportedPosX = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175172_bI'));
-const lastReportedPosY = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175166_bJ'));
-const lastReportedPosZ = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175167_bK'));
 
 const far = 8;
 const near = 0.01;
@@ -59,9 +55,9 @@ const serverTickReg = reg('serverTick', () => {
       if (!ent) return;
 
       const pos = {
-        x: e === Player ? lastReportedPosX.get(ent) : ent.field_70118_ct / 32,
-        y: (e === Player ? lastReportedPosY.get(ent) : ent.field_70117_cu / 32) + getEyeHeight(ent),
-        z: e === Player ? lastReportedPosZ.get(ent) : ent.field_70116_cv / 32
+        x: e === Player ? getLastReportedX() : ent.field_70118_ct / 32,
+        y: (e === Player ? getLastReportedY() : ent.field_70117_cu / 32) + getEyeHeight(ent),
+        z: e === Player ? getLastReportedZ() : ent.field_70116_cv / 32
       };
       const look = fromVec3(ent.func_70040_Z());
       const plane = (n, p) => [n.x, n.y, n.z, -dot(n, p)];

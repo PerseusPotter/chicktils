@@ -292,6 +292,42 @@ export function bowVelocity(ticks) {
   return v < 0.3 ? 0 : Math.min(3, v);
 }
 
+const lastReportedPosX = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175172_bI'));
+const lastReportedPosY = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175166_bJ'));
+const lastReportedPosZ = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175167_bK'));
+const lastReportedPit = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175165_bM'));
+const lastReportedYaw = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175164_bL'));
+const serverSneakState = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175170_bN'));
+const serverSprintState = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175171_bO'));
+/** @returns {number} */
+export function getLastReportedX() {
+  return lastReportedPosX.get(Player.getPlayer());
+}
+/** @returns {number} */
+export function getLastReportedY() {
+  return lastReportedPosY.get(Player.getPlayer());
+}
+/** @returns {number} */
+export function getLastReportedZ() {
+  return lastReportedPosZ.get(Player.getPlayer());
+}
+/** @returns {number} */
+export function getLastReportedPit() {
+  return lastReportedPit.get(Player.getPlayer());
+}
+/** @returns {number} */
+export function getLastReportedYaw() {
+  return lastReportedYaw.get(Player.getPlayer());
+}
+/** @returns {boolean} */
+export function getServerSneakState() {
+  return serverSneakState.get(Player.getPlayer());
+}
+/** @returns {boolean} */
+export function getServerSprintState() {
+  return serverSprintState.get(Player.getPlayer());
+}
+
 export const stateSinglePlayer = new StateVar(false);
 register('serverConnect', () => stateSinglePlayer.set(Server.getIP() == 'localhost'));
 register('worldLoad', () => stateSinglePlayer.set(Server.getIP() === 'localhost'));
