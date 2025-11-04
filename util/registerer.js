@@ -1,6 +1,6 @@
 import { removeElementMap, removeElementSet } from './helper';
 import { log } from './log';
-import { getBlockPos } from './mc';
+import { getBlockPos, stateSinglePlayer } from './mc';
 import { getOrPut, inherits, setAccessible } from './polyfill';
 import { endRender, endTick, PROFILER, start } from './profiler';
 import { StateVar } from './state';
@@ -386,24 +386,17 @@ reg = function reg(type, shit) {
     ChickTilsServerTick.list.forEach(v => v.cb(ChickTilsServerTick.tick));
     ChickTilsServerTick.tick++;
   }).setFilteredClass(Java.type('net.minecraft.network.play.server.S32PacketConfirmTransaction'));
-  const stateSingleplayer = new StateVar(false);
   ChickTilsServerTick.backupReg = reg('tick', () => {
     ChickTilsServerTick.list.forEach(v => v.cb(ChickTilsServerTick.tick));
     ChickTilsServerTick.tick++;
-  }).setEnabled(stateSingleplayer);
-  ChickTilsServerTick.changeServerReg = reg('serverConnect', () => {
-    stateSingleplayer.set(Server.getIP() === 'localhost');
-  });
-  ChickTilsServerTick.changeServerReg.forceTrigger();
+  }).setEnabled(stateSinglePlayer);
   ChickTilsServerTick.prototype.update = function update() {
     if (ChickTilsServerTick.list.size) {
       ChickTilsServerTick.tickReg.register();
       ChickTilsServerTick.backupReg.register();
-      ChickTilsServerTick.changeServerReg.register();
     } else {
       ChickTilsServerTick.tickReg.unregister();
       ChickTilsServerTick.backupReg.unregister();
-      ChickTilsServerTick.changeServerReg.unregister();
     }
   };
 

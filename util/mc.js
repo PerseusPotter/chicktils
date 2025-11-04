@@ -1,4 +1,5 @@
 import { setAccessible } from './polyfill';
+import { StateVar } from './state';
 
 const itemIdDict = Java.type('net.minecraft.item.Item').field_150901_e;
 /**
@@ -290,3 +291,7 @@ export function bowVelocity(ticks) {
   const v = t * t + 2 * t;
   return v < 0.3 ? 0 : Math.min(3, v);
 }
+
+export const stateSinglePlayer = new StateVar(false);
+register('serverConnect', () => stateSinglePlayer.set(Server.getIP() == 'localhost'));
+register('worldLoad', () => stateSinglePlayer.set(Server.getIP() === 'localhost'));
