@@ -6,7 +6,7 @@ import { StateProp, StateVar } from '../util/state';
 import { compareFloat, dist } from '../util/math';
 import { colorForNumber } from '../util/format';
 import GlStateManager2 from '../util/glStateManager';
-import { setAccessible } from '../util/polyfill';
+import { getLastReportedX, getLastReportedY, getLastReportedZ } from '../util/mc';
 
 function spawnParticle(x, y, z, r, g, b, age) {
   // World.particle.spawnParticle('REDSTONE', x, y, z, 0, 0, 0).setMaxAge(age).setColor(r, g, b, 1);
@@ -444,27 +444,24 @@ const equipmentReg = reg('packetReceived', (pack, doDupe) => {
     y: ent.field_70163_u
   });
 }).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment);
-const lastReportedPosX = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175172_bI'));
-const lastReportedPosY = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175166_bJ'));
-const lastReportedPosZ = setAccessible(net.minecraft.client.entity.EntityPlayerSP.class.getDeclaredField('field_175167_bK'));
 const soundReg = reg('packetReceived', pack => {
   const name = pack.func_149212_c();
   if (name === 'random.wood_click') {
     if (pack.func_149208_g() !== 0.5) return;
     if (compareFloat(pack.func_149209_h(), 0.841269850730896, 1e-10) !== 0) return;
     if (
-      dist(lastReportedPosX.get(Player.getPlayer()), pack.func_149207_d()) > 1 ||
-      dist(lastReportedPosY.get(Player.getPlayer()), pack.func_149211_e()) > 1 ||
-      dist(lastReportedPosZ.get(Player.getPlayer()), pack.func_149210_f()) > 1
+      dist(getLastReportedX(), pack.func_149207_d()) > 1 ||
+      dist(getLastReportedY(), pack.func_149211_e()) > 1 ||
+      dist(getLastReportedZ(), pack.func_149210_f()) > 1
     ) return;
     ownDeployLoc = { x: pack.func_149207_d(), y: pack.func_149211_e(), z: pack.func_149210_f(), isFlux: true };
   } else if (name === 'fireworks.launch') {
     if (pack.func_149208_g() !== 3) return;
     if (pack.func_149209_h() !== 1) return;
     if (
-      dist(lastReportedPosX.get(Player.getPlayer()), pack.func_149207_d()) > 1 ||
-      dist(lastReportedPosY.get(Player.getPlayer()) + 1.5, pack.func_149211_e()) > 1 ||
-      dist(lastReportedPosZ.get(Player.getPlayer()), pack.func_149210_f()) > 1
+      dist(getLastReportedX(), pack.func_149207_d()) > 1 ||
+      dist(getLastReportedY() + 1.5, pack.func_149211_e()) > 1 ||
+      dist(getLastReportedZ(), pack.func_149210_f()) > 1
     ) return;
     ownDeployLoc = { x: pack.func_149207_d(), y: pack.func_149211_e(), z: pack.func_149210_f(), isFlux: false };
   }
