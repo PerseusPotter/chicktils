@@ -57,7 +57,7 @@ export function countItems(sbId) {
 const spawnLocations = {
   'Private Island': [7, 100, 7],
   'Hub': [-3, 70, -70],
-  'Dungeon Hub': [-31, 121, 0],
+  'Dungeon Hub': [-25, 121, 0],
   'The Farming Islands': [113, 71, -208],
   'The Park': [-279, 82, -14],
   'Gold Mine': [-5, 74, -279],
