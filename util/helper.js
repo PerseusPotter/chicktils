@@ -100,3 +100,17 @@ export function base64EncodeInt(m, o, args) {
   if (!helper) return '';
   return helper.base64EncodeInt(m, o, args);
 }
+
+/**
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @param {number} yaw
+ * @param {number} pit
+ * @param {number} flags 1: x | 2: y | 4: z | 8: yaw | 16: pitch
+ * @returns {import('../../@types/External').JavaClass<'net.minecraft.network.play.server.S08PacketPlayerPosLook'>}
+ */
+export function createS08PacketPlayerPosLook(x, y, z, yaw, pit, flags) {
+  if (!helper) return null;
+  return helper.createS08PacketPlayerPosLook(x, y, z, yaw, pit, flags);
+}

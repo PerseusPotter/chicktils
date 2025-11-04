@@ -3,6 +3,7 @@ package com.perseuspotter.chicktilshelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ChatLine;
 import net.minecraft.client.gui.GuiNewChat;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -171,5 +172,17 @@ public class ChickTilsHelper {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    public static S08PacketPlayerPosLook createS08PacketPlayerPosLook(
+        double x, double y, double z,
+        float yaw, float pit,
+        int flags
+    ) {
+        return new S08PacketPlayerPosLook(
+            x, y, z,
+            yaw, pit,
+            S08PacketPlayerPosLook.EnumFlags.func_180053_a(flags)
+        );
     }
 }
