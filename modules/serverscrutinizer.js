@@ -3,6 +3,7 @@ import settings from '../settings';
 import createTextGui from '../util/customtextgui';
 import { colorForNumber } from '../util/format';
 import { log } from '../util/log';
+import { stateSinglePlayer } from '../util/mc';
 import { getAveragePing, getMedianPing, getPing } from '../util/ping';
 import { Deque } from '../util/polyfill';
 import reg from '../util/registerer';
@@ -181,12 +182,11 @@ const rendOvTps = reg('renderOverlay', () => {
 
 const lastTickDisplay = createTextGui(() => data.serverScrutinizerLastPacketDisplay, () => ['zzz for &469.42s']);
 const rendOvLTD = reg('renderOverlay', () => {
-  if (Server.getIP() === 'localhost') return;
   const t = Date.now() - lastTickTime;
   if (t < settings.serverScrutinizerLastTickThreshold) return;
   lastTickDisplay.setLine(`zzz for ${colorForNumber(2000 - t, 2000)}${(t / 1000).toFixed(2)}s`);
   lastTickDisplay.render();
-}).setEnabled(settings._serverScrutinizerLastTickDisplay);
+}).setEnabled(new StateProp(stateSinglePlayer).not().and(settings._serverScrutinizerLastTickDisplay));
 
 const frames = new TickInfo(settings.serverScrutinizerFPSMaxAge, 1_000);
 const renderTickReg = reg('renderWorld', () => frames.add(Date.now())).setEnabled(settings._serverScrutinizerFPSDisplay);
