@@ -646,10 +646,10 @@ const serverReg = reg('packetReceived', pack => {
     case 'S29PacketSoundEffect':
       fields.push(['soundName', pack.func_149212_c()]);
       fields.push(['x', S29PacketSoundEffect$x.get(pack)]);
-      fields.push(['x_', pack.func_149207_d()]);
       fields.push(['y', S29PacketSoundEffect$y.get(pack)]);
-      fields.push(['y_', pack.func_149211_e()]);
       fields.push(['z', S29PacketSoundEffect$z.get(pack)]);
+      fields.push(['x_', pack.func_149207_d()]);
+      fields.push(['y_', pack.func_149211_e()]);
       fields.push(['z_', pack.func_149210_f()]);
       fields.push(['volume', pack.func_149208_g()]);
       fields.push(['pitch', S29PacketSoundEffect$pitch.get(pack)]);
