@@ -2,9 +2,11 @@ import { getRenderX, getRenderY, getRenderZ, renderBoxFilled, renderBoxOutline }
 import settings from '../settings';
 import createTextGui from '../util/customtextgui';
 import { fastDistance } from '../util/math';
+import { stateSinglePlayer } from '../util/mc';
 import reg from '../util/registerer';
 import { getSbId } from '../util/skyblock';
 import { StateProp, StateVar } from '../util/state';
+import { isFakeAotv, stateAOTVSim } from './singleplayer';
 
 let etherDistance = 0;
 let maxEtherDist = 0;
@@ -29,20 +31,24 @@ const tickReg = reg('tick', () => {
   }
   if (dist !== null) return etherDistance = dist;
 
-  const id = getSbId(item);
-  if (['ETHERWARP_CONDUIT', 'ASPECT_OF_THE_VOID', 'ASPECT_OF_THE_END'].includes(id)) {
-    const tag = stack.func_77978_p().func_74775_l('display');
-    const lore = tag.func_150295_c('Lore', 8);
-    for (let i = 0; i < lore.func_74745_c(); i++) {
-      let m = lore.func_150307_f(i).match(/^§7(?:up )?to §a(\d\d) blocks §7away\.$/);
-      if (m) {
-        etherDistance = +m[1];
-        break;
+  if (stateSinglePlayer.get()) {
+    if (stateAOTVSim.get() && isFakeAotv(stack)) etherDistance = 57 + settings.singlePlayerAOTVTuners;
+  } else {
+    var id = getSbId(item);
+    if (['ETHERWARP_CONDUIT', 'ASPECT_OF_THE_VOID', 'ASPECT_OF_THE_END'].includes(id)) {
+      const tag = stack.func_77978_p().func_74775_l('display');
+      const lore = tag.func_150295_c('Lore', 8);
+      for (let i = 0; i < lore.func_74745_c(); i++) {
+        let m = lore.func_150307_f(i).match(/^§7(?:up )?to §a(\d\d) blocks §7away\.$/);
+        if (m) {
+          etherDistance = +m[1];
+          break;
+        }
       }
-    }
-    if (id === 'ETHERWARP_CONDUIT') {
-      isConduit = true;
-      etherDistance = -etherDistance;
+      if (id === 'ETHERWARP_CONDUIT') {
+        isConduit = true;
+        etherDistance = -etherDistance;
+      }
     }
   }
 
