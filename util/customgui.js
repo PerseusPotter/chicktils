@@ -67,26 +67,33 @@ editGui.registerScrolled((x, y, d) => {
  *  getLoc: () => import('../data').Location;
  *  isEdit: boolean;
  *  str: string;
+ *  baseW: number;
+ *  baseH: number;
  *  render: (this: CustomGui) => void;
  *  renderEdit: (this: CustomGui) => void;
  *  edit: () => void;
- *  getX: (x: number) => number;
- *  getY: (y: number) => number;
+ *  x: (x: number) => number;
+ *  y: (y: number) => number;
  *  scale: (n: number) => number;
  *  getW: () => number;
  *  getH: () => number;
+ *  getX1: () => number;
+ *  getY1: () => number;
  *  getX2: () => number;
  *  getY2: () => number;
+ *  getScale: () => number;
  * }} CustomGui
  */
 /**
  * @param {() => import('../data').Location} getLoc
+ * @param {number} baseW
+ * @param {number} baseH
  * @param {(this: CustomGui) => void} render
  * @param {?(this: CustomGui) => void} renderEdit
  * @param {string?} str
  * @returns {CustomGui}
  */
-export default function createGui(getLoc, render, renderEdit, str = '') {
+export default function createGui(getLoc, baseW, baseH, render, renderEdit, str = '') {
   /**
    * @type {CustomGui}
    */
@@ -94,6 +101,8 @@ export default function createGui(getLoc, render, renderEdit, str = '') {
   obj.getLoc = getLoc;
   obj.isEdit = false;
   obj.str = str;
+  obj.baseW = baseW;
+  obj.baseH = baseH;
   obj.edit = function() {
     this.isEdit = true;
     curr = this;
@@ -109,11 +118,11 @@ export default function createGui(getLoc, render, renderEdit, str = '') {
     if (!this.isEdit) return;
     renderEdit.call(this);
   };
-  obj.getX = function getX(x) {
+  obj.x = function x(x) {
     const l = this.getLoc();
     return l.x + x * l.s;
   };
-  obj.getY = function getY(y) {
+  obj.y = function y(y) {
     const l = this.getLoc();
     return l.y + y * l.s;
   };
@@ -121,18 +130,30 @@ export default function createGui(getLoc, render, renderEdit, str = '') {
     return n * this.getLoc().s;
   };
   obj.getW = function() {
-    return 100 * this.getLoc().s;
+    return this.baseW * this.getLoc().s;
   };
   obj.getH = function() {
-    return 100 * this.getLoc().s;
+    return this.baseH * this.getLoc().s;
+  };
+  obj.getX1 = function() {
+    const l = this.getLoc();
+    return l.x;
+  };
+  obj.getY1 = function() {
+    const l = this.getLoc();
+    return l.y;
   };
   obj.getX2 = function() {
     const l = this.getLoc();
-    return l.x + 100 * l.s;
+    return l.x + this.baseW * l.s;
   };
   obj.getY2 = function() {
     const l = this.getLoc();
-    return l.y + 100 * l.s;
+    return l.y + this.baseH * l.s;
+  };
+  obj.getScale = function() {
+    const l = this.getLoc();
+    return l.s;
   };
 
   return obj;
