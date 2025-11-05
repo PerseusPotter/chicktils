@@ -27,7 +27,12 @@ public class ProjectileHelper {
     // summation simplifies to (V0 + a / (d - 1)) (d^t - 1) / (d - 1) - a * t / (d - 1) where d != 1
     // closed form of inverse can be found using lambert W
     // more math
-    public static ProjectileData solve(double dx, double dy, double dz, double eps, double a, double v, double d, boolean high) {
+    public static ProjectileData solve(
+        double dx, double dy, double dz,
+        double eps,
+        double a, double v, double d,
+        boolean high
+    ) {
         if (d == 1.0) throw new IllegalArgumentException("sorry");
         final double theta = Math.atan2(dz, dx);
         final double R = Math.sqrt(dx * dx + dz * dz);
@@ -115,5 +120,59 @@ public class ProjectileHelper {
         }
 
         return new ProjectileData(theta, (searchL + searchR) / 2.0, t);
+    }
+
+    // 3 <= ticks <= 20
+    public static double bowVelocity(int ticks) {
+        double t = ticks * 0.05;
+        double v = t * t + 2.0 * t;
+        return v < 0.3 ? 0.0 : Math.min(3.0, v);
+    }
+
+    // finds (max ? largest : smallest) number such that max height doesn't exceed maxDy
+    // while still being able to reach the target
+    public static int bestPrefireTick(
+        double dx, double dy, double dz,
+        double maxDy,
+        double eps,
+        boolean max
+    ) {
+        final double a = -0.05;
+        final double d = 0.99;
+        final double a_id = a / (d - 1);
+        final double lnd = Math.log(d);
+
+        int l = 3;
+        int r = 20;
+        int val = -1;
+
+        while (l <= r) {
+            int m = (l + r) >> 1;
+            double v = bowVelocity(m);
+            ProjectileData data = solve(
+                dx, dy, dz,
+                eps,
+                a, v, d,
+                true
+            );
+
+            if (Double.isNaN(data.theta)) {
+                l = m + 1;
+                continue;
+            }
+
+            double vy = Math.cos(data.phi) * v;
+            double yPeak = 0.0;
+            if (vy > 0.0) {
+                double t = Math.log(a_id / (vy + a_id)) / lnd;
+                yPeak = (vy + a_id) * (Math.pow(d, t + 1) - 1) / (d - 1) - (t + 1) * a_id;
+            }
+
+            if (yPeak < maxDy) val = m;
+            if (yPeak < maxDy && max) l = m + 1;
+            else r = m - 1;
+        }
+
+        return val;
     }
 }
