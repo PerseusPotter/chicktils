@@ -23,9 +23,16 @@ export function getPitch() {
   return p.field_70127_C + (p.field_70125_A - p.field_70127_C) * Tessellator.partialTicks;
 }
 let lastServerTickTime = Date.now();
+let lastServerTickLength = 50;
 let cachedServerTickPartial = 0;
-reg('serverTick', () => lastServerTickTime = Date.now()).register();
-reg(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, () => cachedServerTickPartial = Math.min(1, (Date.now() - lastServerTickTime) / 50)).register();
+reg('serverTick', () => {
+  const d = Date.now();
+  lastServerTickLength = d - lastServerTickTime;
+  lastServerTickTime = d;
+}).register();
+reg(net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent, () => {
+  cachedServerTickPartial = Math.min(1, (Date.now() - lastServerTickTime) / lastServerTickLength);
+}).register();
 export function getPartialServerTick() {
   return cachedServerTickPartial;
 }
