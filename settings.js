@@ -593,6 +593,7 @@ const builder = new Builder('ChickTils', 'settings.json')
 
   .addPage('Testing')
   .addToggle('enableboxallentities', 'EnableBoxAllEntities', false, { desc: 'mostly for debugging' })
+  .addToggle('boxAllEntitiesTileEntities', 'BoxAllTileEntities', false, { desc: 'also box tile entities', shouldShow: p => addDependency(p.enableboxallentities) })
   .addToggle('boxAllEntitiesInvis', 'BoxAllEntitiesInvisible', false, { desc: 'box invisible entities', shouldShow: p => addDependency(p.enableboxallentities) })
   .addColor('boxAllEntitiesColor', 'BoxAllEntitiesColor', 0xFF0000FF, { shouldShow: p => addDependency(p.enableboxallentities) })
   .addToggle('boxAllEntitiesEsp', 'BoxAllEntitiesEsp', true, { shouldShow: p => addDependency(p.enableboxallentities) })
