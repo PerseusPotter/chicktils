@@ -146,8 +146,9 @@ function tryHighlightBlock(blockPos, cw, cf, lw, isEther) {
   if (!w.func_175723_af().func_177746_a(blockPos)) return;
 
   block.func_180654_a(w, blockPos);
+  const v = isEther ? 0.01 : 0.001;
   const aabb = block.func_180646_a(w, blockPos)
-    .func_72314_b(0.01, 0.01, 0.01)
+    .func_72314_b(v, v, v)
     .func_72317_d(-getRenderX(), -getRenderY(), -getRenderZ());
   renderBlockHighlight(aabb, cw, cf, lw, isEther);
 }
