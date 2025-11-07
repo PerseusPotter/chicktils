@@ -1786,33 +1786,33 @@ export const ITEMS = [
     "id": "NURSE_SHARK_TOOTH"
   },
   {
-    "nameF": "§f§kObfuscated 1§r §8§lBRONZE",
-    "nameUF": "Obfuscated 1 BRONZE",
+    "nameF": "§f§kObfuscated-1§r §8§lBRONZE",
+    "nameUF": "Obfuscated-1 BRONZE",
     "id": "OBFUSCATED_FISH_1_BRONZE"
   },
   {
-    "nameF": "§f§kObfuscated 1§r §7§lSILVER",
-    "nameUF": "Obfuscated 1 SILVER",
+    "nameF": "§f§kObfuscated-1§r §7§lSILVER",
+    "nameUF": "Obfuscated-1 SILVER",
     "id": "OBFUSCATED_FISH_1_SILVER"
   },
   {
-    "nameF": "§a§kObfuscated 2§r §8§lBRONZE",
-    "nameUF": "Obfuscated 2 BRONZE",
+    "nameF": "§a§kObfuscated-2§r §8§lBRONZE",
+    "nameUF": "Obfuscated-2 BRONZE",
     "id": "OBFUSCATED_FISH_2_BRONZE"
   },
   {
-    "nameF": "§a§kObfuscated 2§r §7§lSILVER",
-    "nameUF": "Obfuscated 2 SILVER",
+    "nameF": "§a§kObfuscated-2§r §7§lSILVER",
+    "nameUF": "Obfuscated-2 SILVER",
     "id": "OBFUSCATED_FISH_2_SILVER"
   },
   {
-    "nameF": "§9§kObfuscated 3§r §8§lBRONZE",
-    "nameUF": "Obfuscated 3 BRONZE",
+    "nameF": "§9§kObfuscated-3§r §8§lBRONZE",
+    "nameUF": "Obfuscated-3 BRONZE",
     "id": "OBFUSCATED_FISH_3_BRONZE"
   },
   {
-    "nameF": "§9§kObfuscated 3§r §7§lSILVER",
-    "nameUF": "Obfuscated 3 SILVER",
+    "nameF": "§9§kObfuscated-3§r §7§lSILVER",
+    "nameUF": "Obfuscated-3 SILVER",
     "id": "OBFUSCATED_FISH_3_SILVER"
   },
   {
