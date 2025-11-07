@@ -164,14 +164,14 @@ function renderBlockHighlight(aabb, cw, cf, lw, isEther) {
     cf,
     x, y, z,
     wx, h,
-    { centered: false, wz }
+    { centered: false, wz, cull: false }
   );
 
   renderBoxOutline(
     cw,
     x, y, z,
     wx, h,
-    { centered: false, wz, lw, phase: isEther, smooth: true }
+    { centered: false, wz, lw, phase: isEther, smooth: true, cull: false }
   );
 }
 
