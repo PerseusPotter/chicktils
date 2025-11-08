@@ -321,7 +321,10 @@ function ransac() {
   const comb = binomial(L, MIN_CHAIN_LENGTH);
   const rand = new Array(L - 1).fill(0).map((_, i) => i);
   let start = 0;
-  const getPart = i => i < L1 ? possibleStartingParticles.at(i < start ? i : i + 1) : unclaimedParticles.at(i - L1 + 1);
+  const getPart = i => {
+    if (i >= start) i++;
+    return i < L1 ? possibleStartingParticles.at(i) : unclaimedParticles.at(i - L1);
+  };
 
   for (let i = Math.min(comb, RANSAC_ITERS_PER) - 1; i >= 0; i--) {
     shuffle(rand, MIN_CHAIN_LENGTH - 1);
