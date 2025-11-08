@@ -283,6 +283,36 @@ export function ndRegression(d, arr) {
 }
 
 /**
+ * @param {number[]} X
+ * @param {number[]} Y
+ * @returns {number}
+ */
+export function pearsonCoeff(X, Y) {
+  const N = Math.min(X.length, Y.length);
+  const N_1 = 1 / N;
+  const EX = X.reduce((a, v) => a + v, 0) * N_1;
+  const EY = Y.reduce((a, v) => a + v, 0) * N_1;
+
+  let cov = 0;
+  let sX = 0;
+  let sY = 0;
+  for (let i = 0; i < N; i++) {
+    let x = X[i];
+    let y = Y[i];
+
+    sX += x * x;
+    sY += y * y;
+    cov += (x - EX) * (y - EY);
+  }
+
+  sX = Math.sqrt(sX * N_1 - EX * EX);
+  sY = Math.sqrt(sY * N_1 - EY * EY);
+  cov *= N_1;
+
+  return cov / (sX * sY);
+}
+
+/**
  * @param {number[]} arr
  * @returns {number}
  */
@@ -947,3 +977,37 @@ export function geoMedian(points, iters = 100, epsilon = 1e-5, distance = (a, b)
 
   return guess;
 }
+
+// https://stackoverflow.com/a/37716142
+export const binomial = (function() {
+  const lookup = [
+    [1],
+    [1, 1],
+    [1, 2, 1],
+    [1, 3, 3, 1],
+    [1, 4, 6, 4, 1],
+    [1, 5, 10, 10, 5, 1],
+    [1, 6, 15, 20, 15, 6, 1],
+    [1, 7, 21, 35, 35, 21, 7, 1],
+    [1, 8, 28, 56, 70, 56, 28, 8, 1],
+  ];
+
+  /**
+   * @param {number} n
+   * @param {number} K
+   * @returns {number}
+   */
+  return function(n, k) {
+    while (n >= lookup.length) {
+      let s = lookup.length;
+      let nextRow = [];
+      nextRow[0] = 1;
+      for (let i = 1, prev = s - 1; i < s; i++) {
+        nextRow[i] = lookup[prev][i - 1] + lookup[prev][i];
+      }
+      nextRow[s] = 1;
+      lookup.push(nextRow);
+    }
+    return lookup[n][k];
+  };
+}());
