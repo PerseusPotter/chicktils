@@ -8,19 +8,39 @@ import { colorForNumber } from '../util/format';
 import GlStateManager2 from '../util/glStateManager';
 import { getLastReportedX, getLastReportedY, getLastReportedZ } from '../util/mc';
 
-function spawnParticle(x, y, z, r, g, b, age) {
+/** @type {[number, number, number][]} */
+let spawnParticleOld = [];
+/** @type {[number, number, number][]} */
+let spawnParticleNew = [];
+function spawnParticle(id, x, y, z, r, g, b, age) {
   // World.particle.spawnParticle('REDSTONE', x, y, z, 0, 0, 0).setMaxAge(age).setColor(r, g, b, 1);
+  let dx = 0;
+  let dy = 0;
+  let dz = 0;
+  let px = x;
+  let py = y;
+  let pz = z;
+  const old = spawnParticleOld[id];
+  if (old) {
+    px = spawnParticleOld[id][0];
+    py = spawnParticleOld[id][1];
+    pz = spawnParticleOld[id][2];
+    dx = x - px;
+    dy = y - py;
+    dz = z - pz;
+  }
+  spawnParticleNew[id] = [x, y, z];
   const part = Client.getMinecraft().field_71438_f.func_174974_b(
     30, true,
-    x, y, z,
-    0, 0, 0
+    px, py, pz,
+    dx, dy, dz
   );
   if (!part) return;
   part.field_70547_e = age;
   part.func_70538_b(r, g, b);
 }
 /**
- * @typedef {{ ent: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>, ttl: number, isFlux: boolean, prio: number, id: string, stats: string[], range: number, isOwn: boolean, y: number }} Deployable
+ * @typedef {{ ent: import('../../@types/External').JavaClass<'net.minecraft.entity.Entity'>, ttl: number, isFlux: boolean, prio: number, id: string, stats: string[], range: number, isOwn: boolean, y: number, parts: [number, number, number][] }} Deployable
  */
 const DEPLOYABLE_DATA = {
   RADIANT_POWER_ORB: {
@@ -31,17 +51,18 @@ const DEPLOYABLE_DATA = {
     /**
      * @param {number} t
      * @param {[number, number, number]} pos
+     * @param {number} y
      */
-    parts(t, pos) {
-      const y = 0.8 * Math.sin(t / 6);
-      for (let i = 0; i < 20; i++) {
-        let a = 2 * Math.PI * i / 20;
+    parts(t, pos, y) {
+      for (let i = 0; i < 10; i++) {
+        let a = 2 * Math.PI * i / 10 + t / 5;
         let x = Math.cos(a);
         let z = Math.sin(a);
         spawnParticle(
-          x + pos[0], y + pos[1], z + pos[2],
+          i,
+          x + pos[0], (y - pos[1]) * 1.5 + pos[1], z + pos[2],
           0.2, 0.8, 0.16,
-          10
+          20
         );
       }
     }
@@ -61,13 +82,14 @@ const DEPLOYABLE_DATA = {
      */
     parts(t, pos) {
       pos[1]--;
-      t /= 3;
       t %= 100;
       if (t < 69) {
-        const k = 0.04;
-        for (let i = 0; i < 3; i++) {
-          let o = 2 * Math.PI * i / 3;
+        t *= 4;
+        const k = 0.01;
+        for (let i = 0; i < 5; i++) {
+          let o = 2 * Math.PI * i / 5;
           spawnParticle(
+            i,
             2 * Math.cos(t + o) / Math.cosh(k * t) + pos[0],
             2 * Math.tanh(k * t) + pos[1],
             2 * Math.sin(t + o) / Math.cosh(k * t) + pos[2],
@@ -75,21 +97,23 @@ const DEPLOYABLE_DATA = {
             t > 50 ? 10 : 20
           );
         }
-      } else if (t < 90) {
+      } else if (t < 80) {
         t -= 69;
         spawnParticle(
+          3,
           pos[0],
-          -0.005 * t * t + 2 + pos[1],
+          -0.02 * t * t + 2 + pos[1],
           pos[2],
           0, 0.5, 1,
           10
         );
       } else {
-        const r = 2 * (t - 90) / 10;
+        const r = 2 * (t - 80) / 20;
         const n = 30;
         for (let i = 0; i < n; i++) {
           let a = 2 * Math.PI * i / n + Math.random() / 20;
           spawnParticle(
+            i + 4,
             r * Math.cos(a) + pos[0],
             pos[1],
             r * Math.sin(a) + pos[2],
@@ -123,6 +147,7 @@ const DEPLOYABLE_DATA = {
      */
     parts(t, pos, y) {
       t /= 50;
+      let id = 0;
       this.hoops.forEach(([n, a, k, r, c]) => {
         const nx = Math.cos(a) * Math.cos(t) * Math.cos(k * t) - Math.sin(t) * Math.sin(k * t);
         const ny = Math.sin(a) * Math.cos(k * t);
@@ -140,11 +165,12 @@ const DEPLOYABLE_DATA = {
         for (let i = 0; i < n; i++) {
           let a = 2 * Math.PI * i / n;
           spawnParticle(
+            id++,
             r * (ux * Math.cos(a) + vx * Math.sin(a)) + pos[0],
             r * (uy * Math.cos(a) + vy * Math.sin(a)) + y,
             r * (uz * Math.cos(a) + vz * Math.sin(a)) + pos[2],
             c[0], c[1], c[2],
-            3
+            5
           );
         }
       });
@@ -193,10 +219,12 @@ const DEPLOYABLE_DATA = {
       const k = q / (q + 2);
       const R = 1;
       const n = 3;
-      t /= 3;
+      t *= 0.342;
+      t += Math.PI;
       for (let i = 0; i < n; i++) {
         let v = i * 30 / n + t;
         spawnParticle(
+          i,
           R * (k * Math.cos(v) * Math.cos(k * v) + Math.sin(v) * Math.sin(k * v)) + pos[0],
           R * Math.sqrt(1 - k * k) * Math.cos(k * v) + pos[1],
           R * (k * Math.sin(v) * Math.cos(k * v) - Math.cos(v) * Math.sin(k * v)) + pos[2],
@@ -223,11 +251,12 @@ const DEPLOYABLE_DATA = {
     parts(t, pos) {
       const n = 3 / 5;
       const R = 1;
-      const k = 3;
+      const k = 5;
       t /= 5;
       for (let i = 0; i < k; i++) {
         let v = i * 30 / n + t;
         spawnParticle(
+          i,
           R * Math.cos(n * v) * Math.cos(v) + pos[0],
           R * Math.sin(n * v) + pos[1],
           R * Math.cos(n * v) * Math.sin(v) + pos[2],
@@ -260,10 +289,12 @@ const DEPLOYABLE_DATA = {
       const u = 60 * Math.PI / 180;
       const v = 20 * Math.PI / 180;
       const n = 4;
-      t /= 10;
-      for (let i = 0; i < n; i++) {
+      t *= 0.19;
+      t += Math.PI;
+      for (let i = 0; i < 8; i++) {
         let o = 2 * Math.PI * i / n;
         spawnParticle(
+          i,
           a * Math.sin(p * t + u + o) + pos[0],
           b * Math.sin(t) + pos[1],
           a * Math.sin(q * t + v + o) + pos[2],
@@ -420,7 +451,8 @@ const equipmentReg = reg('packetReceived', (pack, doDupe) => {
       stats,
       ttl: data.duration,
       isOwn: ownDeployLoc && ownDeployLoc.isFlux && dist(ownDeployLoc.x, ent.field_70165_t) < 3 && dist(ownDeployLoc.y - 1, ent.field_70163_u) < 3 && dist(ownDeployLoc.z, ent.field_70161_v) < 3,
-      y: ent.field_70163_u + 1
+      y: ent.field_70163_u + 1,
+      parts: []
     });
     return;
   }
@@ -441,7 +473,8 @@ const equipmentReg = reg('packetReceived', (pack, doDupe) => {
     stats,
     ttl: data.duration,
     isOwn: ownDeployLoc && !ownDeployLoc.isFlux && dist(ownDeployLoc.x, ent.field_70165_t) < 3 && ownDeployLoc.y - 2 < ent.field_70163_u && ownDeployLoc.y + 10 > ent.field_70163_u && dist(ownDeployLoc.z, ent.field_70161_v) < 3,
-    y: ent.field_70163_u
+    y: ent.field_70163_u,
+    parts: []
   });
 }).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment);
 const soundReg = reg('packetReceived', pack => {
@@ -530,9 +563,12 @@ const partTickReg = reg('tick', () => {
     } else if (settings.deployableParticlesOther !== 'Custom') return;
     const t = DEPLOYABLE_DATA[v.id].duration - v.ttl;
     // .spawnParticle throws errors very cool ty
+    spawnParticleOld = v.parts;
+    spawnParticleNew = [];
     try {
       DEPLOYABLE_DATA[v.id].parts(t, [v.ent.field_70165_t, v.y + 1.7, v.ent.field_70161_v], v.ent.field_70163_u + 1.8);
     } catch (_) { }
+    v.parts = spawnParticleNew;
   });
 }).setEnabled(new StateProp(settings._deployableParticlesOwn).equals('Custom').or(new StateProp(settings._deployableParticlesOther).equals('Custom')));
 
