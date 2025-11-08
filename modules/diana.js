@@ -319,13 +319,16 @@ function ransac() {
   if (L < MIN_CHAIN_LENGTH) return;
 
   const comb = binomial(L, MIN_CHAIN_LENGTH);
-  const rand = new Array(L).fill(0).map((_, i) => i);
-  const getPart = i => i < L1 ? possibleStartingParticles.at(i) : unclaimedParticles.at(i - L1);
+  const rand = new Array(L - 1).fill(0).map((_, i) => i);
+  let start = 0;
+  const getPart = i => i < L1 ? possibleStartingParticles.at(i < start ? i : i + 1) : unclaimedParticles.at(i - L1 + 1);
 
   for (let i = Math.min(comb, RANSAC_ITERS_PER) - 1; i >= 0; i--) {
-    shuffle(rand, MIN_CHAIN_LENGTH);
-    let possInliersI = rand.slice(0, MIN_CHAIN_LENGTH);
+    shuffle(rand, MIN_CHAIN_LENGTH - 1);
+    let possInliersI = rand.slice(0, MIN_CHAIN_LENGTH - 1);
+    start = ~~(Math.random() * L1);
     let possInliers = possInliersI.map(v => getPart(v));
+    possInliers.unshift(possibleStartingParticles.at(start));
     let minT = possInliers.reduce((a, v) => a < v.t ? a : v.t, Number.POSITIVE_INFINITY);
     let poly = [
       toPolynomial(ndRegression(3, possInliers.map(v => [v.t - minT, v.x]))),
@@ -343,7 +346,7 @@ function ransac() {
         (v.x - px) ** 2 +
         (v.y - py) ** 2 +
         (v.z - pz) ** 2
-        < 25
+        < 4
       ) inliers.push(v);
     };
     possibleStartingParticles.forEach(addIf);
@@ -389,7 +392,7 @@ const spawnPartReg = reg('packetReceived', pack => {
       const spline = splinePoly.get();
       if (spline) {
         const predicted = spline.map(v => v(knownParticleChain.length));
-        if ((predicted[0] - x) ** 2 + (predicted[1] - y) ** 2 + (predicted[2] - z) ** 2 < 25) {
+        if ((predicted[0] - x) ** 2 + (predicted[1] - y) ** 2 + (predicted[2] - z) ** 2 < 4) {
           knownParticleChain.push(obj);
           isKnown = true;
           updateGuesses();
