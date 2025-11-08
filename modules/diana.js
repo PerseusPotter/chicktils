@@ -3,7 +3,7 @@ import data from '../data';
 import reg, { customRegs, execCmd } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { binomial, compareFloat, convergeHalfInterval, geoMedian, lineRectColl, ndRegression, pearsonCoeff, rescale, toPolynomial } from '../util/math';
+import { binomial, compareFloat, convergeHalfInterval, lineRectColl, ndRegression, pearsonCoeff, rescale, toPolynomial } from '../util/math';
 import { getBlockPos, getItemId, getLastReportedX, getLastReportedY, getLastReportedZ, getLowerContainer } from '../util/mc';
 import { unrun } from '../util/threading';
 import { renderBeacon, renderBillboardString, renderBoxOutline, renderLine } from '../../Apelles/index';
@@ -317,6 +317,7 @@ function ransac() {
   const L2 = unclaimedParticles.length;
   const L = L1 + L2;
   if (L < MIN_CHAIN_LENGTH) return;
+  if (L1 === 0) return;
 
   const comb = binomial(L, MIN_CHAIN_LENGTH);
   const rand = new Array(L - 1).fill(0).map((_, i) => i);
@@ -349,7 +350,7 @@ function ransac() {
         (v.x - px) ** 2 +
         (v.y - py) ** 2 +
         (v.z - pz) ** 2
-        < 4
+        < 25
       ) inliers.push(v);
     };
     possibleStartingParticles.forEach(addIf);
@@ -395,7 +396,7 @@ const spawnPartReg = reg('packetReceived', pack => {
       const spline = splinePoly.get();
       if (spline) {
         const predicted = spline.map(v => v(knownParticleChain.length));
-        if ((predicted[0] - x) ** 2 + (predicted[1] - y) ** 2 + (predicted[2] - z) ** 2 < 4) {
+        if ((predicted[0] - x) ** 2 + (predicted[1] - y) ** 2 + (predicted[2] - z) ** 2 < 25) {
           knownParticleChain.push(obj);
           isKnown = true;
           updateGuesses();
@@ -436,7 +437,7 @@ const renderGuessReg = reg('renderWorld', () => {
     splinePolyPos,
     { phase: true }
   );
-  if (guessPos) renderBoxOutline(
+  if (guessPos && guessPos[0]) renderBoxOutline(
     settings.dianaGuessFromParticlesAverageColor,
     guessPos[0], guessPos[1] - 1, guessPos[2],
     1, 1,
