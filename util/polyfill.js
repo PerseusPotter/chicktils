@@ -80,11 +80,12 @@ export function setAccessible(obj) {
 /**
  * @template {any[]} T
  * @param {T} arr
+ * @param {number} [limit]
  * @returns {T}
  */
-export function shuffle(arr) {
-  for (let i = arr.length - 1; i >= 1; i--) {
-    let j = ~~(Math.random() * (i + 1));
+export function shuffle(arr, limit = arr.length) {
+  for (let i = 0; i < limit; i++) {
+    let j = ~~(Math.random() * (arr.length - i)) + i;
     let t = arr[i];
     arr[i] = arr[j];
     arr[j] = t;
@@ -524,6 +525,21 @@ export class Deque {
       i++;
     }
     return dq;
+  }
+
+  /**
+   * @param {(v: T, i: number, a: Deque<T>) => boolean} func
+   * @returns {Deque<T>}
+   */
+  removeIf(func, that = this) {
+    let c = this.$head;
+    let i = 0;
+    while (c) {
+      if (func.call(that, c.v, i, this)) this.$remove(c);
+      c = c.r;
+      i++;
+    }
+    return this;
   }
 
   /**
