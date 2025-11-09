@@ -440,7 +440,7 @@ const renderGuessReg = reg('renderWorld', () => {
   );
   if (guessPos && guessPos[0]) renderBoxOutline(
     settings.dianaGuessFromParticlesAverageColor,
-    guessPos[0], guessPos[1] - 1, guessPos[2],
+    guessPos[0], guessPos[1], guessPos[2],
     1, 1,
     { phase: true }
   );
