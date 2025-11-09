@@ -161,13 +161,13 @@ const renderTargetsReg = reg('renderWorld', () => {
   prevGuesses.forEach(v => {
     renderBoxOutline(
       settings.dianaBurrowPrevGuessColor,
-      v[0], v[1] - 1, v[2],
+      v[0], v[1], v[2],
       1, 1,
       { phase: true }
     );
     if (v !== targetLoc) renderBeacon(
       settings.dianaBurrowPrevGuessColor,
-      v[0], v[1], v[2],
+      v[0], v[1] + 1, v[2],
       { phase: true }
     );
   });
@@ -297,6 +297,7 @@ function updateGuesses() {
   const guess = _splinePoly.map(v => v(splineIntTime));
   */
   guess = _splinePoly.map(v => v(weightT));
+  guess[1]--;
 
   const _splinePolyPos = new ArrayList();
   for (let i = 0; i <= 100; i++) {
@@ -504,7 +505,7 @@ const startBurrowReg = reg('chat', () => {
   tickReg.register();
   arrowPointReg.register();
   unloadReg.register();
-}).setCriteria(/&r&eYou dug out a Griffin Burrow! &r&7\(\d\/\d\)&r/);
+}).setCriteria(/&r&eYou dug out a Griffin Burrow! &r&7\(\d+\/\d+\)&r/);
 const unloadReg = reg('worldUnload', () => {
   removeClosestReg.unregister();
   burrowSpawnReg.unregister();
