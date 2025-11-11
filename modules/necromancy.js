@@ -2,7 +2,7 @@ import { getRenderX, getRenderY, getRenderZ, renderBillboardString } from '../..
 import settings from '../settings';
 import { Gradient, renderWaypoint } from '../util/draw';
 import Grid from '../util/grid';
-import { dist, distAngle } from '../util/math';
+import { dist, distAngle, lerp } from '../util/math';
 import { Deque } from '../util/polyfill';
 import reg, { customRegs } from '../util/registerer';
 
@@ -11,7 +11,7 @@ const deadMobs = new Grid({ size: 1, key: 2017, addNeighbors: 2, maxSize: 10 });
 /** @type {Map<number, { x: number, y: number, z: number, yaw: number }>} */
 const recentSpawnIds = new Map();
 const recentSpawnEvicting = new Deque();
-/** @type {Map<number, { name: string, t: number }>} */
+/** @type {Map<number, { name: string, t: number, e: any, id: number }>} */
 const droppedSouls = new Map();
 let soulWhitelist = [];
 let soulBlacklist = [];
@@ -74,30 +74,43 @@ const soulSpawnReg = reg('packetReceived', pack => {
     }
     droppedSouls.set(id, {
       name,
-      t: customRegs.serverTick.tick
+      t: customRegs.serverTick.tick,
+      id
     });
   });
 }).setFilteredClass(net.minecraft.network.play.server.S04PacketEntityEquipment).setEnabled(settings._necromancyTrackSouls);
 const MAX_SOUL_LIFE = 20 * 30;
 const soulGradient = new Gradient(settings._necromancySoulColorNew, settings._necromancySoulColorOld);
-const soulRenderReg = reg('postRenderEntity', (ent, pos) => {
-  const data = droppedSouls.get(ent.entity.func_145782_y());
-  if (!data) return;
+const soulRenderReg = reg('renderWorld', pt => {
   const t = customRegs.serverTick.tick;
-  if (settings.necromancyShowMobName) renderBillboardString(
-    0xFFFFFFFF,
-    data.name,
-    pos.getX() + getRenderX(), pos.getY() + getRenderY() + 1.4375 + 0.9, pos.getZ() + getRenderZ(),
-    { phase: settings.necromancySoulEsp, blackBox: 0 }
-  );
-  if (settings.necromancyBoxSoul) renderWaypoint(
-    pos.getX() + getRenderX(), pos.getY() + 1.4375 + getRenderY(), pos.getZ() + getRenderZ(),
-    0.7, 0.7,
-    soulGradient.get((t - data.t) / MAX_SOUL_LIFE),
-    settings.necromancySoulEsp, true,
-    3
-  );
-}).setEnabled(settings._necromancyTrackSouls);
+  droppedSouls.forEach(v => {
+    if (!v.e) {
+      v.e = World.getWorld().func_73045_a(v.id);
+      if (!v.e) return;
+    }
+    if (v.e.field_70128_L) {
+      droppedSouls.delete(v.id);
+      return;
+    }
+
+    const x = lerp(v.e.field_70169_q, v.e.field_70165_t, pt);
+    const y = lerp(v.e.field_70167_r, v.e.field_70163_u, pt);
+    const z = lerp(v.e.field_70166_s, v.e.field_70161_v, pt);
+    if (settings.necromancyShowMobName) renderBillboardString(
+      0xFFFFFFFF,
+      v.name,
+      x, y + 1.4375 + 0.9, z,
+      { phase: settings.necromancySoulEsp, blackBox: 0 }
+    );
+    if (settings.necromancyBoxSoul) renderWaypoint(
+      x, y + 1.4375, z,
+      0.7, 0.7,
+      soulGradient.get((t - v.t) / MAX_SOUL_LIFE),
+      settings.necromancySoulEsp, true,
+      3
+    );
+  });
+});
 const worldUnloadReg = reg('worldUnload', () => {
   deadMobs.clear();
   recentSpawnIds.clear();
