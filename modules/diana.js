@@ -230,6 +230,7 @@ function fullReset() {
 }
 
 function updateGuesses() {
+  if (knownParticleChain.length < MIN_CHAIN_LENGTH) return;
   // from https://github.com/hannibal002/SkyHanni/blob/08e5cf831e3e22401d1de830ee522aadcff6634d/src/main/java/at/hannibal2/skyhanni/utils/PolynomialFitter.kt
   const splineX = ndRegression(3, knownParticleChain.map((v, i) => [i, v.x]));
   const splineY = ndRegression(3, knownParticleChain.map((v, i) => [i, v.y]));
@@ -331,7 +332,7 @@ function ransac() {
 
   // let bestR = 0;
   let bestD = Number.POSITIVE_INFINITY;
-  let best;
+  let best = [];
 
   for (let i = Math.min(comb, RANSAC_ITERS_PER) - 1; i >= 0; i--) {
     shuffle(rand, MIN_CHAIN_LENGTH - 1);
@@ -387,7 +388,7 @@ function ransac() {
     }
   }
 
-  if (bestD < MAX_CHAIN_DISTANCE_ERROR) {
+  if (bestD < MAX_CHAIN_DISTANCE_ERROR && best.length >= MIN_CHAIN_LENGTH) {
     let s = new Set();
     best.forEach(v => s.add(v.t));
     possibleStartingParticles.removeIf(v => s.has(v.t));
