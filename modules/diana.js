@@ -3,8 +3,8 @@ import data from '../data';
 import reg, { customRegs, execCmd } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { binomial, compareFloat, convergeHalfInterval, lineRectColl, ndRegression, pearsonCoeff, rescale, toPolynomial } from '../util/math';
-import { getBlockPos, getItemId, getLastReportedX, getLastReportedY, getLastReportedZ, getLowerContainer } from '../util/mc';
+import { binomial, compareFloat, convergeHalfInterval, dist, lineRectColl, ndRegression, rescale, toPolynomial } from '../util/math';
+import { getBlockPos, getItemId, getLastReportedX, getLastReportedY, getLastReportedZ, getLowerContainer, getServerSneakState } from '../util/mc';
 import { unrun } from '../util/threading';
 import { renderBeacon, renderBillboardString, renderBoxOutline, renderLine } from '../../Apelles/index';
 import { Deque, shuffle, toArrayList } from '../util/polyfill';
@@ -187,9 +187,10 @@ const unclaimedParticles = new Deque();
 const possibleStartingParticles = new Deque();
 /** @type {ParticlePos[]} */
 let knownParticleChain = [];
-const MIN_CHAIN_LENGTH = 4;
-const MIN_CHAIN_PEARSON_SQ = 0.7;
-const RANSAC_ITERS_PER = 5;
+const MIN_CHAIN_LENGTH = 6;
+// const MIN_CHAIN_PEARSON_SQ = 0.9;
+const MAX_CHAIN_DISTANCE_ERROR = 0.5;
+const RANSAC_ITERS_PER = 10;
 
 /** @type {[number, number, number]?} */
 let guessPos = null;
@@ -328,6 +329,10 @@ function ransac() {
     return i < L1 ? possibleStartingParticles.at(i) : unclaimedParticles.at(i - L1);
   };
 
+  // let bestR = 0;
+  let bestD = Number.POSITIVE_INFINITY;
+  let best;
+
   for (let i = Math.min(comb, RANSAC_ITERS_PER) - 1; i >= 0; i--) {
     shuffle(rand, MIN_CHAIN_LENGTH - 1);
     let possInliersI = rand.slice(0, MIN_CHAIN_LENGTH - 1);
@@ -351,27 +356,45 @@ function ransac() {
         (v.x - px) ** 2 +
         (v.y - py) ** 2 +
         (v.z - pz) ** 2
-        < 25
+        < 9
       ) inliers.push(v);
     };
     possibleStartingParticles.forEach(addIf);
     unclaimedParticles.forEach(addIf);
 
     minT = inliers.reduce((a, v) => a < v.t ? a : v.t, Number.POSITIVE_INFINITY);
-    if (Math.min(
-      pearsonCoeff(inliers.map(v => v.t - minT), inliers.map(v => v.x)) ** 2,
-      pearsonCoeff(inliers.map(v => v.t - minT), inliers.map(v => v.y)) ** 2,
-      pearsonCoeff(inliers.map(v => v.t - minT), inliers.map(v => v.z)) ** 2,
-    ) > MIN_CHAIN_PEARSON_SQ) {
-      let s = new Set();
-      inliers.forEach(v => s.add(v.t));
-      possibleStartingParticles.removeIf(v => s.has(v.t));
-      unclaimedParticles.removeIf(v => s.has(v.t));
-      resetGuess();
-      knownParticleChain = inliers.sort((a, b) => a.t - b.t);
-      updateGuesses();
-      break;
+    // let r = Math.min(
+    //   pearsonCoeff(inliers.map(v => v.t - minT), inliers.map(v => v.x)) ** 2,
+    //   pearsonCoeff(inliers.map(v => v.t - minT), inliers.map(v => v.y)) ** 2,
+    //   pearsonCoeff(inliers.map(v => v.t - minT), inliers.map(v => v.z)) ** 2,
+    // );
+    // if (r > bestR) {
+    //   bestR = r;
+    //   best = inliers;
+    // }
+    poly = [
+      toPolynomial(ndRegression(3, possInliers.map(v => [v.t - minT, v.x]))),
+      toPolynomial(ndRegression(3, possInliers.map(v => [v.t - minT, v.y]))),
+      toPolynomial(ndRegression(3, possInliers.map(v => [v.t - minT, v.z])))
+    ];
+    let d =
+      inliers.reduce((a, v) => a + dist(poly[0](v.t - minT), v.x), 0) +
+      inliers.reduce((a, v) => a + dist(poly[1](v.t - minT), v.y), 0) +
+      inliers.reduce((a, v) => a + dist(poly[2](v.t - minT), v.z), 0);
+    if (d < bestD) {
+      bestD = d;
+      best = inliers;
     }
+  }
+
+  if (bestD < MAX_CHAIN_DISTANCE_ERROR) {
+    let s = new Set();
+    best.forEach(v => s.add(v.t));
+    possibleStartingParticles.removeIf(v => s.has(v.t));
+    unclaimedParticles.removeIf(v => s.has(v.t));
+    resetGuess();
+    knownParticleChain = best.sort((a, b) => a.t - b.t);
+    updateGuesses();
   }
 }
 
@@ -392,16 +415,14 @@ const spawnPartReg = reg('packetReceived', pack => {
   const t = getTickCount();
   const obj = { t, x, y, z };
   let isKnown = false;
-  if (knownParticleChain.length) {
-    if (t < knownParticleChain[knownParticleChain.length - 1].t + 5) {
-      const spline = splinePoly.get();
-      if (spline) {
-        const predicted = spline.map(v => v(knownParticleChain.length));
-        if ((predicted[0] - x) ** 2 + (predicted[1] - y) ** 2 + (predicted[2] - z) ** 2 < 25) {
-          knownParticleChain.push(obj);
-          isKnown = true;
-          updateGuesses();
-        }
+  if (knownParticleChain.length && t < knownParticleChain[knownParticleChain.length - 1].t + 5) {
+    const spline = splinePoly.get();
+    if (spline) {
+      const predicted = spline.map(v => v(knownParticleChain.length));
+      if ((predicted[0] - x) ** 2 + (predicted[1] - y) ** 2 + (predicted[2] - z) ** 2 < 9) {
+        knownParticleChain.push(obj);
+        isKnown = true;
+        updateGuesses();
       }
     }
   }
@@ -411,7 +432,7 @@ const spawnPartReg = reg('packetReceived', pack => {
       (v[0] - x) ** 2 +
       (v[1] - y) ** 2 +
       (v[2] - z) ** 2
-      < 25
+      < 4
     )) possibleStartingParticles.push(obj);
     else unclaimedParticles.push(obj);
 
@@ -427,7 +448,7 @@ const spadeUseReg = reg('packetSent', pack => {
 
   if (id === 'ANCESTRAL_SPADE' || id === 'ARCHAIC_SPADE' || id === 'DEIFIC_SPADE') spadeUsePositions.push([
     getLastReportedX(),
-    getLastReportedY(),
+    getLastReportedY() + (getServerSneakState() ? 1.54 : 1.62),
     getLastReportedZ()
   ]);
 }).setFilteredClass(net.minecraft.network.play.client.C08PacketPlayerBlockPlacement).setEnabled(settings._dianaGuessFromParticles);
