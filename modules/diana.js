@@ -447,11 +447,14 @@ const spadeUseReg = reg('packetSent', pack => {
   if (!stack) return;
   const id = getSbId(stack);
 
-  if (id === 'ANCESTRAL_SPADE' || id === 'ARCHAIC_SPADE' || id === 'DEIFIC_SPADE') spadeUsePositions.push([
-    getLastReportedX(),
-    getLastReportedY() + (getServerSneakState() ? 1.54 : 1.62),
-    getLastReportedZ()
-  ]);
+  if (id === 'ANCESTRAL_SPADE' || id === 'ARCHAIC_SPADE' || id === 'DEIFIC_SPADE') {
+    spadeUsePositions.push([
+      getLastReportedX(),
+      getLastReportedY() + (getServerSneakState() ? 1.54 : 1.62),
+      getLastReportedZ()
+    ]);
+    if (spadeUsePositions.length > 10) spadeUsePositions.shift();
+  }
 }).setFilteredClass(net.minecraft.network.play.client.C08PacketPlayerBlockPlacement).setEnabled(settings._dianaGuessFromParticles);
 
 const renderGuessReg = reg('renderWorld', () => {
