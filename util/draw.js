@@ -244,7 +244,7 @@ export function drawPolygon(color, vertexes) {
  * @param {number} a [0, 1]
  * @returns {number} rgba
  */
-function applyTint(c, a) {
+export function applyTint(c, a) {
   // (((( moment, i have 0 trust in bitwise associativity
   return 0 |
     ((((c >> 24) & 0xFF) * a) << 24) |
@@ -381,6 +381,115 @@ export function drawRoundRect(color, x, y, w, h, r = 5, lw = 2) {
   GlStateManager2.enableCull();
   GlStateManager2.disableBlend();
   GL11.glLineWidth(1);
+}
+
+/**
+ * t0 <= t1 <= t2 <= t3
+ * t0 <= t <= t3
+ * @param {number} x
+ * @param {number} y
+ * @param {number} w
+ * @param {number} h
+ * @param {number} t
+ * @param {number} t0
+ * @param {number} t1
+ * @param {number} t2
+ * @param {number} t3
+ * @param {number} cb
+ * @param {number} cf
+ * @param {number} ct
+ */
+export function drawTimerBar(x, y, w, h, t, t0, t1, t2, t3, cb, cf, ct) {
+  t1 = Math.max(t0, t1);
+  t2 = Math.min(t3, t2);
+  t = Math.max(t0, Math.min(t3, t));
+  const rh = h * 0.8;
+  const ts = h * 0.5;
+  const th = ts * Math.sqrt(3) / 2;
+  const ty = h - th;
+
+  GlStateManager2.pushMatrix();
+  GlStateManager2.translate(x, y, 0);
+
+  GlStateManager2.disableTexture2D();
+  GlStateManager2.disableDepth();
+  GlStateManager2.enableBlend();
+  GlStateManager2.tryBlendFuncSeparate(770, 771, 1, 771);
+  GlStateManager2.disableCull();
+  GlStateManager2.color(1, 1, 1, 1);
+
+  worldRen.func_181668_a(4, DefaultVertexFormats.field_181706_f);
+
+  const ncb = normColor(cb);
+  const ncf = normColor(cf);
+  const nct = normColor(ct);
+  const tr = t3 - t0;
+  const rtw = w / tr;
+  const tx1 = (t1 - t0) / tr * rtw;
+  const tx2 = (t2 - t0) / tr * rtw;
+
+  if (t1 !== t0) {
+    worldRen.func_181662_b(0, 0, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(0, rh, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(tx1, 0, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(0, rh, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(tx1, rh, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(tx1, 0, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+  }
+
+  if (t2 !== t1) {
+    worldRen.func_181662_b(tx1, 0, 0).func_181666_a(ncf[0], ncf[1], ncf[2], ncf[3]).func_181675_d();
+    worldRen.func_181662_b(tx1, rh, 0).func_181666_a(ncf[0], ncf[1], ncf[2], ncf[3]).func_181675_d();
+    worldRen.func_181662_b(tx2, 0, 0).func_181666_a(ncf[0], ncf[1], ncf[2], ncf[3]).func_181675_d();
+    worldRen.func_181662_b(tx1, rh, 0).func_181666_a(ncf[0], ncf[1], ncf[2], ncf[3]).func_181675_d();
+    worldRen.func_181662_b(tx2, rh, 0).func_181666_a(ncf[0], ncf[1], ncf[2], ncf[3]).func_181675_d();
+    worldRen.func_181662_b(tx2, 0, 0).func_181666_a(ncf[0], ncf[1], ncf[2], ncf[3]).func_181675_d();
+  }
+
+  if (t3 !== t2) {
+    worldRen.func_181662_b(tx2, 0, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(tx2, rh, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(w, 0, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(tx2, rh, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(w, rh, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+    worldRen.func_181662_b(w, 0, 0).func_181666_a(ncb[0], ncb[1], ncb[2], ncb[3]).func_181675_d();
+  }
+
+  const tx = (t - t0) * rtw;
+  worldRen.func_181662_b(tx, ty, 2).func_181666_a(nct[0], nct[1], nct[2], nct[3]).func_181675_d();
+  worldRen.func_181662_b(tx - ts / 2, h, 2).func_181666_a(nct[0], nct[1], nct[2], nct[3]).func_181675_d();
+  worldRen.func_181662_b(tx + ts / 2, h, 2).func_181666_a(nct[0], nct[1], nct[2], nct[3]).func_181675_d();
+
+  tess.func_78381_a();
+
+  GlStateManager2.color(0, 0, 0, 1);
+  worldRen.func_181668_a(1, DefaultVertexFormats.field_181705_e);
+
+  worldRen.func_181662_b(0, 0, 1).func_181675_d();
+  worldRen.func_181662_b(w, 0, 1).func_181675_d();
+  worldRen.func_181662_b(0, rh, 1).func_181675_d();
+  worldRen.func_181662_b(w, rh, 1).func_181675_d();
+  worldRen.func_181662_b(0, 0, 1).func_181675_d();
+  worldRen.func_181662_b(0, rh, 1).func_181675_d();
+  worldRen.func_181662_b(w, 0, 1).func_181675_d();
+  worldRen.func_181662_b(w, rh, 1).func_181675_d();
+
+  worldRen.func_181662_b(tx, ty, 3).func_181675_d();
+  worldRen.func_181662_b(tx - ts / 2, h, 3).func_181675_d();
+  worldRen.func_181662_b(tx, ty, 3).func_181675_d();
+  worldRen.func_181662_b(tx + ts / 2, h, 3).func_181675_d();
+  worldRen.func_181662_b(tx - ts / 2, h, 3).func_181675_d();
+  worldRen.func_181662_b(tx + ts / 2, h, 3).func_181675_d();
+
+  tess.func_78381_a();
+
+  GlStateManager2.color(1, 1, 1, 1);
+  GlStateManager2.enableTexture2D();
+  GlStateManager2.enableDepth();
+  GlStateManager2.enableCull();
+  GlStateManager2.disableBlend();
+
+  GlStateManager2.popMatrix();
 }
 
 /**

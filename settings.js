@@ -123,9 +123,17 @@ const builder = new Builder('ChickTils', 'settings.json')
 
   .addToggle('dungeonAutoArchitect', 'DungeonAutoGFSArchitect', false, { desc: 'auto gfs on puzzle fail, and a friendly reminder', shouldShow: p => addDependency(p.enabledungeon) })
 
-  .addOption('dungeonNecronDragTimer', 'DungeonNecronDragTimer', 'None', { desc: 'timer when necron does some dragging\n(timer will automatically pop up when instamidding!)', options: ['OnScreen', 'InstaMid', 'Both', 'None'], shouldShow: p => addDependency(p.enabledungeon), isNewSection: true })
-  .addAction('moveNecronDragTimer', 'MoveNecronDragTimer', null, { shouldShow: p => addDependency(p.dungeonNecronDragTimer) })
-  .addInteger('dungeonNecronDragDuration', 'DungeonNecronDragDuration', 120, { desc: 'in ticks, 120 = move/leap, 163 = immunity', min: 0, shouldShow: p => addDependency(p.dungeonNecronDragTimer) })
+  .addToggle('dungeonNecronDrag', 'DungeonNecronDrag', true, { desc: 'necron drag stuff', shouldShow: p => addDependency(p.enabledungeon), isNewSection: true })
+  .addOption('dungeonNecronDragTimer', 'DungeonNecronDragTimer', 'None', { desc: 'timer when necron does some dragging\n(timer will automatically pop up when instamidding!)', options: ['OnScreen', 'InstaMid', 'Both', 'None'], shouldShow: p => addDependency(p.dungeonNecronDrag) })
+  .addAction('moveNecronDragTimer', 'MoveNecronDragTimer', { shouldShow: p => new StateProp(p.dungeonNecronDragTimer).notequals('None').and(p.dungeonNecronDragTimer.shouldShow) })
+  .addToggle('dungeonNecronDragPrefire', 'DungeonNecronDragPrefire', false, { desc: 'helper to prefire lb', shouldShow: p => addDependency(p.dungeonNecronDrag) })
+  .addAction('moveNecronDragPrefire', 'MoveNecronDragPrefire', { shouldShow: p => addDependency(p.dungeonNecronDragPrefire) })
+  .addText('dungeonNecronDragPrefireClasses', 'DungeonNecronDragPrefireClasses', 'thb', { desc: 'for which classes should the helper activate on', shouldShow: p => addDependency(p.dungeonNecronDragPrefire) })
+  .addColor('dungeonNecronDragPrefireBackgroundColor', 'DungeonNecronDragPrefireBackgroundColor', 0xFFFFFFFF, { shouldShow: p => addDependency(p.dungeonNecronDragPrefire) })
+  .addColor('dungeonNecronDragPrefireForegroundColor', 'DungeonNecronDragPrefireForegroundColor', 0x00FF00FF, { shouldShow: p => addDependency(p.dungeonNecronDragPrefire) })
+  .addColor('dungeonNecronDragPrefireArrowColor', 'DungeonNecronDragPrefireArrowColor', 0xFF0000FF, { shouldShow: p => addDependency(p.dungeonNecronDragPrefire) })
+  .addNumber('dungeonNecronDragPrefireInactiveTint', 'DungeonNecronDragPrefireInactiveTint', 0.5, { min: 0, max: 1, shouldShow: p => addDependency(p.dungeonNecronDragPrefire) })
+  .addColor('dungeonNecronDragPrefireAimColor', 'DungeonNecronDragPrefireAimColor', 0x0000FFFF, { shouldShow: p => addDependency(p.dungeonNecronDragPrefire) })
 
   .addOption('dungeonDev4Helper', 'DungeonClearViewDev4', 'Both', { desc: 'clearer vision while doing 4th dev', options: ['None', 'Titles', 'Particles', 'Both'], shouldShow: p => addDependency(p.enabledungeon), isNewSection: true })
 

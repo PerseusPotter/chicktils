@@ -11,6 +11,9 @@ export function setIsMain() {
  * @typedef {{ x: number, y: number, s: number }} Location
  */
 /**
+ * @typedef {{ x: number, y: number, s: number, w: number, h: number }} SizedLocation
+ */
+/**
  * @typedef {Location & { a: number, b: boolean, c: number }} TextLocation
  */
 /**
@@ -52,6 +55,7 @@ export function setIsMain() {
  *  dragonHelperStackRunTimer: TextLocation;
  *  packetLoggerLoc: TextLocation;
  *  golemTilsSpawnLoc: TextLocation;
+ *  dungeonNecronDragPrefireLoc: SizedLocation;
  * }}
  */
 const data = new PogObject('chicktils', { firstLoad: true, clipboardData: {} }, 'data.json');
@@ -66,6 +70,14 @@ function resetLocation(key, mute) {
 function verifyLocation(value) {
   return Boolean(value) && ['x', 'y', 's'].every(v => typeof value[v] === 'number');
 }
+function resetSizedLocation(key, mute) {
+  data[key].w = 100;
+  data[key].h = 100;
+  reset(key, mute);
+}
+function verifySizedLocation(value) {
+  return typeof value.w === 'number' && typeof value.h === 'number';
+}
 function resetTextLocation(key, mute) {
   data[key].a = 0;
   data[key].b = true;
@@ -79,6 +91,13 @@ function verifyTextLocation(value) {
 [
   'dungeonMapLoc'
 ].forEach(v => verifyLocation(data[v]) || resetLocation(v));
+
+[
+  'dungeonNecronDragPrefireLoc'
+].forEach(v => {
+  if (!verifyLocation(data[v])) resetLocation(v);
+  if (!verifySizedLocation(data[v])) resetSizedLocation(v);
+});
 
 [
   'quiverLoc',

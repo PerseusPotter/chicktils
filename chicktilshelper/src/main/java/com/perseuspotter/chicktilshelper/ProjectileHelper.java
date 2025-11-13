@@ -1,5 +1,9 @@
 package com.perseuspotter.chicktilshelper;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class ProjectileHelper {
     public static class ProjectileData {
         public final double theta;
@@ -13,7 +17,7 @@ public class ProjectileHelper {
         }
 
         public String toString() {
-            return String.format("%.1f %.1f %.2f", theta * 180 / Math.PI, phi * 180 / Math.PI, ticks / 20);
+            return String.format("%.1ft %.1fy %.2fs", theta * 180 / Math.PI, phi * 180 / Math.PI, ticks / 20);
         }
     }
 
@@ -122,6 +126,22 @@ public class ProjectileHelper {
         return new ProjectileData(theta, (searchL + searchR) / 2.0, t);
     }
 
+    public static class AimData {
+        public final int index;
+        public final int tick;
+        public final ProjectileData data;
+
+        public AimData(int index, int tick, ProjectileData data) {
+            this.index = index;
+            this.tick = tick;
+            this.data = data;
+        }
+
+        public String toString() {
+            return String.format("%d %d (%s)", index, tick, data == null ? "null" : data.toString());
+        }
+    }
+
     // 3 <= ticks <= 20
     public static double bowVelocity(int ticks) {
         double t = ticks * 0.05;
@@ -131,10 +151,11 @@ public class ProjectileHelper {
 
     // finds (max ? largest : smallest) number such that max height doesn't exceed maxDy
     // while still being able to reach the target
-    public static int bestPrefireTick(
+    public static AimData calcTickRange(
         double dx, double dy, double dz,
         double maxDy,
         double eps,
+        boolean high,
         boolean max
     ) {
         final double a = -0.05;
@@ -144,7 +165,7 @@ public class ProjectileHelper {
 
         int l = 3;
         int r = 20;
-        int val = -1;
+        AimData aim = null;
 
         while (l <= r) {
             int m = (l + r) >> 1;
@@ -153,7 +174,7 @@ public class ProjectileHelper {
                 dx, dy, dz,
                 eps,
                 a, v, d,
-                true
+                high
             );
 
             if (Double.isNaN(data.theta)) {
@@ -168,11 +189,190 @@ public class ProjectileHelper {
                 yPeak = (vy + a_id) * (Math.pow(d, t + 1) - 1) / (d - 1) - (t + 1) * a_id;
             }
 
-            if (yPeak < maxDy) val = m;
+            if (yPeak < maxDy) aim = new AimData(-1, m, data);
             if (yPeak < maxDy && max) l = m + 1;
             else r = m - 1;
         }
 
-        return val;
+        return aim;
+    }
+
+    // calculates best place/angle to intersect a moving target
+    public static AimData aimFixedVelocity(
+        double ticksRemaining,
+        List<List<Double>> path, int prevTarget,
+        double eps,
+        double a, double v, double d,
+        boolean high,
+        double x, double y, double z
+    ) {
+        Set<Integer> visited = new HashSet<>();
+        visited.add(prevTarget);
+
+        ProjectileData bestData = solve(
+            path.get(prevTarget).get(0) - x,
+            path.get(prevTarget).get(1) - y,
+            path.get(prevTarget).get(2) - z,
+            eps,
+            a, v, d,
+            high
+        );
+        int bestI = prevTarget;
+        double bestCost = Double.isNaN(bestData.ticks) ?
+            Double.POSITIVE_INFINITY :
+            Math.abs(bestData.ticks - ticksRemaining - prevTarget);
+
+        int dir = 1;
+        boolean swapped = false;
+        int pos = prevTarget;
+
+        while (true) {
+            int next = pos + dir;
+            boolean shouldSwap = false;
+
+            if (0 <= next && next < path.size() && visited.add(next)) {
+                ProjectileData data = solve(
+                    path.get(next).get(0) - x,
+                    path.get(next).get(1) - y,
+                    path.get(next).get(2) - z,
+                    eps,
+                    a, v, d,
+                    high
+                );
+                double cost = Double.isNaN(data.ticks) ?
+                    Double.POSITIVE_INFINITY :
+                    Math.abs(data.ticks - ticksRemaining - next);
+
+                // assumes this relationship is roughly monotonic
+                if (cost < bestCost) {
+                    bestI = next;
+                    bestData = data;
+                    pos = next;
+                } else shouldSwap = true;
+            } else shouldSwap = true;
+
+            if (shouldSwap) {
+                if (swapped) break;
+                swapped = true;
+                dir = -dir;
+            }
+        }
+
+        return new AimData(bestI, (int) Math.ceil(bestCost), bestData);
+    }
+
+    // calculates earliest time to release bow to hit a stationary target
+    public static AimData aimFixedPosition(
+        double dx, double dy, double dz,
+        int pullTicks, int targetTime,
+        double eps,
+        boolean high
+    ) {
+        final double a = -0.05;
+        final double d = 0.99;
+
+        int l = Math.max(0, 3 - pullTicks);
+        int r = Math.max(0, 19 - pullTicks);
+        ProjectileData best = solve(
+            dx, dy, dz,
+            eps,
+            a, 3.0, d,
+            high
+        );
+        if (Double.isNaN(best.theta)) return null;
+        int tu20 = Math.max(0, 20 - pullTicks);
+        int time = tu20 + (int) Math.ceil(best.ticks);
+        if (time < targetTime) return new AimData(-1, targetTime - (int) Math.ceil(best.ticks), best);
+
+        while (l <= r) {
+            int m = (l + r) >> 1;
+            double v = bowVelocity(m + pullTicks);
+            ProjectileData data = solve(
+                dx, dy, dz,
+                eps,
+                a, v, d,
+                high
+            );
+
+            if (Double.isNaN(data.theta)) {
+                l = m + 1;
+                continue;
+            }
+
+            int hitTime = (int) Math.ceil(data.ticks) + m;
+            if (hitTime >= targetTime) {
+                time = m;
+                best = data;
+            }
+            if (hitTime >= targetTime == high) r = m - 1;
+            else l = m + 1;
+        }
+
+        return new AimData(-1, time, best);
+    }
+
+    // calculates earliest time to release bow to hit a moving target
+    public static AimData aim(
+        double ticksRemaining,
+        List<List<Double>> path, int prevTarget,
+        double eps,
+        boolean high,
+        double x, double y, double z,
+        int pullTicks, int targetTime
+    ) {
+        Set<Integer> visited = new HashSet<>();
+        visited.add(prevTarget);
+
+        AimData bestData = aimFixedPosition(
+            path.get(prevTarget).get(0) - x,
+            path.get(prevTarget).get(1) - y,
+            path.get(prevTarget).get(2) - z,
+            pullTicks, targetTime,
+            eps,
+            high
+        );
+        int bestI = prevTarget;
+        double bestCost = bestData == null ?
+            Double.POSITIVE_INFINITY :
+            Math.abs(bestData.tick - ticksRemaining - prevTarget);
+
+        int dir = 1;
+        boolean swapped = false;
+        int pos = prevTarget;
+
+        while (true) {
+            int next = pos + dir;
+            boolean shouldSwap = false;
+
+            if (0 <= next && next < path.size() && visited.add(next)) {
+                AimData data = aimFixedPosition(
+                    path.get(next).get(0) - x,
+                    path.get(next).get(1) - y,
+                    path.get(next).get(2) - z,
+                    pullTicks, targetTime,
+                    eps,
+                    high
+                );
+                double cost = bestData == null ?
+                    Double.POSITIVE_INFINITY :
+                    Math.abs(bestData.tick - ticksRemaining - prevTarget);
+
+                // assumes this relationship is roughly monotonic
+                if (cost < bestCost) {
+                    bestI = next;
+                    bestData = data;
+                    pos = next;
+                } else shouldSwap = true;
+            } else shouldSwap = true;
+
+            if (shouldSwap) {
+                if (swapped) break;
+                swapped = true;
+                dir = -dir;
+            }
+        }
+
+        if (bestData == null) return null;
+        return new AimData(bestI, bestData.tick, bestData.data);
     }
 }

@@ -11,7 +11,7 @@ import { getPlayers, registerTrackPlayers, stateFloor, stateIsInBoss, statePlaye
 import { fastDistance, lerp } from '../../util/math';
 import { getRenderX, getRenderY, getRenderZ, renderBillboardString, renderBoxFilled, renderTracer } from '../../../Apelles/index';
 import { getMedianPing } from '../../util/ping';
-import aim from '../../util/aimproj';
+import { toArrayList } from '../../util/polyfill';
 
 const stateDragonHelper = new StateProp(stateFloor).equals('M7').and(stateIsInBoss).and(settings._dungeonDragonHelper);
 const stateInP5 = new StateVar(false);
@@ -20,10 +20,7 @@ const stateDragonHelperHits = stateDragonHelperActive.and(new StateProp(settings
 const stateDragon = new StateVar();
 const stateDragonHelperTrackHits = stateDragonHelperHits.and(stateDragon);
 const stateDragonHelperAim = stateDragonHelperActive.and(settings._dungeonDragonHelperShowStackAimer).and(new StateProp(statePlayerClass).customBinary(settings._dungeonDragonHelperShowStackClass, (c, s) => c === 'Unknown' || s.includes(c[0].toLowerCase())));
-/** @type {StateVar<[number, number, number]?>} */
-const stateAimPosition = new AtomicStateVar();
-const stateDragonHelperAimRender = stateDragonHelperAim.and(stateAimPosition);
-const stateDragonHelperStackRunTimer = stateDragonHelperAimRender.and(settings._dungeonDragonHelperStackTimeUntilRun);
+const stateDragonHelperStackRunTimer = stateDragonHelperAim.and(settings._dungeonDragonHelperStackTimeUntilRun);
 
 /** @typedef {'r' | 'o' | 'b' | 'p' | 'g'} DragonType */
 /** @type {Map<DragonType, number>} */
@@ -32,14 +29,14 @@ const spawnAlert = createAlert('', 5, settings.dungeonDragonHelperAlertSound);
 let dragonCount = 0;
 const timerHud = createTextGui(() => data.dragonHelperTimer, () => ['&24269']);
 const runTimerHud = createTextGui(() => data.dragonHelperStackRunTimer, () => ['&24269']);
-/** @typedef {{ color: string, pos: number[], name: string, path: number[][] }} DragonInfo */
+/** @typedef {{ color: string, pos: number[], name: string, path: any }} DragonInfo */
 /** @type {{ [k in DragonType]: DragonInfo }} */
 const DRAGONS = {
   r: {
     color: '&c',
     pos: [32, 20, 59],
     name: 'POWER',
-    path: [
+    path: toArrayList([
       [864, 448, 1888],
       [879, 467, 1880],
       [886, 476, 1876],
@@ -70,13 +67,13 @@ const DRAGONS = {
       [1107, 599, 1689],
       [1116, 599, 1679],
       [1125, 600, 1670],
-    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32]).map(v => toArrayList(v)))
   },
   o: {
     color: '&6',
     pos: [80, 20, 56],
     name: 'FLAME',
-    path: [
+    path: toArrayList([
       [2720, 448, 1792],
       [2710, 455, 1796],
       [2700, 462, 1800],
@@ -109,13 +106,13 @@ const DRAGONS = {
       [2540, 597, 1979],
       [2543, 598, 1991],
       [2547, 598, 2003],
-    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32]).map(v => toArrayList(v)))
   },
   b: {
     color: '&b',
     pos: [79, 20, 94],
     name: 'ICE',
-    path: [
+    path: toArrayList([
       [2688, 448, 3008],
       [2683, 452, 3019],
       [2678, 457, 3030],
@@ -148,13 +145,13 @@ const DRAGONS = {
       [2554, 581, 3327],
       [2550, 585, 3338],
       [2545, 590, 3349],
-    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32]).map(v => toArrayList(v)))
   },
   p: {
     color: '&d',
     pos: [56, 20, 128],
     name: 'SOUL',
-    path: [
+    path: toArrayList([
       [1792, 448, 4000],
       [1792, 448, 4000],
       [1792, 448, 4000],
@@ -185,13 +182,13 @@ const DRAGONS = {
       [1792, 448, 4000],
       [1792, 448, 4000],
       [1792, 448, 4000],
-    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32]).map(v => toArrayList(v)))
   },
   g: {
     color: '&a',
     pos: [32, 20, 94],
     name: 'APEX',
-    path: [
+    path: toArrayList([
       [864, 448, 3008],
       [858, 456, 2984],
       [855, 461, 2972],
@@ -222,7 +219,7 @@ const DRAGONS = {
       [788, 573, 2680],
       [785, 578, 2669],
       [783, 582, 2657],
-    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32])
+    ].map(v => [v[0] / 32, v[1] / 32 + 4, v[2] / 32]).map(v => toArrayList(v)))
   }
 };
 /** @type {DragonType} */
@@ -230,8 +227,8 @@ let currDragPrio;
 let isHighDragon = false;
 let hitTimes = [0];
 let prevBestTarget = 0;
-/** @type {[number, number]?} */
-let prevAimPosition;
+/** @type {[number, number, number]?} */
+let aimPosition;
 
 const tickReg = reg('tick', () => stateInP5.set(Player.getY() < 30)).setEnabled(stateDragonHelper);
 /**
@@ -253,8 +250,7 @@ function addDragon(c) {
   if (spawnedDrags.has(c)) return;
   spawnedDrags.set(c, 100);
   prevBestTarget = 0;
-  stateAimPosition.set(null);
-  prevAimPosition = null;
+  aimPosition = null;
 
   let dragD = DRAGONS[c];
   currDragPrio = c;
@@ -384,31 +380,24 @@ const serverTickHitReg = reg('serverTick', () => {
   hitTimes.push(0);
 }).setEnabled(stateDragonHelperTrackHits);
 const bowHitReg = reg('soundPlay', () => hitTimes[hitTimes.length - 1]++).setCriteria('random.successful_hit').setEnabled(stateDragonHelperTrackHits);
-const serverTickAimReg = reg('serverTick', () => {
+const ProjectileHelper = Java.type('com.perseuspotter.chicktilshelper.ProjectileHelper');
+const worldRenAimReg = reg('renderWorld', () => {
   let ticksRemaining = spawnedDrags.get(currDragPrio);
   // only the position of the first 30 ticks are defined
-  if (ticksRemaining === undefined || ticksRemaining < -30) return stateAimPosition.set(null);
+  if (ticksRemaining === undefined || ticksRemaining < -30) return aimPosition = null;
   ticksRemaining -= getMedianPing() / 50;
 
-  const { bestTarget, bestT, bestP, bestD } = aim(
+  const best = ProjectileHelper.aimFixedVelocity(
     ticksRemaining,
     DRAGONS[currDragPrio].path,
     prevBestTarget,
     0.001, -0.05, 3, 0.99, false,
-    0, isHighDragon ? 8 : 0, 0
+    getRenderX(), getRenderY() + (isHighDragon ? 8 : 0), getRenderZ()
   );
-
-  prevBestTarget = bestTarget;
-  prevAimPosition = stateAimPosition.get() ?? [bestT, bestP];
-  stateAimPosition.set([bestT, bestP, bestD]);
-}).setEnabled(stateDragonHelperAim);
-const worldRenAimReg = reg('renderWorld', () => {
-  const o = stateAimPosition.get();
-  if (!o) return;
-  const [ntheta, nphi] = o;
-  const [otheta, ophi] = prevAimPosition;
-  const theta = lerp(otheta, ntheta, getPartialServerTick());
-  const phi = lerp(ophi, nphi, getPartialServerTick());
+  const theta = best.data.theta;
+  const phi = best.data.phi;
+  prevBestTarget = best.index;
+  aimPosition = [theta, phi, best.data.ticks];
   renderBoxFilled(
     settings.dungeonDragonHelperStackAimerColor,
     getRenderX() + 50 * Math.sin(phi) * Math.cos(theta),
@@ -424,14 +413,10 @@ const worldRenAimReg = reg('renderWorld', () => {
     getRenderZ() + 50 * Math.sin(phi) * Math.sin(theta),
     { lw: 5, smooth: true }
   );
-}).setEnabled(stateDragonHelperAimRender);
+}).setEnabled(stateDragonHelperAim);
 const renderOvAimReg = reg('renderOverlay', () => {
-  const o = stateAimPosition.get();
-  if (!o) return;
-  const [ntheta, nphi] = o;
-  const [otheta, ophi] = prevAimPosition;
-  const theta = lerp(otheta, ntheta, getPartialServerTick());
-  const phi = lerp(ophi, nphi, getPartialServerTick());
+  if (!aimPosition) return;
+  const [theta, phi] = aimPosition;
   drawArrow3DPos(
     settings.dungeonDragonHelper,
     50 * Math.sin(phi) * Math.cos(theta),
@@ -439,13 +424,12 @@ const renderOvAimReg = reg('renderOverlay', () => {
     50 * Math.sin(phi) * Math.sin(theta),
     false
   );
-}).setEnabled(stateDragonHelperAimRender.and(settings.dungeonDragonHelperStackAimerPointTo).and(new StateProp(settings._preferUseTracer).not()));
+}).setEnabled(stateDragonHelperAim.and(settings.dungeonDragonHelperStackAimerPointTo).and(new StateProp(settings._preferUseTracer).not()));
 const renderOvRunReg = reg('renderOverlay', () => {
   const ticks = spawnedDrags.values().next().value;
   if (ticks === undefined) return;
-  const o = stateAimPosition.get();
-  if (!o) return;
-  const arrowTime = o[2];
+  if (!aimPosition) return;
+  const arrowTime = aimPosition[2];
   const remaining = (ticks - getPartialServerTick() - arrowTime) * 50 - getMedianPing();
   runTimerHud.setLine(remaining < 0 ? '&bNOW' : colorForNumber(remaining, 5000) + remaining.toFixed(0));
   runTimerHud.render();
@@ -488,7 +472,6 @@ export function start() {
   dragonSpawnReg.register();
   serverTickHitReg.register();
   bowHitReg.register();
-  serverTickAimReg.register();
   worldRenAimReg.register();
   renderOvAimReg.register();
   renderOvRunReg.register();
@@ -502,7 +485,6 @@ export function reset() {
   dragonSpawnReg.unregister();
   serverTickHitReg.unregister();
   bowHitReg.unregister();
-  serverTickAimReg.unregister();
   worldRenAimReg.unregister();
   renderOvAimReg.unregister();
   renderOvRunReg.unregister();

@@ -9,7 +9,7 @@ import { run } from '../../util/threading';
 
 let map;
 let mapId;
-const mapDisplay = createGui(() => data.dungeonMapLoc, 100, 100, renderMap, renderMapEdit);
+const mapDisplay = createGui(() => data.dungeonMapLoc, () => 100, () => 100, renderMap, renderMapEdit);
 let lastRoom = '';
 
 const stateMap = new StateProp(settings._dungeonMap).and(new StateProp(settings._dungeonMapHideBoss).not().or(new StateProp(stateIsInBoss).not()));
