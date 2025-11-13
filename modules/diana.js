@@ -3,7 +3,7 @@ import data from '../data';
 import reg, { customRegs, execCmd } from '../util/registerer';
 import { log } from '../util/log';
 import createAlert from '../util/alert';
-import { binomial, compareFloat, convergeHalfInterval, dist, lineRectColl, ndRegression, rescale, toPolynomial } from '../util/math';
+import { binomial, compareFloat, convergeHalfInterval, dist, lineRectColl, ndRegression, FIRST_100_PRIMES, rescale, toPolynomial } from '../util/math';
 import { getBlockPos, getItemId, getLastReportedX, getLastReportedY, getLastReportedZ, getLowerContainer, getServerSneakState } from '../util/mc';
 import { unrun } from '../util/threading';
 import { renderBeacon, renderBillboardString, renderBoxOutline, renderLine } from '../../Apelles/index';
@@ -11,6 +11,7 @@ import { Deque, shuffle, toArrayList } from '../util/polyfill';
 import { getSbId } from '../util/skyblock';
 import createPointer from '../util/pointto';
 import { AtomicStateVar } from '../util/state';
+import { getMedianPing } from '../util/ping';
 
 const warps = [
   {
@@ -179,7 +180,7 @@ const renderTargetsReg = reg('renderWorld', () => {
 });
 
 /** @typedef {{ t: number, x: number, y: number, z: number }} ParticlePos */
-/** @type {Deque<[number, number, number]>} */
+/** @type {Deque<[number, number, number, number]>} */
 const spadeUsePositions = new Deque();
 /** @type {Deque<ParticlePos>} */
 const unclaimedParticles = new Deque();
@@ -190,7 +191,7 @@ let knownParticleChain = [];
 const MIN_CHAIN_LENGTH = 6;
 // const MIN_CHAIN_PEARSON_SQ = 0.9;
 const MAX_CHAIN_DISTANCE_ERROR = 0.5;
-const RANSAC_ITERS_PER = 10;
+const RANSAC_ITERS_PER = 30;
 
 /** @type {[number, number, number]?} */
 let guessPos = null;
@@ -314,32 +315,40 @@ function updateGuesses() {
 
 function ransac() {
   const t = getTickCount();
-  possibleStartingParticles.removeIf(v => v.t < t - 80);
-  unclaimedParticles.removeIf(v => v.t < t - 80);
+  possibleStartingParticles.removeIf(v => v.t < t - 20);
+  unclaimedParticles.removeIf(v => v.t < t - 20);
   const L1 = possibleStartingParticles.length;
   const L2 = unclaimedParticles.length;
   const L = L1 + L2;
   if (L < MIN_CHAIN_LENGTH) return;
   if (L1 === 0) return;
 
-  const comb = binomial(L, MIN_CHAIN_LENGTH);
+  const comb = binomial(L, MIN_CHAIN_LENGTH) - (L - L2 < MIN_CHAIN_LENGTH ? 0 : binomial(L - L2, MIN_CHAIN_LENGTH));
   const rand = new Array(L - 1).fill(0).map((_, i) => i);
   let start = 0;
+  const poss = possibleStartingParticles.toArray();
+  const uncl = unclaimedParticles.toArray();
+  const getActualId = i => i + (i > start);
   const getPart = i => {
-    if (i >= start) i++;
-    return i < L1 ? possibleStartingParticles.at(i) : unclaimedParticles.at(i - L1);
+    if (i > start) i++;
+    return i < L1 ? poss[i] : uncl[i - L1];
   };
 
   // let bestR = 0;
   let bestD = Number.POSITIVE_INFINITY;
   let best = [];
+  const tried = new Set();
 
   for (let i = Math.min(comb, RANSAC_ITERS_PER) - 1; i >= 0; i--) {
     shuffle(rand, MIN_CHAIN_LENGTH - 1);
     let possInliersI = rand.slice(0, MIN_CHAIN_LENGTH - 1);
     start = ~~(Math.random() * L1);
+    let hash = FIRST_100_PRIMES[start];
+    possInliersI.forEach(v => hash *= FIRST_100_PRIMES[getActualId(v)]);
+    if (tried.has(hash)) continue;
+    tried.add(hash);
     let possInliers = possInliersI.map(v => getPart(v));
-    possInliers.unshift(possibleStartingParticles.at(start));
+    possInliers.unshift(poss[start]);
     let minT = possInliers.reduce((a, v) => a < v.t ? a : v.t, Number.POSITIVE_INFINITY);
     let poly = [
       toPolynomial(ndRegression(3, possInliers.map(v => [v.t - minT, v.x]))),
@@ -420,7 +429,7 @@ const spawnPartReg = reg('packetReceived', pack => {
     const spline = splinePoly.get();
     if (spline) {
       const predicted = spline.map(v => v(knownParticleChain.length));
-      if ((predicted[0] - x) ** 2 + (predicted[1] - y) ** 2 + (predicted[2] - z) ** 2 < 9) {
+      if ((predicted[0] - x) + (predicted[1] - y) + (predicted[2] - z) < MAX_CHAIN_DISTANCE_ERROR) {
         knownParticleChain.push(obj);
         isKnown = true;
         updateGuesses();
@@ -430,6 +439,7 @@ const spawnPartReg = reg('packetReceived', pack => {
 
   if (!isKnown) {
     if (spadeUsePositions.some(v =>
+      t < v[3] &&
       (v[0] - x) ** 2 +
       (v[1] - y) ** 2 +
       (v[2] - z) ** 2
@@ -451,7 +461,8 @@ const spadeUseReg = reg('packetSent', pack => {
     spadeUsePositions.push([
       getLastReportedX(),
       getLastReportedY() + (getServerSneakState() ? 1.54 : 1.62),
-      getLastReportedZ()
+      getLastReportedZ(),
+      getTickCount() + getMedianPing() / 50 + 10
     ]);
     if (spadeUsePositions.length > 10) spadeUsePositions.shift();
   }
