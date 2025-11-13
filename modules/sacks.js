@@ -132,8 +132,8 @@ function updateItemGui(items, time) {
     if (itemBlacklist.length) {
       if (itemBlacklist.some(v => matchesName(id, n, v))) return;
     }
-    return [id, d];
-  }).filter(v => v && ITEMS_ID_MAP.has(v[0]));
+    return [ITEMS_ID_MAP.has(id) ? ITEMS_ID_MAP.get(id).nameF : n, d];
+  }).filter(v => v);
   if (settings.sacksDisplayTrackAggregateQuantities) itemsA.forEach(e => {
     const [k, v] = e;
     const o = getOrPut(itemAggregate, k, () => new Difference());
@@ -155,7 +155,7 @@ function updateItemGui(items, time) {
       iter.value()[1] = t;
     };
     itemsA.forEach(([k, d]) => {
-      const n = ITEMS_ID_MAP.get(k).nameF;
+      const n = k;
       if (settings.sacksDisplayCombineQuantities) updateLine(k, formatQuantity(d.sum(), n));
       else {
         if (d.pos > 0) updateLine('+' + k, formatQuantity(d.pos, n));
