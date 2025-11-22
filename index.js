@@ -12,7 +12,7 @@ import { createIntegerProp, Property } from './settingsLib';
 import getTextEditor from './util/textfromeditor';
 settings.setMainInstance();
 setIsMainD();
-const VERSION = '0.13.1';
+const VERSION = '0.14.0';
 
 let sev;
 function tryUpdate(delay = 0) {
