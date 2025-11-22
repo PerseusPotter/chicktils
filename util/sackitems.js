@@ -1736,6 +1736,11 @@ export const ITEMS = [
     "id": "MYCEL"
   },
   {
+    "nameF": "§9Mythos Fragment",
+    "nameUF": "Mythos Fragment",
+    "id": "MYTHOS_FRAGMENT"
+  },
+  {
     "nameF": "Nether Wart",
     "nameUF": "Nether Wart",
     "id": "NETHER_STALK"
