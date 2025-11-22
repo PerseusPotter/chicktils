@@ -905,6 +905,79 @@
           "desc": "neuitempreload"
         }
       ]
+    },
+    {
+      "version": "0.14.0",
+      "changes": [
+        {
+          "type": "fix",
+          "desc": "lots of npe's"
+        },
+        {
+          "type": "misc",
+          "desc": "add start/stop for packet logger"
+        },
+        {
+          "type": "change",
+          "desc": "migrate hide/mute party messages to a single setting"
+        },
+        {
+          "type": "feat",
+          "desc": "custom ether sound"
+        },
+        {
+          "type": "feat",
+          "desc": "hud for packet logger"
+        },
+        {
+          "type": "feat",
+          "desc": "hide nearby particles"
+        },
+        {
+          "type": "misc",
+          "desc": "add option to open setting in new window"
+        },
+        {
+          "type": "misc",
+          "desc": "update item list"
+        },
+        {
+          "type": "feat",
+          "desc": "golemtils"
+        },
+        {
+          "type": "misc",
+          "desc": "consume mouse events in unfocus"
+        },
+        {
+          "type": "misc",
+          "desc": "aim for dojo mastery"
+        },
+        {
+          "type": "misc",
+          "desc": "update enchantment list"
+        },
+        {
+          "type": "feat",
+          "desc": "singleplayer stuff"
+        },
+        {
+          "type": "misc",
+          "desc": "tweak deployable particles"
+        },
+        {
+          "type": "change",
+          "desc": "diana stuff"
+        },
+        {
+          "type": "misc",
+          "desc": "necromancy performance improvement"
+        },
+        {
+          "type": "misc",
+          "desc": "sack log still shows unknown items"
+        }
+      ]
     }
   ]
 }
