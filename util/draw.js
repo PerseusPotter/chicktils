@@ -440,7 +440,6 @@ export class JavaColorWrapper {
   }
 }
 
-const BufferUtils = Java.type('org.lwjgl.BufferUtils');
 register('gameUnload', () => BufferedImageWrapper.ALL_IMAGES.forEach(v => v._internalDestroy()));
 export class BufferedImageWrapper {
   static ALL_IMAGES = new Set();
@@ -501,7 +500,7 @@ export class BufferedImageWrapper {
 
         GL15.glBindBuffer(GL21.GL_PIXEL_UNPACK_BUFFER, 0);
       } else {
-        const buf = BufferUtils.createByteBuffer(pixels.length);
+        const buf = org.lwjgl.BufferUtils.createByteBuffer(pixels.length);
         buf.put(pixels);
         buf.flip();
 
